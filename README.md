@@ -1,434 +1,181 @@
 <div align="center">
 
-# 🌟 修仙文字游戏 🌟
+# ☢️ Wasteland Survivor ☢️
 
-> 一款基于 React + TypeScript 的沉浸式修仙文字冒险游戏
+> A Post-Apocalyptic Text Adventure Roguelike inspired by Fallout
 
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite)](https://vitejs.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-_踏上修仙之路，体验从炼气到飞升的完整修仙历程_
+_War. War never changes. But your story in the wasteland is just beginning._
 
 </div>
 
 ---
 
-## 📖 项目简介
+## 📖 Introduction
 
-这是一款以修仙为主题的**文字冒险游戏**，玩家将扮演一名修仙者，通过历练、修炼、突破境界等方式不断提升实力。游戏采用**AI生成事件**机制，每次历练都会遇到不同的随机事件，让每一次游戏体验都充满未知与惊喜。
+**Wasteland Survivor** is an immersive text-based roguelike adventure set in a radiated post-apocalyptic world. Players take on the role of a Vault Dweller or Wasteland Drifter, struggling to survive, scavenge, and thrive amidst the ruins of the old world.
 
-### ✨ 核心特色
+Powered by **Generative AI**, every journey is unique. Encounter different mutated creatures, discover lost vaults, and navigate complex faction politics in your quest for power and survival.
 
-- 🎲 **AI驱动事件系统** - 使用 AI 生成丰富的随机事件，每次历练都是全新体验
-- 🏔️ **完整修仙体系** - 从炼气期到飞升，7大境界，每个境界10层，共70层修炼之路
-- 🎒 **丰富装备系统** - 武器、护甲、首饰、戒指、法宝等多样装备，支持强化升级
-- 🐉 **灵宠养成** - 收集、培养、进化灵宠，与灵宠并肩作战
-- 🏛️ **宗门系统** - 加入宗门，完成宗门任务，兑换稀有物品
-- 🎫 **抽奖系统** - 使用抽奖券抽取稀有奖励，包含保底机制
-- 🏆 **成就系统** - 完成各种成就，获得称号和奖励
-- 💎 **本命法宝** - 祭炼本命法宝，获得50%属性加成
-- ⚔️ **危险历练** - 遭遇邪修、魔修、陷阱等危险事件，体验真实的修仙世界
+### ✨ Key Features
+
+- 📟 **Pip-Boy Interface** - Authentic retro-futuristic monochrome green UI with CRT scanline effects.
+- ☢️ **S.P.E.C.I.A.L. Progression** - Advance from a lowly Scavenger to a Legend of the Wastes (7 Tiers of evolution).
+- 🎒 **Scavenging System** - Loot Caps, Stimpaks, RadAway, and legendary pre-war tech like the "Fat Man" or "Power Armor".
+- 🐕 **Companions** - Recruit loyal allies like Dogmeat, Deathclaws, or Super Mutants to fight by your side.
+- ⚔️ **Faction Warfare** - Join the **Brotherhood of Steel**, **The Institute**, **The Railroad**, or the **Enclave**.
+- 🎰 **Lucky Find** - Try your luck with the Wasteland Lottery for rare blueprints and resources.
+- 🏆 **Perks & Achievements** - Unlock unique perks that drastically change your playstyle.
+- 💀 **Classic Fallout Vibe** - Encounter Raiders, Ghouls, Deathclaws, and navigate radiation zones.
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 环境要求
+### Prerequisites
 
 - **Node.js** >= 18.0.0
-- **pnpm** >= 8.0.0 (推荐) 或 **npm** >= 9.0.0
+- **pnpm** >= 8.0.0 (Recommended) or **npm** >= 9.0.0
 
-### 安装步骤
+### Installation
 
-#### 1️⃣ 克隆项目
+#### 1️⃣ Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd react-xiuxian-game
+git clone https://github.com/keithhegit/fallout_roguelite.git
+cd fallout_roguelite
 ```
 
-#### 2️⃣ 安装依赖
+#### 2️⃣ Install Dependencies
 
-使用 **pnpm** (推荐):
+Using **pnpm** (recommended):
 
 ```bash
 pnpm install
 ```
 
-或使用 **npm**:
+#### 3️⃣ Setup Environment Variables
 
-```bash
-npm install
-```
+**⚠️ IMPORTANT**: This project requires an AI API Key to generate dynamic events.
 
-#### 3️⃣ 配置环境变量
-
-**⚠️ 重要**: 项目不再包含硬编码的 API Key，必须配置环境变量。
-
-**默认配置**: 项目默认使用 **GLM (智谱AI)** 作为 AI 接口，只需配置 API Key 即可。
-
-在项目根目录创建 `.env.local` 文件：
+Create a `.env.local` file in the root directory:
 
 ```bash
 # .env.local
-# 最小配置：只需设置 API Key，其他使用默认值（GLM/智谱AI）
+# Main configuration for AI Provider (Default: GLM/ZhipuAI)
 VITE_AI_KEY=your-api-key-here
 
-# 可选配置（如果不设置，将使用默认值）
-# VITE_AI_PROVIDER=glm  # 默认: glm (智谱AI)
-# VITE_AI_MODEL=glm-4.5v  # 默认模型
+# Optional: Switch providers (supported: glm, siliconflow, openai)
+# VITE_AI_PROVIDER=glm
 ```
 
-> 💡 **获取 API Key**:
->
-> - 访问 [智谱AI开放平台](https://open.bigmodel.cn) 注册账号并创建 API Key
-> - 如需使用其他 AI 服务（SiliconFlow、OpenAI 等），设置 `VITE_AI_PROVIDER` 环境变量
-> - 支持的提供商：`glm`（默认）、`siliconflow`、`openai`、`custom`
->
-> ⚠️ **安全提示**: `.env.local` 文件已添加到 `.gitignore`，不会被提交到 Git。不要将 API Key 提交到代码仓库。
-
-#### 4️⃣ 启动开发服务器
+#### 4️⃣ Start Development Server
 
 ```bash
-# 使用 pnpm
 pnpm dev
-
-# 或使用 npm
-npm run dev
 ```
 
-#### 5️⃣ 访问游戏
+#### 5️⃣ Enter the Wasteland
 
-打开浏览器访问: `http://localhost:3000`
-
----
-
-## 🎮 游戏玩法
-
-### 基础操作
-
-#### 🎯 开始游戏
-
-1. 输入你的修仙者名称
-2. 系统会随机分配一个天赋（不可更改）
-3. 开始你的修仙之旅！
-
-#### 📊 属性系统
-
-游戏包含以下核心属性：
-
-- **气血 (HP)** - 生命值，战斗和危险事件会消耗气血
-- **修为 (EXP)** - 经验值，通过历练和修炼获得
-- **攻击** - 影响战斗伤害
-- **防御** - 减少受到的伤害
-- **神识** - 影响法术威力和感知能力
-- **体魄** - 影响生命上限和物理抗性
-- **速度** - 影响行动顺序和闪避
-- **幸运** - 影响随机事件的好坏
-- **灵石** - 游戏货币，用于购买物品和服务
-
-#### 🗺️ 主要玩法
-
-##### 1. 历练冒险
-
-点击 **"历练"** 按钮，触发随机事件：
-
-- ✅ **正面事件**: 获得修为、灵石、物品、灵宠等
-- ⚠️ **危险事件**: 遭遇邪修、魔修、陷阱，可能受伤、属性降低或被抢灵石
-- 🌌 **特殊事件**: 触发随机秘境，进入后获得更高风险和收益
-- 🎫 **抽奖券**: 偶尔获得抽奖券，可在抽奖系统使用
-- 🏆 **传承**: 极小概率获得传承，可直接突破1-4个境界
-
-##### 2. 修炼突破
-
-- **打坐修炼**: 消耗时间获得修为，安全稳定
-- **突破境界**: 当修为达到上限时，可以尝试突破
-  - 突破成功：提升境界或境界层数，大幅提升属性
-  - 突破失败：修为和气血会减少，需要重新积累
-
-##### 3. 装备系统
-
-- **装备类型**:
-  - 🗡️ **武器** - 提升攻击力
-  - 🛡️ **护甲** - 提升防御力（头部、肩部、胸甲、手套、裤腿、鞋子）
-  - 💍 **戒指** - 最多装备4个，提供各种属性加成
-  - 📿 **首饰** - 最多装备2个，提供特殊效果
-  - 🏺 **法宝** - 最多装备2个，提供强大属性加成
-
-- **装备强化**: 使用强化材料和灵石强化装备，提升属性
-- **本命法宝**:
-  - 选择一件法宝进行祭炼，消耗气血上限
-  - 本命法宝获得 **50% 属性加成**
-  - 同时只能拥有一件本命法宝
-
-##### 4. 灵宠系统
-
-- **获得灵宠**: 通过历练、抽奖等方式获得灵兽蛋，孵化后获得灵宠
-- **培养灵宠**:
-  - 喂食灵宠提升经验
-  - 灵宠升级后属性提升
-  - 达到一定等级可进化，获得更强属性
-- **灵宠技能**: 每个灵宠都有独特的技能，提供战斗或辅助效果
-
-##### 5. 宗门系统
-
-- **加入宗门**: 达到一定境界后可加入宗门
-- **宗门任务**:
-  - 完成宗门任务获得贡献
-  - 部分任务有每日限制（如巡逻任务每日10次）
-- **宗门商店**: 使用贡献兑换稀有物品
-- **宗门等级**: 提升宗门等级，解锁更多权限
-
-##### 6. 炼丹系统
-
-- **收集材料**: 通过历练获得炼丹材料
-- **炼制丹药**: 消耗材料和灵石炼制丹药
-- **丹药效果**: 使用丹药获得临时或永久属性提升
-
-##### 7. 抽奖系统
-
-- **获得抽奖券**: 通过历练、成就等方式获得
-- **抽奖奖励**:
-  - 灵石、修为、物品、灵宠、抽奖券等
-  - 每10次抽奖必得稀有以上奖励（保底机制）
-
-##### 8. 成就系统
-
-- **完成成就**: 达成各种条件解锁成就
-- **成就奖励**: 获得称号、属性加成等奖励
-- **称号系统**: 装备称号获得额外属性加成
+Open your browser and visit: `http://localhost:5173`
 
 ---
 
-## 🎯 游戏目标
+## 🎮 Gameplay Guide
 
-### 短期目标
+### S.P.E.C.I.A.L. Stats
 
-- 提升境界，突破到更高层次
-- 收集强力装备，提升战斗力
-- 培养灵宠，获得战斗伙伴
-- 完成成就，解锁称号
+Your survival depends on these core attributes:
 
-### 长期目标
+- **HP (Health)** - Your lifeline. Reaching 0 means death.
+- **EXP (Experience)** - Gained from combat and exploration.
+- **Attack** - Raw damage output.
+- **Defense** - Damage mitigation.
+- **Perception** - Affects ability to find loot and detect traps.
+- **Endurance** - Resistance to radiation and physical trauma.
+- **Agility** - Combat speed and evasion.
+- **Luck** - Influences critical hits and random event outcomes.
+- **Caps** - The currency of the wasteland.
 
-- 🏆 **飞升成仙** - 达到最高境界"飞升"
-- 💎 **收集仙品** - 获得所有仙品装备和灵宠
-- 🏛️ **宗门领袖** - 在宗门中达到最高等级
-- 🎖️ **成就大师** - 完成所有成就
+### 🗺️ Activities
 
----
+#### 1. Exploration
+Click **"Explore"** to venture into the unknown. You might find:
+- ✅ **Resources**: Caps, scrap metal, food, and water.
+- ⚠️ **Encounters**: Raiders, Super Mutants, or Feral Ghouls.
+- ☢️ **Hazards**: Radiation storms, minefields, and toxic sludge.
+- 🏛️ **Locations**: Abandoned Vaults, Red Rocket Stations, and Ruined Cities.
 
-## 🛠️ 技术栈
+#### 2. Breakthroughs
+When your EXP gains fill your bar, you must **Break Through** to the next stage of evolution (e.g., from Scavenger to Wastelander). Failure results in a "Qi Deviation" (Radiation Sickness) which harms your stats.
 
-- **前端框架**: React 19.2.0
-- **开发语言**: TypeScript 5.8.2
-- **构建工具**: Vite 6.2.0
-- **UI图标**: Lucide React
-- **AI服务**: 支持多种 AI 服务（默认 GLM/智谱AI，支持 SiliconFlow、OpenAI 等）
-- **状态管理**: React Hooks (useState, useEffect)
-- **数据持久化**: localStorage
+#### 3. Equipment
+- **Weapons**: Pipe Pistols, Laser Rifles, Chainsaws, etc.
+- **Armor**: Leather Armor, Combat Armor, Power Armor pieces.
+- **Implants**: Cybernetic enhancements (replace the classic "Soul Bound" artifacts).
 
----
-
-## 📁 项目结构
-
-```
-react-xiuxian-game/
-├── components/          # React 组件
-│   ├── AchievementModal.tsx    # 成就弹窗
-│   ├── AlchemyModal.tsx        # 炼丹弹窗
-│   ├── CharacterModal.tsx      # 角色信息弹窗
-│   ├── InventoryModal.tsx      # 背包弹窗
-│   ├── LotteryModal.tsx         # 抽奖弹窗
-│   ├── PetModal.tsx            # 灵宠弹窗
-│   ├── SectModal.tsx           # 宗门弹窗
-│   ├── ShopModal.tsx           # 商店弹窗
-│   └── ...
-├── services/            # 服务层
-│   └── aiService.ts     # AI 事件生成服务
-├── types.ts            # TypeScript 类型定义
-├── constants.ts        # 游戏常量配置
-├── App.tsx             # 主应用组件
-├── index.tsx           # 应用入口
-└── vite.config.ts      # Vite 配置
-```
+#### 4. Factions
+Join a faction to gain access to exclusive shops and missions:
+- **Minutemen**: Focus on settlements and defense.
+- **Brotherhood of Steel**: Tech-hoarders with heavy firepower.
+- **The Institute**: Advanced science and synth creation.
+- **The Enclave**: Seeking to purge the wasteland.
 
 ---
 
-## 🎨 游戏截图
+## 🛠️ Tech Stack
 
-> 📸 截图功能待添加，欢迎贡献！
-
----
-
-## 🔧 开发命令
-
-```bash
-# 开发模式
-pnpm dev          # 或 npm run dev
-
-# 构建生产版本
-pnpm build        # 或 npm run build
-
-# 预览生产构建
-pnpm preview      # 或 npm run preview
-```
+- **Frontend**: React 19, TypeScript 5.8
+- **Build Tool**: Vite 6.2
+- **Styling**: Tailwind CSS 4 (Custom Pip-Boy Theme)
+- **Icons**: Lucide React
+- **AI Integration**: Google GenAI / ZhipuAI / OpenAI
+- **State**: React Hooks & Local Storage
+- **Deployment**: Cloudflare Pages / Vercel
 
 ---
 
-## 🐳 Docker 部署
+## ☁️ Deployment
 
-支持使用 Docker 进行部署，提供一键构建和打包命令。详细说明请查看 [Docker 部署指南](DOCKER.md)。
+### Cloudflare Pages (Recommended)
 
-### 快速开始
-
-```bash
-# 1. 配置环境变量（创建 .env 文件）
-VITE_AI_KEY=your_api_key
-VITE_AI_PROVIDER=glm
-
-# 2. 一键构建并启动（推荐）
-npm run docker:build-and-up
-
-# 3. 访问应用
-# http://localhost:3000
-```
-
-### 一键构建和打包
-
-```bash
-# 使用 npm 脚本（推荐）
-npm run docker:build-and-pack
-
-# 或使用 make 命令
-make build-and-pack
-
-# 这会生成 react-xiuxian-game.tar.gz 文件
-```
-
-### 常用命令
-
-```bash
-# 查看日志
-npm run docker:logs
-# 或
-make logs
-
-# 停止容器
-npm run docker:down
-# 或
-make down
-
-# 构建镜像（无缓存）
-npm run docker:build-no-cache
-```
-
-### 查看所有可用命令
-
-```bash
-# 查看 npm 脚本
-npm run
-
-# 查看 Makefile 命令
-make help
-```
-
-### 镜像导入
-
-```bash
-# 在目标机器导入打包的镜像
-docker load < react-xiuxian-game.tar.gz
-```
-
-更多详细信息和高级配置，请查看：
-- [Docker 部署指南](DOCKER.md) - 完整的部署文档
-- [Docker 使用示例](DOCKER_EXAMPLES.md) - 常见场景和最佳实践
+1.  Push your code to a GitHub repository.
+2.  Log in to [Cloudflare Dashboard](https://dash.cloudflare.com/).
+3.  Go to **Workers & Pages** > **Create Application** > **Pages** > **Connect to Git**.
+4.  Select your repository.
+5.  **Build Settings**:
+    - Framework: **Vite**
+    - Build Command: `pnpm build`
+    - Output Directory: `dist`
+6.  **Environment Variables**:
+    - Add `VITE_AI_KEY` and `VITE_AI_PROVIDER`.
 
 ---
 
-## 📋 版本信息
+## 🤝 Contributing
 
-当前版本: **v0.1.0** (2024-12-05)
+We welcome fellow wastelanders to contribute!
 
-查看完整的版本更新历史和功能计划，请访问 [CHANGELOG.md](CHANGELOG.md)。
-
-### 最近更新
-
-- 🐛 修复回合制战斗技能列表滚动问题
-- 🔧 完善 Docker 环境变量配置和部署文档
-- 🎨 设置界面添加版本号显示
-- 📚 新增版本更新日志
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/NewPerk`)
+3.  Commit your changes (`git commit -m 'Add Mysterious Stranger perk'`)
+4.  Push to the branch (`git push origin feature/NewPerk`)
+5.  Open a Pull Request
 
 ---
 
-## 📝 游戏规则说明
+## 📄 License
 
-### 境界系统
-
-游戏共有 **7大境界**，每个境界有 **10层**：
-
-1. **炼气期** - 修仙入门
-2. **筑基期** - 奠定基础
-3. **金丹期** - 凝聚金丹
-4. **元婴期** - 元婴出窍
-5. **化神期** - 神识化神
-6. **炼虚期** - 虚空炼体
-7. **飞升** - 成仙之路
-
-### 物品稀有度
-
-- **普通** (白色) - 基础物品
-- **稀有** (蓝色) - 属性提升 1.5倍
-- **传说** (紫色) - 属性提升 2.5倍
-- **仙品** (金色) - 属性提升 5.0倍
-
-### 装备限制
-
-- **装备不可叠加** - 每件装备只能拥有1个
-- **装备属性预览** - 装备描述中显示属性加成
-- **本命法宝** - 只能同时拥有1个本命法宝
-
-### 危险事件
-
-历练时可能遭遇：
-
-- ⚠️ **邪修/魔修** - 可能受伤、被抢灵石、修为降低
-- 🪤 **陷阱** - 可能受伤、属性降低
-- 🌌 **随机秘境** - 高风险高收益的特殊区域
-
----
-
-## 🤝 贡献指南
-
-欢迎贡献代码、报告问题或提出建议！
-
-1. Fork 本项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
-
----
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
-
----
-
-## 🙏 致谢
-
-- 感谢所有修仙小说作者提供的灵感
-- 感谢 GLM (智谱AI)、SiliconFlow、OpenAI 等 AI 服务提供商
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
 <div align="center">
 
-**🌟 愿你在修仙路上，早日飞升成仙！🌟**
-
-Made with ❤️ by [JeasonLoop]
+**🌟 Ad Victoriam, Survivor! 🌟**
 
 </div>
