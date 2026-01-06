@@ -1,6 +1,7 @@
 import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
 
 // 从环境变量获取代理目标，默认使用 SiliconFlow
@@ -52,6 +53,31 @@ export default defineConfig({
       hotKeys: ['altKey'],
     }),
     react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      manifest: {
+        name: 'Wasteland Ascendant',
+        short_name: 'Wasteland',
+        description: 'Post-apocalyptic survival RPG',
+        theme_color: '#0a0f0a',
+        background_color: '#0a0f0a',
+        display: 'standalone',
+        orientation: 'portrait',
+        icons: [
+          {
+            src: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    }),
   ],
   resolve: {
     alias: {
