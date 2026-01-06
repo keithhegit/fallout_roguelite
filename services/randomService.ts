@@ -5,7 +5,7 @@ import { getItemFromConstants } from '../utils/itemConstantsUtils';
 const randomId = () => Math.random().toString(36).slice(2, 9);
 
 // 秘境名称池 - 按风险等级分类
-const REALM_NAMES_BY_RISK: Record<'低' | '中' | '高' | '极度危险', string[]> = {
+const REALM_NAMES_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[]> = {
   'Low': [
     'Mystic Realm', 'Star Ruins', 'Beast Mountain Outer', 'Herb Garden', 'Breeze Valley',
     'Jade Pool', 'Purple Bamboo Forest', 'Bird Habitat', 'Spirit Stone Mine', 'Ancient Cave',
@@ -894,30 +894,33 @@ export const generateRandomSects = (
     const gradeWeights = [0.4, 0.3, 0.2, 0.1]; // C最多，S最少
     let grade: SectGrade = 'C';
     const rand = Math.random();
-    else grade = '天';
+    if (rand < gradeWeights[0]) grade = 'C';
+    else if (rand < gradeWeights[0] + gradeWeights[1]) grade = 'B';
+    else if (rand < gradeWeights[0] + gradeWeights[1] + gradeWeights[2]) grade = 'A';
+    else grade = 'S';
 
-// 根据等级设置退出代价
-const exitCostMultiplier = {
-  '黄': 1,
-  '玄': 2,
-  '地': 5,
-  '天': 10,
-}[grade];
+    // 根据等级设置退出代价
+    const exitCostMultiplier = {
+      'C': 1,
+      'B': 2,
+      'A': 5,
+      'S': 10,
+    }[grade];
 
-sects.push({
-  id: `sect-${randomId()}`,
-  name,
-  description,
-  reqRealm,
-  grade,
-  exitCost: {
-    spiritStones: Math.floor(300 * exitCostMultiplier),
-    items: [{ name: '聚灵草', quantity: Math.floor(5 * exitCostMultiplier) }],
-  },
-});
+    sects.push({
+      id: `sect-${randomId()}`,
+      name,
+      description,
+      reqRealm,
+      grade,
+      exitCost: {
+        spiritStones: Math.floor(300 * exitCostMultiplier),
+        items: [{ name: '聚灵草', quantity: Math.floor(5 * exitCostMultiplier) }],
+      },
+    });
   }
 
-return sects;
+  return sects;
 };
 
 // 根据玩家境界计算任务收益倍数
