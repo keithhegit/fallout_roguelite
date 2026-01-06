@@ -1,0 +1,166 @@
+{
+    "types": {
+        "weapon": "Weapon",
+        "armor": "Armor",
+        "accessory": "Accessory",
+        "artifact": "Relic",
+        "pill": "Chem",
+        "material": "Material",
+        "herb": "Plant",
+        "scroll": "Schematic",
+        "consumable": "Consumable",
+        "pet_egg": "Mutation Egg",
+        "pet_food": "Companion Food",
+        "recipe": "Blueprint",
+        "key": "Key",
+        "quest": "Quest Item"
+    },
+    "slots": {
+        "weapon": "Weapon",
+        "head": "Head",
+        "shoulder": "Shoulder",
+        "chest": "Chest",
+        "gloves": "Gloves",
+        "legs": "Legs",
+        "boots": "Boots",
+        "ring": "Ring",
+        "necklace": "Necklace",
+        "artifact": "Relic"
+    },
+    "materials": {
+        "spiritGrass": {
+            "name": "Mutant Herb",
+            "description": "A common herb that grows in irradiated areas."
+        },
+        "healingGrass": {
+            "name": "Healing Moss",
+            "description": "A herb that can stop bleeding."
+        },
+        "refiningShard": {
+            "name": "Refining Shard",
+            "description": "Material used to upgrade equipment."
+        },
+        "ironOre": {
+            "name": "Scrap Metal",
+            "description": "Basic metal scraps for crafting."
+        },
+        "beastCore": {
+            "name": "Mutant Core",
+            "description": "Core essence from a mutant beast."
+        },
+        "starFragment": {
+            "name": "Star Shard",
+            "description": "A fragment that fell from the sky."
+        },
+        "dragonScale": {
+            "name": "Deathclaw Scale",
+            "description": "Scale from a fearsome predator."
+        },
+        "ginseng1000": {
+            "name": "Ancient Ginseng",
+            "description": "A thousand-year-old ginseng root."
+        },
+        "phoenixFeather": {
+            "name": "Radbird Feather",
+            "description": "Feather from a radiation phoenix."
+        }
+    },
+    "chems": {
+        "focusChem": {
+            "name": "Focus Chem",
+            "description": "Temporarily boosts training efficiency."
+        },
+        "cleansePill": {
+            "name": "Rad-Away",
+            "description": "Cleanses radiation. Slightly increases max health."
+        },
+        "foundationPill": {
+            "name": "Stabilizer",
+            "description": "Increases evolution success rate."
+        },
+        "goldenPill": {
+            "name": "Mutagen",
+            "description": "Powerful mutation catalyst."
+        },
+        "nascentPill": {
+            "name": "Evolution Serum",
+            "description": "Accelerates major mutations."
+        },
+        "immortalPill": {
+            "name": "Immortality Serum",
+            "description": "The ultimate life-extending serum."
+        }
+    },
+    "weapons": {
+        "woodenSword": {
+            "name": "Wooden Club",
+            "description": "A basic wooden weapon."
+        },
+        "ironSword": {
+            "name": "Pipe Wrench",
+            "description": "A sturdy metal weapon."
+        },
+        "steelBlade": {
+            "name": "Combat Knife",
+            "description": "A well-made fighting blade."
+        },
+        "spiritSword": {
+            "name": "Plasma Cutter",
+            "description": "A pre-war industrial tool repurposed as a weapon."
+        },
+        "dragonSlayer": {
+            "name": "Deathclaw Slayer",
+            "description": "A massive blade made for killing beasts."
+        }
+    },
+    "armor": {
+        "ragCloth": {
+            "name": "Rags",
+            "description": "Basic cloth offering minimal protection."
+        },
+        "leatherArmor": {
+            "name": "Leather Armor",
+            "description": "Basic leather protection."
+        },
+        "metalArmor": {
+            "name": "Metal Armor",
+            "description": "Sturdy metal plating."
+        },
+        "combatArmor": {
+            "name": "Combat Armor",
+            "description": "Military-grade protection."
+        },
+        "powerArmor": {
+            "name": "Power Armor",
+            "description": "Pre-war powered exoskeleton."
+        }
+    },
+    "relics": {
+        "basicArtifact": {
+            "name": "Tech Gadget",
+            "description": "A simple pre-war device."
+        },
+        "advancedArtifact": {
+            "name": "Advanced Module",
+            "description": "An advanced technological component."
+        },
+        "ancientArtifact": {
+            "name": "Ancient Relic",
+            "description": "A mysterious artifact from before the war."
+        },
+        "immortalArtifact": {
+            "name": "Legendary Tech",
+            "description": "Technology that should not exist."
+        }
+    },
+    "messages": {
+        "obtained": "Obtained: {item} x{quantity}",
+        "used": "Used: {item}",
+        "equipped": "Equipped: {item}",
+        "unequipped": "Unequipped: {item}",
+        "upgraded": "{item} upgraded to +{level}!",
+        "upgradeFailed": "Upgrade failed!",
+        "notEnoughMaterials": "Not enough materials!",
+        "inventoryFull": "Inventory is full!"
+    }
+}

@@ -1,0 +1,106 @@
+import React from 'react';
+import {
+  PlayerStats,
+  Recipe,
+  Item,
+  ItemType,
+  EquipmentSlot,
+  ItemRarity,
+} from '../../types';
+import { uid } from '../../utils/gameUtils';
+import { addItemToInventory } from '../../utils/inventoryUtils';
+import { showSuccess } from '../../utils/toastUtils';
+
+interface UseAlchemyHandlersProps {
+  player: PlayerStats;
+  setPlayer: React.Dispatch<React.SetStateAction<PlayerStats>>;
+  addLog: (message: string, type?: string) => void;
+  triggerVisual?: (type: 'damage' | 'heal' | 'slash' | 'alchemy', value?: string, color?: string) => void;
+}
+
+/**
+ * 炼丹处理函数
+ * 包含炼丹
+ * @param player 玩家数据
+ * @param setPlayer 设置玩家数据
+ * @param addLog 添加日志
+ * @returns handleCraft 炼丹
+ */
+export function useAlchemyHandlers({
+  setPlayer,
+  addLog,
+  triggerVisual,
+}: UseAlchemyHandlersProps) {
+  const handleCraft = async (recipe: Recipe) => {
+    // 先触发炼丹开始动画
+    if (triggerVisual) {
+      triggerVisual('alchemy', '🔥 炼丹中...', 'text-mystic-gold');
+    }
+
+    // 延迟一下，让用户看到炼丹过程
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    setPlayer((prev) => {
+      if (prev.spiritStones < recipe.cost) return prev;
+
+      const newInventory = [...prev.inventory];
+      for (const req of recipe.ingredients) {
+        const itemIdx = newInventory.findIndex((i) => i.name === req.name);
+        if (itemIdx === -1 || newInventory[itemIdx].quantity < req.qty)
+          return prev;
+
+        newInventory[itemIdx] = {
+          ...newInventory[itemIdx],
+          quantity: newInventory[itemIdx].quantity - req.qty,
+        };
+      }
+
+      const cleanedInventory = addItemToInventory(newInventory.filter((i) => i.quantity > 0), {
+        name: recipe.result.name || 'Unknown',
+        type: recipe.result.type || ItemType.Pill,
+        description: recipe.result.description || '',
+        rarity: (recipe.result.rarity as ItemRarity) || '普通',
+        effect: recipe.result.effect,
+        permanentEffect: recipe.result.permanentEffect,
+      });
+
+      addLog(`丹炉火起，药香四溢。你炼制出了 ${recipe.result.name}。`, 'gain');
+      // 显示全局成功提示
+      showSuccess(`炼制成功！获得 ${recipe.result.name}`);
+      // 触发炼丹成功动画（更明显的效果）
+      if (triggerVisual) {
+        // 延迟触发成功动画，让用户看到完整的炼丹过程
+        setTimeout(() => {
+          triggerVisual('alchemy', `✨ ${recipe.result.name}`, 'text-mystic-gold');
+        }, 200);
+      }
+
+      const newStats = {
+        ...(prev.statistics || {
+          killCount: 0,
+          meditateCount: 0,
+          adventureCount: 0,
+          equipCount: 0,
+          petCount: 0,
+          recipeCount: 0,
+          artCount: 0,
+          breakthroughCount: 0,
+          secretRealmCount: 0,
+          alchemyCount: 0,
+        }),
+      };
+      newStats.alchemyCount = (newStats.alchemyCount || 0) + 1;
+
+      return {
+        ...prev,
+        spiritStones: prev.spiritStones - recipe.cost,
+        inventory: cleanedInventory,
+        statistics: newStats,
+      };
+    });
+  };
+
+  return {
+    handleCraft,
+  };
+}

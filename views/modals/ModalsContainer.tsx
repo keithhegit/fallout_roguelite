@@ -1,0 +1,443 @@
+import React, { Suspense, lazy } from 'react';
+import {
+  PlayerStats,
+  Shop,
+  GameSettings,
+  Item,
+  ShopItem,
+  CultivationArt,
+  Recipe,
+} from '../../types';
+import { useUI } from '../../context/UIContext';
+
+// 使用 React.lazy 异步加载所有弹窗以优化性能
+const InventoryModal = lazy(() => import('../../components/InventoryModal'));
+const CultivationModal = lazy(() => import('../../components/CultivationModal'));
+const AlchemyModal = lazy(() => import('../../components/AlchemyModal'));
+const ArtifactUpgradeModal = lazy(() => import('../../components/ArtifactUpgradeModal'));
+const SectModal = lazy(() => import('../../components/SectModal'));
+const SecretRealmModal = lazy(() => import('../../components/SecretRealmModal'));
+const BattleModal = lazy(() => import('../../components/BattleModal'));
+const TurnBasedBattleModal = lazy(() => import('../../components/TurnBasedBattleModal'));
+const CharacterModal = lazy(() => import('../../components/CharacterModal'));
+const AchievementModal = lazy(() => import('../../components/AchievementModal'));
+const PetModal = lazy(() => import('../../components/PetModal'));
+const LotteryModal = lazy(() => import('../../components/LotteryModal'));
+const SettingsModal = lazy(() => import('../../components/SettingsModal'));
+const DailyQuestModal = lazy(() => import('../../components/DailyQuestModal'));
+const ShopModal = lazy(() => import('../../components/ShopModal'));
+const ReputationEventModal = lazy(() => import('../../components/ReputationEventModal'));
+const GrottoModal = lazy(() => import('../../components/GrottoModal'));
+const SectTreasureVaultModal = lazy(() => import('../../components/SectTreasureVaultModal'));
+
+import { BattleReplay } from '../../services/battleService';
+import { RandomSectTask } from '../../services/randomService';
+
+/**
+ * 弹窗容器组件
+ * 包含战斗、背包、功法、炼丹、法宝强化、宗门、秘境、角色、成就、灵宠、抽奖、设置、商店弹窗
+ * @param player 玩家数据
+ * @param settings 游戏设置
+ * @param modals 弹窗状态
+ * @param modalState 弹窗状态
+ * @param handlers 弹窗处理函数
+ */
+
+interface ModalsContainerProps {
+  player: PlayerStats;
+  settings: GameSettings;
+  setItemActionLog?: (log: { text: string; type: string } | null) => void;
+  autoAdventure?: boolean; // 是否在自动历练模式下
+  handlers: {
+    // Modal toggles
+    setIsInventoryOpen: (open: boolean) => void;
+    setIsGrottoOpen: (open: boolean) => void;
+    setIsCultivationOpen: (open: boolean) => void;
+    setIsAlchemyOpen: (open: boolean) => void;
+    setIsUpgradeOpen: (open: boolean) => void;
+    setIsSectOpen: (open: boolean) => void;
+    setIsRealmOpen: (open: boolean) => void;
+    setIsCharacterOpen: (open: boolean) => void;
+    setIsAchievementOpen: (open: boolean) => void;
+    setIsPetOpen: (open: boolean) => void;
+    setIsLotteryOpen: (open: boolean) => void;
+    setIsSettingsOpen: (open: boolean) => void;
+    setIsDailyQuestOpen: (open: boolean) => void;
+    setIsShopOpen: (open: boolean) => void;
+    setIsBattleModalOpen: (open: boolean) => void;
+    setItemToUpgrade: (item: Item | null) => void;
+    setCurrentShop: (shop: Shop | null) => void;
+    setBattleReplay: (replay: BattleReplay | null) => void;
+    setRevealedBattleRounds: (
+      rounds: number | ((prev: number) => number)
+    ) => void;
+    // ... rest of handlers
+    // Battle
+    handleSkipBattleLogs: () => void;
+    handleCloseBattleModal: () => void;
+    // Inventory
+    handleUseItem: (item: Item) => void;
+    handleEquipItem: (item: Item, slot: any) => void;
+    handleUnequipItem: (slot: any) => void;
+    handleOpenUpgrade: (item: Item) => void;
+    handleDiscardItem: (item: Item) => void;
+    handleBatchDiscard: (itemIds: string[]) => void;
+    handleBatchUse?: (itemIds: string[]) => void;
+    handleOrganizeInventory?: () => void;
+    handleRefineNatalArtifact: (item: Item) => void;
+    handleUnrefineNatalArtifact: () => void;
+    handleRefineAdvancedItem?: (item: Item) => void;
+    handleUpgradeItem: (item: Item, costStones: number, costMats: number, upgradeStones?: number) => Promise<'success' | 'failure' | 'error'>;
+    // Cultivation
+    handleLearnArt: (art: CultivationArt) => void;
+    handleActivateArt: (art: CultivationArt) => void;
+    // Alchemy
+    handleCraft: (recipe: Recipe) => Promise<void>;
+    // Sect
+    handleJoinSect: (sectId: string, sectName?: string, sectInfo?: { exitCost?: { spiritStones?: number; items?: { name: string; quantity: number }[] } }) => void;
+    handleLeaveSect: () => void;
+    handleSafeLeaveSect: () => void;
+    handleSectTask: (task: RandomSectTask, encounterResult?: any) => void;
+    handleSectPromote: () => void;
+    handleSectBuy: (
+      itemTemplate: Partial<Item>,
+      cost: number,
+      quantity?: number
+    ) => void;
+    handleChallengeLeader: () => void;
+    // Realm
+    handleEnterRealm: (realm: any) => void;
+    // Character
+    handleSelectTalent: (talentId: string) => void;
+    handleSelectTitle: (titleId: string) => void;
+    handleAllocateAttribute: (
+      type: 'attack' | 'defense' | 'hp' | 'spirit' | 'physique' | 'speed'
+    ) => void;
+    handleAllocateAllAttributes?: (
+      type: 'attack' | 'defense' | 'hp' | 'spirit' | 'physique' | 'speed'
+    ) => void;
+    handleUseInheritance: () => void;
+    setPlayer: React.Dispatch<React.SetStateAction<PlayerStats>>;
+    addLog: (message: string, type?: string) => void;
+    handleUpdateViewedAchievements: () => void;
+    // Pet
+    handleActivatePet: (petId: string) => void;
+    handleDeactivatePet?: () => void;
+    handleFeedPet: (
+      petId: string,
+      feedType: 'hp' | 'item' | 'exp',
+      itemId?: string
+    ) => void;
+    handleBatchFeedItems?: (petId: string, itemIds: string[]) => void;
+    handleBatchFeedHp?: (petId: string) => void;
+    handleEvolvePet: (petId: string) => void;
+    handleReleasePet?: (petId: string) => void;
+    handleBatchReleasePets?: (petIds: string[]) => void;
+    // Lottery
+    handleDraw: (count: number) => void;
+    // Settings
+    handleUpdateSettings: (newSettings: Partial<GameSettings>) => void;
+    handleRestartGame?: () => void;
+    onOpenSaveManager?: () => void;
+    // Daily Quest
+    handleClaimQuestReward?: (questId: string) => void;
+    // Grotto
+    handleUpgradeGrotto: (level: number) => void;
+    handlePlantHerb: (herbId: string) => void;
+    handleHarvestHerb: (index: number) => void;
+    handleHarvestAll: () => void;
+    handleEnhanceSpiritArray: (enhancementId: string) => void;
+    handleToggleAutoHarvest: () => void;
+    handleSpeedupHerb: (index: number) => void;
+    // Shop
+    handleBuyItem: (shopItem: any, quantity?: number) => void;
+    handleSellItem: (item: Item, quantity?: number) => void;
+    handleRefreshShop?: (newItems: ShopItem[]) => void;
+    // Turn-based battle
+    setIsTurnBasedBattleOpen?: (open: boolean) => void;
+    handleTurnBasedBattleClose?: (result?: {
+      victory: boolean;
+      hpLoss: number;
+      expChange: number;
+      spiritChange: number;
+      items?: Array<{
+        name: string;
+        type: string;
+        description: string;
+        rarity?: string;
+        isEquippable?: boolean;
+        equipmentSlot?: string;
+        effect?: any;
+        permanentEffect?: any;
+      }>;
+      petSkillCooldowns?: Record<string, number>; // 灵宠技能冷却状态
+    }, updatedInventory?: Item[]) => void;
+    // Reputation event
+    setIsReputationEventOpen: (open: boolean) => void;
+    handleReputationEventChoice: (choiceIndex: number) => void;
+    setIsTreasureVaultOpen: (open: boolean) => void;
+    handleTakeTreasureVaultItem: (item: Item) => void;
+    handleUpdateVault?: (vault: { items: Item[]; takenItemIds: string[] }) => void;
+  };
+}
+
+function ModalsContainer({
+  player,
+  settings,
+  setItemActionLog,
+  autoAdventure = false,
+  handlers,
+}: ModalsContainerProps) {
+  const { modals, shop, upgrade, battle, turnBasedBattle, reputationEvent } = useUI();
+  const modalState = {
+    currentShop: shop.currentShop,
+    itemToUpgrade: upgrade.itemToUpgrade,
+    battleReplay: battle.battleReplay,
+    revealedBattleRounds: battle.revealedBattleRounds,
+    turnBasedBattleParams: turnBasedBattle.params,
+    reputationEvent: reputationEvent.event,
+  };
+
+  return (
+    <Suspense fallback={null}>
+      {modals.isBattleModalOpen && (
+        <BattleModal
+          isOpen={modals.isBattleModalOpen}
+          replay={modalState.battleReplay}
+          revealedRounds={modalState.revealedBattleRounds}
+          onSkip={handlers.handleSkipBattleLogs}
+          onClose={handlers.handleCloseBattleModal}
+        />
+      )}
+
+      {(modals.isTurnBasedBattleOpen || false) && modalState.turnBasedBattleParams && (
+        <TurnBasedBattleModal
+          isOpen={modals.isTurnBasedBattleOpen || false}
+          player={player}
+          adventureType={modalState.turnBasedBattleParams.adventureType}
+          riskLevel={modalState.turnBasedBattleParams.riskLevel}
+          realmMinRealm={modalState.turnBasedBattleParams.realmMinRealm}
+          bossId={modalState.turnBasedBattleParams.bossId}
+          autoAdventure={autoAdventure}
+          onClose={(result, updatedInventory) => {
+            if (handlers.setIsTurnBasedBattleOpen) {
+              handlers.setIsTurnBasedBattleOpen(false);
+            }
+            if (handlers.handleTurnBasedBattleClose) {
+              handlers.handleTurnBasedBattleClose(result, updatedInventory);
+            }
+          }}
+        />
+      )}
+
+      {modals.isInventoryOpen && (
+        <InventoryModal
+          isOpen={modals.isInventoryOpen}
+          onClose={() => handlers.setIsInventoryOpen(false)}
+          inventory={player.inventory}
+          equippedItems={player.equippedItems}
+          natalArtifactId={player.natalArtifactId}
+          playerRealm={player.realm}
+          foundationTreasure={player.foundationTreasure}
+          heavenEarthEssence={player.heavenEarthEssence}
+          heavenEarthMarrow={player.heavenEarthMarrow}
+          longevityRules={player.longevityRules}
+          maxLongevityRules={player.maxLongevityRules}
+          onUseItem={handlers.handleUseItem}
+          onEquipItem={handlers.handleEquipItem}
+          onUnequipItem={handlers.handleUnequipItem}
+          onUpgradeItem={handlers.handleOpenUpgrade}
+          onDiscardItem={handlers.handleDiscardItem}
+          onBatchDiscard={handlers.handleBatchDiscard}
+          onBatchUse={handlers.handleBatchUse}
+          onOrganizeInventory={handlers.handleOrganizeInventory}
+          onRefineNatalArtifact={handlers.handleRefineNatalArtifact}
+          setItemActionLog={setItemActionLog}
+          onUnrefineNatalArtifact={handlers.handleUnrefineNatalArtifact}
+          onRefineAdvancedItem={handlers.handleRefineAdvancedItem}
+        />
+      )}
+
+      {modals.isCultivationOpen && (
+        <CultivationModal
+          isOpen={modals.isCultivationOpen}
+          onClose={() => handlers.setIsCultivationOpen(false)}
+          player={player}
+          onLearnArt={handlers.handleLearnArt}
+          onActivateArt={handlers.handleActivateArt}
+        />
+      )}
+
+      {modals.isAlchemyOpen && (
+        <AlchemyModal
+          isOpen={modals.isAlchemyOpen}
+          onClose={() => handlers.setIsAlchemyOpen(false)}
+          player={player}
+          onCraft={handlers.handleCraft}
+        />
+      )}
+
+      {modals.isUpgradeOpen && (
+        <ArtifactUpgradeModal
+          isOpen={modals.isUpgradeOpen}
+          onClose={() => {
+            handlers.setIsUpgradeOpen(false);
+            handlers.setItemToUpgrade(null);
+          }}
+          item={modalState.itemToUpgrade}
+          player={player}
+          onConfirm={handlers.handleUpgradeItem}
+          setItemActionLog={setItemActionLog}
+        />
+      )}
+
+      {modals.isSectOpen && (
+        <SectModal
+          isOpen={modals.isSectOpen}
+          onClose={() => handlers.setIsSectOpen(false)}
+          player={player}
+          onJoinSect={handlers.handleJoinSect}
+          onLeaveSect={handlers.handleLeaveSect}
+          onSafeLeaveSect={handlers.handleSafeLeaveSect}
+          onTask={handlers.handleSectTask}
+          onPromote={handlers.handleSectPromote}
+          onBuy={handlers.handleSectBuy}
+          onChallengeLeader={handlers.handleChallengeLeader}
+          setItemActionLog={setItemActionLog}
+        />
+      )}
+
+      {modals.isRealmOpen && (
+        <SecretRealmModal
+          isOpen={modals.isRealmOpen}
+          onClose={() => handlers.setIsRealmOpen(false)}
+          player={player}
+          onEnter={handlers.handleEnterRealm}
+        />
+      )}
+
+      {modals.isCharacterOpen && (
+        <CharacterModal
+          isOpen={modals.isCharacterOpen}
+          onClose={() => handlers.setIsCharacterOpen(false)}
+          player={player}
+          setPlayer={handlers.setPlayer}
+          onSelectTalent={handlers.handleSelectTalent}
+          onSelectTitle={handlers.handleSelectTitle}
+          onAllocateAttribute={handlers.handleAllocateAttribute}
+          onAllocateAllAttributes={handlers.handleAllocateAllAttributes}
+          onUseInheritance={handlers.handleUseInheritance}
+          addLog={handlers.addLog}
+        />
+      )}
+
+      {modals.isAchievementOpen && (
+        <AchievementModal
+          isOpen={modals.isAchievementOpen}
+          onClose={() => handlers.setIsAchievementOpen(false)}
+          player={player}
+        />
+      )}
+
+      {modals.isPetOpen && (
+        <PetModal
+          isOpen={modals.isPetOpen}
+          onClose={() => handlers.setIsPetOpen(false)}
+          player={player}
+          onActivatePet={handlers.handleActivatePet}
+          onDeactivatePet={handlers.handleDeactivatePet}
+          onFeedPet={handlers.handleFeedPet}
+          onBatchFeedItems={handlers.handleBatchFeedItems}
+          onBatchFeedHp={handlers.handleBatchFeedHp}
+          onEvolvePet={handlers.handleEvolvePet}
+          onReleasePet={handlers.handleReleasePet}
+          onBatchReleasePets={handlers.handleBatchReleasePets}
+        />
+      )}
+
+      {modals.isLotteryOpen && (
+        <LotteryModal
+          isOpen={modals.isLotteryOpen}
+          onClose={() => handlers.setIsLotteryOpen(false)}
+          player={player}
+          onDraw={handlers.handleDraw}
+        />
+      )}
+
+      {modals.isSettingsOpen && (
+        <SettingsModal
+          isOpen={modals.isSettingsOpen}
+          onClose={() => handlers.setIsSettingsOpen(false)}
+          settings={settings}
+          onUpdateSettings={handlers.handleUpdateSettings}
+          onRestartGame={handlers.handleRestartGame}
+          onOpenSaveManager={handlers.onOpenSaveManager}
+        />
+      )}
+
+      {modals.isDailyQuestOpen && (
+        <DailyQuestModal
+          isOpen={modals.isDailyQuestOpen}
+          onClose={() => handlers.setIsDailyQuestOpen(false)}
+          player={player}
+          onClaimReward={handlers.handleClaimQuestReward || (() => {})}
+        />
+      )}
+
+      {modals.isShopOpen && modalState.currentShop && (
+        <ShopModal
+          isOpen={modals.isShopOpen}
+          onClose={() => {
+            handlers.setIsShopOpen(false);
+            handlers.setCurrentShop(null);
+          }}
+          shop={modalState.currentShop}
+          player={player}
+          onBuyItem={handlers.handleBuyItem}
+          onSellItem={handlers.handleSellItem}
+          onRefreshShop={handlers.handleRefreshShop}
+          onOpenInventory={() => handlers.setIsInventoryOpen(true)}
+        />
+      )}
+
+      {modals.isReputationEventOpen && (
+        <ReputationEventModal
+          isOpen={modals.isReputationEventOpen}
+          onClose={() => {
+            handlers.setIsReputationEventOpen(false);
+          }}
+          event={modalState.reputationEvent}
+          onChoice={handlers.handleReputationEventChoice}
+        />
+      )}
+
+      {modals.isGrottoOpen && (
+        <GrottoModal
+          isOpen={modals.isGrottoOpen}
+          onClose={() => handlers.setIsGrottoOpen(false)}
+          player={player}
+          onUpgradeGrotto={handlers.handleUpgradeGrotto}
+          onPlantHerb={handlers.handlePlantHerb}
+          onHarvestHerb={handlers.handleHarvestHerb}
+          onHarvestAll={handlers.handleHarvestAll}
+          onEnhanceSpiritArray={handlers.handleEnhanceSpiritArray}
+          onToggleAutoHarvest={handlers.handleToggleAutoHarvest}
+          onSpeedupHerb={handlers.handleSpeedupHerb}
+        />
+      )}
+
+      {modals.isTreasureVaultOpen && (
+        <SectTreasureVaultModal
+          isOpen={modals.isTreasureVaultOpen}
+          onClose={() => handlers.setIsTreasureVaultOpen(false)}
+          player={player}
+          onTakeItem={handlers.handleTakeTreasureVaultItem}
+          onUpdateVault={handlers.handleUpdateVault}
+        />
+      )}
+    </Suspense>
+  );
+}
+
+export default React.memo(ModalsContainer);
+

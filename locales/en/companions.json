@@ -1,0 +1,102 @@
+{
+    "types": {
+        "normal": "Normal",
+        "fire": "Fire",
+        "ice": "Ice",
+        "lightning": "Electric",
+        "poison": "Toxic",
+        "holy": "Radiant",
+        "dark": "Shadow"
+    },
+    "companions": {
+        "wolf": {
+            "name": "Wasteland Wolf",
+            "description": "A loyal mutant wolf. Fast and fierce."
+        },
+        "tiger": {
+            "name": "Irradiated Tiger",
+            "description": "A powerful mutant feline. High attack."
+        },
+        "bear": {
+            "name": "Yao Guai",
+            "description": "A massive mutant bear. Incredible strength."
+        },
+        "eagle": {
+            "name": "Rad Eagle",
+            "description": "A giant irradiated bird. Excellent scout."
+        },
+        "snake": {
+            "name": "Venomous Serpent",
+            "description": "A toxic mutant snake. Poison attacks."
+        },
+        "dragon": {
+            "name": "Deathclaw",
+            "description": "The apex predator of the wasteland."
+        },
+        "phoenix": {
+            "name": "Radbird",
+            "description": "Born from nuclear fire. Regenerates health."
+        },
+        "turtle": {
+            "name": "Shell Beast",
+            "description": "Radiation-hardened turtle. Incredible defense."
+        },
+        "rabbit": {
+            "name": "Lucky Hare",
+            "description": "A quick little mutant. Increases luck."
+        },
+        "cat": {
+            "name": "Shadow Cat",
+            "description": "A stealthy feline companion. Increases agility."
+        }
+    },
+    "actions": {
+        "feed": "Feed",
+        "evolve": "Evolve",
+        "deploy": "Deploy",
+        "recall": "Recall",
+        "release": "Release"
+    },
+    "stats": {
+        "level": "Level",
+        "experience": "Experience",
+        "attack": "Attack",
+        "defense": "Defense",
+        "health": "Health",
+        "skill": "Skill"
+    },
+    "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "legendary": "Legendary",
+        "mythic": "Mythic"
+    },
+    "messages": {
+        "obtained": "New companion: {name}!",
+        "fedSuccess": "{name} has been fed. +{exp} exp",
+        "levelUp": "{name} leveled up!",
+        "evolutionReady": "{name} can now evolve!",
+        "evolutionSuccess": "{name} evolved into {evolution}!",
+        "deployed": "{name} is now fighting alongside you.",
+        "recalled": "{name} has been recalled.",
+        "released": "You released {name}."
+    },
+    "eggs": {
+        "common": {
+            "name": "Mutation Pod",
+            "description": "Contains a common mutant creature."
+        },
+        "rare": {
+            "name": "Rare Mutation Pod",
+            "description": "Contains a rare mutant creature."
+        },
+        "legendary": {
+            "name": "Ancient Pod",
+            "description": "Contains a legendary creature."
+        },
+        "mythic": {
+            "name": "Primordial Pod",
+            "description": "Contains a mythic being."
+        }
+    }
+}

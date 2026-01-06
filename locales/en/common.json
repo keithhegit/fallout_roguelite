@@ -1,0 +1,81 @@
+{
+    "game": {
+        "title": "Wasteland Survivor",
+        "subtitle": "Survive. Evolve. Transcend.",
+        "startGame": "Start New Journey",
+        "continueGame": "Continue Journey",
+        "settings": "Settings",
+        "language": "Language",
+        "version": "Version"
+    },
+    "stats": {
+        "health": "Health",
+        "maxHealth": "Max Health",
+        "attack": "Attack",
+        "defense": "Defense",
+        "spirit": "Perception",
+        "physique": "Endurance",
+        "speed": "Agility",
+        "luck": "Luck",
+        "experience": "Experience",
+        "scrap": "Scrap",
+        "lifespan": "Lifespan",
+        "age": "Age"
+    },
+    "actions": {
+        "scavenge": "Scavenge",
+        "rest": "Rest",
+        "evolve": "Evolve",
+        "craft": "Craft",
+        "inventory": "Inventory",
+        "character": "Character",
+        "faction": "Faction",
+        "companion": "Companion",
+        "salvage": "Salvage",
+        "shelter": "Shelter",
+        "achievements": "Achievements",
+        "dailyMissions": "Daily Missions",
+        "shop": "Trading Post"
+    },
+    "buttons": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "close": "Close",
+        "equip": "Equip",
+        "unequip": "Unequip",
+        "use": "Use",
+        "discard": "Discard",
+        "upgrade": "Upgrade",
+        "buy": "Buy",
+        "sell": "Sell",
+        "join": "Join",
+        "leave": "Leave",
+        "claim": "Claim"
+    },
+    "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "legendary": "Legendary",
+        "mythic": "Mythic"
+    },
+    "messages": {
+        "notEnoughScrap": "Not enough scrap!",
+        "notEnoughHealth": "Health too low!",
+        "inventoryFull": "Inventory is full!",
+        "itemObtained": "Obtained: {item}",
+        "levelUp": "Evolution successful!",
+        "evolutionFailed": "Evolution failed!",
+        "deathMessage": "You have perished in the wasteland...",
+        "saveSuccess": "Progress saved",
+        "loadSuccess": "Progress loaded"
+    },
+    "tutorial": {
+        "welcome": "Welcome to the Wasteland, Survivor.",
+        "step1": "This world was once beautiful, now only ruins remain.",
+        "step2": "Scavenge the wastes to find resources and grow stronger.",
+        "step3": "Rest to recover your health and train your body.",
+        "step4": "When ready, evolve to the next survival tier.",
+        "step5": "Join a faction to gain allies and special rewards.",
+        "step6": "Good luck, Survivor. The wasteland waits for no one."
+    }
+}

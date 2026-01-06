@@ -1,0 +1,51 @@
+{
+    "tiers": {
+        "scavenger": {
+            "name": "Vault Dweller",
+            "description": "Just emerged from the vault, adapting to high-radiation environments and struggling to survive."
+        },
+        "wastelander": {
+            "name": "Wasteland Scavenger",
+            "description": "Familiar with wasteland rules, collecting pre-war tech and establishing initial outposts."
+        },
+        "mutant": {
+            "name": "Mercenary Veteran",
+            "description": "Equipped with quality gear, has a place in Diamond City or Rivet City. A 'nuclear core' has formed within."
+        },
+        "evolved": {
+            "name": "Brotherhood Paladin",
+            "description": "Qualified to pilot Power Armor. Flesh and machine have merged perfectly, combat power transformed."
+        },
+        "apex": {
+            "name": "Enclave General",
+            "description": "Has orbital strike authorization. Will and spirit sufficient to interfere with reality, ruling over the wasteland."
+        },
+        "transcendent": {
+            "name": "Cyber-Ascendant",
+            "description": "An existence like Frank Horrigan - a half-human, half-god bio-weapon beyond mortal limits."
+        },
+        "immortal": {
+            "name": "Wasteland Legend",
+            "description": "Become a legend like the 'Lone Wanderer' or 'The Courier', completely dominating the wasteland's fate."
+        }
+    },
+    "layers": {
+        "1": "Tier I",
+        "2": "Tier II",
+        "3": "Tier III",
+        "4": "Tier IV",
+        "5": "Tier V",
+        "6": "Tier VI",
+        "7": "Tier VII",
+        "8": "Tier VIII",
+        "9": "Tier IX",
+        "10": "Tier X"
+    },
+    "messages": {
+        "atMaxTier": "You have become a Wasteland Legend!",
+        "expRequired": "Genetic Data required: {exp}",
+        "evolutionSuccess": "Gene Splicing successful! You are now a {tier}!",
+        "evolutionFailed": "Gene Splicing failed. Your body rejected the modification.",
+        "notReady": "Not enough Genetic Data to evolve."
+    }
+}

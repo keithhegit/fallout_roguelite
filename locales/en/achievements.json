@@ -1,0 +1,120 @@
+{
+    "categories": {
+        "cultivation": "Survival",
+        "combat": "Combat",
+        "exploration": "Exploration",
+        "collection": "Collection",
+        "special": "Special"
+    },
+    "achievements": {
+        "firstStep": {
+            "name": "First Steps",
+            "description": "Complete your first rest session."
+        },
+        "foundation": {
+            "name": "Wasteland Adapted",
+            "description": "Evolve to Wastelander tier."
+        },
+        "goldenCore": {
+            "name": "Mutation Accepted",
+            "description": "Evolve to Mutant tier."
+        },
+        "firstKill": {
+            "name": "First Blood",
+            "description": "Defeat your first enemy."
+        },
+        "killer10": {
+            "name": "Ten Down",
+            "description": "Defeat 10 enemies."
+        },
+        "killer50": {
+            "name": "Battle Hardened",
+            "description": "Defeat 50 enemies."
+        },
+        "killer100": {
+            "name": "Hundred Slayer",
+            "description": "Defeat 100 enemies."
+        },
+        "collector10": {
+            "name": "Collector",
+            "description": "Collect 10 different items."
+        },
+        "collector20": {
+            "name": "Item Hoarder",
+            "description": "Collect 20 different items."
+        },
+        "collector50": {
+            "name": "Treasure Hunter",
+            "description": "Collect 50 different items."
+        },
+        "adventure20": {
+            "name": "Scavenger",
+            "description": "Complete 20 scavenging runs."
+        },
+        "adventure50": {
+            "name": "Wastelander",
+            "description": "Complete 50 scavenging runs."
+        },
+        "adventure100": {
+            "name": "Veteran Survivor",
+            "description": "Complete 100 scavenging runs."
+        },
+        "meditate100": {
+            "name": "Focused Mind",
+            "description": "Complete 100 rest sessions."
+        },
+        "equip5": {
+            "name": "Geared Up",
+            "description": "Equip 5 items."
+        },
+        "pet1": {
+            "name": "Companion Found",
+            "description": "Obtain your first companion."
+        },
+        "pet3": {
+            "name": "Pack Leader",
+            "description": "Obtain 3 companions."
+        },
+        "recipe5": {
+            "name": "Apprentice Chemist",
+            "description": "Unlock 5 blueprints."
+        },
+        "art3": {
+            "name": "Skill Learner",
+            "description": "Learn 3 skills."
+        },
+        "art10": {
+            "name": "Skill Master",
+            "description": "Learn 10 skills."
+        },
+        "breakthrough5": {
+            "name": "Evolving",
+            "description": "Successfully evolve 5 times."
+        },
+        "secretRealm5": {
+            "name": "Zone Explorer",
+            "description": "Enter 5 special zones."
+        },
+        "lottery10": {
+            "name": "Salvage Beginner",
+            "description": "Complete 10 salvage runs."
+        },
+        "lottery50": {
+            "name": "Salvage Expert",
+            "description": "Complete 50 salvage runs."
+        },
+        "alchemy20": {
+            "name": "Master Chemist",
+            "description": "Successfully craft 20 chems."
+        },
+        "sectMaster": {
+            "name": "Faction Leader",
+            "description": "Become a faction lieutenant or higher."
+        }
+    },
+    "messages": {
+        "unlocked": "Achievement Unlocked: {name}!",
+        "progress": "Progress: {current}/{target}",
+        "rewardClaimed": "Rewards claimed!"
+    }
+}

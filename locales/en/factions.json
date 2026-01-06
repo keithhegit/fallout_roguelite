@@ -1,0 +1,141 @@
+{
+    "factions": {
+        "cloud": {
+            "name": "Haven Outpost",
+            "description": "A peaceful survivor settlement. Welcoming to most wastelanders."
+        },
+        "fire": {
+            "name": "Inferno Gang",
+            "description": "Built near a volcanic vent. Specialists in fire and explosives."
+        },
+        "sword": {
+            "name": "Steel Brotherhood",
+            "description": "Weapon masters. Their fighters are among the deadliest."
+        },
+        "temple": {
+            "name": "The Sanctuary",
+            "description": "A community of healers. Known for their defensive capabilities."
+        },
+        "taoist": {
+            "name": "Tech Cult",
+            "description": "Worshippers of pre-war technology. Fast learners."
+        },
+        "blood": {
+            "name": "Blood Raiders",
+            "description": "Ruthless raiders. Powerful but dangerous to join."
+        },
+        "lotus": {
+            "name": "Blue Lotus Militia",
+            "description": "Precision fighters. Masters of blade combat."
+        },
+        "xuantian": {
+            "name": "Vault Dwellers",
+            "description": "Survivors from an ancient vault. Deep resources."
+        },
+        "jiuyou": {
+            "name": "Shadow Syndicate",
+            "description": "Masters of stealth and assassination."
+        },
+        "star": {
+            "name": "Stargazers",
+            "description": "Mysterious group studying pre-war satellite technology."
+        },
+        "dragon": {
+            "name": "Mutant Legion",
+            "description": "A faction of powerful mutants. Strong bloodlines."
+        },
+        "phoenix": {
+            "name": "Phoenix Clan",
+            "description": "Known for their regenerative abilities."
+        },
+        "thunder": {
+            "name": "Thunder Legion",
+            "description": "Controls power generators. Masters of electricity."
+        },
+        "ice": {
+            "name": "Frost Bunker",
+            "description": "Survivors from a frozen bunker. Strong defense."
+        },
+        "poison": {
+            "name": "Toxic Valley",
+            "description": "Masters of poisons and chemicals."
+        },
+        "illusion": {
+            "name": "Mirage Runners",
+            "description": "Experts in deception and misdirection."
+        },
+        "diamond": {
+            "name": "Iron Fist Gym",
+            "description": "Physical training specialists. Tough bodies."
+        },
+        "yinyang": {
+            "name": "Balance Keepers",
+            "description": "Believe in balance. Well-rounded in all areas."
+        }
+    },
+    "ranks": {
+        "outer": {
+            "title": "Newcomer",
+            "description": "Just joined the faction."
+        },
+        "inner": {
+            "title": "Member",
+            "description": "Recognized faction member."
+        },
+        "core": {
+            "title": "Trusted",
+            "description": "Trusted inner circle member."
+        },
+        "elder": {
+            "title": "Lieutenant",
+            "description": "High-ranking faction officer."
+        },
+        "leader": {
+            "title": "Leader",
+            "description": "Leader of the faction."
+        }
+    },
+    "grades": {
+        "sky": "Elite",
+        "earth": "Advanced",
+        "mystic": "Standard",
+        "yellow": "Basic"
+    },
+    "messages": {
+        "joined": "You have joined {faction}!",
+        "left": "You have left {faction}.",
+        "promoted": "Promoted to {rank}!",
+        "notEnoughContribution": "Not enough contribution points.",
+        "requiresHigherTier": "Requires higher survival tier."
+    },
+    "shop": {
+        "title": "Faction Store",
+        "contribution": "Contribution",
+        "items": {
+            "refiningShard": {
+                "name": "Refining Shard",
+                "description": "Material for upgrading equipment."
+            },
+            "focusChem": {
+                "name": "Focus Chem",
+                "description": "Temporarily increases training speed."
+            },
+            "purpleFlower": {
+                "name": "Mutant Blossom",
+                "description": "Rare crafting material. Grows on irradiated cliffs."
+            },
+            "cleansePill": {
+                "name": "Cleanse Chem",
+                "description": "Removes radiation poisoning. Slightly increases max health."
+            },
+            "foundationPill": {
+                "name": "Stabilizer Shot",
+                "description": "Increases chance of successful evolution."
+            },
+            "beastCore": {
+                "name": "Mutant Core",
+                "description": "Core from a powerful mutant beast."
+            }
+        }
+    }
+}

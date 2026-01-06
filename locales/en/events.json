@@ -1,0 +1,93 @@
+{
+    "locations": {
+        "forest": {
+            "name": "Toxic Forest",
+            "description": "A forest shrouded in radiation fog. Dangers lurk within."
+        },
+        "mountain": {
+            "name": "Broken Mountains",
+            "description": "Ruined peaks. Rumored to hold pre-war bunkers."
+        },
+        "abyss": {
+            "name": "The Crater",
+            "description": "Ground zero. High radiation but rich in resources."
+        },
+        "ruins": {
+            "name": "Urban Ruins",
+            "description": "A destroyed city. Scavengers' paradise."
+        },
+        "bunker": {
+            "name": "Abandoned Bunker",
+            "description": "A sealed vault. Unknown treasures inside."
+        },
+        "factory": {
+            "name": "Old Factory",
+            "description": "Pre-war manufacturing plant. Dangerous machinery."
+        }
+    },
+    "encounters": {
+        "herb": {
+            "name": "Found Supplies",
+            "description": "You found some useful herbs growing in the rubble."
+        },
+        "spiritStone": {
+            "name": "Scrap Cache",
+            "description": "You discovered a hidden cache of valuable scrap."
+        },
+        "ancientCave": {
+            "name": "Pre-War Bunker",
+            "description": "You found a sealed bunker with valuable tech inside."
+        },
+        "immortalHerb": {
+            "name": "Mutation Plant",
+            "description": "A rare plant with incredible mutagenic properties!"
+        }
+    },
+    "events": {
+        "positive": {
+            "foundScrap": "You found {amount} scrap metal!",
+            "foundItem": "You found {item}!",
+            "gainedExp": "You gained {amount} experience!",
+            "metTrader": "You met a friendly trader!",
+            "discoveredCache": "You discovered a hidden cache!"
+        },
+        "negative": {
+            "ambushed": "You were ambushed by raiders!",
+            "trapped": "You triggered a trap!",
+            "poisoned": "You were exposed to radiation!",
+            "robbed": "Raiders stole {amount} scrap!",
+            "injured": "You took {damage} damage!"
+        },
+        "neutral": {
+            "wandered": "You wandered the wastes...",
+            "rested": "You found a safe spot to rest.",
+            "nothing": "The wastes were quiet today."
+        }
+    },
+    "secretRealms": {
+        "ancient": {
+            "name": "Ancient Vault",
+            "description": "A perfectly preserved pre-war vault."
+        },
+        "radiation": {
+            "name": "Radiation Zone",
+            "description": "Extreme radiation. High risk, high reward."
+        },
+        "military": {
+            "name": "Military Base",
+            "description": "Abandoned military installation."
+        }
+    },
+    "riskLevels": {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk",
+        "extreme": "Extreme Risk"
+    },
+    "messages": {
+        "enterZone": "Entering {zone}...",
+        "exitZone": "Leaving {zone}...",
+        "notEnoughHealth": "Too injured to explore!",
+        "tierRequired": "Requires {tier} or higher."
+    }
+}

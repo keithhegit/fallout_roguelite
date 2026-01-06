@@ -1,0 +1,168 @@
+{
+    "talents": {
+        "ordinary": {
+            "name": "Ordinary",
+            "description": "No special traits. Just a regular survivor."
+        },
+        "strongBody": {
+            "name": "Hardy",
+            "description": "Built tough. Slightly increased health."
+        },
+        "quickLearner": {
+            "name": "Quick Learner",
+            "description": "Learns slightly faster than others."
+        },
+        "spiritRoot": {
+            "name": "Radiation Resistant",
+            "description": "Natural resistance to radiation. +10% experience gain."
+        },
+        "ironBone": {
+            "name": "Iron Bones",
+            "description": "Dense bone structure. Increased defense and endurance."
+        },
+        "sharpBlade": {
+            "name": "Born Fighter",
+            "description": "Natural combat instincts. Increased attack power."
+        },
+        "spiritSense": {
+            "name": "Keen Senses",
+            "description": "Heightened awareness. Increased perception and agility."
+        },
+        "vitality": {
+            "name": "Robust",
+            "description": "Exceptional vitality. Greatly increased health."
+        },
+        "fastCultivation": {
+            "name": "Fast Adapter",
+            "description": "Adapts quickly to radiation. +15% experience gain."
+        },
+        "lucky": {
+            "name": "Lucky",
+            "description": "Fortune favors you. Increased luck."
+        },
+        "balanced": {
+            "name": "Well-Rounded",
+            "description": "Balanced development in all areas."
+        },
+        "immortalBody": {
+            "name": "Radiation Absorber",
+            "description": "Your body absorbs radiation. Greatly increased health and defense."
+        },
+        "swordHeart": {
+            "name": "Weapon Master",
+            "description": "Innate mastery of weapons. Greatly increased attack."
+        },
+        "thunderBody": {
+            "name": "Electric",
+            "description": "Your body generates electricity. Increased attack, speed, and perception."
+        },
+        "dragonBlood": {
+            "name": "Mutant Blood",
+            "description": "Powerful mutant genes. Greatly increased health and endurance."
+        },
+        "genius": {
+            "name": "Prodigy",
+            "description": "Exceptional adaptation potential. Greatly increased experience gain."
+        },
+        "blessed": {
+            "name": "Fortune's Child",
+            "description": "Blessed by fate. Increased luck and experience."
+        },
+        "luckystar": {
+            "name": "Chosen One",
+            "description": "Destiny's favorite. Massively increased luck and experience."
+        },
+        "immortalKing": {
+            "name": "Alpha Strain",
+            "description": "Carries the ultimate mutation. All stats massively increased."
+        },
+        "chaosBody": {
+            "name": "Omega Strain",
+            "description": "The perfect mutation. All stats and experience greatly increased."
+        }
+    },
+    "titles": {
+        "novice": {
+            "name": "Newcomer",
+            "description": "Just arrived in the wasteland."
+        },
+        "foundation": {
+            "name": "Wastelander",
+            "description": "Established survivor of the wastes."
+        },
+        "goldenCore": {
+            "name": "Mutant Warrior",
+            "description": "A formidable mutant fighter."
+        },
+        "nascentSoul": {
+            "name": "Wasteland Legend",
+            "description": "A legendary figure in the new world."
+        },
+        "immortal": {
+            "name": "Radiation God",
+            "description": "An immortal being of pure energy."
+        },
+        "warrior": {
+            "name": "Fighter",
+            "description": "Proven combat ability."
+        },
+        "slayer": {
+            "name": "Slayer",
+            "description": "Has killed many in battle."
+        },
+        "champion": {
+            "name": "War God",
+            "description": "Undefeated in combat."
+        },
+        "explorer": {
+            "name": "Explorer",
+            "description": "Curious about the unknown."
+        },
+        "adventurer": {
+            "name": "Wanderer",
+            "description": "Has traveled far and wide."
+        },
+        "traveler": {
+            "name": "Nomad",
+            "description": "Has been everywhere."
+        },
+        "collector": {
+            "name": "Hoarder",
+            "description": "Collects various items."
+        },
+        "hoarder": {
+            "name": "Pack Rat",
+            "description": "Has many collections."
+        },
+        "treasurer": {
+            "name": "Treasure Hunter",
+            "description": "Has countless rare items."
+        },
+        "hermit": {
+            "name": "Hermit",
+            "description": "Prefers solitude and training."
+        },
+        "alchemist": {
+            "name": "Chemist",
+            "description": "Master of crafting chems."
+        },
+        "sectMaster": {
+            "name": "Faction Leader",
+            "description": "Leader of a faction."
+        }
+    },
+    "sets": {
+        "warrior": {
+            "name": "Combat Set",
+            "description": "Wearing all combat titles grants massive combat bonuses."
+        },
+        "explorer": {
+            "name": "Explorer Set",
+            "description": "Wearing all explorer titles increases exploration rewards."
+        },
+        "collector": {
+            "name": "Collector Set",
+            "description": "Wearing all collector titles greatly increases luck."
+        }
+    }
+}
