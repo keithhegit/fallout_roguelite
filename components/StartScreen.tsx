@@ -193,7 +193,7 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
           <div>
             <label className="block text-stone-300 mb-2 font-semibold flex items-center gap-2 text-sm md:text-base">
               <User size={18} className="md:w-5 md:h-5" />
-              修仙者名称
+              Name Of Survival
             </label>
             <input
               type="text"
@@ -303,8 +303,8 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
             </label>
             <div className="space-y-2">
               <label className={`flex items-center gap-3 p-3 bg-stone-800/50 rounded border-2 cursor-pointer transition-colors ${difficulty === 'easy'
-                  ? 'border-green-500 bg-green-900/20'
-                  : 'border-stone-700 hover:border-mystic-jade/50'
+                ? 'border-green-500 bg-green-900/20'
+                : 'border-stone-700 hover:border-mystic-jade/50'
                 }`}>
                 <input
                   type="radio"
@@ -324,8 +324,8 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
                 </div>
               </label>
               <label className={`flex items-center gap-3 p-3 bg-stone-800/50 rounded border-2 cursor-pointer transition-colors ${difficulty === 'normal'
-                  ? 'border-yellow-500 bg-yellow-900/20'
-                  : 'border-stone-700 hover:border-mystic-jade/50'
+                ? 'border-yellow-500 bg-yellow-900/20'
+                : 'border-stone-700 hover:border-mystic-jade/50'
                 }`}>
                 <input
                   type="radio"
@@ -345,8 +345,8 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
                 </div>
               </label>
               <label className={`flex items-center gap-3 p-3 bg-stone-800/50 rounded border-2 cursor-pointer transition-colors ${difficulty === 'hard'
-                  ? 'border-red-500 bg-red-900/20'
-                  : 'border-stone-700 hover:border-mystic-jade/50'
+                ? 'border-red-500 bg-red-900/20'
+                : 'border-stone-700 hover:border-mystic-jade/50'
                 }`}>
                 <input
                   type="radio"

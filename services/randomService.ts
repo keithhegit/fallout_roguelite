@@ -6,121 +6,121 @@ const randomId = () => Math.random().toString(36).slice(2, 9);
 
 // 秘境名称池 - 按风险等级分类
 const REALM_NAMES_BY_RISK: Record<'低' | '中' | '高' | '极度危险', string[]> = {
-  '低': [
-    '仙灵秘境', '星辰遗迹', '万兽山脉外围', '灵草园', '清风谷',
-    '碧水潭', '紫竹林', '灵鸟栖息地', '灵石矿脉', '古修士洞府',
-    '百花谷', '月华池', '云海峰', '翠竹岭', '灵泉洞',
-    '仙鹤湖', '彩虹桥', '灵药田', '静心亭', '飞瀑崖'
+  'Low': [
+    'Mystic Realm', 'Star Ruins', 'Beast Mountain Outer', 'Herb Garden', 'Breeze Valley',
+    'Jade Pool', 'Purple Bamboo Forest', 'Bird Habitat', 'Spirit Stone Mine', 'Ancient Cave',
+    'Flower Valley', 'Moonlit Pool', 'Cloud Peak', 'Bamboo Ridge', 'Spring Cave',
+    'Crane Lake', 'Rainbow Bridge', 'Medicine Field', 'Quiet Pavilion', 'Waterfall Cliff'
   ],
-  '中': [
-    '上古剑冢', '冰封雪域', '幻境迷窟', '龙族古墓', '万兽山脉深处',
-    '古战场遗迹', '天音谷', '迷雾森林', '灵石洞', '试炼之塔',
-    '风雷谷', '烈焰山', '寒冰洞', '毒蛇谷', '妖兽巢穴',
-    '古墓迷宫', '剑意峰', '龙脉之地', '传承殿', '试炼秘境'
+  'Medium': [
+    'Ancient Sword Tomb', 'Frozen Snowfield', 'Illusion Cave', 'Dragon Tomb', 'Beast Mountain Deep',
+    'Battlefield Ruins', 'Echo Valley', 'Mist Forest', 'Spirit Cave', 'Trial Tower',
+    'Thunder Valley', 'Flame Mountain', 'Ice Cave', 'Snake Valley', 'Beast Lair',
+    'Tomb Maze', 'Sword Peak', 'Dragon Vein', 'Inheritance Hall', 'Trial Realm'
   ],
-  '高': [
-    '天火熔岩', '毒瘴沼泽', '幽冥洞府', '时光裂缝', '死亡峡谷',
-    '血海边缘', '雷霆谷', '邪魔洞', '黑风山', '白骨岭',
-    '魔焰深渊', '鬼哭岭', '血月洞', '暗影森林', '诅咒之地',
-    '绝望深渊', '魔龙巢', '邪神祭坛', '死灵之域', '破碎虚空'
+  'High': [
+    'Lava Flow', 'Toxic Swamp', 'Nether Cave', 'Time Rift', 'Death Canyon',
+    'Blood Sea Edge', 'Thunder Valley', 'Demon Cave', 'Black Wind Mountain', 'White Bone Ridge',
+    'Demon Flame Abyss', 'Ghost Ridge', 'Blood Moon Cave', 'Shadow Forest', 'Cursed Land',
+    'Despair Abyss', 'Dragon Lair', 'Evil Altar', 'Necro Domain', 'Void Fracture'
   ],
-  '极度危险': [
-    '雷罚炼狱', '血海魔渊', '九幽深渊', '天劫雷池', '混沌虚空',
-    '神魔战场', '灭世禁地', '亡者之国', '虚空裂缝', '万古魔域',
-    '天道禁区', '轮回之地', '永恒炼狱', '虚无之境', '毁灭之源',
-    '禁忌之地', '天罚之域', '魔道本源', '死亡核心', '终极深渊'
+  'Extreme': [
+    'Thunder Purgatory', 'Blood Sea Abyss', 'Nine Nether Abyss', 'Heavenly Tribulation Pool', 'Chaos Void',
+    'God Demon Battlefield', 'World Extinction Forbidden Land', 'Kingdom of the Dead', 'Void Rift', 'Eternal Demon Domain',
+    'Heavenly Dao Forbidden Zone', 'Reincarnation Land', 'Eternal Purgatory', 'Nothingness Realm', 'Source of Destruction',
+    'Taboo Land', 'Punishment Domain', 'Demon Origin', 'Death Core', 'Ultimate Abyss'
   ]
 };
 
 // 秘境描述池 - 按风险等级分类
-const REALM_DESCRIPTIONS_BY_RISK: Record<'低' | '中' | '高' | '极度危险', string[]> = {
-  '低': [
-    '仙灵之气浓郁，适合修炼，相对安全。',
-    '星辰之力汇聚，灵气充沛，但需小心守护妖兽。',
-    '外围相对安全，只有一些弱小的妖兽出没。',
-    '灵草遍地，适合采集，偶有灵兽守护。',
-    '清风徐来，环境宜人，但不可掉以轻心。',
-    '碧水清波，灵气氤氲，适合静心修炼。',
-    '紫竹摇曳，环境清幽，偶有小妖兽。',
-    '灵鸟聚集之地，相对安全，可采集灵物。',
-    '灵石矿脉，需要小心守护者。',
-    '古修士遗留的洞府，结构完整，相对安全。',
-    '百花盛开，香气四溢，灵气温和，适合新手修士。',
-    '月华如水，夜晚时灵气最为浓郁，适合夜间修炼。',
-    '云海翻腾，仙气缭绕，但需注意高空危险。',
-    '翠竹成林，清雅幽静，偶有竹精出没。',
-    '灵泉汩汩，泉水甘甜，长期饮用可改善体质。',
-    '仙鹤翩翩，祥瑞之地，但不可惊扰仙鹤。',
-    '彩虹横跨，美丽异常，但彩虹尽头隐藏着未知。',
-    '灵药成片，药香扑鼻，需小心守护药园的妖兽。',
-    '静心亭中，可静心悟道，但不可久留。',
-    '飞瀑如练，水声轰鸣，瀑布后别有洞天。'
+const REALM_DESCRIPTIONS_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[]> = {
+  'Low': [
+    'Rich in spiritual energy, suitable for cultivation, relatively safe.',
+    'Gathering power of stars, full of spiritual energy.',
+    'The outer area is relatively safe.',
+    'Herbs are everywhere, suitable for gathering.',
+    'Gentle breeze, pleasant environment.',
+    'Clear water, misty spiritual energy.',
+    'Purple bamboo swaying, quiet environment.',
+    'Where spiritual birds gather.',
+    'Spirit stone mine, watch out for guardians.',
+    'Ancient cultivator cave, structurally intact.',
+    'Flowers blooming, fragrant.',
+    'Moonlight like water.',
+    'Clouds rolling.',
+    'Bamboo forest.',
+    'Spring water bubbling.',
+    'Cranes dancing.',
+    'Rainbow spanning across.',
+    'Medicinal herbs in patches.',
+    'Quiet pavilion.',
+    'Waterfall like silk.'
   ],
-  '中': [
-    '传说中上古剑修的埋骨之地，剑气纵横，需小心剑意。',
-    '冰天雪地，寒风刺骨，但蕴藏着珍贵的冰属性宝物。',
-    '幻象丛生，真假难辨，考验修士的心智和意志。',
-    '龙族遗迹，蕴藏着龙族传承，但守护力量不弱。',
-    '深处盘踞着强大的妖兽，需要小心应对。',
-    '古战场遗迹，杀气残留，偶有怨灵出没。',
-    '天音回荡，但暗藏杀机，需要谨慎探索。',
-    '迷雾重重，容易迷失方向，需要强大的神识。',
-    '灵石洞中，守护妖兽实力强劲。',
-    '试炼之塔，层层考验，风险与机遇并存。',
-    '风雷交加，电闪雷鸣，风雷属性修士的福地。',
-    '烈焰熊熊，火属性灵气浓郁，但温度极高。',
-    '寒冰刺骨，冰属性宝物众多，但需抵御严寒。',
-    '毒蛇盘踞，毒气弥漫，需备好解毒丹药。',
-    '妖兽巢穴，妖兽众多，但材料丰富。',
-    '古墓迷宫，机关重重，需小心谨慎。',
-    '剑意冲天，剑修圣地，但剑气伤人。',
-    '龙脉之地，灵气汇聚，但龙威压迫。',
-    '传承殿中，功法众多，但考验严格。',
-    '试炼秘境，层层试炼，通过者可得传承。'
+  'Medium': [
+    'Burial ground of ancient sword cultivators.',
+    'Icy and snowy.',
+    'Illusions abound.',
+    'Dragon ruins.',
+    'Deep in the mountains.',
+    'Ancient battlefield ruins.',
+    'Echoes of heaven.',
+    'Heavy fog.',
+    'Spirit stone cave.',
+    'Trial tower.',
+    'Wind and thunder.',
+    'Raging flames.',
+    'Biting cold.',
+    'Venomous snakes.',
+    'Beast lair.',
+    'Tomb maze.',
+    'Soaring sword intent.',
+    'Dragon vein land.',
+    'Inheritance hall.',
+    'Trial realm.'
   ],
-  '高': [
-    '地火喷涌，岩浆翻滚，火属性修士的圣地，但极端危险。',
-    '毒气弥漫，危险重重，但蕴藏着珍稀毒草和剧毒妖兽。',
-    '阴气森森，鬼物横行，非正道修士或实力不足者不可入。',
-    '时间之力扭曲，过去未来交错，稍有不慎便会迷失其中。',
-    '死气弥漫，亡魂游荡，生命气息会被逐渐侵蚀。',
-    '血海边缘，魔气滔天，邪物横行，正道修士的禁地。',
-    '雷霆谷中，雷光闪烁，稍有不慎便会遭到雷霆攻击。',
-    '邪魔聚集之地，魔气浓郁，正道修士需格外小心。',
-    '黑风山，邪风阵阵，危险异常。',
-    '白骨岭，死气沉沉，亡者之地。',
-    '魔焰燃烧，魔气冲天，魔道修士的乐园，正道修士的绝地。',
-    '鬼哭狼嚎，怨气冲天，无数怨灵在此游荡。',
-    '血月当空，邪异异常，血月之下邪物实力大增。',
-    '暗影笼罩，光线难入，暗属性妖兽横行。',
-    '诅咒之力弥漫，进入者会受到诅咒，需小心应对。',
-    '绝望气息笼罩，意志不坚者会陷入绝望。',
-    '魔龙盘踞，龙威滔天，非强者不可入。',
-    '邪神祭坛，邪气浓郁，邪神之力残留。',
-    '死灵之域，死气浓郁，生者进入会被死气侵蚀。',
-    '空间破碎，虚空裂缝遍布，随时可能被吞噬。'
+  'High': [
+    'Lava surging.',
+    'Toxic gas permeating.',
+    'Gloomy and cold.',
+    'Time distortion.',
+    'Deadly atmosphere.',
+    'Edge of the blood sea.',
+    'Thunder valley.',
+    'Evil gathering place.',
+    'Black wind mountain.',
+    'White bone ridge.',
+    'Demon flame burning.',
+    'Ghostly wailing.',
+    'Blood moon hanging high.',
+    'Shadow shrouded.',
+    'Cursed power permeating.',
+    'Despair atmosphere.',
+    'Demon dragon coiling.',
+    'Evil god altar.',
+    'Necro domain.',
+    'Space shattered.'
   ],
-  '极度危险': [
-    '终年雷霆不息，天劫之力残留，稍有不慎便会灰飞烟灭。',
-    '魔气滔天，邪物横行，是正道修士的绝地，九死一生。',
-    '九幽之地，死气沉沉，亡者的国度，生者禁入。',
-    '天劫之力残留，危险异常，稍有不慎便会引发天劫。',
-    '混沌之力混乱，空间不稳定，随时可能被空间裂缝吞噬。',
-    '上古神魔大战的遗迹，杀气冲天，怨灵遍地。',
-    '灭世禁地，连仙人都要避让，凡人进入必死无疑。',
-    '亡者之国，死者的世界，生者无法存活。',
-    '虚空裂缝，空间破碎，稍有不慎便会坠入无尽虚空。',
-    '万古魔域，魔道之源，正道修士的绝地。',
-    '天道禁区，天道之力排斥一切，进入者必遭天谴。',
-    '轮回之地，生死轮回，稍有不慎便会陷入轮回。',
-    '永恒炼狱，火焰永恒不灭，连灵魂都会被灼烧。',
-    '虚无之境，一切皆无，存在本身都会被抹除。',
-    '毁灭之源，毁灭之力弥漫，一切都会被毁灭。',
-    '禁忌之地，天道禁忌，进入者必遭天罚。',
-    '天罚之域，天罚之力残留，随时可能降下天罚。',
-    '魔道本源，魔道力量的源头，魔气浓郁到极致。',
-    '死亡核心，死亡之力的核心，生者无法存活。',
-    '终极深渊，一切深渊的终点，进入者永无归路。'
+  'Extreme': [
+    'Thunder never ceases.',
+    'Monstrous demonic energy.',
+    'Land of Nine Nether.',
+    'Remnant power of heavenly tribulation.',
+    'Chaotic power.',
+    'Ruins of ancient god-demon war.',
+    'Forbidden land of extinction.',
+    'Kingdom of the dead.',
+    'Void rift.',
+    'Eternal demon domain.',
+    'Forbidden zone of heavenly dao.',
+    'Land of reincarnation.',
+    'Eternal purgatory.',
+    'Realm of nothingness.',
+    'Source of destruction.',
+    'Taboo land.',
+    'Domain of heavenly punishment.',
+    'Origin of demonic path.',
+    'Core of death.',
+    'Ultimate abyss.'
   ]
 };
 
@@ -476,9 +476,9 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
   explore: {
     realmOffset: 1,
     getReward: (rank, diff, qual, realm, quality) => {
-      const items = [{ name: '炼器石', quantity: Math.floor((1 + Math.random() * 2) * diff * qual) }];
-      if (quality === '传说' || quality === '仙品') {
-        items.push({ name: quality === '仙品' ? '仙品材料' : '传说材料', quantity: 1 });
+      const items = [{ name: 'Scrap Metal', quantity: Math.floor((1 + Math.random() * 2) * diff * qual) }];
+      if (quality === 'Legendary' || quality === 'Mythic') {
+        items.push({ name: quality === 'Mythic' ? 'Mythic Material' : 'Legendary Material', quantity: 1 });
       }
       return {
         contribution: Math.floor((35 + Math.random() * 45) * rank * diff * qual * realm),
@@ -527,8 +527,8 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
         contribution: Math.floor((50 + Math.random() * 70) * rank * diff * qual * realm),
         spiritStones: Math.floor((200 + Math.random() * 300) * diff * qual)
       };
-      if (quality === '传说' || quality === '仙品') {
-        reward.items = [{ name: '外交信物', quantity: 1 }];
+      if (quality === 'Legendary' || quality === 'Mythic') {
+        reward.items = [{ name: 'Diplomatic Token', quantity: 1 }];
       }
       return reward;
     }
@@ -568,9 +568,9 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
   treasure_hunt: {
     realmOffset: 1,
     getReward: (rank, diff, qual, realm, quality) => {
-      const items = [{ name: '炼器石', quantity: Math.floor((2 + Math.random() * 3) * diff * qual) }];
-      if (quality === '传说' || quality === '仙品') {
-        items.push({ name: quality === '仙品' ? '仙品法宝碎片' : '传说法宝碎片', quantity: 1 });
+      const items = [{ name: 'Scrap Metal', quantity: Math.floor((2 + Math.random() * 3) * diff * qual) }];
+      if (quality === 'Legendary' || quality === 'Mythic') {
+        items.push({ name: quality === 'Mythic' ? 'Mythic Artifact Fragment' : 'Legendary Artifact Fragment', quantity: 1 });
       }
       return {
         contribution: Math.floor((40 + Math.random() * 50) * rank * diff * qual * realm),
@@ -618,8 +618,8 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
         contribution: Math.floor((40 + Math.random() * 50) * rank * diff * qual * realm),
         exp: Math.floor((70 + Math.random() * 130) * rank * diff * qual * realm)
       };
-      if (quality === '传说' || quality === '仙品') {
-        reward.items = [{ name: quality === '仙品' ? '仙品灵兽内丹' : '传说灵兽内丹', quantity: 1 }];
+      if (quality === 'Legendary' || quality === 'Mythic') {
+        reward.items = [{ name: quality === 'Mythic' ? 'Mythic Beast Core' : 'Legendary Beast Core', quantity: 1 }];
       }
       return reward;
     }
@@ -640,8 +640,8 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
         contribution: Math.floor((50 + Math.random() * 70) * rank * diff * qual * realm),
         exp: Math.floor((150 + Math.random() * 300) * rank * diff * qual * realm)
       };
-      if (quality === '传说' || quality === '仙品') {
-        reward.items = [{ name: '传承玉简', quantity: 1 }];
+      if (quality === 'Legendary' || quality === 'Mythic') {
+        reward.items = [{ name: 'Inheritance Jade', quantity: 1 }];
       }
       return reward;
     }
@@ -665,7 +665,7 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
     }),
     getReward: (rank, diff, qual, realm, quality) => ({
       contribution: Math.floor((40 + Math.random() * 60) * rank * diff * qual * realm),
-      items: [{ name: quality === '仙品' ? '九转金丹' : quality === '传说' ? '天元丹' : '筑基丹', quantity: Math.floor((1 + Math.random() * 2) * diff * qual) }]
+      items: [{ name: quality === 'Mythic' ? 'Nine-Cycle Golden Pill' : quality === 'Legendary' ? 'Heavenly Pill' : 'Foundation Pill', quantity: Math.floor((1 + Math.random() * 2) * diff * qual) }]
     })
   }
 };
@@ -676,22 +676,22 @@ const TASK_QUALITY_CONFIG: Record<TaskQuality, {
   rewardMultiplier: number;
   contributionBonus: number;
 }> = {
-  普通: {
+  'Common': {
     probability: 0.6,
     rewardMultiplier: 1.0,
     contributionBonus: 0,
   },
-  稀有: {
+  'Rare': {
     probability: 0.25,
     rewardMultiplier: 1.5,
     contributionBonus: 50,
   },
-  传说: {
+  'Legendary': {
     probability: 0.12,
     rewardMultiplier: 2.5,
     contributionBonus: 200,
   },
-  仙品: {
+  'Mythic': {
     probability: 0.03,
     rewardMultiplier: 8.0,
     contributionBonus: 3000,
@@ -699,7 +699,7 @@ const TASK_QUALITY_CONFIG: Record<TaskQuality, {
 };
 
 // 任务品质类型
-export type TaskQuality = '普通' | '稀有' | '传说' | '仙品';
+export type TaskQuality = 'Common' | 'Rare' | 'Legendary' | 'Mythic';
 
 // 任务类型扩展
 export type TaskType =
@@ -737,7 +737,7 @@ export interface RandomSectTask {
   name: string;
   description: string;
   type: TaskType;
-  difficulty: '简单' | '普通' | '困难' | '极难'; // 任务难度
+  difficulty: 'Easy' | 'Normal' | 'Hard' | 'Extreme'; // 任务难度
   quality: TaskQuality; // 任务品质
   minRealm?: RealmType; // 最低境界要求
   recommendedRealm?: RealmType; // 推荐境界
@@ -775,6 +775,22 @@ export interface RandomSectTask {
   typeBonus?: number; // 任务类型连续完成加成（百分比）
 }
 
+// Helper to get random item by quality
+const getRandomItemByQuality = (quality: TaskQuality): { name: string } | undefined => {
+  // Simple implementation: pick from drop items
+  // In a real implementation this would filter a larger item database
+  if (Math.random() > 0.5) return undefined;
+
+  const rareItems = ['Mutant Flower', 'Scrap Metal', 'Energy Drink'];
+  const legendItems = ['Plasma Rifle', 'Power Armor Helmet', 'Fusion Core'];
+  const mythicItems = ['Alien Blaster', 'Experimental MIRV', 'G.E.C.K.'];
+
+  if (quality === 'Mythic') return { name: mythicItems[Math.floor(Math.random() * mythicItems.length)] };
+  if (quality === 'Legendary') return { name: legendItems[Math.floor(Math.random() * legendItems.length)] };
+  if (quality === 'Rare') return { name: rareItems[Math.floor(Math.random() * rareItems.length)] };
+  return undefined;
+};
+
 // 生成随机秘境
 export const generateRandomRealms = (
   playerRealm: RealmType,
@@ -796,11 +812,11 @@ export const generateRandomRealms = (
     const minRealm = REALM_ORDER[realmIndex];
 
     // 随机选择风险等级
-    const riskLevels: ('低' | '中' | '高' | '极度危险')[] = [
-      '低',
-      '中',
-      '高',
-      '极度危险',
+    const riskLevels: ('Low' | 'Medium' | 'High' | 'Extreme')[] = [
+      'Low',
+      'Medium',
+      'High',
+      'Extreme',
     ];
     const riskLevel = riskLevels[Math.floor(Math.random() * riskLevels.length)];
 
@@ -874,37 +890,34 @@ export const generateRandomSects = (
     const description = sectData.description;
 
     // 根据境界随机分配宗门等级
-    const grades: SectGrade[] = ['黄', '玄', '地', '天'];
-    const gradeWeights = [0.4, 0.3, 0.2, 0.1]; // 黄最多，天最少
-    let grade: SectGrade = '黄';
+    const grades: SectGrade[] = ['C', 'B', 'A', 'S'];
+    const gradeWeights = [0.4, 0.3, 0.2, 0.1]; // C最多，S最少
+    let grade: SectGrade = 'C';
     const rand = Math.random();
-    if (rand < gradeWeights[0]) grade = '黄';
-    else if (rand < gradeWeights[0] + gradeWeights[1]) grade = '玄';
-    else if (rand < gradeWeights[0] + gradeWeights[1] + gradeWeights[2]) grade = '地';
     else grade = '天';
 
-    // 根据等级设置退出代价
-    const exitCostMultiplier = {
-      '黄': 1,
-      '玄': 2,
-      '地': 5,
-      '天': 10,
-    }[grade];
+// 根据等级设置退出代价
+const exitCostMultiplier = {
+  '黄': 1,
+  '玄': 2,
+  '地': 5,
+  '天': 10,
+}[grade];
 
-    sects.push({
-      id: `sect-${randomId()}`,
-      name,
-      description,
-      reqRealm,
-      grade,
-      exitCost: {
-        spiritStones: Math.floor(300 * exitCostMultiplier),
-        items: [{ name: '聚灵草', quantity: Math.floor(5 * exitCostMultiplier) }],
-      },
-    });
+sects.push({
+  id: `sect-${randomId()}`,
+  name,
+  description,
+  reqRealm,
+  grade,
+  exitCost: {
+    spiritStones: Math.floor(300 * exitCostMultiplier),
+    items: [{ name: '聚灵草', quantity: Math.floor(5 * exitCostMultiplier) }],
+  },
+});
   }
 
-  return sects;
+return sects;
 };
 
 // 根据玩家境界计算任务收益倍数
@@ -1078,13 +1091,18 @@ export const generateRandomSectTasks = (
 
     // 特殊奖励（低概率，仅高品质任务）
     let specialReward: RandomSectTask['specialReward'] | undefined;
-    if ((quality === '传说' || quality === '仙品') && Math.random() < 0.15) {
+    if (quality === 'Legendary' || quality === 'Mythic') {
+      const specialItem = getRandomItemByQuality(quality);
+      if (specialItem) {
+        reward.items = reward.items || [];
+        reward.items.push({ name: specialItem.name, quantity: 1 });
+      }
       const specialTypes: Array<'equipment' | 'cultivationArt' | 'rareMaterial' | 'title'> =
         ['equipment', 'rareMaterial'];
       specialReward = {
         type: specialTypes[Math.floor(Math.random() * specialTypes.length)],
         item: {
-          name: quality === '仙品' ? '仙品法宝' : '传说法宝',
+          name: quality === 'Mythic' ? 'Mythic Artifact' : 'Legendary Artifact',
           quantity: 1,
         },
       };
@@ -1206,9 +1224,9 @@ const createItemFromConstants = (itemName: string, cost: number): { name: string
 // 宗门商店物品池（用于生成藏宝阁物品）- 从常量池获取
 const SECT_SHOP_ITEM_POOL: Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> = [
   // 从常量池获取的物品
-  createItemFromConstants('炼器石', 10) || { name: '炼器石', cost: 10, item: { name: '炼器石', type: ItemType.Material, description: '用于强化法宝的基础材料。', quantity: 1, rarity: '普通' } },
-  createPillItem('聚气丹', 20),
-  createItemFromConstants('紫猴花', 50) || { name: '紫猴花', cost: 50, item: { name: '紫猴花', type: ItemType.Herb, description: '炼制洗髓丹的材料，生长在悬崖峭壁。', quantity: 1, rarity: '稀有' } },
+  createItemFromConstants('Scrap Metal', 10) || { name: 'Scrap Metal', cost: 10, item: { name: 'Scrap Metal', type: ItemType.Material, description: 'Basic material for crafting.', quantity: 1, rarity: 'Common' } },
+  createPillItem('Energy Drink', 20),
+  createItemFromConstants('Mutant Flower', 50) || { name: 'Mutant Flower', cost: 50, item: { name: 'Mutant Flower', type: ItemType.Herb, description: 'A rare flower from the wasteland.', quantity: 1, rarity: 'Rare' } },
   createPillItem('洗髓丹', 100),
   createPillItem('筑基丹', 1000),
   createItemFromConstants('高阶妖丹', 500) || { name: '高阶妖丹', cost: 500, item: { name: '高阶妖丹', type: ItemType.Material, description: '强大妖兽的内丹，灵气逼人。', quantity: 1, rarity: '稀有' } },

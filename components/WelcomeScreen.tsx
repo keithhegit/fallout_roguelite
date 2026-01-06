@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Sparkles, Play, Upload } from 'lucide-react';
-import logo from '../public/assets/images/logo.png';
+const logo = 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/main_logo.png';
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import {
   getCurrentSlotId,

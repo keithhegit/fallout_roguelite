@@ -10,10 +10,10 @@ const CultivationIntroModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
-  const text = '我辈修士，夺天地造化，现传法如下；吸天地之灵以御其气；假天地之奇以筑道基；窥天地之法以炼金丹；夺天地之精以成元婴；抽天地之髓以得其神；祭天地之魄以身合道；逆天地之理以证长生；';
+  const text = 'War. War never changes. Since the dawn of human kind, when our ancestors first discovered the killing power of rock and bone, blood has been spilled in the name of everything: from God to justice to simple, psychotic rage. In the year 2077, after millennia of armed conflict, the destructive nature of man could sustain itself no longer. The world was plunged into an abyss of nuclear fire and radiation. But it was not, as some had predicted, the end of the world. Instead, the apocalypse was simply the prologue to another bloody chapter of human history. For man had succeeded in destroying the world - but war, war never changes.';
 
-  // 将文本按分号分割成句子
-  const sentences = text.split('；');
+  // Split text by sentences (periods)
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
 
   useEffect(() => {
     if (isOpen) {
@@ -36,7 +36,7 @@ const CultivationIntroModal: React.FC<Props> = ({ isOpen, onClose }) => {
         clearInterval(timer);
         return prev;
       });
-    }, 1000); // 每1000ms显示一句
+    }, 2500); // Slower pacing for dramatic effect
 
     return () => clearInterval(timer);
   }, [isOpen, isVisible, sentences.length]);
@@ -45,69 +45,66 @@ const CultivationIntroModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[10000] p-4"
+      className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[10000] p-4"
       onClick={onClose}
     >
       <div
-        className="bg-stone-800 rounded-lg border border-stone-600 shadow-lg max-w-3xl w-full p-6 md:p-8 relative"
+        className="bg-stone-900 rounded-lg border-2 border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.3)] max-w-3xl w-full p-6 md:p-8 relative font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 关闭按钮 */}
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-stone-400 hover:text-white transition-colors"
-          aria-label="关闭"
+          className="absolute top-4 right-4 text-green-500 hover:text-green-400 transition-colors"
+          aria-label="Close"
         >
           <X size={20} />
         </button>
 
-        {/* 标题 */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl md:text-3xl font-serif font-bold text-stone-200">
-            修仙法门
+        {/* Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-green-500 tracking-widest border-b border-green-500/30 pb-4">
+            ARCHIVE LOG 2077
           </h2>
         </div>
 
-        {/* 内容区域 */}
-        <div className="space-y-4">
+        {/* Content Area */}
+        <div className="space-y-6 min-h-[300px]">
           {sentences.map((sentence, index) => {
             const shouldShow = index <= currentIndex;
 
             return (
               <div
                 key={index}
-                className={`transition-all duration-500 ${
-                  shouldShow
+                className={`transition-all duration-1000 ${shouldShow
                     ? 'opacity-100 translate-y-0'
                     : 'opacity-0 translate-y-4'
-                }`}
+                  }`}
               >
                 <p
-                  className={`text-lg md:text-xl font-serif text-center leading-relaxed ${
-                    shouldShow ? 'text-stone-300' : 'text-stone-600'
-                  }`}
+                  className={`text-lg md:text-xl font-mono leading-relaxed ${shouldShow ? 'text-green-400' : 'text-green-900'
+                    } drop-shadow-[0_0_5px_rgba(34,197,94,0.5)]`}
                 >
-                  {sentence}
-                  {index < sentences.length - 1 && '；'}
+                  {sentence.trim()}
                 </p>
               </div>
             );
           })}
         </div>
 
-        {/* 底部提示 */}
+        {/* Footer */}
         {currentIndex >= sentences.length - 1 && (
-          <div className="mt-6 text-center">
-            <p className="text-stone-500 text-sm">
-              点击任意位置关闭
+          <div className="mt-8 text-center animate-pulse">
+            <p className="text-green-600 text-sm">
+              [ PRESS ANY KEY TO CONTINUE ]
             </p>
           </div>
         )}
 
-        {/* 引用信息 */}
+        {/* Reference */}
         <div className="mt-4 text-right">
-          <p className="text-stone-500 text-xs">
-            ---出自《我的模拟长生路》
+          <p className="text-green-800 text-xs">
+            --- ROOT ACCESS GRANTED
           </p>
         </div>
       </div>
