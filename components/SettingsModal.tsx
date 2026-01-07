@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { GameSettings } from '../types';
 import dayjs from 'dayjs';
+import { ASSETS } from '../constants/assets';
 import { showError, showSuccess, showInfo, showConfirm } from '../utils/toastUtils';
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import {

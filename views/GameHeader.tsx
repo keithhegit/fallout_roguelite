@@ -14,6 +14,7 @@ import {
   Users,
 } from 'lucide-react';
 import { PlayerStats } from '../types';
+import { ASSETS } from '../constants/assets';
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import { useParty } from '../hooks/useParty';
 
