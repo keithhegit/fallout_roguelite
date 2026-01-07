@@ -228,7 +228,7 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
           {/* Challenge Briefing */}
           <div className="mb-6 p-4 bg-stone-900/40 border border-stone-800 rounded-none">
             <h3 className="text-sm font-bold text-emerald-500 mb-2 uppercase tracking-widest">
-              > MISSION_BRIEFING
+              {'>'} MISSION_BRIEFING
             </h3>
             <p className="text-stone-300 text-sm leading-relaxed">
               To cross the final frontier and achieve Apex status, you must neutralize a high-threat Wasteland Entity. Proving your combat superiority is mandatory for final elevation.

@@ -54,7 +54,7 @@ const DailyQuestModal: React.FC<Props> = ({
         // Sort by progress (incomplete first, completed descending by progress)
         if (a.completed !== b.completed) return a.completed ? 1 : -1;
         return b.progress - a.progress;
-      case 'rarity':
+      case 'rarity': {
         // Sort by rarity
         const rarityOrder: Record<ItemRarity, number> = {
           Common: 1,
@@ -63,7 +63,8 @@ const DailyQuestModal: React.FC<Props> = ({
           Mythic: 4,
         };
         return rarityOrder[b.rarity] - rarityOrder[a.rarity];
-      case 'reward':
+      }
+      case 'reward': {
         // Sort by reward value
         const rewardA =
           (a.reward.exp || 0) +
@@ -74,6 +75,7 @@ const DailyQuestModal: React.FC<Props> = ({
           (b.reward.spiritStones || 0) * 0.1 +
           (b.reward.lotteryTickets || 0) * 10;
         return rewardB - rewardA;
+      }
       default:
         return 0;
     }

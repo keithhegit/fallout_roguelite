@@ -234,7 +234,7 @@ const BatchFeedModal: React.FC<Props> = ({
                 PET_NOURISHMENT_PROTOCOL
               </h3>
               <p className="text-[10px] text-stone-600 tracking-widest uppercase">
-                FEEDING: {pet.name} // RESOURCE_ALLOCATION
+                FEEDING: {pet.name} {'//'} RESOURCE_ALLOCATION
               </p>
             </div>
           </div>
@@ -508,4 +508,3 @@ const BatchFeedModal: React.FC<Props> = ({
 };
 
 export default BatchFeedModal;
-

@@ -14,8 +14,6 @@ interface LotteryModalProps {
 }
 
 const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, onDraw }) => {
-  if (!isOpen) return null;
-
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastResult, setLastResult] = useState<LotteryPrize[] | null>(null);
   const [displayTickets, setDisplayTickets] = useState(player.lotteryTickets);
@@ -139,6 +137,8 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
       </div>
     );
   };
+
+  if (!isOpen) return null;
 
   return (
     <div

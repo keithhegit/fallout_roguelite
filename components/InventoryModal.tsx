@@ -17,6 +17,8 @@ import { ASSETS } from '../constants/assets';
 import {
   X,
   Package,
+  Archive,
+  FileText,
   ShieldCheck,
   Hammer,
   Trash2,

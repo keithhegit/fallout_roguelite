@@ -152,7 +152,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   const formatCategoryName = (category: string): string => {
     // Remove emojis, keep text only
-    return category.replace(/^[🎉🐛🔧📚🎯🎨💥🔒]+\s*/, '').trim();
+    return category.replace(/^(?:🎉|🐛|🔧|📚|🎯|🎨|💥|🔒)+\s*/u, '').trim();
   };
 
   const getCategoryIcon = (category: string): string => {
@@ -202,7 +202,9 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">REVISION_CHRONICLES</h2>
-              <p className="text-[10px] text-stone-600 tracking-widest uppercase">FIRMWARE_V{currentVersion} // STABLE_BUILD</p>
+              <p className="text-[10px] text-stone-600 tracking-widest uppercase">
+                FIRMWARE_V{currentVersion} {'//'} STABLE_BUILD
+              </p>
             </div>
           </div>
           <button

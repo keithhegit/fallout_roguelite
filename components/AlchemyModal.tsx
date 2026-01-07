@@ -16,8 +16,6 @@ const AlchemyModal: React.FC<Props> = ({
   player,
   onCraft,
 }) => {
-  if (!isOpen) return null;
-
   const countItem = (itemName: string) => {
     const item = player.inventory.find((i) => i.name === itemName);
     return item ? item.quantity : 0;
@@ -31,6 +29,8 @@ const AlchemyModal: React.FC<Props> = ({
     );
     return [...PILL_RECIPES, ...unlocked];
   }, [player.unlockedRecipes]);
+
+  if (!isOpen) return null;
 
   return (
     <div

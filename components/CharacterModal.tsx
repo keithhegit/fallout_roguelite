@@ -228,8 +228,6 @@ const CharacterModal: React.FC<Props> = ({
   onResetAttributes,
   addLog = (msg: string) => logger.log(msg),
 }) => {
-  if (!isOpen) return null;
-
   // Use getPlayerTotalStats to get total stats including heart method bonuses
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const totalStats = useMemo(() => getPlayerTotalStats(player), [player]);
@@ -641,6 +639,8 @@ const CharacterModal: React.FC<Props> = ({
       }
     );
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -1233,7 +1233,7 @@ const CharacterModal: React.FC<Props> = ({
                       </div>
                       
                       <p className="text-[9px] text-stone-600 leading-relaxed uppercase tracking-tighter italic">
-                        // Legacy data synchronization complete. Authorized for tier evolution protocols.
+                        {'// Legacy data synchronization complete. Authorized for tier evolution protocols.'}
                       </p>
 
                       {onUseInheritance && (

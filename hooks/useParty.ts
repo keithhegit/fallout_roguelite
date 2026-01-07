@@ -11,14 +11,10 @@ const getPartyKitHost = () => {
     return `${hostname}:1999`;
   } else {
     // 生产环境：使用配置的远程服务器
-    return (
-      import.meta.env.VITE_PARTYKIT_HOST ||
-      'xiuxian-game-party.dnzzk2.partykit.dev'
-    );
+    return import.meta.env.VITE_PARTYKIT_HOST;
   }
 };
 
-console.log(getPartyKitHost());
 const PARTYKIT_HOST = getPartyKitHost();
 
 // 全局状态管理
@@ -28,6 +24,7 @@ let onlineCountListeners: ((count: number) => void)[] = [];
 let currentOnlineCount = 0;
 
 function setupGlobalConnection(roomName: string) {
+  if (!PARTYKIT_HOST) return null;
   if (globalSocket) return globalSocket;
 
   const s = new PartySocket({
@@ -75,6 +72,11 @@ export function useParty(roomName: string = 'main', limit: number = 150) {
 
   useEffect(() => {
     const s = setupGlobalConnection(roomName);
+    if (!s) {
+      setSocket(null);
+      setOnlineCount(0);
+      return;
+    }
     setSocket(s);
 
     // 添加消息监听器

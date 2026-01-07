@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { User, Briefcase, Radio, Menu, Map } from 'lucide-react';
 import { PlayerStats, LogEntry } from '../types';
 import { ASSETS } from '../constants/assets';

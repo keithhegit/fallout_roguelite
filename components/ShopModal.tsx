@@ -59,8 +59,6 @@ const ShopModal: React.FC<Props> = ({
     'all'
   );
 
-  if (!isOpen) return null;
-
   const canBuyItem = (shopItem: ShopItem): boolean => {
     // 检查声望要求（声望商店）
     if (shop.reputationRequired && (player.reputation || 0) < shop.reputationRequired) {
@@ -226,6 +224,8 @@ const ShopModal: React.FC<Props> = ({
       }
     );
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
