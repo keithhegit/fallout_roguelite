@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Gift, Sparkles } from 'lucide-react';
 import { PlayerStats, LotteryPrize, ItemRarity } from '../types';
+import { ASSETS } from '../constants/assets';
 import { LOTTERY_PRIZES } from '../constants/index';
 import { showError } from '../utils/toastUtils';
 import { getRarityColor, getRarityBorder } from '../utils/rarityUtils';
 
-interface Props {
+interface LotteryModalProps {
   isOpen: boolean;
   onClose: () => void;
   player: PlayerStats;
   onDraw: (count: number) => void;
 }
 
-const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
+const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, onDraw }) => {
   if (!isOpen) return null;
 
   const [isDrawing, setIsDrawing] = useState(false);
@@ -141,23 +142,34 @@ const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-50 p-0 md:p-4 backdrop-blur-sm touch-manipulation"
+      className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-50 p-0 md:p-4 backdrop-blur-sm touch-manipulation font-mono"
       onClick={() => !isDrawing && onClose()}
     >
       {renderDrawingOverlay()}
       <div
-        className="bg-paper-800 w-full h-[80vh] md:h-auto md:max-w-2xl rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-600 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-3 md:p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 rounded-t-2xl z-10">
-          <h2 className="text-lg md:text-xl font-serif text-mystic-gold flex items-center gap-2">
-            <Gift className="text-yellow-400 w-5 h-5 md:w-6 md:h-6" />
-            Supply Drop System
-          </h2>
+          className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-2xl rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* 背景纹理 */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+          
+          {/* CRT 效果层 */}
+          <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+          <div className="crt-noise"></div>
+          <div className="crt-vignette"></div>
+
+          <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 rounded-none z-10">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg md:text-xl font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-2">
+              <Gift className="text-emerald-500 w-5 h-5 md:w-6 md:h-6" />
+              Lottery_Terminal
+            </h2>
+            <div className="hidden md:block px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] uppercase tracking-widest">System_Active</div>
+          </div>
           <button
             onClick={onClose}
             disabled={isDrawing}
-            className={`text-stone-400 min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation transition-colors ${isDrawing
+            className={`text-stone-500 min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation transition-colors ${isDrawing
                 ? 'opacity-20 cursor-not-allowed'
                 : 'active:text-white hover:text-stone-300'
               }`}
@@ -166,20 +178,23 @@ const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
           </button>
         </div>
 
-        <div className="modal-scroll-container modal-scroll-content p-6 space-y-6 bg-paper-800">
+        <div className="modal-scroll-container modal-scroll-content p-6 space-y-6 bg-ink-950/50 z-10">
           {/* 抽奖券信息 */}
-          <div className="bg-stone-900 rounded p-4 border border-stone-700 text-center">
-            <div className="text-2xl font-bold text-yellow-400 mb-2">
-              {displayTickets} x
-            </div>
-            <div className="text-stone-400">Supply Tickets</div>
-            <div className="text-xs text-stone-500 mt-2">
-              Total Draws: {player.lotteryCount}
-              {player.lotteryCount >= 10 && player.lotteryCount % 10 !== 0 && (
-                <span className="text-yellow-400 ml-2">
-                  ({10 - (player.lotteryCount % 10)} more for Rare+)
-                </span>
-              )}
+          <div className="bg-stone-900/50 rounded-none p-4 border border-stone-800 text-center relative overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+            <div className="relative z-10">
+              <div className="text-2xl font-bold text-emerald-400 mb-2">
+                {displayTickets} x
+              </div>
+              <div className="text-stone-400 text-xs uppercase tracking-widest">Supply_Tickets_Available</div>
+              <div className="text-[10px] text-stone-500 mt-2 uppercase tracking-tighter">
+                Total_Draws_Executed: {player.lotteryCount}
+                {player.lotteryCount >= 10 && player.lotteryCount % 10 !== 0 && (
+                  <span className="text-emerald-500/60 ml-2">
+                    ({10 - (player.lotteryCount % 10)} more for Rare+)
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -190,25 +205,23 @@ const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
               <button
                 onClick={() => handleDraw(1)}
                 disabled={isDrawing || displayTickets < 1}
-                className="group relative px-6 py-8 bg-stone-900 hover:bg-stone-800 rounded-lg border-2 border-purple-900/50 hover:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all overflow-hidden shadow-lg"
+                className="group relative px-6 py-8 bg-stone-900/40 hover:bg-stone-800/60 rounded-none border border-stone-800 hover:border-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all overflow-hidden shadow-lg"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -inset-y-2 w-px bg-purple-500/20 left-4 group-hover:bg-purple-500/40 transition-colors" />
-                <div className="absolute -inset-y-2 w-px bg-purple-500/20 right-4 group-hover:bg-purple-500/40 transition-colors" />
-
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                
                 {isDrawing ? (
                   <div className="flex flex-col items-center gap-2 relative z-10">
-                    <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-purple-400 text-sm">Searching...</span>
+                    <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                    <span className="text-emerald-500 text-[10px] uppercase tracking-widest">Searching...</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-2 relative z-10">
                     <Gift
                       size={32}
-                      className="text-purple-400 group-hover:scale-110 transition-transform"
+                      className="text-stone-500 group-hover:text-emerald-500 transition-colors"
                     />
-                    <span className="font-bold text-stone-200">Single Draw</span>
-                    <span className="text-xs text-stone-500">Costs 1 Ticket</span>
+                    <span className="font-bold text-stone-300 uppercase tracking-wider">Single_Draw</span>
+                    <span className="text-[10px] text-stone-600 uppercase">Cost: 1_Unit</span>
                   </div>
                 )}
               </button>
@@ -216,99 +229,94 @@ const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
               <button
                 onClick={() => handleDraw(10)}
                 disabled={isDrawing || displayTickets < 10}
-                className="group relative px-6 py-8 bg-stone-900 hover:bg-stone-800 rounded-lg border-2 border-yellow-900/50 hover:border-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all overflow-hidden shadow-xl"
+                className="group relative px-6 py-8 bg-stone-900/40 hover:bg-stone-800/60 rounded-none border border-stone-800 hover:border-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all overflow-hidden shadow-xl"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute -inset-y-2 w-px bg-yellow-500/20 left-4 group-hover:bg-yellow-500/40 transition-colors" />
-                <div className="absolute -inset-y-2 w-px bg-yellow-500/20 right-4 group-hover:bg-yellow-500/40 transition-colors" />
-                <div className="absolute inset-0 draw-button-shimmer pointer-events-none opacity-20" />
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 draw-button-shimmer pointer-events-none opacity-10" />
 
                 {isDrawing ? (
                   <div className="flex flex-col items-center gap-2 relative z-10">
-                    <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-yellow-400 text-sm">Processing...</span>
+                    <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                    <span className="text-emerald-500 text-[10px] uppercase tracking-widest">Processing...</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-2 relative z-10">
                     <Sparkles
                       size={32}
-                      className="text-yellow-400 group-hover:scale-110 transition-transform"
+                      className="text-stone-500 group-hover:text-emerald-500 transition-colors"
                     />
-                    <span className="font-bold text-stone-200">10x Draw</span>
-                    <span className="text-xs text-stone-500">Costs 10 Tickets</span>
+                    <span className="font-bold text-stone-300 uppercase tracking-wider">10x_Draw</span>
+                    <span className="text-[10px] text-stone-600 uppercase">Cost: 10_Units</span>
                   </div>
                 )}
               </button>
             </div>
 
             {/* 自定义连抽 */}
-            <div className="bg-stone-900 rounded-lg p-4 border border-stone-700">
-              <div className="text-sm font-bold text-stone-300 mb-3">
-                Bulk Supply Request
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  max={displayTickets}
-                  value={customCountInput}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    // 允许用户输入空字符串或数字
-                    if (inputValue === '') {
-                      setCustomCountInput('');
-                      return;
+            <div className="bg-stone-900/40 rounded-none p-4 border border-stone-800 relative overflow-hidden">
+              <div className="absolute inset-0 opacity-[0.01] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+              <div className="relative z-10">
+                <div className="text-[10px] font-bold text-stone-500 mb-3 uppercase tracking-widest">
+                  Bulk_Supply_Request
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min="1"
+                    max={displayTickets}
+                    value={customCountInput}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+                      if (inputValue === '') {
+                        setCustomCountInput('');
+                        return;
+                      }
+                      const value = parseInt(inputValue, 10);
+                      if (!isNaN(value) && value > 0) {
+                        setCustomCountInput(String(Math.max(1, value)));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const inputValue = e.target.value;
+                      if (inputValue === '') {
+                        return;
+                      }
+                      const value = parseInt(inputValue, 10);
+                      if (isNaN(value) || value < 1) {
+                        setCustomCountInput('');
+                      } else {
+                        const maxValue = displayTickets > 0 ? displayTickets : 1;
+                        const validValue = Math.min(Math.max(1, value), maxValue);
+                        setCustomCountInput(String(validValue));
+                      }
+                    }}
+                    disabled={isDrawing}
+                    className="flex-1 px-3 py-2 bg-stone-950 border border-stone-800 rounded-none text-emerald-500 focus:outline-none focus:border-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    placeholder="ENTER_QTY"
+                  />
+                  <button
+                    onClick={() => handleDraw(customCount)}
+                    disabled={
+                      isDrawing || displayTickets < customCount || customCount < 1
                     }
-                    const value = parseInt(inputValue, 10);
-                    if (!isNaN(value) && value > 0) {
-                      // 输入时只验证最小值，允许用户输入超过当前抽奖券数量的值
-                      // 最大值限制在失去焦点时处理
-                      setCustomCountInput(String(Math.max(1, value)));
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const inputValue = e.target.value;
-                    // 如果为空，保持空值
-                    if (inputValue === '') {
-                      return;
-                    }
-                    const value = parseInt(inputValue, 10);
-                    if (isNaN(value) || value < 1) {
-                      // 无效值时设为空而不是1
-                      setCustomCountInput('');
-                    } else {
-                      // 失去焦点时，确保值在有效范围内
-                      const maxValue = displayTickets > 0 ? displayTickets : 1;
-                      const validValue = Math.min(Math.max(1, value), maxValue);
-                      setCustomCountInput(String(validValue));
-                    }
-                  }}
-                  disabled={isDrawing}
-                  className="flex-1 px-3 py-2 bg-stone-800 border border-stone-600 rounded text-stone-200 focus:outline-none focus:border-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder="Enter quantity"
-                />
-                <button
-                  onClick={() => handleDraw(customCount)}
-                  disabled={
-                    isDrawing || displayTickets < customCount || customCount < 1
-                  }
-                  className="px-6 py-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed rounded text-white font-bold transition-colors"
-                >
-                  {customCount > 0 ? `Draw ${customCount}` : 'Set Count'}
-                </button>
-              </div>
-              <div className="text-xs text-stone-500 mt-2">
-                {customCount > 0 ? `Costs ${customCount} Tickets` : 'Please enter quantity'}
-                {customCount > 0 && displayTickets < customCount && (
-                  <span className="text-red-400 ml-2">(Insufficient Tickets)</span>
-                )}
+                    className="px-6 py-2 bg-stone-800 hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-none text-stone-300 text-xs font-bold transition-colors border border-stone-700 uppercase tracking-wider"
+                  >
+                    {customCount > 0 ? `EXECUTE_${customCount}` : 'SET_COUNT'}
+                  </button>
+                </div>
+                <div className="text-[9px] text-stone-600 mt-2 uppercase tracking-tighter">
+                  {customCount > 0 ? `Resource_Requirement: ${customCount}_Tickets` : 'Awaiting input...'}
+                  {customCount > 0 && displayTickets < customCount && (
+                    <span className="text-red-900 ml-2">!_INSUFFICIENT_RESOURCES</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* 奖品稀有度分布 */}
           <div>
-            <h3 className="text-lg font-bold mb-3">Supply Rarity Distribution</h3>
+            <h3 className="text-xs font-bold mb-3 text-stone-500 uppercase tracking-widest">Supply_Manifest_Probabilities</h3>
             <div className="space-y-3">
               {(['Common', 'Rare', 'Epic', 'Legendary'] as const).map((rarity) => {
                 const prizesOfRarity = LOTTERY_PRIZES.filter(
@@ -330,26 +338,35 @@ const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
                 return (
                   <div
                     key={rarity}
-                    className={`bg-stone-900 rounded p-3 border ${getRarityBorder(rarity as ItemRarity)}`}
+                    className={`bg-stone-900/40 rounded-none p-3 border border-stone-800 relative overflow-hidden group`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="absolute inset-0 bg-stone-800/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div
-                          className={`text-sm font-bold ${getRarityColor(rarity).split(' ')[0]}`}
+                          className={`text-[10px] font-bold uppercase tracking-wider ${
+                            rarity === 'Common' ? 'text-stone-400' : 
+                            rarity === 'Rare' ? 'text-blue-400' : 
+                            rarity === 'Epic' ? 'text-purple-400' : 'text-emerald-400'
+                          }`}
                         >
                           {rarity}
                         </div>
-                        <div className="text-xs text-stone-500">
-                          ({prizesOfRarity.length} items)
+                        <div className="text-[9px] text-stone-600 uppercase tracking-tighter">
+                          [{prizesOfRarity.length}_Entries]
                         </div>
                       </div>
-                      <div className="text-sm font-bold text-yellow-400">
+                      <div className="text-xs font-bold text-stone-400 font-mono">
                         {probability}%
                       </div>
                     </div>
-                    <div className="mt-2 bg-stone-800 rounded-full h-2 overflow-hidden">
+                    <div className="mt-2 bg-stone-950 border border-stone-800 h-1 overflow-hidden">
                       <div
-                        className={`h-full ${rarity === 'Common' ? 'bg-gray-500' : rarity === 'Rare' ? 'bg-blue-500' : rarity === 'Epic' ? 'bg-purple-500' : 'bg-yellow-500'}`}
+                        className={`h-full ${
+                          rarity === 'Common' ? 'bg-stone-600' : 
+                          rarity === 'Rare' ? 'bg-blue-600' : 
+                          rarity === 'Epic' ? 'bg-purple-600' : 'bg-emerald-600'
+                        } opacity-50`}
                         style={{ width: `${probability}%` }}
                       />
                     </div>
@@ -357,8 +374,8 @@ const LotteryModal: React.FC<Props> = ({ isOpen, onClose, player, onDraw }) => {
                 );
               })}
             </div>
-            <div className="mt-4 text-xs text-stone-500 text-center">
-              💡 10x Draws guarantee at least one Rare+ item.
+            <div className="mt-4 text-[9px] text-stone-600 text-center uppercase tracking-widest">
+              * Guaranteed_Rare+ unit every 10 sequential cycles.
             </div>
           </div>
         </div>

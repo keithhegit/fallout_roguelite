@@ -58,6 +58,7 @@ import { STORAGE_KEYS } from '../constants/storageKeys';
 import { LOOT_ITEMS } from '../services/battleService';
 import { showSuccess, showError, showInfo, showConfirm } from '../utils/toastUtils';
 import { getRarityTextColor } from '../utils/rarityUtils';
+import { ASSETS } from '../constants/assets';
 
 // 生成唯一ID
 const uid = () =>
@@ -874,28 +875,53 @@ const DebugModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4 touch-manipulation"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 crt-screen"
       onClick={onClose}
     >
       <div
-        className="bg-stone-800 md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-700 w-full h-[90vh] md:h-auto md:max-w-4xl md:max-h-[90vh] flex flex-col safe-area-modal"
+        className="bg-ink-950 w-full max-w-5xl h-[90vh] rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="bg-stone-800 border-b border-stone-700 p-3 md:p-4 flex justify-between items-center md:rounded-t-2xl shrink-0">
-          <h2 className="text-lg md:text-xl font-serif text-red-500">
-            🔧 调试模式
-          </h2>
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+        
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
+        <div className="bg-stone-950/50 border-b border-stone-800 p-4 md:p-6 flex justify-between items-center relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-red-500 shadow-inner relative group overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+              />
+              <Power size={24} className="relative z-10" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">DEBUG_TERMINAL</h2>
+              <p className="text-[10px] text-stone-600 tracking-widest uppercase">OVERRIDE_MODE // SYSTEM_ADMIN</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+            className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50 relative group overflow-hidden"
+            aria-label="ABORT"
           >
-            <X size={24} />
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <X size={24} className="relative z-10" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="modal-scroll-container modal-scroll-content p-4 md:p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10">
           {/* 全局搜索 */}
           <div className="bg-stone-900/50 border border-stone-700 rounded-lg p-3">
             <div className="flex items-center gap-2">
@@ -3606,21 +3632,29 @@ const DebugModal: React.FC<Props> = ({
         </div>
 
         {/* Footer */}
-        <div className="bg-stone-800 border-t border-stone-700 p-3 md:p-4 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 shrink-0 safe-area-footer">
+        <div className="bg-stone-950 border-t border-stone-800 p-4 md:p-6 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 shrink-0 relative z-10">
           <button
             onClick={handleDisableDebugMode}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-orange-700 active:bg-orange-600 text-white rounded border border-orange-600 transition-colors min-h-[44px] touch-manipulation"
-            title="关闭调试模式"
+            className="h-12 px-6 bg-red-950/20 hover:bg-red-950/40 text-red-500 border border-red-900/50 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs font-bold relative group overflow-hidden"
+            title="TERMINATE_DEBUG_PROTOCOL"
           >
-            <Power size={16} />
-            关闭调试模式
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <Power size={18} className="relative z-10" />
+            <span className="relative z-10">TERMINATE_DEBUG</span>
           </button>
           <button
             onClick={handleReset}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-stone-700 active:bg-stone-600 text-stone-200 rounded border border-stone-600 transition-colors min-h-[44px] touch-manipulation"
+            className="h-12 px-6 bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-800 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs font-bold relative group overflow-hidden"
           >
-            <RotateCcw size={16} />
-            重置
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <RotateCcw size={18} className="relative z-10" />
+            <span className="relative z-10">REVERT_ALL</span>
           </button>
         </div>
       </div>

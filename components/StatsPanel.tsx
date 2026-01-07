@@ -52,17 +52,17 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
   // Use unified utility function to get rarity color
 
   return (
-    <div className="bg-paper-800 border-r-2 border-b-2 md:border-b-0 border-stone-700 p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full md:w-80 shrink-0 h-auto md:h-full overflow-y-auto">
+    <div className="bg-ink-950 border-r-2 border-b-2 md:border-b-0 border-stone-800 p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full md:w-80 shrink-0 h-auto md:h-full overflow-y-auto font-mono">
       {/* Mobile Collapse Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="md:hidden flex items-center justify-between w-full p-2 bg-ink-800 rounded border border-stone-600 mb-2 touch-manipulation"
+        className="md:hidden flex items-center justify-between w-full p-2 bg-ink-900 rounded-none border border-stone-700 mb-2 touch-manipulation"
       >
         <div className="text-center flex-1">
-          <h2 className="text-lg font-serif font-bold text-mystic-gold tracking-widest">
+          <h2 className="text-lg font-mono font-bold text-mystic-gold tracking-[0.2em] uppercase">
             {player.name}
           </h2>
-          <div className="text-stone-400 text-xs mt-0.5 font-serif">
+          <div className="text-stone-400 text-xs mt-0.5 font-mono uppercase tracking-wider">
             {(() => {
               // Using mutant path title for RealmType.GoldenCore
               if (player.realm === 'Mutant' && player.goldenCoreMethodCount) {
@@ -77,11 +77,11 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
       </button>
 
       {/* Desktop Header */}
-      <div className="hidden md:block text-center mb-4">
-        <h2 className="text-2xl font-serif font-bold text-mystic-gold tracking-widest">
+      <div className="hidden md:block text-center mb-4 border-b-2 border-stone-800 pb-4">
+        <h2 className="text-2xl font-mono font-bold text-mystic-gold tracking-[0.2em] uppercase">
           {player.name}
         </h2>
-        <div className="text-stone-400 text-sm mt-1 font-serif">
+        <div className="text-stone-400 text-sm mt-1 font-mono uppercase tracking-wider">
           {(() => {
             // Using mutant path title for RealmType.GoldenCore
             if (player.realm === 'Mutant' && player.goldenCoreMethodCount) {
@@ -106,7 +106,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
                 {formatNumber(player.hp)} / {formatNumber(totalStats.maxHp)}
               </span>
             </div>
-            <div className="h-2 bg-stone-900 rounded-full overflow-hidden border border-stone-700">
+            <div className="h-2 bg-stone-900 rounded-none overflow-hidden border border-stone-700">
               <div
                 className="h-full bg-mystic-blood transition-all duration-500 ease-out"
                 style={{ width: `${hpPercentage}%` }}
@@ -121,7 +121,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
                 {formatNumber(Math.floor(player.exp))} / {formatNumber(player.maxExp)}
               </span>
             </div>
-            <div className="h-2 bg-stone-900 rounded-full overflow-hidden border border-stone-700">
+            <div className="h-2 bg-stone-900 rounded-none overflow-hidden border border-stone-700">
               <div
                 className="h-full bg-mystic-jade transition-all duration-500 ease-out"
                 style={{ width: `${expPercentage}%` }}
@@ -136,7 +136,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
                 {formatNumber(Math.floor(player.lifespan ?? player.maxLifespan ?? 100))} / {formatNumber(Math.floor(player.maxLifespan ?? 100))}
               </span>
             </div>
-            <div className="h-2 bg-stone-900 rounded-full overflow-hidden border border-stone-700">
+            <div className="h-2 bg-stone-900 rounded-none overflow-hidden border border-stone-700">
               <div
                 className={`h-full transition-all duration-500 ease-out ${lifespanPercentage < 20 ? 'bg-red-500' : lifespanPercentage < 50 ? 'bg-orange-500' : 'bg-emerald-500'
                   }`}
@@ -147,33 +147,33 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
         </div>
 
         {/* Active Art */}
-        <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+        <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
           <BookOpen
             size={16}
             className="md:w-[18px] md:h-[18px] text-blue-400"
           />
           <div className="flex-1">
-            <div className="text-[10px] md:text-xs text-stone-500">
+            <div className="text-[10px] md:text-xs text-stone-500 uppercase">
               Active Neural Mod
             </div>
-            <div className="text-stone-200 font-serif font-bold text-xs md:text-sm">
+            <div className="text-stone-200 font-mono font-bold text-xs md:text-sm uppercase">
               {activeArt ? activeArt.name : 'Unknown Mod'}
             </div>
           </div>
         </div>
 
         {/* Natal Artifact */}
-        <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+        <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
           <Sword
             size={16}
             className="md:w-[18px] md:h-[18px] text-purple-400"
           />
           <div className="flex-1">
-            <div className="text-[10px] md:text-xs text-stone-500">
+            <div className="text-[10px] md:text-xs text-stone-500 uppercase">
               Signature Gear
             </div>
             <div
-              className={`font-serif font-bold text-xs md:text-sm ${getRarityTextColor(natalArtifact?.rarity)}`}
+              className={`font-mono font-bold text-xs md:text-sm uppercase ${getRarityTextColor(natalArtifact?.rarity)}`}
             >
               {natalArtifact ? natalArtifact.name : 'None'}
             </div>
@@ -182,67 +182,67 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
 
         {/* Attributes */}
         <div className="grid grid-cols-2 gap-2 md:gap-3 mt-1">
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Sword size={14} className="md:w-[18px] md:h-[18px] text-red-400" />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">Firepower (FP)</div>
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">Firepower (FP)</div>
               <div className="text-stone-200 font-bold text-xs md:text-base">
                 {totalStats.attack}
               </div>
             </div>
           </div>
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Shield
               size={14}
               className="md:w-[18px] md:h-[18px] text-blue-400"
             />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">Dmg Resist (DR)</div>
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">Dmg Resist (DR)</div>
               <div className="text-stone-200 font-bold text-xs md:text-base">
                 {totalStats.defense}
               </div>
             </div>
           </div>
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Zap
               size={14}
               className="md:w-[18px] md:h-[18px] text-yellow-400"
             />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">Perception (PER)</div>
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">Perception (PER)</div>
               <div className="text-stone-200 font-bold text-xs md:text-base">
                 {totalStats.spirit}
               </div>
             </div>
           </div>
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Shield
               size={14}
               className="md:w-[18px] md:h-[18px] text-green-400"
             />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">Endurance (END)</div>
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">Endurance (END)</div>
               <div className="text-stone-200 font-bold text-xs md:text-base">
                 {totalStats.physique}
               </div>
             </div>
           </div>
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Zap size={14} className="md:w-[18px] md:h-[18px] text-cyan-400" />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">Agility (AGL)</div>
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">Agility (AGL)</div>
               <div className="text-stone-200 font-bold text-xs md:text-base">
                 {totalStats.speed}
               </div>
             </div>
           </div>
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Coins
               size={14}
               className="md:w-[18px] md:h-[18px] text-mystic-gold"
             />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">Bottle Caps</div>
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">Bottle Caps</div>
               <div className="text-mystic-gold font-bold text-xs md:text-base">
                 {formatNumber(player.spiritStones)}
               </div>
@@ -252,13 +252,13 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
 
         {/* 其他信息 */}
         {player.lotteryTickets > 0 && (
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-yellow-500/50 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-yellow-500/50 flex items-center gap-2 md:gap-3">
             <Zap
               size={14}
               className="md:w-[18px] md:h-[18px] text-yellow-400"
             />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">
                 Lottery Tickets
               </div>
               <div className="text-yellow-400 font-bold text-xs md:text-base">
@@ -268,13 +268,13 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
           </div>
         )}
         {player.inheritanceLevel > 0 && (
-          <div className="bg-ink-800 p-2 md:p-3 rounded border border-purple-500/50 flex items-center gap-2 md:gap-3">
+          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-purple-500/50 flex items-center gap-2 md:gap-3">
             <Zap
               size={14}
               className="md:w-[18px] md:h-[18px] text-purple-400"
             />
             <div>
-              <div className="text-[10px] md:text-xs text-stone-500">
+              <div className="text-[10px] md:text-xs text-stone-500 uppercase">
                 Legacy Level
               </div>
               <div className="text-purple-400 font-bold text-xs md:text-base">
@@ -285,13 +285,13 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
         )}
 
         {/* 灵根显示 */}
-        <div className="bg-ink-800 p-2 md:p-3 rounded border border-stone-700">
+        <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles
               size={14}
               className="md:w-[18px] md:h-[18px] text-purple-400"
             />
-            <div className="text-[10px] md:text-xs text-stone-500">Aptitude</div>
+            <div className="text-[10px] md:text-xs text-stone-500 uppercase">Aptitude</div>
           </div>
           <div className="grid grid-cols-5 gap-1">
             {(['metal', 'wood', 'water', 'fire', 'earth'] as const).map((root) => {
@@ -313,7 +313,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
               return (
                 <div
                   key={root}
-                  className="text-center p-1 bg-stone-900 rounded border border-stone-700"
+                  className="text-center p-1 bg-stone-900 rounded-none border border-stone-700"
                 >
                   <div className={`text-[10px] md:text-xs font-bold ${rootColors[root]}`}>
                     {rootNames[root]}
@@ -327,7 +327,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
           </div>
         </div>
 
-        <div className="hidden md:block mt-auto pt-6 border-t border-stone-700 text-xs text-stone-500 italic text-center">
+        <div className="hidden md:block mt-auto pt-6 border-t border-stone-700 text-xs text-stone-500 italic text-center uppercase tracking-widest">
           "War. War never changes."
         </div>
       </div>

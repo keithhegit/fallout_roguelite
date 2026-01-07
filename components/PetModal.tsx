@@ -17,6 +17,7 @@ import { PET_TEMPLATES, RARITY_MULTIPLIERS, REALM_ORDER } from '../constants/ind
 import BatchFeedModal from './BatchFeedModal';
 import BatchReleaseModal from './BatchReleaseModal';
 import { getRarityTextColor } from '../utils/rarityUtils';
+import { ASSETS } from '../constants/assets';
 
 interface Props {
   isOpen: boolean;
@@ -102,10 +103,14 @@ const PetModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full h-[80vh] md:h-auto md:max-w-3xl rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-600 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden"
+        className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-3xl md:rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[90vh] relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-3 md:p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 rounded-t-2xl z-10">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        
+        <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 z-10">
           <h2 className="text-lg md:text-xl font-serif text-mystic-gold">
             Creature Taming System
           </h2>
@@ -118,7 +123,7 @@ const PetModal: React.FC<Props> = ({
           </button>
         </div>
 
-        <div className="modal-scroll-container modal-scroll-content p-6 space-y-6 bg-paper-800">
+        <div className="modal-scroll-container modal-scroll-content p-6 space-y-6 bg-ink-950/50 z-10">
           {/* Currently Active Creature */}
           {activePet && (
             <div className="bg-stone-900 rounded p-4 border-2 border-yellow-600">

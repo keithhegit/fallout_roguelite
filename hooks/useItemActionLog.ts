@@ -18,6 +18,7 @@ import { useDelayedState } from './useDelayedState';
 export interface ItemActionLog {
   text: string;
   type: string;
+  timestamp?: number;
 }
 
 export interface UseItemActionLogOptions {
@@ -70,8 +71,13 @@ export function useItemActionLog(
   const setItemActionLog = useCallback(
     (log: ItemActionLog | null) => {
       if (log) {
+        // 设置日志，自动添加时间戳
+        const logWithTimestamp = {
+          ...log,
+          timestamp: log.timestamp || Date.now(),
+        };
         // 设置日志，延迟状态会自动管理清除
-        setDelayedItemActionLog(log);
+        setDelayedItemActionLog(logWithTimestamp);
       } else {
         // 立即清除外部状态
         if (externalSetter) {

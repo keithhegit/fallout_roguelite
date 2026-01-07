@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
+import { ASSETS } from '../constants/assets';
 import { Sparkles, Play, Upload } from 'lucide-react';
-const logo = 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/main_logo.png';
-import { STORAGE_KEYS } from '../constants/storageKeys';
+
 import {
   getCurrentSlotId,
   saveToSlot,
@@ -100,30 +100,35 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 flex items-center justify-center z-50 overflow-hidden touch-manipulation">
-      {/* Background Decoration */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(203,161,53,0.1),transparent_70%)]" />
-      </div>
+    <div className="fixed inset-0 bg-ink-950 flex items-center justify-center z-50 overflow-hidden touch-manipulation crt-screen">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
+        style={{ backgroundImage: `url(${ASSETS.BRAND.WELCOME_BG})` }}
+      ></div>
+      
+      {/* CRT Visual Layers */}
+      <div className="crt-noise"></div>
+      <div className="crt-vignette"></div>
+      <div className="scanline-overlay"></div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-3 sm:p-4 md:p-6 lg:p-8">
+      <div className="relative z-30 flex flex-col items-center justify-center w-full h-full p-6 sm:p-8">
         {/* Logo Image */}
-        <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-12 animate-fade-in">
+        <div className="mb-8 sm:mb-12 animate-fade-in">
           <div className="relative">
             <img
-              src={logo}
+              src={ASSETS.BRAND.LOGO}
               alt="Wasteland Survivor"
-              className="w-[70vw] max-w-[280px] sm:w-[60vw] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-auto max-h-[30vh] sm:max-h-[35vh] md:max-h-[40vh] lg:max-h-[400px] object-contain drop-shadow-2xl relative z-10 animate-glow-pulse"
+              className="w-[75vw] max-w-[300px] sm:max-w-[450px] h-auto object-contain drop-shadow-[0_0_20px_rgba(203,161,53,0.3)] relative z-10 animate-glow-pulse"
             />
             {/* Glow Effect */}
-            {/* Glow Effect */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[115%] aspect-square -z-10 opacity-20 sm:opacity-85 pointer-events-none">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] aspect-square -z-10 opacity-30 pointer-events-none">
               <div
-                className="w-full h-full animate-glow-pulse blur-2xl sm:blur-3xl"
+                className="w-full h-full animate-glow-pulse blur-3xl"
                 style={{
                   background:
-                    'radial-gradient(circle, rgba(203, 161, 53, 0.6) 0%, transparent 70%)',
+                    'radial-gradient(circle, rgba(203, 161, 53, 0.4) 0%, transparent 70%)',
                 }}
               />
             </div>
@@ -132,20 +137,24 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
 
         {/* 游戏标题 */}
         <div
-          className="text-center mb-4 sm:mb-6 md:mb-8 lg:mb-12 px-4 animate-fade-in"
+          className="text-center mb-10 sm:mb-16 px-4 animate-fade-in"
           style={{ animationDelay: '0.2s' }}
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-mystic-gold tracking-wide sm:tracking-wider md:tracking-widest mb-2 sm:mb-3 md:mb-4 drop-shadow-lg">
+          <h1 className="text-3xl sm:text-5xl font-mono font-bold text-mystic-gold tracking-[0.2em] mb-4 drop-shadow-[0_0_10px_rgba(203,161,53,0.5)] uppercase">
             Wasteland Survivor
           </h1>
-          <p className="text-stone-400 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-light px-2">
-            Embark on your journey of survival
-          </p>
+          <div className="flex items-center justify-center gap-4">
+            <div className="h-[1px] w-8 bg-mystic-gold/30"></div>
+            <p className="text-mystic-gold/60 text-xs sm:text-sm font-mono tracking-[0.3em] uppercase">
+              Terminal v2.1.0
+            </p>
+            <div className="h-[1px] w-8 bg-mystic-gold/30"></div>
+          </div>
         </div>
 
         {/* Game Buttons */}
         <div
-          className="animate-fade-in flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-xs sm:max-w-sm md:max-w-md px-4 sm:px-0"
+          className="animate-fade-in flex flex-col gap-4 w-full max-w-xs sm:max-w-sm px-4"
           style={{ animationDelay: '0.4s' }}
         >
           {/* Hidden File Input */}
@@ -162,77 +171,71 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
             <>
               <button
                 onClick={onContinue}
-                className="group relative px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-3.5 md:py-4 lg:py-5 bg-gradient-to-r from-mystic-jade to-green-600 text-stone-900 font-bold text-sm sm:text-base md:text-lg lg:text-xl rounded-lg transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2 sm:gap-3 min-h-[50px] sm:min-h-[55px] md:min-h-[60px] lg:min-h-[70px] touch-manipulation overflow-hidden"
+                className="group relative px-8 py-4 bg-emerald-500 text-ink-950 font-bold text-base sm:text-lg rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 min-h-[60px] touch-manipulation uppercase tracking-[0.2em] border-2 border-emerald-500 overflow-hidden"
               >
-                {/* Button Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
+                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.05] transition-opacity"
+                  style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
                 <Play
-                  size={20}
-                  className="sm:w-6 sm:h-6 md:w-7 md:h-7 relative z-10 flex-shrink-0"
+                  size={22}
+                  className="relative z-10 flex-shrink-0"
                 />
                 <span className="relative z-10 whitespace-nowrap">
                   Continue Journey
                 </span>
               </button>
-              <button
-                onClick={onStart}
-                className="group relative px-4 sm:px-6 md:px-8 lg:px-12 py-2.5 sm:py-3 md:py-4 lg:py-5 bg-gradient-to-r from-stone-600 to-stone-700 text-stone-200 font-bold text-xs sm:text-sm md:text-base lg:text-lg rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2 sm:gap-3 min-h-[45px] sm:min-h-[50px] md:min-h-[55px] lg:min-h-[60px] touch-manipulation overflow-hidden border border-stone-500"
-              >
-                {/* Button Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
-                <Sparkles
-                  size={18}
-                  className="sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10 flex-shrink-0"
-                />
-                <span className="relative z-10 whitespace-nowrap">New Game</span>
-              </button>
-              <button
-                onClick={handleImportClick}
-                className="group relative px-4 sm:px-6 md:px-8 lg:px-12 py-2.5 sm:py-3 md:py-4 lg:py-5 bg-gradient-to-r from-stone-500 to-stone-600 text-stone-200 font-bold text-xs sm:text-sm md:text-base lg:text-lg rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2 sm:gap-3 min-h-[45px] sm:min-h-[50px] md:min-h-[55px] lg:min-h-[60px] touch-manipulation overflow-hidden border border-stone-500"
-              >
-                {/* Button Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
-                <Upload
-                  size={18}
-                  className="sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10 flex-shrink-0"
-                />
-                <span className="relative z-10 whitespace-nowrap">Import Save</span>
-              </button>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={onStart}
+                  className="group relative px-4 py-3 bg-stone-900/40 text-stone-400 font-bold text-xs sm:text-sm rounded-none transition-all duration-300 border-2 border-stone-800 hover:border-emerald-500/50 hover:text-emerald-500 flex items-center justify-center gap-2 min-h-[50px] touch-manipulation uppercase tracking-wider overflow-hidden"
+                >
+                  <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.03] transition-opacity"
+                    style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+                  <Sparkles size={16} className="relative z-10" />
+                  <span className="relative z-10">New Game</span>
+                </button>
+                <button
+                  onClick={handleImportClick}
+                  className="group relative px-4 py-3 bg-stone-900/40 text-stone-400 font-bold text-xs sm:text-sm rounded-none transition-all duration-300 border-2 border-stone-800 hover:border-emerald-500/50 hover:text-emerald-500 flex items-center justify-center gap-2 min-h-[50px] touch-manipulation uppercase tracking-wider overflow-hidden"
+                >
+                  <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.03] transition-opacity"
+                    style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+                  <Upload size={16} className="relative z-10" />
+                  <span className="relative z-10">Import</span>
+                </button>
+              </div>
             </>
           ) : (
             // No save: Show Start Game and Import buttons
             <>
               <button
                 onClick={onStart}
-                className="group relative px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-3.5 md:py-4 lg:py-5 bg-gradient-to-r from-mystic-gold to-yellow-600 text-stone-900 font-bold text-sm sm:text-base md:text-lg lg:text-xl rounded-lg transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2 sm:gap-3 min-h-[50px] sm:min-h-[55px] md:min-h-[60px] lg:min-h-[70px] touch-manipulation overflow-hidden"
+                className="group relative px-8 py-4 bg-emerald-500 text-ink-950 font-bold text-base sm:text-lg rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 min-h-[60px] touch-manipulation uppercase tracking-[0.2em] border-2 border-emerald-500 overflow-hidden"
               >
-                {/* Button Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
+                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.05] transition-opacity"
+                  style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
                 <Sparkles
-                  size={20}
-                  className="sm:w-6 sm:h-6 md:w-7 md:h-7 relative z-10 flex-shrink-0"
+                  size={22}
+                  className="relative z-10 flex-shrink-0"
                 />
                 <span className="relative z-10 whitespace-nowrap">Enter Wasteland</span>
               </button>
               <button
                 onClick={handleImportClick}
-                className="group relative px-4 sm:px-6 md:px-8 lg:px-12 py-2.5 sm:py-3 md:py-4 lg:py-5 bg-gradient-to-r from-stone-500 to-stone-600 text-stone-200 font-bold text-xs sm:text-sm md:text-base lg:text-lg rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center gap-2 sm:gap-3 min-h-[45px] sm:min-h-[50px] md:min-h-[55px] lg:min-h-[60px] touch-manipulation overflow-hidden border border-stone-500"
+                className="group relative px-8 py-3 bg-stone-900/40 text-stone-400 font-bold text-sm rounded-none transition-all duration-300 border-2 border-stone-800 hover:border-emerald-500/50 hover:text-emerald-500 flex items-center justify-center gap-2 min-h-[50px] touch-manipulation uppercase tracking-[0.2em] overflow-hidden"
               >
-                {/* Button Glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
-                <Upload
-                  size={18}
-                  className="sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10 flex-shrink-0"
-                />
-                <span className="relative z-10 whitespace-nowrap">Import Save</span>
+                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.03] transition-opacity"
+                  style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+                <Upload size={18} className="relative z-10" />
+                <span className="relative z-10">Import Save</span>
               </button>
             </>
           )}
+        </div>
+
+        {/* Footer info */}
+        <div className="absolute bottom-8 left-0 right-0 text-center animate-fade-in opacity-40 text-[10px] font-mono tracking-widest uppercase pointer-events-none" style={{ animationDelay: '0.6s' }}>
+          Authorized access only // RobCo Industries
         </div>
       </div>
     </div>

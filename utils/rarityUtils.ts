@@ -90,6 +90,22 @@ export const getRarityBadge = (rarity: ItemRarity | undefined): string => {
 };
 
 /**
+ * 获取稀有度的发光样式类名
+ */
+export const getRarityGlow = (rarity: ItemRarity | undefined): string => {
+  switch (rarity) {
+    case '稀有':
+      return 'shadow-[0_0_10px_rgba(96,165,250,0.15)]';
+    case '传说':
+      return 'shadow-[0_0_15px_rgba(192,132,252,0.2)]';
+    case '仙品':
+      return 'shadow-[0_0_20px_rgba(203,161,53,0.25)]';
+    default:
+      return 'shadow-none';
+  }
+};
+
+/**
  * 获取稀有度的排序权重（用于排序）
  */
 export const getRarityOrder = (rarity: ItemRarity | undefined): number => {
@@ -106,7 +122,16 @@ export const getRarityOrder = (rarity: ItemRarity | undefined): number => {
  * 获取稀有度的显示名称
  */
 export const getRarityDisplayName = (rarity: ItemRarity | undefined): string => {
-  return rarity || '普通';
+  switch (rarity) {
+    case '稀有':
+      return 'Rare';
+    case '传说':
+      return 'Legendary';
+    case '仙品':
+      return 'Mythic';
+    default:
+      return 'Common';
+  }
 };
 
 /**

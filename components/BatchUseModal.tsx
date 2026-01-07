@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, Zap, Filter } from 'lucide-react';
 import { Item, ItemType, ItemRarity, EquipmentSlot } from '../types';
+import { ASSETS } from '../constants/assets';
 import { getRarityTextColor, getRarityBorder } from '../utils/rarityUtils';
 import { normalizeTypeLabel } from '../utils/itemUtils';
 import { showConfirm } from '../utils/toastUtils';
@@ -182,25 +183,30 @@ const BatchUseModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full max-w-4xl max-h-[90vh] rounded-lg border border-stone-600 shadow-2xl flex flex-col overflow-hidden"
+        className="bg-ink-950 w-full max-w-4xl max-h-[90vh] md:rounded-none border border-stone-800 shadow-2xl flex flex-col overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 rounded-t">
-          <h3 className="text-xl font-serif text-mystic-gold flex items-center gap-2">
-            <Zap size={20} /> 批量使用
+        {/* 背景纹理层 */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+
+        <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 md:rounded-none z-10">
+          <h3 className="text-xl font-bold text-mystic-gold flex items-center gap-2 uppercase tracking-tighter">
+            <Zap size={20} /> Bulk Consumption
           </h3>
-          <button onClick={onClose} className="text-stone-400 hover:text-white">
+          <button onClick={onClose} className="text-stone-400 hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
 
-        <div className="p-4 flex-1 overflow-y-auto">
+        <div className="modal-scroll-container modal-scroll-content p-4 z-10">
           {/* 筛选器 */}
-          <div className="mb-4 space-y-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2 text-stone-400 text-sm">
-                <Filter size={16} />
-                <span>分类:</span>
+          <div className="mb-6 space-y-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 text-stone-500 text-[10px] font-bold uppercase tracking-widest">
+                <Filter size={14} />
+                <span>Category:</span>
               </div>
               {(['all', 'pill', 'consumable'] as ItemCategory[]).map((category) => (
                 <button
@@ -210,25 +216,25 @@ const BatchUseModal: React.FC<Props> = ({
                     setSelectedItems(new Set());
                     setItemQuantities(new Map());
                   }}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+                  className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest border transition-all ${
                     selectedCategory === category
                       ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
+                      : 'bg-stone-900 border-stone-800 text-stone-500 hover:text-stone-300 hover:bg-stone-800'
                   }`}
                 >
                   {category === 'all'
-                    ? '全部'
+                    ? 'All'
                     : category === 'pill'
-                      ? '丹药'
-                      : '用品'}
+                      ? 'Meds'
+                      : 'Provs'}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2 text-stone-400 text-sm">
-                <Filter size={16} />
-                <span>品质:</span>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 text-stone-500 text-[10px] font-bold uppercase tracking-widest">
+                <Filter size={14} />
+                <span>Rarity:</span>
               </div>
               {(['all', '普通', '稀有', '传说', '仙品'] as RarityFilter[]).map(
                 (rarity) => (
@@ -239,13 +245,13 @@ const BatchUseModal: React.FC<Props> = ({
                       setSelectedItems(new Set());
                       setItemQuantities(new Map());
                     }}
-                    className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+                    className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest border transition-all ${
                       selectedRarity === rarity
                         ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                        : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
+                        : 'bg-stone-900 border-stone-800 text-stone-500 hover:text-stone-300 hover:bg-stone-800'
                     }`}
                   >
-                    {rarity === 'all' ? '全部' : rarity}
+                    {rarity === 'all' ? 'All' : rarity}
                   </button>
                 )
               )}
@@ -253,38 +259,38 @@ const BatchUseModal: React.FC<Props> = ({
           </div>
 
           {/* 操作栏 */}
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="mb-6 flex items-center justify-between flex-wrap gap-4 bg-stone-900/50 p-4 border border-stone-800">
+            <div className="flex items-center gap-4 flex-wrap">
               <button
                 onClick={handleSelectAll}
-                className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-300 rounded text-sm border border-stone-600"
+                className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-stone-300 rounded-none text-[10px] font-bold uppercase tracking-widest border border-stone-800 transition-all active:scale-95"
               >
                 {selectedItems.size === filteredItems.length
-                  ? '取消全选'
-                  : '全选'}
+                  ? 'Deselect All'
+                  : 'Select Current'}
               </button>
-              <span className="text-sm text-stone-400">
-                已选择: {selectedItems.size} / {filteredItems.length} ({totalSelectedQuantity} 件)
-              </span>
+              <div className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                Selected: <span className="text-stone-300">{selectedItems.size} / {filteredItems.length}</span> (<span className="text-mystic-gold">{totalSelectedQuantity} Units</span>)
+              </div>
             </div>
             <button
               onClick={handleUse}
               disabled={selectedItems.size === 0}
-              className={`px-4 py-2 rounded text-sm font-bold transition-colors ${
+              className={`px-6 py-2 rounded-none text-xs font-bold uppercase tracking-widest transition-all ${
                 selectedItems.size > 0
-                  ? 'bg-green-900 hover:bg-green-800 text-green-200 border border-green-700'
-                  : 'bg-stone-700 text-stone-500 cursor-not-allowed border border-stone-600'
+                  ? 'bg-green-900/20 hover:bg-green-900/30 text-green-400 border border-green-900/50 active:scale-95'
+                  : 'bg-stone-900 text-stone-600 cursor-not-allowed border border-stone-800'
               }`}
             >
-              使用选中 ({totalSelectedQuantity})
+              Consume Selected ({totalSelectedQuantity})
             </button>
           </div>
 
           {/* 物品列表 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredItems.length === 0 ? (
-              <div className="col-span-full text-center text-stone-500 py-10">
-                没有可使用的物品
+              <div className="col-span-full text-center text-stone-600 py-12 font-bold uppercase tracking-widest text-sm border border-dashed border-stone-800">
+                No consumable items.
               </div>
             ) : (
               filteredItems.map((item) => {
@@ -295,63 +301,59 @@ const BatchUseModal: React.FC<Props> = ({
                 return (
                   <div
                     key={item.id}
-                    onClick={() => handleToggleItem(item.id)}
-                    className={`p-3 rounded border flex flex-col gap-2 transition-colors cursor-pointer ${
+                    className={`p-4 rounded-none border flex flex-col gap-3 transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-green-900/30 border-green-600'
-                        : 'bg-ink-800 hover:bg-ink-700 border-stone-700'
+                        ? 'bg-green-950/20 border-green-800 shadow-lg'
+                        : 'bg-stone-950/50 hover:bg-stone-900 border-stone-800'
                     }`}
+                    onClick={() => handleToggleItem(item.id)}
                   >
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => {}}
-                        className="mt-1 pointer-events-none"
-                      />
-                        <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="flex items-start gap-4">
+                      <div className={`mt-1 w-4 h-4 border border-stone-700 flex items-center justify-center transition-colors ${isSelected ? 'bg-mystic-gold border-mystic-gold' : 'bg-stone-950'}`}>
+                        {isSelected && <div className="w-2 h-2 bg-stone-950"></div>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
                           <h4
-                            className={`font-bold text-sm ${getRarityTextColor(rarity)}`}
+                            className={`font-bold text-sm uppercase tracking-tight ${getRarityTextColor(rarity)}`}
                           >
                             {item.name}
                           </h4>
-                          <span className="text-xs bg-stone-700 text-stone-300 px-1.5 py-0.5 rounded shrink-0">
-                            拥有: {item.quantity}
+                          <span className="text-[10px] bg-stone-900 text-stone-400 px-2 py-0.5 rounded-none border border-stone-800 font-bold uppercase">
+                            Own: {item.quantity}
                           </span>
                         </div>
-                        <div className="flex gap-2 mb-1">
+                        <div className="flex gap-2 mb-2">
                           <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded border ${getRarityBorder(rarity)}`}
+                            className={`text-[9px] px-1.5 py-0.5 rounded-none border font-bold uppercase tracking-widest ${getRarityBorder(rarity).replace('border-2', 'border')}`}
                           >
                             {rarity}
                           </span>
-                          <span className="text-xs text-stone-500">
+                          <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
                             {normalizeTypeLabel(item.type, item)}
                           </span>
                         </div>
-                        <p className="text-xs text-stone-500 line-clamp-2">
+                        <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed italic">
                           {item.description}
                         </p>
                       </div>
                     </div>
                     {isSelected && (
-                      <div
-                        className="flex items-center gap-2 pl-8"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <label className="text-xs text-stone-400">使用数量:</label>
-                        <input
-                          type="number"
-                          min={1}
-                          max={item.quantity}
-                          value={quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(item.id, parseInt(e.target.value) || 1)
-                          }
-                          className="w-20 px-2 py-1 bg-stone-700 border border-stone-600 rounded text-sm text-stone-200"
-                        />
-                        <span className="text-xs text-stone-500">
+                      <div className="flex items-center gap-3 pl-8 pt-2 border-t border-stone-800/50" onClick={(e) => e.stopPropagation()}>
+                        <label className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Quantity:</label>
+                        <div className="flex items-center gap-2 bg-stone-950 border border-stone-800 p-1">
+                          <input
+                            type="number"
+                            min={1}
+                            max={item.quantity}
+                            value={quantity}
+                            onChange={(e) =>
+                              handleQuantityChange(item.id, parseInt(e.target.value) || 1)
+                            }
+                            className="w-16 px-2 py-1 bg-transparent text-sm text-stone-200 focus:outline-none font-bold text-center"
+                          />
+                        </div>
+                        <span className="text-[10px] text-stone-600 font-bold">
                           / {item.quantity}
                         </span>
                       </div>

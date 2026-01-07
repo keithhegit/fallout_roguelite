@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Shield, Sword, X, SkipForward } from 'lucide-react';
+import { ASSETS } from '../constants/assets';
 import { BattleReplay } from '../services/battleService';
 
 interface BattleModalProps {
@@ -50,133 +51,179 @@ const BattleModal: React.FC<BattleModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-[80] p-0 md:p-8"
+      className="fixed inset-0 bg-black/95 flex items-end md:items-center justify-center z-[80] p-0 md:p-8 touch-manipulation crt-screen"
       onClick={() => {
         if (!closeDisabled) onClose();
       }}
     >
       <div
-        className="bg-ink-900 border border-stone-700 w-full md:max-w-3xl max-h-[92vh] rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col"
+        className="bg-ink-950 border border-stone-800 w-full md:max-w-3xl max-h-[92vh] rounded-none shadow-2xl flex flex-col relative overflow-hidden font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-stone-700">
-          <div>
-            <div className="text-xs text-stone-500 uppercase tracking-widest">
-              Combat Encounter
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
+        <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-stone-800 bg-stone-950 relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-stone-900 border border-stone-800 flex items-center justify-center text-red-500/80 shadow-inner">
+              <Sword size={24} />
             </div>
-            <div className="flex items-center gap-2 text-lg md:text-xl font-serif text-mystic-gold">
-              <Sword size={18} className="text-mystic-gold" />
-              {replay.enemy.title}·{replay.enemy.name}
-              <span className="text-[11px] text-stone-400 bg-ink-800 px-2 py-0.5 rounded border border-stone-700">
-                {replay.enemy.realm}
-              </span>
+            <div>
+              <div className="text-[10px] text-stone-600 uppercase tracking-[0.3em] font-bold">
+                COMBAT_ENCOUNTER // SEQ_v2.01
+              </div>
+              <div className="flex items-center gap-2 text-lg md:text-xl font-bold text-stone-200 uppercase tracking-widest">
+                {replay.enemy.title}·{replay.enemy.name}
+                <span className="text-[9px] text-yellow-600 bg-stone-950 px-2 py-0.5 rounded-none border border-yellow-900/30">
+                  {replay.enemy.realm}
+                </span>
+              </div>
             </div>
           </div>
           <button
             onClick={onClose}
             disabled={closeDisabled}
-            className={`p-2 rounded border ${closeDisabled
-                ? 'border-stone-700 text-stone-600 cursor-not-allowed'
-                : 'border-stone-600 text-stone-200 hover:bg-stone-700/40'
+            className={`w-10 h-10 flex items-center justify-center transition-all border ${closeDisabled
+                ? 'border-stone-900 text-stone-800 cursor-not-allowed'
+                : 'border-stone-800 text-stone-500 hover:text-red-500 hover:bg-red-950/10 hover:border-red-900/50'
               }`}
             title={closeDisabled ? 'Combat in progress' : 'Close combat log'}
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="px-5 md:px-6 py-4 border-b border-stone-800 bg-ink-900">
-          <div className="flex flex-wrap gap-4 text-xs text-stone-400">
-            <span>Enemy HP: {replay.enemy.maxHp}</span>
-            <span>Enemy ATK: {replay.enemy.attack}</span>
-            <span>Enemy DEF: {replay.enemy.defense}</span>
-            <span>Enemy SPD: {replay.enemy.speed}</span>
-            <span>Enemy PER: {replay.enemy.spirit}</span>
+        <div className="px-5 md:px-6 py-4 border-b border-stone-800 bg-stone-950/50 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {[
+              { label: 'HP', value: replay.enemy.maxHp, color: 'bg-red-500' },
+              { label: 'ATK', value: replay.enemy.attack, color: 'bg-orange-500' },
+              { label: 'DEF', value: replay.enemy.defense, color: 'bg-blue-500' },
+              { label: 'SPD', value: replay.enemy.speed, color: 'bg-cyan-500' },
+              { label: 'PER', value: replay.enemy.spirit, color: 'bg-purple-500' }
+            ].map((stat) => (
+              <div key={stat.label} className="flex flex-col gap-1">
+                <div className="flex justify-between items-center text-[9px] text-stone-500 uppercase tracking-widest font-bold">
+                  <span>{stat.label}</span>
+                  <span>{stat.value}</span>
+                </div>
+                <div className="h-1 bg-stone-900 rounded-none overflow-hidden">
+                  <div className={`h-full ${stat.color} opacity-30`} style={{ width: '100%' }}></div>
+                </div>
+              </div>
+            ))}
           </div>
-          <p
-            className={`mt-3 text-sm md:text-base font-semibold ${replay.victory ? 'text-emerald-400' : 'text-rose-400'
-              }`}
-          >
+          <div className={`mt-4 p-3 border border-dashed text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-center ${replay.victory ? 'bg-emerald-950/10 border-emerald-900/50 text-emerald-500' : 'bg-red-950/10 border-red-900/50 text-red-500'
+              }`}>
             {replay.summary}
-          </p>
+          </div>
         </div>
 
         <div
           ref={logRef}
-          className="flex-1 overflow-y-auto px-5 md:px-6 py-4 space-y-3 bg-ink-800/60 text-sm"
+          className="flex-1 overflow-y-auto px-5 md:px-6 py-6 space-y-4 bg-stone-950 relative z-10 custom-scrollbar"
         >
           {visibleRounds.length === 0 ? (
-            <div className="text-center text-stone-500 py-6">
-              Combat logs initializing...
+            <div className="flex flex-col items-center justify-center py-20 text-stone-700 font-mono">
+              <div className="w-8 h-8 border-2 border-stone-800 border-t-stone-600 animate-spin mb-4"></div>
+              <div className="uppercase tracking-[0.3em] text-[10px]">INITIALIZING_COMBAT_LOGS...</div>
             </div>
           ) : (
             visibleRounds.map((round, idx) => (
               <div
                 key={round.id}
-                className={`p-3 rounded border text-stone-200 ${round.attacker === 'player'
-                    ? 'bg-emerald-900/10 border-emerald-700/40'
-                    : 'bg-rose-900/15 border-rose-700/40'
+                className={`p-4 rounded-none border relative overflow-hidden transition-all ${round.attacker === 'player'
+                    ? 'bg-emerald-950/5 border-emerald-900/30 shadow-[0_0_10px_rgba(16,185,129,0.02)]'
+                    : 'bg-red-950/5 border-red-900/30 shadow-[0_0_10px_rgba(239,68,68,0.02)]'
                   }`}
               >
-                <div className="flex justify-between text-[11px] text-stone-400 mb-1">
-                  <span>
-                    Round {idx + 1} ·{' '}
-                    {round.attacker === 'player' ? 'Your Turn' : 'Enemy Turn'}
+                <div className="absolute inset-0 bg-scanlines opacity-[0.01] pointer-events-none"></div>
+                
+                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest mb-3 font-bold">
+                  <span className={round.attacker === 'player' ? 'text-emerald-600' : 'text-red-600'}>
+                    [{String(idx + 1).padStart(2, '0')}] // {round.attacker === 'player' ? 'USER_ACTION' : 'HOSTILE_ACTION'}
                   </span>
-                  <span>
-                    Damage {round.damage}
+                  <div className="flex items-center gap-3">
+                    <span className="text-stone-600 italic">
+                      DMG: <span className={round.damage > 0 ? 'text-stone-200' : 'text-stone-700'}>{round.damage}</span>
+                    </span>
                     {round.crit && (
-                      <span className="text-mystic-gold ml-1">· CRIT</span>
+                      <span className="text-yellow-600 bg-yellow-950/20 px-1.5 py-0.5 border border-yellow-900/50">CRIT</span>
                     )}
-                  </span>
+                  </div>
                 </div>
-                <p>{round.description}</p>
-                <div className="mt-2 flex items-center justify-between text-[11px] text-stone-400">
-                  <span>Your HP: {round.playerHpAfter}</span>
-                  <span>Enemy HP: {round.enemyHpAfter}</span>
+                
+                <p className="text-[13px] leading-relaxed text-stone-300 uppercase tracking-wider mb-4 border-l-2 border-stone-800 pl-3 py-1">
+                  {round.description}
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[9px] text-stone-600 uppercase tracking-widest font-bold">
+                      <span>USER_INTEGRITY</span>
+                      <span>{round.playerHpAfter}</span>
+                    </div>
+                    <div className="h-1 bg-stone-900 overflow-hidden">
+                      <div className="h-full bg-emerald-600 transition-all duration-500" style={{ width: `${Math.max(0, Math.min(100, (round.playerHpAfter / replay.playerHpBefore) * 100))}%` }}></div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[9px] text-stone-600 uppercase tracking-widest font-bold">
+                      <span>HOSTILE_INTEGRITY</span>
+                      <span>{round.enemyHpAfter}</span>
+                    </div>
+                    <div className="h-1 bg-stone-900 overflow-hidden text-right">
+                      <div className="h-full bg-red-600 transition-all duration-500 float-right" style={{ width: `${Math.max(0, Math.min(100, (round.enemyHpAfter / replay.enemy.maxHp) * 100))}%` }}></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))
           )}
         </div>
 
-        <div className="border-t border-stone-700 px-5 md:px-6 py-4 bg-ink-900/90 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="text-xs text-stone-400 space-y-1">
-            <div>Combat Progress: {progressText} Rounds</div>
-            <div>HP Loss: {replay.hpLoss}</div>
-            <div className="text-stone-300">
-              Rewards:
-              {replay.expChange >= 0
-                ? `+${replay.expChange}`
-                : replay.expChange}{' '}
-              XP ·{' '}
-              {replay.spiritChange >= 0
-                ? `+${replay.spiritChange}`
-                : replay.spiritChange}{' '}
-              Caps
+        <div className="border-t border-stone-800 px-5 md:px-6 py-6 bg-stone-950 flex flex-col gap-6 md:flex-row md:items-center md:justify-between relative z-10">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] text-stone-600 uppercase tracking-widest font-bold">SEQ_PROGRESS</span>
+              <span className="text-xs text-stone-400 font-mono">{progressText} ROUNDS</span>
             </div>
-            <div>Current HP: {replay.playerHpAfter}</div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] text-stone-600 uppercase tracking-widest font-bold">INTEGRITY_LOSS</span>
+              <span className="text-xs text-red-600 font-mono">-{replay.hpLoss} HP</span>
+            </div>
+            <div className="flex flex-col gap-0.5 col-span-2 mt-1">
+              <span className="text-[9px] text-stone-600 uppercase tracking-widest font-bold">DATA_REWARDS</span>
+              <div className="flex gap-4 text-xs text-yellow-600 font-mono">
+                <span>XP: {replay.expChange >= 0 ? `+${replay.expChange}` : replay.expChange}</span>
+                <span>CAPS: {replay.spiritChange >= 0 ? `+${replay.spiritChange}` : replay.spiritChange}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
+          
+          <div className="flex gap-3">
             {!isResolved && (
               <button
                 onClick={onSkip}
-                className="flex items-center gap-1 px-3 py-2 rounded border border-amber-500 text-amber-300 hover:bg-amber-500/10 text-sm"
+                className="flex items-center justify-center gap-2 px-6 py-2 bg-stone-950 hover:bg-stone-900 text-amber-600 hover:text-amber-500 border border-amber-900/50 hover:border-amber-600 text-[10px] font-bold uppercase tracking-[0.2em] transition-all"
               >
-                <SkipForward size={16} />
-                Skip Combat
+                <SkipForward size={14} />
+                FAST_FORWARD
               </button>
             )}
             <button
               onClick={onClose}
               disabled={closeDisabled}
-              className={`flex items-center gap-1 px-3 py-2 rounded border text-sm ${closeDisabled
-                  ? 'border-stone-700 text-stone-600 cursor-not-allowed'
-                  : 'border-emerald-500 text-emerald-300 hover:bg-emerald-500/10'
+              className={`flex items-center justify-center gap-2 px-6 py-2 border text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${closeDisabled
+                  ? 'bg-stone-950 border-stone-900 text-stone-800 cursor-not-allowed'
+                  : 'bg-stone-950 border-emerald-900/50 text-emerald-600 hover:bg-emerald-950/20 hover:text-emerald-500 hover:border-emerald-500'
                 }`}
             >
-              <Shield size={16} />
-              {closeDisabled ? 'Combat Active' : 'End Combat'}
+              <Shield size={14} />
+              {closeDisabled ? 'SEQ_ACTIVE' : 'SEQ_COMPLETE'}
             </button>
           </div>
         </div>

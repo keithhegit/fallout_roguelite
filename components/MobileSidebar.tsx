@@ -1,25 +1,21 @@
 import React, { useMemo, useCallback } from 'react';
 import {
-  Menu,
   X,
   BookOpen,
-  Backpack,
   Star,
   Trophy,
   Sparkles,
   Gift,
   Settings,
-  BarChart3,
   Bug,
   Home,
 } from 'lucide-react';
+import { PlayerStats } from '../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onOpenStats: () => void;
   onOpenCultivation: () => void;
-  onOpenInventory: () => void;
   onOpenCharacter: () => void;
   onOpenAchievement: () => void;
   onOpenPet: () => void;
@@ -31,15 +27,13 @@ interface Props {
   achievementCount?: number;
   petCount?: number;
   lotteryTickets?: number;
-  player?: any; // 用于显示洞府等级
+  player?: PlayerStats; // 用于显示洞府等级
 }
 
 const MobileSidebar: React.FC<Props> = ({
   isOpen,
   onClose,
-  onOpenStats,
   onOpenCultivation,
-  onOpenInventory,
   onOpenCharacter,
   onOpenAchievement,
   onOpenPet,
@@ -56,46 +50,34 @@ const MobileSidebar: React.FC<Props> = ({
   const menuItems = useMemo(
     () => [
       {
-        icon: BarChart3,
-        label: '属性',
-        onClick: onOpenStats,
-        color: 'text-mystic-gold',
-      },
-      {
         icon: BookOpen,
-        label: '功法',
+        label: 'Mods',
         onClick: onOpenCultivation,
         color: 'text-blue-400',
       },
       {
-        icon: Backpack,
-        label: '储物袋',
-        onClick: onOpenInventory,
-        color: 'text-green-400',
-      },
-      {
         icon: Star,
-        label: '角色',
+        label: 'Character',
         onClick: onOpenCharacter,
         color: 'text-yellow-400',
       },
       {
         icon: Trophy,
-        label: '成就',
+        label: 'Achievements',
         onClick: onOpenAchievement,
         color: 'text-purple-400',
         badge: achievementCount > 0 ? achievementCount : undefined,
       },
       {
         icon: Sparkles,
-        label: '灵宠',
+        label: 'Pets',
         onClick: onOpenPet,
         color: 'text-cyan-400',
         badge: petCount > 0 ? petCount : undefined,
       },
       {
         icon: Gift,
-        label: '抽奖',
+        label: 'Gacha',
         onClick: onOpenLottery,
         color: 'text-orange-400',
         badge: lotteryTickets > 0 ? lotteryTickets : undefined,
@@ -104,7 +86,7 @@ const MobileSidebar: React.FC<Props> = ({
         ? [
             {
               icon: Home,
-              label: '洞府',
+              label: 'Base',
               onClick: onOpenGrotto,
               color: 'text-purple-400',
               badge: player?.grotto?.level > 0 ? `Lv.${player.grotto.level}` : undefined,
@@ -113,7 +95,7 @@ const MobileSidebar: React.FC<Props> = ({
         : []),
       {
         icon: Settings,
-        label: '设置',
+        label: 'Settings',
         onClick: onOpenSettings,
         color: 'text-stone-400',
       },
@@ -121,7 +103,7 @@ const MobileSidebar: React.FC<Props> = ({
         ? [
             {
               icon: Bug,
-              label: '调试',
+              label: 'Debug',
               onClick: onOpenDebug,
               color: 'text-red-400',
             },
@@ -129,9 +111,7 @@ const MobileSidebar: React.FC<Props> = ({
         : []),
     ],
     [
-      onOpenStats,
       onOpenCultivation,
-      onOpenInventory,
       onOpenCharacter,
       onOpenAchievement,
       onOpenPet,
@@ -168,15 +148,15 @@ const MobileSidebar: React.FC<Props> = ({
       {/* Sidebar */}
       <div
         className={`
-          fixed top-0 right-0 h-full w-64 bg-paper-800 border-l border-stone-700 shadow-2xl z-50
+          fixed top-0 right-0 h-full w-64 bg-ink-950 border-l border-stone-800 shadow-2xl z-50
           transform transition-transform duration-300 ease-in-out md:hidden
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-4 border-b border-stone-700 flex justify-between items-center bg-ink-800">
-            <h2 className="text-lg font-serif text-mystic-gold">功能菜单</h2>
+          <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-ink-800">
+            <h2 className="text-lg font-mono text-mystic-gold uppercase tracking-widest">Menu</h2>
             <button
               onClick={onClose}
               className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
@@ -193,17 +173,17 @@ const MobileSidebar: React.FC<Props> = ({
                 <button
                   key={index}
                   onClick={() => handleItemClick(item.onClick)}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-ink-800 hover:bg-ink-700 active:bg-ink-600 rounded border border-stone-700 mb-2 transition-colors touch-manipulation min-h-[56px]"
+                  className="w-full flex items-center gap-3 px-4 py-4 bg-ink-800 hover:bg-ink-700 active:bg-ink-600 rounded-none border border-stone-800 mb-2 transition-colors touch-manipulation min-h-[56px]"
                 >
                   <Icon size={22} className={item.color} />
-                  <span className="text-stone-200 font-medium flex-1 text-left">
+                  <span className="text-stone-200 font-mono uppercase tracking-wider flex-1 text-left">
                     {item.label}
                   </span>
                   {item.badge !== undefined && (
-                    <span className={`text-white text-xs px-2 py-0.5 rounded font-bold ${
+                    <span className={`text-white text-xs px-2 py-0.5 rounded-none font-bold ${
                       typeof item.badge === 'string' && item.badge.startsWith('Lv.')
                         ? 'bg-purple-500'
-                        : 'bg-red-500 rounded-full w-6 h-6 flex items-center justify-center'
+                        : 'bg-red-500 w-6 h-6 flex items-center justify-center'
                     }`}>
                       {item.badge}
                     </span>

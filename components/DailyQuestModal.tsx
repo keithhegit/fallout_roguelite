@@ -10,6 +10,7 @@ import {
   Download,
 } from 'lucide-react';
 import { PlayerStats, DailyQuest, ItemRarity } from '../types';
+import { ASSETS } from '../constants/assets';
 import { getRarityTextColor } from '../utils/rarityUtils';
 
 interface Props {
@@ -91,10 +92,14 @@ const DailyQuestModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-paper-800 border-2 border-mystic-gold rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-ink-950 md:rounded-none border border-stone-800 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col relative">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+
         {/* Header */}
-        <div className="bg-ink-800 p-4 border-b border-stone-700 flex items-center justify-between flex-shrink-0">
+        <div className="bg-stone-950 p-4 border-b border-stone-800 flex items-center justify-between flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
             <Calendar className="text-mystic-gold w-6 h-6" />
             <h2 className="text-xl font-serif font-bold text-mystic-gold">
@@ -113,7 +118,7 @@ const DailyQuestModal: React.FC<Props> = ({
         </div>
 
         {/* Progress Bar */}
-        <div className="p-4 bg-ink-800 border-b border-stone-700 flex-shrink-0">
+        <div className="p-4 bg-stone-900/50 border-b border-stone-800 flex-shrink-0 z-10">
           <div className="flex items-center justify-between mb-2">
             <span className="text-stone-300 text-sm">Today's Progress</span>
             <div className="flex items-center gap-3">
@@ -131,7 +136,7 @@ const DailyQuestModal: React.FC<Props> = ({
               )}
             </div>
           </div>
-          <div className="h-3 bg-stone-900 rounded-full overflow-hidden border border-stone-700">
+          <div className="h-3 bg-stone-950 rounded-full overflow-hidden border border-stone-800">
             <div
               className="h-full bg-gradient-to-r from-mystic-jade to-mystic-gold transition-all duration-500"
               style={{ width: `${completionRate}%` }}
@@ -140,7 +145,7 @@ const DailyQuestModal: React.FC<Props> = ({
         </div>
 
         {/* Filter and Sort Controls */}
-        <div className="p-4 bg-ink-800 border-b border-stone-700 flex-shrink-0 flex flex-wrap gap-3 items-center">
+        <div className="p-4 bg-stone-900/30 border-b border-stone-800 flex-shrink-0 flex flex-wrap gap-3 items-center z-10">
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-stone-400" />
             <span className="text-stone-300 text-sm">Filter:</span>
@@ -149,7 +154,7 @@ const DailyQuestModal: React.FC<Props> = ({
               onChange={(e) =>
                 setFilterRarity(e.target.value as ItemRarity | 'all')
               }
-              className="px-2 py-1 bg-stone-900 border border-stone-700 rounded text-stone-200 text-sm"
+              className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-stone-200 text-sm outline-none focus:border-mystic-gold"
             >
               <option value="all">All Rarities</option>
               <option value="Common">Common</option>
@@ -164,7 +169,7 @@ const DailyQuestModal: React.FC<Props> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="px-2 py-1 bg-stone-900 border border-stone-700 rounded text-stone-200 text-sm"
+              className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-stone-200 text-sm outline-none focus:border-mystic-gold"
             >
               <option value="default">Default</option>
               <option value="progress">Progress</option>
@@ -177,14 +182,14 @@ const DailyQuestModal: React.FC<Props> = ({
               type="checkbox"
               checked={showCompleted}
               onChange={(e) => setShowCompleted(e.target.checked)}
-              className="w-4 h-4 rounded border-stone-600 bg-stone-800 text-mystic-jade focus:ring-mystic-jade"
+              className="w-4 h-4 rounded border-stone-800 bg-stone-900 text-mystic-jade focus:ring-mystic-jade"
             />
             <span className="text-stone-300 text-sm">Show Completed</span>
           </label>
         </div>
 
         {/* Quest List */}
-        <div className="modal-scroll-container modal-scroll-content p-4 space-y-3">
+        <div className="modal-scroll-container modal-scroll-content p-4 space-y-3 z-10">
           {sortedQuests.length === 0 ? (
             <div className="text-center text-stone-400 py-8">
               <Sparkles className="w-12 h-12 mx-auto mb-2 opacity-50" />

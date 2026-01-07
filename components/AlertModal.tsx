@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react';
+import { ASSETS } from '../constants/assets';
 
 export type AlertType = 'success' | 'error' | 'info' | 'warning';
 
@@ -22,10 +23,10 @@ const AlertModal: React.FC<AlertModalProps> = ({
   type,
   title,
   message,
-  confirmText = '确定',
+  confirmText = 'CONFIRM',
   onConfirm,
   showCancel = false,
-  cancelText = '取消',
+  cancelText = 'CANCEL',
   onCancel,
 }) => {
   if (!isOpen) return null;
@@ -35,39 +36,43 @@ const AlertModal: React.FC<AlertModalProps> = ({
       case 'success':
         return {
           icon: CheckCircle,
-          iconColor: 'text-green-400',
-          bgColor: 'bg-green-900/20',
-          borderColor: 'border-green-600',
-          titleColor: 'text-green-300',
-          defaultTitle: '成功',
+          iconColor: 'text-emerald-400',
+          bgColor: 'bg-ink-950',
+          borderColor: 'border-emerald-900/50',
+          titleColor: 'text-emerald-400',
+          defaultTitle: 'SUCCESS',
+          glowColor: 'shadow-emerald-500/20',
         };
       case 'error':
         return {
           icon: XCircle,
-          iconColor: 'text-red-400',
-          bgColor: 'bg-red-900/20',
-          borderColor: 'border-red-600',
-          titleColor: 'text-red-300',
-          defaultTitle: '错误',
+          iconColor: 'text-red-500',
+          bgColor: 'bg-ink-950',
+          borderColor: 'border-red-900/50',
+          titleColor: 'text-red-500',
+          defaultTitle: 'SYSTEM ERROR',
+          glowColor: 'shadow-red-500/20',
         };
       case 'warning':
         return {
           icon: AlertTriangle,
-          iconColor: 'text-yellow-400',
-          bgColor: 'bg-yellow-900/20',
-          borderColor: 'border-yellow-600',
-          titleColor: 'text-yellow-300',
-          defaultTitle: '警告',
+          iconColor: 'text-yellow-500',
+          bgColor: 'bg-ink-950',
+          borderColor: 'border-yellow-900/50',
+          titleColor: 'text-yellow-500',
+          defaultTitle: 'WARNING',
+          glowColor: 'shadow-yellow-500/20',
         };
       case 'info':
       default:
         return {
           icon: Info,
           iconColor: 'text-blue-400',
-          bgColor: 'bg-blue-900/20',
-          borderColor: 'border-blue-600',
-          titleColor: 'text-blue-300',
-          defaultTitle: '提示',
+          bgColor: 'bg-ink-950',
+          borderColor: 'border-blue-900/50',
+          titleColor: 'text-blue-400',
+          defaultTitle: 'INFORMATION',
+          glowColor: 'shadow-blue-500/20',
         };
     }
   };
@@ -92,56 +97,69 @@ const AlertModal: React.FC<AlertModalProps> = ({
 
   return (
     <div
-      className="z-99999 fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[1000] p-4 backdrop-blur-sm font-mono"
       onClick={onClose}
     >
       <div
-        className={`bg-stone-800 rounded-lg border-2 ${config.borderColor} shadow-2xl max-w-md w-full ${config.bgColor}`}
+        className={`bg-ink-950 rounded-none border-2 ${config.borderColor} shadow-2xl max-w-md w-full relative overflow-hidden`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+
+        {/* CRT 效果层 */}
+        <div className="absolute inset-0 pointer-events-none z-50">
+          <div className="absolute inset-0 crt-noise opacity-[0.02]"></div>
+          <div className="absolute inset-0 scanline-overlay opacity-[0.04]"></div>
+          <div className="absolute inset-0 crt-vignette"></div>
+        </div>
+
+        <div className="p-6 relative z-10">
           {/* 图标和标题 */}
-          <div className="flex items-start gap-4 mb-4">
-            <Icon size={32} className={`${config.iconColor} flex-shrink-0 mt-1`} />
+          <div className="flex items-start gap-4 mb-6">
+            <div className={`p-3 bg-stone-900/40 border ${config.borderColor} rounded-none relative group/icon`}>
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/icon:opacity-100 transition-opacity" />
+              <Icon size={28} className={`${config.iconColor} flex-shrink-0 relative z-10`} />
+            </div>
             <div className="flex-1">
-              <h3 className={`text-xl font-serif font-bold ${config.titleColor} mb-2`}>
-                {displayTitle}
+              <h3 className={`text-xl font-mono font-bold ${config.titleColor} mb-2 uppercase tracking-[0.2em]`}>
+                [ {displayTitle} ]
               </h3>
-              <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">
+              <div className={`h-[2px] w-full bg-gradient-to-r ${config.borderColor.replace('border-', 'from-')} to-transparent mb-4 opacity-30`}></div>
+              <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line uppercase tracking-wider font-medium">
                 {message}
               </p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-stone-400 hover:text-white transition-colors flex-shrink-0"
-            >
-              <X size={20} />
-            </button>
           </div>
 
           {/* 按钮 */}
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex justify-end gap-4 mt-8">
             {showCancel && (
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 rounded border border-stone-600 transition-colors"
+                className="group/btn relative px-8 py-3 bg-stone-900/40 hover:bg-stone-800 text-stone-500 border border-stone-800 rounded-none transition-all uppercase tracking-[0.2em] text-[10px] min-h-[44px] overflow-hidden"
               >
-                {cancelText}
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                <span className="relative z-10">{cancelText}</span>
               </button>
             )}
             <button
               onClick={handleConfirm}
-              className={`px-4 py-2 rounded border transition-colors ${
+              className={`group/confirm relative px-8 py-3 rounded-none border transition-all uppercase tracking-[0.2em] text-[10px] font-bold min-h-[44px] overflow-hidden ${
                 type === 'success'
-                  ? 'bg-green-700 hover:bg-green-600 text-green-200 border-green-600'
+                  ? 'bg-emerald-900/20 hover:bg-emerald-800/40 text-emerald-500 border-emerald-500/50 hover:border-emerald-400'
                   : type === 'error'
-                    ? 'bg-red-700 hover:bg-red-600 text-red-200 border-red-600'
+                    ? 'bg-red-900/20 hover:bg-red-800/40 text-red-500 border-red-500/50 hover:border-red-500'
                     : type === 'warning'
-                      ? 'bg-yellow-700 hover:bg-yellow-600 text-yellow-200 border-yellow-600'
-                      : 'bg-blue-700 hover:bg-blue-600 text-blue-200 border-blue-600'
+                      ? 'bg-yellow-900/20 hover:bg-yellow-800/40 text-yellow-500 border-yellow-500/50 hover:border-yellow-500'
+                      : 'bg-blue-900/20 hover:bg-blue-800/40 text-blue-400 border-blue-400/50 hover:border-blue-400'
               }`}
             >
-              {confirmText}
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/confirm:opacity-100 transition-opacity" />
+              <span className="relative z-10">{confirmText}</span>
             </button>
           </div>
         </div>

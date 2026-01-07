@@ -18,6 +18,7 @@ import {
 import { showError, showSuccess, showConfirm, showInfo } from '../utils/toastUtils';
 import { PlayerStats, LogEntry } from '../types';
 import dayjs from 'dayjs';
+import { ASSETS } from '../constants/assets';
 
 interface Props {
   isOpen: boolean;
@@ -263,28 +264,37 @@ const SaveManagerModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center z-50 p-0 md:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-stone-800 md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-700 w-full h-[90vh] md:h-auto md:max-w-4xl md:max-h-[90vh] flex flex-col"
+        className="bg-ink-950 rounded-none border-0 md:border border-stone-800 w-full h-[90vh] md:h-auto md:max-w-4xl md:max-h-[90vh] flex flex-col relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-stone-800 border-b border-stone-700 p-3 md:p-4 flex justify-between items-center md:rounded-t-2xl flex-shrink-0">
-          <h2 className="text-lg md:text-xl font-serif text-mystic-gold">
-            存档管理
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+        
+        {/* CRT 扫描线 */}
+        <div className="absolute inset-0 pointer-events-none z-0 bg-crt-lines opacity-[0.02]" />
+
+        <div className="bg-stone-900/40 border-b border-stone-800 p-3 md:p-4 flex justify-between items-center rounded-none flex-shrink-0 relative z-10">
+          <h2 className="text-lg md:text-xl font-bold text-emerald-500 uppercase tracking-widest">
+            [ DATA_STORAGE_MANAGER ]
           </h2>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="text-stone-500 hover:text-emerald-500 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
           >
             <X size={24} />
           </button>
         </div>
 
-        <div className="modal-scroll-container modal-scroll-content p-4 md:p-6 space-y-4">
+        <div className="modal-scroll-container modal-scroll-content p-4 md:p-6 space-y-6 relative z-10">
           {/* 存档槽位列表 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {slots.map((slot) => {
               const isEmpty = !slot.data;
               const isCurrent = currentSlotId === slot.id;
@@ -292,85 +302,93 @@ const SaveManagerModal: React.FC<Props> = ({
               return (
                 <div
                   key={slot.id}
-                  className={`border rounded-lg p-4 ${
+                  className={`border p-4 transition-all rounded-none relative group/slot ${
                     isEmpty
-                      ? 'border-stone-700 bg-stone-900/50'
+                      ? 'border-stone-800 bg-stone-900/20 opacity-60'
                       : isCurrent
-                        ? 'border-mystic-gold bg-stone-900'
-                        : 'border-stone-600 bg-stone-800'
+                        ? 'border-emerald-500 bg-emerald-900/10 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                        : 'border-stone-800 bg-stone-900/40 hover:border-stone-700'
                   }`}
                 >
-                  <div className="flex items-start justify-between mb-2">
+                  {/* 悬停纹理 */}
+                  {!isEmpty && (
+                    <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/slot:opacity-[0.02] transition-opacity"
+                      style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+                  )}
+
+                  <div className="flex items-start justify-between mb-4 relative z-10">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-stone-200">
-                          存档{slot.id}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-stone-300 uppercase tracking-wider">
+                          SLOT_{slot.id.toString().padStart(2, '0')}
                         </span>
                         {isCurrent && (
-                          <span className="text-xs bg-mystic-gold text-stone-900 px-2 py-0.5 rounded">
-                            当前
+                          <span className="text-[10px] bg-emerald-900 text-emerald-500 border border-emerald-500/50 px-2 py-0.5 font-bold uppercase tracking-widest">
+                            ACTIVE
                           </span>
                         )}
                         {isEmpty && (
-                          <span className="text-xs text-stone-500">空槽位</span>
+                          <span className="text-[10px] text-stone-600 font-bold uppercase tracking-widest">
+                            EMPTY_BUFFER
+                          </span>
                         )}
                       </div>
                       {!isEmpty && (
-                        <div className="text-sm text-stone-400 space-y-1">
-                          <div>玩家: {slot.playerName}</div>
-                          <div>境界: {slot.realm} {slot.realmLevel}层</div>
-                          <div className="text-xs">
-                            {dayjs(slot.timestamp).format('YYYY-MM-DD HH:mm:ss')}
+                        <div className="text-[11px] space-y-1 font-bold uppercase tracking-wider">
+                          <div className="text-emerald-500/80">SUBJECT: {slot.playerName}</div>
+                          <div className="text-stone-400">STATE: {slot.realm} {slot.realmLevel}_LVL</div>
+                          <div className="text-stone-600 text-[10px] mt-2">
+                            TIMESTAMP: {dayjs(slot.timestamp).format('YYYY.MM.DD_HH:MM:SS')}
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="grid grid-cols-2 gap-2 mt-4 relative z-10">
                     {!isEmpty && (
                       <>
                         <button
                           onClick={() => handleLoadFromSlot(slot.id)}
-                          className="flex-1 min-w-[80px] bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1.5 rounded flex items-center justify-center gap-1"
+                          className="bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border border-emerald-800/50 rounded-none text-[10px] py-2 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest transition-all"
                         >
-                          <Save size={14} />
-                          加载
+                          <RotateCcw size={12} />
+                          [ LOAD ]
                         </button>
                         <button
                           onClick={() => handleExportSlot(slot.id)}
-                          className="flex-1 min-w-[80px] bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1.5 rounded flex items-center justify-center gap-1"
+                          className="bg-stone-900/40 hover:bg-stone-800 text-stone-400 border border-stone-800 rounded-none text-[10px] py-2 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest transition-all"
                         >
-                          <Download size={14} />
-                          导出
+                          <Download size={12} />
+                          [ EXPORT ]
                         </button>
                         <button
                           onClick={() => handleDeleteSlot(slot.id)}
-                          className="flex-1 min-w-[80px] bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1.5 rounded flex items-center justify-center gap-1"
+                          className="bg-red-900/10 hover:bg-red-900/20 text-red-500/70 hover:text-red-500 border border-red-900/30 rounded-none text-[10px] py-2 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest transition-all"
                         >
-                          <Trash2 size={14} />
-                          删除
+                          <Trash2 size={12} />
+                          [ PURGE ]
                         </button>
                         <button
                           onClick={() => handleShowBackups(slot.id)}
-                          className="flex-1 min-w-[80px] bg-purple-600 hover:bg-purple-700 text-white text-xs px-2 py-1.5 rounded flex items-center justify-center gap-1"
+                          className="bg-stone-900/40 hover:bg-stone-800 text-stone-400 border border-stone-800 rounded-none text-[10px] py-2 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest transition-all"
                         >
-                          <Copy size={14} />
-                          备份
+                          <Copy size={12} />
+                          [ BACKUP ]
                         </button>
                       </>
                     )}
                     <button
                       onClick={() => handleSaveToSlot(slot.id)}
-                      className="flex-1 min-w-[80px] bg-stone-600 hover:bg-stone-700 text-white text-xs px-2 py-1.5 rounded flex items-center justify-center gap-1"
+                      className={`col-span-1 ${isEmpty ? 'col-span-2' : ''} bg-emerald-600 hover:bg-emerald-500 text-white rounded-none text-[10px] py-2 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)]`}
                       disabled={!currentPlayer}
                     >
-                      <Save size={14} />
-                      {isEmpty ? '保存' : '覆盖'}
+                      <Save size={12} />
+                      {isEmpty ? '[ INITIALIZE_SAVE ]' : '[ OVERWRITE ]'}
                     </button>
-                    <label className="flex-1 min-w-[80px] bg-stone-600 hover:bg-stone-700 text-white text-xs px-2 py-1.5 rounded flex items-center justify-center gap-1 cursor-pointer">
-                      <Upload size={14} />
-                      导入
+                    <label className="col-span-1 bg-stone-900/40 hover:bg-stone-800 text-stone-400 border border-stone-800 rounded-none text-[10px] py-2 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest transition-all cursor-pointer">
+                      <Upload size={12} />
+                      [ IMPORT ]
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -383,46 +401,44 @@ const SaveManagerModal: React.FC<Props> = ({
 
                   {/* 备份列表 */}
                   {showBackups === slot.id && (
-                    <div className="mt-3 pt-3 border-t border-stone-700">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-stone-300">
-                          备份列表
+                    <div className="mt-4 pt-4 border-t border-stone-800 relative z-10">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-[0.2em]">
+                          REDUNDANCY_LOGS
                         </span>
                         <button
                           onClick={() => handleCreateBackup(slot.id)}
-                          className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded"
+                          className="text-[9px] bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border border-emerald-800/50 px-2 py-1 rounded-none font-bold uppercase tracking-widest transition-all"
                           disabled={!currentPlayer || currentSlotId !== slot.id}
                         >
-                          创建备份
+                          [ CREATE_BACKUP ]
                         </button>
                       </div>
                       {backups.length === 0 ? (
-                        <div className="text-xs text-stone-500 py-2">
-                          暂无备份
+                        <div className="text-[10px] text-stone-600 py-3 text-center italic uppercase tracking-wider">
+                          NO_BACKUP_DATA_FOUND
                         </div>
                       ) : (
-                        <div className="space-y-2 max-h-40 overflow-y-auto">
-                          {backups.map((backup, index) => (
+                        <div className="space-y-2">
+                          {backups.map((backup, idx) => (
                             <div
-                              key={index}
-                              className="bg-stone-900 rounded p-2 text-xs"
+                              key={idx}
+                              className="flex items-center justify-between p-2 bg-stone-900/60 border border-stone-800/50 text-[10px]"
                             >
-                              <div className="flex items-center justify-between">
-                                <div className="text-stone-400">
-                                  {dayjs(backup.timestamp).format(
-                                    'YYYY-MM-DD HH:mm:ss'
-                                  )}
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    handleRestoreBackup(slot.id, index)
-                                  }
-                                  className="text-purple-400 hover:text-purple-300 flex items-center gap-1"
-                                >
-                                  <RotateCcw size={12} />
-                                  恢复
-                                </button>
+                              <div className="flex flex-col">
+                                <span className="text-stone-400 font-bold uppercase">
+                                  {backup.player.name}
+                                </span>
+                                <span className="text-[9px] text-stone-600 font-mono">
+                                  {dayjs(backup.timestamp).format('YYYY.MM.DD_HH:MM')}
+                                </span>
                               </div>
+                              <button
+                                onClick={() => handleRestoreBackup(slot.id, idx)}
+                                className="text-emerald-500/60 hover:text-emerald-500 transition-colors font-bold uppercase tracking-widest"
+                              >
+                                [ RESTORE ]
+                              </button>
                             </div>
                           ))}
                         </div>
@@ -436,38 +452,40 @@ const SaveManagerModal: React.FC<Props> = ({
 
           {/* 存档对比功能 */}
           {onCompareSaves && (
-            <div className="mt-4 pt-4 border-t border-stone-700">
-              <h3 className="text-md font-semibold text-stone-300 mb-3 flex items-center gap-2">
-                <FileText size={18} />
-                存档对比
+            <div className="pt-6 border-t border-stone-800 relative z-10">
+              <h3 className="text-xs font-bold text-emerald-500 mb-4 flex items-center gap-2 uppercase tracking-widest">
+                <FileText size={16} />
+                [ DATA_DIFFERENTIAL_ANALYSIS ]
               </h3>
-              <div className="flex gap-2">
-                <select
-                  id="compare-slot1"
-                  className="flex-1 bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200 text-sm"
-                >
-                  <option value="">选择存档1</option>
-                  {slots
-                    .filter((s) => s.data)
-                    .map((slot) => (
-                      <option key={slot.id} value={slot.id}>
-                        存档{slot.id} - {slot.playerName}
-                      </option>
-                    ))}
-                </select>
-                <select
-                  id="compare-slot2"
-                  className="flex-1 bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200 text-sm"
-                >
-                  <option value="">选择存档2</option>
-                  {slots
-                    .filter((s) => s.data)
-                    .map((slot) => (
-                      <option key={slot.id} value={slot.id}>
-                        存档{slot.id} - {slot.playerName}
-                      </option>
-                    ))}
-                </select>
+              <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex-1 flex gap-2">
+                  <select
+                    id="compare-slot1"
+                    className="flex-1 bg-stone-900/60 border border-stone-800 rounded-none px-3 py-2 text-stone-300 text-[10px] font-bold uppercase tracking-widest focus:border-emerald-500 outline-none transition-colors"
+                  >
+                    <option value="" className="bg-ink-950">SELECT_SOURCE_A</option>
+                    {slots
+                      .filter((s) => s.data)
+                      .map((slot) => (
+                        <option key={slot.id} value={slot.id} className="bg-ink-950">
+                          SLOT_{slot.id} - {slot.playerName}
+                        </option>
+                      ))}
+                  </select>
+                  <select
+                    id="compare-slot2"
+                    className="flex-1 bg-stone-900/60 border border-stone-800 rounded-none px-3 py-2 text-stone-300 text-[10px] font-bold uppercase tracking-widest focus:border-emerald-500 outline-none transition-colors"
+                  >
+                    <option value="" className="bg-ink-950">SELECT_SOURCE_B</option>
+                    {slots
+                      .filter((s) => s.data)
+                      .map((slot) => (
+                        <option key={slot.id} value={slot.id} className="bg-ink-950">
+                          SLOT_{slot.id} - {slot.playerName}
+                        </option>
+                      ))}
+                  </select>
+                </div>
                 <button
                   onClick={() => {
                     const slot1Select = document.getElementById(
@@ -491,13 +509,20 @@ const SaveManagerModal: React.FC<Props> = ({
 
                     handleCompareSaves(slotId1, slotId2);
                   }}
-                  className="bg-mystic-gold hover:bg-yellow-600 text-stone-900 px-4 py-2 rounded font-semibold"
+                  className="bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border border-emerald-800/50 rounded-none px-6 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
                 >
-                  对比
+                  [ ANALYZE ]
                 </button>
               </div>
             </div>
           )}
+
+          <div className="pt-6 border-t border-stone-800 relative z-10">
+            <p className="text-[10px] text-stone-600 text-center font-bold uppercase tracking-[0.2em] leading-relaxed">
+              STORAGE_PROTOCOL: ALL_DATA_LOCALIZED_TO_USER_INTERFACE_STORAGE_BUFFER<br/>
+              MANUAL_EXPORT_RECOMMENDED_FOR_CRITICAL_PROGRESS_RETENTION
+            </p>
+          </div>
         </div>
       </div>
     </div>

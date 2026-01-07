@@ -34,34 +34,41 @@ const AlchemyModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-50 p-0 md:p-4 backdrop-blur-sm touch-manipulation"
+      className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-50 p-0 md:p-4 backdrop-blur-sm touch-manipulation font-mono"
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full h-[80vh] md:h-auto md:max-w-3xl md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-600 shadow-2xl flex flex-col md:max-h-[85vh] overflow-hidden"
+        className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-3xl rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[85vh] overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-3 md:p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 md:rounded-t">
-          <h3 className="text-lg md:text-xl font-serif text-mystic-gold flex items-center gap-2">
-            <Sparkles size={18} className="md:w-5 md:h-5" /> Lab
+        {/* CRT 效果层 */}
+        <div className="absolute inset-0 pointer-events-none z-50">
+          <div className="absolute inset-0 crt-noise opacity-[0.03]"></div>
+          <div className="absolute inset-0 scanline-overlay opacity-[0.05]"></div>
+          <div className="absolute inset-0 crt-vignette"></div>
+        </div>
+
+        <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-ink-900 rounded-none relative z-10">
+          <h3 className="text-lg md:text-xl font-mono text-mystic-gold flex items-center gap-2 uppercase tracking-widest">
+            <FlaskConical size={18} className="md:w-5 md:h-5" /> Chemical Lab
           </h3>
           <button
             onClick={onClose}
-            className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+            className="text-stone-500 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation transition-colors"
           >
             <X size={24} />
           </button>
         </div>
 
-        <div className="modal-scroll-container modal-scroll-content p-3 md:p-4 bg-paper-800 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div className="col-span-full mb-2 bg-ink-900/50 p-3 rounded border border-stone-700 text-sm text-stone-400 flex justify-between">
+        <div className="modal-scroll-container modal-scroll-content p-3 md:p-4 bg-ink-950 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 relative z-10">
+          <div className="col-span-full mb-2 bg-ink-900/50 p-3 rounded-none border border-stone-800 text-xs md:text-sm text-stone-500 flex justify-between font-mono uppercase tracking-widest">
             <span>
               Caps Holding:
-              <span className="text-mystic-gold font-bold">
+              <span className="text-mystic-gold font-bold ml-2">
                 {player.spiritStones}
               </span>
             </span>
-            <span>Refining chems is precision work; requires focus and Caps.</span>
+            <span className="hidden md:inline">Bio-chemical processing authorized.</span>
           </div>
 
           {availableRecipes.map((recipe, idx) => {
@@ -71,38 +78,39 @@ const AlchemyModal: React.FC<Props> = ({
             return (
               <div
                 key={idx}
-                className="bg-ink-800 border border-stone-700 rounded p-4 flex flex-col"
+                className="bg-ink-950 border border-stone-800 rounded-none p-4 flex flex-col relative group hover:border-mystic-gold transition-colors"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="text-lg font-serif font-bold text-stone-200">
+                <div className="absolute top-0 left-0 w-1 h-full bg-stone-800 group-hover:bg-mystic-gold/50 transition-colors"></div>
+                <div className="flex justify-between items-start mb-3">
+                  <h4 className="text-base md:text-lg font-mono font-bold text-stone-200 uppercase tracking-wider">
                     {recipe.name}
                   </h4>
-                  <span className="text-xs bg-mystic-gold/10 text-mystic-gold border border-mystic-gold/30 px-2 py-0.5 rounded">
-                    Chem
+                  <span className="text-[10px] bg-stone-900 text-stone-500 border border-stone-800 px-2 py-0.5 rounded-none uppercase tracking-tighter">
+                    CHEM
                   </span>
                 </div>
 
-                <p className="text-sm text-stone-500 italic mb-4 h-10 overflow-hidden">
+                <p className="text-[11px] text-stone-500 mb-4 h-10 overflow-hidden leading-relaxed">
                   {recipe.result.description}
                 </p>
 
-                <div className="bg-ink-900 p-2 rounded border border-stone-800 mb-4 flex-1">
-                  <div className="text-xs text-stone-500 mb-2 font-bold uppercase tracking-wider">
-                    Required Materials
+                <div className="bg-ink-900/50 p-3 rounded-none border border-stone-800/50 mb-4 flex-1 font-mono">
+                  <div className="text-[10px] text-stone-600 mb-2 font-bold uppercase tracking-[0.2em] border-b border-stone-800 pb-1">
+                    REQUIRED MATERIALS
                   </div>
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {recipe.ingredients.map((ing, i) => {
                       const owned = countItem(ing.name);
                       if (owned < ing.qty) hasIngredients = false;
 
                       return (
-                        <li key={i} className="flex justify-between text-sm">
-                          <span className="text-stone-300">{ing.name}</span>
+                        <li key={i} className="flex justify-between text-[11px] uppercase tracking-tighter">
+                          <span className="text-stone-400">{ing.name}</span>
                           <span
                             className={
                               owned >= ing.qty
-                                ? 'text-mystic-jade'
-                                : 'text-mystic-blood'
+                                ? 'text-emerald-500'
+                                : 'text-red-500'
                             }
                           >
                             {owned}/{ing.qty}
@@ -110,11 +118,11 @@ const AlchemyModal: React.FC<Props> = ({
                         </li>
                       );
                     })}
-                    <li className="flex justify-between text-sm pt-1 border-t border-stone-800 mt-1">
-                      <span className="text-stone-300">Caps Cost</span>
+                    <li className="flex justify-between text-[11px] pt-1.5 border-t border-stone-800 mt-1.5 uppercase tracking-tighter">
+                      <span className="text-stone-400">CAPS COST</span>
                       <span
                         className={
-                          canAfford ? 'text-mystic-gold' : 'text-mystic-blood'
+                          canAfford ? 'text-mystic-gold' : 'text-red-500'
                         }
                       >
                         {recipe.cost}
@@ -131,10 +139,10 @@ const AlchemyModal: React.FC<Props> = ({
                   }}
                   disabled={!canAfford || !hasIngredients}
                   className={`
-                    w-full py-2 rounded font-serif font-bold text-sm flex items-center justify-center gap-2 transition-colors
+                    w-full py-2.5 rounded-none font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all uppercase tracking-[0.2em] min-h-[44px]
                     ${canAfford && hasIngredients
-                      ? 'bg-mystic-gold/20 text-mystic-gold hover:bg-mystic-gold/30 border border-mystic-gold'
-                      : 'bg-stone-800 text-stone-600 cursor-not-allowed border border-stone-700'
+                      ? 'bg-ink-950 text-mystic-gold hover:bg-stone-900 border border-mystic-gold active:scale-95'
+                      : 'bg-ink-950 text-stone-700 cursor-not-allowed border border-stone-800'
                     }
                   `}
                 >
@@ -143,7 +151,7 @@ const AlchemyModal: React.FC<Props> = ({
                   ) : (
                     <FlaskConical size={16} />
                   )}
-                  {canAfford && hasIngredients ? 'Begin Crafting' : 'Low Materials'}
+                  {canAfford && hasIngredients ? 'INITIALIZE SYNTHESIS' : 'INSUFFICIENT DATA'}
                 </button>
               </div>
             );

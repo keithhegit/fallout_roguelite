@@ -200,127 +200,74 @@ const SettingsModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4 touch-manipulation"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 crt-screen"
       onClick={onClose}
     >
       <div
-        className="bg-stone-800 md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-700 w-full h-[80vh] md:h-auto md:max-w-md md:max-h-[90vh] flex flex-col"
+        className="bg-ink-950 w-full max-w-md rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-stone-800 border-b border-stone-700 p-3 md:p-4 flex justify-between items-center md:rounded-t-2xl flex-shrink-0">
-          <h2 className="text-lg md:text-xl font-serif text-mystic-gold">
-            System Settings
-          </h2>
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+        
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
+        <div className="bg-stone-950/50 border-b border-stone-800 p-4 md:p-6 flex justify-between items-center relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+              />
+              <Save size={24} className="relative z-10" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">SYSTEM_SETTINGS</h2>
+              <p className="text-[10px] text-stone-600 tracking-widest uppercase">HARDWARE_CONFIG // PROTOCOL_V9.4</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+            className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50 relative group overflow-hidden"
+            aria-label="ABORT"
           >
-            <X size={24} />
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <X size={24} className="relative z-10" />
           </button>
         </div>
 
-        <div className="modal-scroll-container modal-scroll-content p-6 space-y-6">
-          {/* 音效设置 */}
-          {/* <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Volume2 size={20} className="text-stone-400" />
-              <h3 className="font-bold">音效</h3>
-            </div>
-            <div className="space-y-3">
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-stone-300">启用音效</span>
-                <input
-                  type="checkbox"
-                  checked={settings.soundEnabled}
-                  onChange={(e) =>
-                    onUpdateSettings({ soundEnabled: e.target.checked })
-                  }
-                  className="w-5 h-5"
-                />
-              </label>
-              {settings.soundEnabled && (
-                <div>
-                  <label className="block text-sm text-stone-400 mb-2">
-                    音效音量: {settings.soundVolume}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={settings.soundVolume}
-                    onChange={(e) =>
-                      onUpdateSettings({
-                        soundVolume: parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-              )}
-            </div>
-          </div> */}
-
-          {/* 音乐设置 */}
-          {/* <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Music size={20} className="text-stone-400" />
-              <h3 className="font-bold">音乐</h3>
-            </div>
-            <div className="space-y-3">
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-stone-300">启用音乐</span>
-                <input
-                  type="checkbox"
-                  checked={settings.musicEnabled}
-                  onChange={(e) =>
-                    onUpdateSettings({ musicEnabled: e.target.checked })
-                  }
-                  className="w-5 h-5"
-                />
-              </label>
-              {settings.musicEnabled && (
-                <div>
-                  <label className="block text-sm text-stone-400 mb-2">
-                    音乐音量: {settings.musicVolume}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={settings.musicVolume}
-                    onChange={(e) =>
-                      onUpdateSettings({
-                        musicVolume: parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-              )}
-            </div>
-          </div> */}
-
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10 max-h-[70vh]">
           {/* 游戏设置 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Save size={20} className="text-stone-400" />
-              <h3 className="font-bold">游戏</h3>
+            <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
+              <Save size={18} className="text-emerald-500" />
+              <h3 className="font-bold uppercase tracking-widest text-sm text-stone-100">GAMEPLAY_PARAMETERS</h3>
             </div>
-            <div className="space-y-3">
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-stone-300">Auto Save</span>
+            <div className="space-y-4">
+              <label className="flex items-center justify-between cursor-pointer group/item">
+                <span className="text-stone-300 text-xs uppercase tracking-wider font-bold">AUTO_SAVE_PROTOCOL</span>
                 <input
                   type="checkbox"
                   checked={settings.autoSave}
                   onChange={(e) =>
                     onUpdateSettings({ autoSave: e.target.checked })
                   }
-                  className="w-5 h-5"
+                  className="w-5 h-5 accent-emerald-600 rounded-none border-stone-700 bg-stone-900"
                 />
               </label>
-              <div>
-                <label className="block text-sm text-stone-400 mb-2">
-                  Animation Speed
+              
+              <div className="space-y-2">
+                <label className="block text-[10px] text-stone-500 uppercase tracking-widest font-bold">
+                  ANIMATION_PROCESSING_SPEED
                 </label>
                 <select
                   value={settings.animationSpeed}
@@ -329,36 +276,37 @@ const SettingsModal: React.FC<Props> = ({
                       animationSpeed: e.target.value as GameSettings['animationSpeed']
                     })
                   }
-                  className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200"
+                  className="w-full bg-stone-900/40 border border-stone-800 rounded-none px-3 py-2 text-stone-200 text-xs uppercase tracking-widest font-bold focus:border-emerald-500 outline-none transition-colors"
                 >
-                  <option value="slow">Slow</option>
-                  <option value="normal">Normal</option>
-                  <option value="fast">Fast</option>
+                  <option value="slow">SLOW_STABILITY</option>
+                  <option value="normal">BALANCED_OPTIMAL</option>
+                  <option value="fast">HIGH_PERFORMANCE</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-sm text-stone-400 mb-2">
-                  Game Difficulty (View Only)
+
+              <div className="space-y-2">
+                <label className="block text-[10px] text-stone-500 uppercase tracking-widest font-bold">
+                  SIMULATION_DIFFICULTY
                 </label>
-                <div className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200">
+                <div className="w-full bg-stone-900/40 border border-stone-800 rounded-none px-3 py-2">
                   {settings.difficulty === 'easy' && (
-                    <span className="text-green-400 font-semibold">
-                      Easy - No Penalties
+                    <span className="text-emerald-500 text-xs font-bold uppercase tracking-widest">
+                      EASY - [ NO_PENALTIES ]
                     </span>
                   )}
                   {settings.difficulty === 'normal' && (
-                    <span className="text-yellow-400 font-semibold">
-                      Normal - Partial Loss on Death
+                    <span className="text-yellow-500 text-xs font-bold uppercase tracking-widest">
+                      NORMAL - [ PARTIAL_DATA_LOSS ]
                     </span>
                   )}
                   {settings.difficulty === 'hard' && (
-                    <span className="text-red-400 font-semibold">
-                      Hardcore - Permanent Death
+                    <span className="text-red-500 text-xs font-bold uppercase tracking-widest">
+                      HARDCORE - [ PERMANENT_TERMINATION ]
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-stone-500 mt-1">
-                  Difficulty is set at character creation and cannot be changed.
+                <p className="text-[10px] text-stone-600 italic leading-tight">
+                  * Difficulty parameters are immutable once simulation begins.
                 </p>
               </div>
             </div>
@@ -366,90 +314,73 @@ const SettingsModal: React.FC<Props> = ({
 
           {/* 存档管理 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Save size={20} className="text-stone-400" />
-              <h3 className="font-bold">Data Storage</h3>
+            <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
+              <FolderOpen size={18} className="text-emerald-500" />
+              <h3 className="font-bold uppercase tracking-widest text-sm text-stone-100">DATA_REQUISITION</h3>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {onOpenSaveManager && (
-                <div>
-                  <label className="block text-sm text-stone-400 mb-2">
-                    Multi-Slot Management
+                <div className="space-y-2">
+                  <label className="block text-[10px] text-stone-500 uppercase tracking-widest font-bold">
+                    ARCHIVE_SYSTEM_ACCESS
                   </label>
                   <button
                     onClick={() => {
                       onOpenSaveManager();
                       onClose();
                     }}
-                    className="w-full bg-mystic-gold hover:bg-yellow-600 text-stone-900 border border-yellow-500 rounded px-4 py-2 flex items-center justify-center transition-colors font-semibold"
+                    className="w-full bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border border-emerald-800/50 rounded-none px-4 py-2.5 flex items-center justify-center transition-all font-bold uppercase tracking-widest text-xs"
                   >
-                    <FolderOpen size={16} className="mr-2" />
-                    Open Save Manager
+                    <FolderOpen size={14} className="mr-2" />
+                    [ ACCESS_SAVE_MANAGER ]
                   </button>
-                  <p className="text-xs text-stone-500 mt-2">
-                    Manage multiple save slots, backups, and comparisons.
-                  </p>
                 </div>
               )}
-              <div>
-                <label className="block text-sm text-stone-400 mb-2">
-                  Export Save
-                </label>
-                <button
-                  onClick={handleExportSave}
-                  className="w-full bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded px-4 py-2 flex items-center justify-center transition-colors"
-                >
-                  <Download size={16} className="mr-2" />
-                  Export Current Save (.json)
-                </button>
-                <p className="text-xs text-stone-500 mt-2">
-                  Export your progress to a JSON file for backup or sharing.
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm text-stone-400 mb-2">
-                  Import Save
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json,.txt"
-                  onChange={handleImportSave}
-                  className="hidden"
-                  id="import-save-input"
-                />
-                <label
-                  htmlFor="import-save-input"
-                  className="block w-full bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded px-4 py-2 text-center cursor-pointer transition-colors"
-                >
-                  <Upload size={16} className="inline mr-2" />
-                  Select Save File (.json or .txt)
-                </label>
-                <p className="text-xs text-stone-500 mt-2">
-                  Importing will replace your current simulation data and refresh the browser.
-                </p>
-              </div>
-              {onRestartGame && (
-                <div>
-                  <label className="block text-sm text-stone-400 mb-2">
-                    Reset Progress
+              
+              <div className="grid grid-cols-1 gap-3">
+                <div className="space-y-2">
+                  <button
+                    onClick={handleExportSave}
+                    className="w-full bg-stone-900/40 hover:bg-stone-800 text-stone-300 border border-stone-800 rounded-none px-4 py-2.5 flex items-center justify-center transition-all font-bold uppercase tracking-widest text-xs"
+                  >
+                    <Download size={14} className="mr-2" />
+                    [ EXPORT_ENCRYPTED_DATA ]
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json,.txt"
+                    onChange={handleImportSave}
+                    className="hidden"
+                    id="import-save-input"
+                  />
+                  <label
+                    htmlFor="import-save-input"
+                    className="block w-full bg-stone-900/40 hover:bg-stone-800 text-stone-300 border border-stone-800 rounded-none px-4 py-2.5 text-center cursor-pointer transition-all font-bold uppercase tracking-widest text-xs"
+                  >
+                    <Upload size={14} className="inline mr-2" />
+                    [ IMPORT_EXTERNAL_RECORDS ]
                   </label>
+                </div>
+              </div>
+
+              {onRestartGame && (
+                <div className="pt-2 border-t border-stone-900">
                   <button
                     onClick={() => {
                       showInfo('Restarting will clear all progress, including:\n- Character Data\n- Gear & Items\n- Rank & XP\n- All Trophies\n\nThis action cannot be undone!', 'Rebuild Future', () => {
                         onRestartGame();
                         onClose();
                       });
-
                     }}
-                    className="w-full bg-red-700 hover:bg-red-600 text-white border border-red-600 rounded px-4 py-2 flex items-center justify-center transition-colors font-semibold"
+                    className="w-full bg-red-900/10 hover:bg-red-900/20 text-red-500 border border-red-900/30 rounded-none px-4 py-2.5 flex items-center justify-center transition-all font-bold uppercase tracking-widest text-xs"
                   >
-                    <RotateCcw size={16} className="mr-2" />
-                    Reset Data
+                    <RotateCcw size={14} className="mr-2" />
+                    [ WIPE_SIMULATION_DATA ]
                   </button>
-                  <p className="text-xs text-stone-500 mt-2">
-                    Clear all current simulation data. Export a backup first if needed.
-                  </p>
                 </div>
               )}
             </div>
@@ -457,9 +388,9 @@ const SettingsModal: React.FC<Props> = ({
 
           {/* 语言设置 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Globe size={20} className="text-stone-400" />
-              <h3 className="font-bold">Language</h3>
+            <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
+              <Globe size={18} className="text-emerald-500" />
+              <h3 className="font-bold uppercase tracking-widest text-sm text-stone-100">INTERFACE_LINGUISTICS</h3>
             </div>
             <select
               value={settings.language}
@@ -468,91 +399,77 @@ const SettingsModal: React.FC<Props> = ({
                   language: e.target.value as GameSettings['language']
                 })
               }
-              className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200"
+              className="w-full bg-stone-900/40 border border-stone-800 rounded-none px-3 py-2 text-stone-200 text-xs uppercase tracking-widest font-bold focus:border-emerald-500 outline-none transition-colors"
             >
-              <option value="zh">Chinese</option>
-              <option value="en">English</option>
+              <option value="zh">ZH_CN_STANDARD</option>
+              <option value="en">EN_US_ENHANCED</option>
             </select>
           </div>
 
           {/* 快捷键 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Keyboard size={20} className="text-stone-400" />
-              <h3 className="font-bold">Shortcuts</h3>
+            <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
+              <Keyboard size={18} className="text-emerald-500" />
+              <h3 className="font-bold uppercase tracking-widest text-sm text-stone-100">NEURAL_INTERFACE_MAPPING</h3>
             </div>
-            <div className="space-y-3">
-              <button
-                onClick={() => setIsShortcutsOpen(true)}
-                className="flex items-center gap-2 w-full bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded px-4 py-2 transition-colors text-left"
-              >
-                <Keyboard size={16} />
-                <span>View Key Bindings</span>
-              </button>
-              <p className="text-xs text-stone-500">
-                View all available keyboard shortcuts for faster navigation.
-              </p>
-            </div>
+            <button
+              onClick={() => setIsShortcutsOpen(true)}
+              className="flex items-center gap-2 w-full bg-stone-900/40 hover:bg-stone-800 text-stone-300 border border-stone-800 rounded-none px-4 py-2.5 transition-all font-bold uppercase tracking-widest text-xs text-left"
+            >
+              <Keyboard size={14} className="text-emerald-500" />
+              <span>[ VIEW_OPERATIONAL_SHORTCUTS ]</span>
+            </button>
           </div>
 
-          {/* 用户反馈交流群 */}
+          {/* 关于与更新 */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <MessageCircle size={20} className="text-stone-400" />
-              <h3 className="font-bold">Community & Feedback</h3>
+            <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
+              <MessageCircle size={18} className="text-emerald-500" />
+              <h3 className="font-bold uppercase tracking-widest text-sm text-stone-100">VAULT_COMMUNICATIONS</h3>
             </div>
-            <div className="space-y-3">
-              <div className="bg-stone-900/50 border border-stone-700 rounded p-4 flex flex-col items-center">
+            <div className="space-y-4">
+              <div className="bg-stone-900/40 border border-stone-800 rounded-none p-4 flex flex-col items-center">
                 <img
                   src="/assets/images/group.jpg"
                   alt="Wasteland Survivor Community"
-                  className="w-full max-w-xs rounded-lg shadow-lg"
+                  className="w-full max-w-xs rounded-none border border-stone-800 shadow-lg grayscale"
                 />
-                <p className="text-xs text-stone-400 mt-3 text-center">
-                  Scan to join our WeChat group for feedback and strategy.
+                <p className="text-[10px] text-stone-500 mt-3 text-center uppercase tracking-widest font-bold">
+                  SCAN_TO_JOIN_SURVIVOR_NETWORK
                 </p>
               </div>
-            </div>
-          </div>
 
-          {/* 关于 */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Github size={20} className="text-stone-400" />
-              <h3 className="font-bold">About</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="bg-stone-900/50 border border-stone-700 rounded px-4 py-3">
+              <div className="bg-stone-950 border border-stone-800 rounded-none px-4 py-3">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-stone-400">Version</span>
-                  <span className="text-sm font-mono text-mystic-gold">
-                    v{import.meta.env.VITE_APP_VERSION || '1.0.0'}
+                  <span className="text-[10px] text-stone-500 uppercase font-bold">FIRMWARE_VERSION</span>
+                  <span className="text-xs font-mono text-emerald-500 font-bold">
+                    V_{import.meta.env.VITE_APP_VERSION || '1.0.0'}
                   </span>
                 </div>
-                <div className="text-xs text-stone-500">
-                  Last Updated: 2024-12-05
+                <div className="text-[10px] text-stone-600 uppercase font-bold">
+                  LAST_STABLE_COMPILE: 2024-12-05
                 </div>
               </div>
-              <a
-                href="https://github.com/JeasonLoop/react-xiuxian-game"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 w-full bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded px-4 py-2 transition-colors"
-              >
-                <Github size={16} />
-                <span>GitHub Repository</span>
-                <span className="ml-auto text-xs text-stone-400">↗</span>
-              </a>
-              <button
-                onClick={() => setIsChangelogOpen(true)}
-                className="flex items-center gap-2 w-full bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded px-4 py-2 transition-colors text-left"
-              >
-                <Save size={16} />
-                <span>Read Revision Notes</span>
-              </button>
-              <p className="text-xs text-stone-500">
-                A fallout-themed survival sim. Star or Fork on GitHub!
-              </p>
+
+              <div className="grid grid-cols-1 gap-3">
+                <a
+                  href="https://github.com/JeasonLoop/react-xiuxian-game"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 w-full bg-stone-900/40 hover:bg-stone-800 text-stone-300 border border-stone-800 rounded-none px-4 py-2.5 transition-all font-bold uppercase tracking-widest text-xs"
+                >
+                  <Github size={14} className="text-emerald-500" />
+                  <span>[ GITHUB_REPOSITORY ]</span>
+                  <span className="ml-auto text-[10px] text-stone-500">↗</span>
+                </a>
+                <button
+                  onClick={() => setIsChangelogOpen(true)}
+                  className="flex items-center gap-2 w-full bg-stone-900/40 hover:bg-stone-800 text-stone-300 border border-stone-800 rounded-none px-4 py-2.5 transition-all font-bold uppercase tracking-widest text-xs text-left"
+                >
+                  <Save size={14} className="text-emerald-500" />
+                  <span>[ REVISION_CHRONICLES ]</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

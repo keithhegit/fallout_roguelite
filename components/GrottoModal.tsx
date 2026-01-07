@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, Home, ArrowUp, Sprout, Package, Coins, Zap, Clock, CheckCircle, AlertCircle, BookOpen, Sparkles, Gauge } from 'lucide-react';
 import { PlayerStats, ItemRarity } from '../types';
+import { ASSETS } from '../constants/assets';
 import { GROTTO_CONFIGS, PLANTABLE_HERBS, REALM_ORDER, SPIRIT_ARRAY_ENHANCEMENTS, SPEEDUP_CONFIG, HERBARIUM_REWARDS } from '../constants/index';
 import { getRarityTextColor } from '../utils/rarityUtils';
 import { formatGrottoTime } from '../utils/formatUtils';
@@ -196,27 +197,32 @@ const GrottoModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 border-2 border-stone-700 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-ink-950 border border-stone-800 md:rounded-none shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 背景纹理层 */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+
         {/* Header */}
-        <div className="bg-ink-900 p-4 border-b border-stone-700 flex items-center justify-between flex-shrink-0">
+        <div className="bg-stone-950 p-4 border-b border-stone-800 flex items-center justify-between flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
             <Home className="text-mystic-gold" size={24} />
-            <h2 className="text-xl font-serif text-mystic-gold tracking-widest">BASE</h2>
+            <h2 className="text-xl font-serif text-mystic-gold tracking-widest font-bold">BASE</h2>
             {grotto.level > 0 && (
-              <span className="text-xs px-2 py-1 rounded bg-stone-700 text-stone-300 border border-stone-600">
+              <span className="text-xs px-2 py-1 rounded-none bg-stone-900 text-stone-300 border border-stone-800">
                 {currentConfig?.name || `Rank ${grotto.level}`}
               </span>
             )}
           </div>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-200 transition-colors p-1 rounded hover:bg-stone-700"
+            className="text-stone-400 hover:text-stone-200 transition-colors p-1"
             title="Close"
           >
             <X size={24} />
@@ -224,63 +230,63 @@ const GrottoModal: React.FC<Props> = ({
         </div>
 
         {/* Tabs */}
-        <div className="bg-ink-900 border-b border-stone-700 flex gap-2 p-2 overflow-x-auto scrollbar-hide flex-shrink-0">
+        <div className="bg-stone-950 border-b border-stone-800 flex gap-0 p-0 overflow-x-auto scrollbar-hide flex-shrink-0 z-10">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 ${activeTab === 'overview'
-              ? 'bg-mystic-gold text-stone-900 font-bold'
-              : 'bg-ink-800 text-stone-300 hover:bg-stone-700'
+            className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'overview'
+              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
             <Home size={16} />
-            <span>Overview</span>
+            <span>OVERVIEW</span>
           </button>
           <button
             onClick={() => setActiveTab('upgrade')}
-            className={`px-4 py-2 rounded transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 ${activeTab === 'upgrade'
-              ? 'bg-mystic-gold text-stone-900 font-bold'
-              : 'bg-ink-800 text-stone-300 hover:bg-stone-700'
+            className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'upgrade'
+              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
             <ArrowUp size={16} />
-            <span>Upgrade</span>
+            <span>UPGRADE</span>
           </button>
           <button
             onClick={() => setActiveTab('plant')}
-            className={`px-4 py-2 rounded transition-colors whitespace-nowrap flex items-center gap-2 relative flex-shrink-0 ${activeTab === 'plant'
-              ? 'bg-mystic-gold text-stone-900 font-bold'
-              : 'bg-ink-800 text-stone-300 hover:bg-stone-700'
+            className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 relative flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'plant'
+              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
             <Sprout size={16} />
-            <span>Produce</span>
+            <span>PRODUCE</span>
             {matureHerbsCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute top-1 right-1 bg-green-600 text-white text-[10px] px-1 rounded-none">
                 {matureHerbsCount}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('enhancement')}
-            className={`px-4 py-2 rounded transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 ${activeTab === 'enhancement'
-              ? 'bg-mystic-gold text-stone-900 font-bold'
-              : 'bg-ink-800 text-stone-300 hover:bg-stone-700'
+            className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'enhancement'
+              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
             <Zap size={16} />
-            <span>Reactor</span>
+            <span>REACTOR</span>
           </button>
           <button
             onClick={() => setActiveTab('herbarium')}
-            className={`px-4 py-2 rounded transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 relative ${activeTab === 'herbarium'
-              ? 'bg-mystic-gold text-stone-900 font-bold'
-              : 'bg-ink-800 text-stone-300 hover:bg-stone-700'
+            className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 relative font-bold ${activeTab === 'herbarium'
+              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
             <BookOpen size={16} />
-            <span>Index</span>
+            <span>INDEX</span>
             {grotto.herbarium && grotto.herbarium.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute top-1 right-1 bg-purple-600 text-white text-[10px] px-1 rounded-none">
                 {grotto.herbarium.length}
               </span>
             )}
@@ -288,119 +294,123 @@ const GrottoModal: React.FC<Props> = ({
         </div>
 
         {/* Content */}
-        <div className="modal-scroll-container modal-scroll-content p-6 min-h-0">
+        <div className="modal-scroll-container modal-scroll-content p-6 min-h-0 z-10">
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {grotto.level === 0 ? (
                 <div className="text-center py-12">
                   <Home className="mx-auto text-stone-500 mb-4" size={64} />
-                  <p className="text-stone-300 text-lg mb-2 font-bold">You don't have a Base yet</p>
+                  <p className="text-stone-300 text-lg mb-2 font-bold uppercase tracking-widest">You don't have a Base yet</p>
                   <p className="text-stone-400 text-sm mb-6 max-w-md mx-auto">
                     Acquiring a Base provides Reactor XP bonuses, supply production, and growth rate enhancements.
                   </p>
                   <button
                     onClick={() => setActiveTab('upgrade')}
-                    className="px-6 py-3 bg-mystic-gold text-stone-900 font-bold rounded hover:bg-yellow-600 transition-colors shadow-lg"
+                    className="px-6 py-3 bg-mystic-gold text-ink-950 font-bold rounded-none hover:bg-yellow-400 transition-all shadow-lg active:scale-95"
                   >
-                    Acquire
+                    ACQUIRE BASE
                   </button>
                 </div>
               ) : (
                 <>
                   {/* 洞府信息卡片 */}
-                  <div className="bg-ink-900 p-5 rounded-lg border border-stone-700 shadow-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-stone-200">
-                          {currentConfig?.name || 'Unknown Base'}
-                        </h3>
-                        <p className="text-stone-400 text-sm mt-1">{currentConfig?.description}</p>
+                  <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-stone-200 uppercase tracking-wider">
+                            {currentConfig?.name || 'Unknown Base'}
+                          </h3>
+                          <p className="text-stone-400 text-sm mt-1 uppercase tracking-tight">{currentConfig?.description}</p>
+                        </div>
+                        <span className="text-mystic-gold text-sm bg-mystic-gold/10 px-3 py-1 rounded-none border border-mystic-gold/50 font-bold tracking-widest">
+                          RANK {grotto.level}
+                        </span>
                       </div>
-                      <span className="text-stone-200 text-sm bg-mystic-gold/20 px-3 py-1 rounded border border-mystic-gold/50 font-bold">
-                        Lv.{grotto.level}
-                      </span>
-                    </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-mystic-gold/50 transition-colors">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Zap className="text-mystic-gold" size={18} />
-                          <span className="text-stone-400 text-xs font-medium">XP Bonus</span>
-                        </div>
-                        <p className="text-2xl font-bold text-mystic-gold">
-                          +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
-                        </p>
-                        {grotto.spiritArrayEnhancement > 0 && (
-                          <p className="text-xs text-stone-500 mt-1">
-                            Base +{(grotto.expRateBonus * 100).toFixed(0)}% | Specs +{((grotto.spiritArrayEnhancement || 0) * 100).toFixed(0)}%
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-mystic-gold/50 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Zap className="text-mystic-gold" size={18} />
+                            <span className="text-stone-400 text-xs font-bold uppercase tracking-widest">XP Bonus</span>
+                          </div>
+                          <p className="text-2xl font-bold text-mystic-gold">
+                            +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
                           </p>
-                        )}
-                      </div>
-                      <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-green-400/50 transition-colors">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sprout className="text-green-400" size={18} />
-                          <span className="text-stone-400 text-xs font-medium">Growth Rate</span>
+                          {grotto.spiritArrayEnhancement > 0 && (
+                            <p className="text-[10px] text-stone-500 mt-1 font-bold uppercase tracking-widest">
+                              Base +{(grotto.expRateBonus * 100).toFixed(0)}% | Specs +{((grotto.spiritArrayEnhancement || 0) * 100).toFixed(0)}%
+                            </p>
+                          )}
                         </div>
-                        <p className="text-2xl font-bold text-green-400">
-                          +{(grotto.growthSpeedBonus * 100).toFixed(0)}%
-                        </p>
-                        <p className="text-xs text-stone-500 mt-1">Cycle Reduction</p>
-                      </div>
-                      <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-blue-400/50 transition-colors">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Package className="text-blue-400" size={18} />
-                          <span className="text-stone-400 text-xs font-medium">Slots</span>
+                        <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-green-400/50 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Sprout className="text-green-400" size={18} />
+                            <span className="text-stone-400 text-xs font-bold uppercase tracking-widest">Growth Rate</span>
+                          </div>
+                          <p className="text-2xl font-bold text-green-400">
+                            +{(grotto.growthSpeedBonus * 100).toFixed(0)}%
+                          </p>
+                          <p className="text-[10px] text-stone-500 mt-1 font-bold uppercase tracking-widest">Cycle Reduction</p>
                         </div>
-                        <p className="text-2xl font-bold text-stone-200">
-                          {grotto.plantedHerbs.length} / {currentConfig?.maxHerbSlots || 0}
-                        </p>
-                        <p className="text-xs text-stone-500 mt-1">
-                          {grotto.plantedHerbs.length >= (currentConfig?.maxHerbSlots || 0) ? 'Full' : 'Available'}
-                        </p>
-                      </div>
-                      <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-purple-400/50 transition-colors">
-                        <div className="flex items-center gap-2 mb-2">
-                          <BookOpen className="text-purple-400" size={18} />
-                          <span className="text-stone-400 text-xs font-medium">Index Progress</span>
+                        <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-blue-400/50 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Package className="text-blue-400" size={18} />
+                            <span className="text-stone-400 text-xs font-bold uppercase tracking-widest">Slots</span>
+                          </div>
+                          <p className="text-2xl font-bold text-stone-200">
+                            {grotto.plantedHerbs.length} / {currentConfig?.maxHerbSlots || 0}
+                          </p>
+                          <p className="text-[10px] text-stone-500 mt-1 font-bold uppercase tracking-widest">
+                            {grotto.plantedHerbs.length >= (currentConfig?.maxHerbSlots || 0) ? 'FULL' : 'AVAILABLE'}
+                          </p>
                         </div>
-                        <p className="text-2xl font-bold text-purple-400">
-                          {grotto.herbarium?.length || 0} / {PLANTABLE_HERBS.length}
-                        </p>
-                        <p className="text-xs text-stone-500 mt-1">
-                          {PLANTABLE_HERBS.length > 0 ? Math.floor(((grotto.herbarium?.length || 0) / PLANTABLE_HERBS.length) * 100) : 0}% Complete
-                        </p>
+                        <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-purple-400/50 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen className="text-purple-400" size={18} />
+                            <span className="text-stone-400 text-xs font-bold uppercase tracking-widest">Index Progress</span>
+                          </div>
+                          <p className="text-2xl font-bold text-purple-400">
+                            {grotto.herbarium?.length || 0} / {PLANTABLE_HERBS.length}
+                          </p>
+                          <p className="text-[10px] text-stone-500 mt-1 font-bold uppercase tracking-widest">
+                            {PLANTABLE_HERBS.length > 0 ? Math.floor(((grotto.herbarium?.length || 0) / PLANTABLE_HERBS.length) * 100) : 0}% COMPLETE
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* 自动收获开关 */}
                   {currentConfig?.autoHarvest && (
-                    <div className="bg-ink-900 p-4 rounded-lg border border-stone-700 shadow-lg">
-                      <div className="flex items-center justify-between">
+                    <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
+                      <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                      <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2.5 rounded-lg ${grotto.autoHarvest ? 'bg-green-900/30 border-2 border-green-500' : 'bg-stone-800 border-2 border-stone-700'}`}>
-                            <Zap className={grotto.autoHarvest ? 'text-green-400' : 'text-stone-500'} size={20} />
+                          <div className={`p-2.5 rounded-none ${grotto.autoHarvest ? 'bg-green-950/30 border border-green-500' : 'bg-stone-950/40 border border-stone-800'}`}>
+                            <Zap className={grotto.autoHarvest ? 'text-green-400' : 'text-stone-600'} size={20} />
                           </div>
                           <div>
-                            <p className="text-stone-200 font-bold flex items-center gap-2">
+                            <p className="text-stone-200 font-bold flex items-center gap-2 uppercase tracking-wider">
                               Auto-Gather
                               {grotto.autoHarvest && (
-                                <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded-full">Active</span>
+                                <span className="text-[10px] bg-green-600/20 text-green-400 px-2 py-0.5 rounded-none font-bold border border-green-500/50">ACTIVE</span>
                               )}
                             </p>
-                            <p className="text-stone-400 text-sm mt-0.5">
+                            <p className="text-stone-400 text-[10px] mt-0.5 font-bold uppercase tracking-widest">
                               {grotto.autoHarvest ? 'Supplies will be automatically collected when ready' : 'Requires manual collection'}
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={onToggleAutoHarvest}
-                          className={`px-5 py-2.5 rounded-lg font-bold transition-all shadow-lg ${grotto.autoHarvest
-                            ? 'bg-green-600 text-white hover:bg-green-700 border-2 border-green-500'
-                            : 'bg-stone-700 text-stone-300 hover:bg-stone-600 border-2 border-stone-600'
+                          className={`px-5 py-2.5 rounded-none font-bold transition-all shadow-lg active:scale-95 uppercase tracking-widest text-xs ${grotto.autoHarvest
+                            ? 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-500/50'
+                            : 'bg-stone-800/40 text-stone-500 hover:bg-stone-700/40 border border-stone-700'
                             }`}
                         >
-                          {grotto.autoHarvest ? '✓ ON' : '○ OFF'}
+                          {grotto.autoHarvest ? '[ ENABLED ]' : '[ DISABLED ]'}
                         </button>
                       </div>
                     </div>
@@ -408,127 +418,132 @@ const GrottoModal: React.FC<Props> = ({
 
                   {/* 种植的灵草 */}
                   {grotto.plantedHerbs.length > 0 && (
-                    <div className="bg-ink-900 p-5 rounded-lg border border-stone-700 shadow-lg">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold text-stone-200 flex items-center gap-2">
-                          <Sprout size={20} />
-                          Active Production
+                    <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden">
+                      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-bold text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                            <Sprout size={20} className="text-green-500" />
+                            Active Production
+                            {matureHerbsCount > 0 && (
+                              <span className="text-[10px] bg-green-600/20 text-green-400 px-2 py-0.5 rounded-none font-bold border border-green-500/50 uppercase">
+                                {matureHerbsCount} READY
+                              </span>
+                            )}
+                          </h3>
                           {matureHerbsCount > 0 && (
-                            <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded-full">
-                              {matureHerbsCount} Ready
-                            </span>
-                          )}
-                        </h3>
-                        {matureHerbsCount > 0 && (
-                          <button
-                            onClick={onHarvestAll}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-sm font-bold flex items-center gap-2 shadow-lg border-2 border-green-500"
-                          >
-                            <CheckCircle size={16} />
-                            Gather All
-                          </button>
-                        )}
-                      </div>
-                      <div className="space-y-3">
-                        {grotto.plantedHerbs.map((herb, index) => {
-                          const now = Date.now();
-                          const isMature = now >= herb.harvestTime;
-                          const remaining = Math.max(0, herb.harvestTime - now);
-                          const progress = calculateProgress(herb.plantTime, herb.harvestTime);
-
-                          return (
-                            <div
-                              key={index}
-                              className={`p-4 rounded-lg border-2 transition-all ${isMature
-                                ? 'bg-green-900/30 border-green-500 shadow-lg ring-2 ring-green-500/30'
-                                : 'bg-stone-800/50 border-stone-700 hover:border-stone-600'
-                                }`}
+                            <button
+                              onClick={onHarvestAll}
+                              className="px-4 py-2 bg-green-900/20 text-green-400 rounded-none hover:bg-green-900/40 transition-all text-xs font-bold flex items-center gap-2 shadow-lg border border-green-500/50 active:scale-95 uppercase tracking-widest"
                             >
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="font-bold text-stone-200 text-lg">{herb.herbName}</span>
-                                    {herb.isMutated && (
-                                      <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded flex items-center gap-1">
-                                        <Sparkles size={12} />
-                                        Mutant
+                              <CheckCircle size={16} />
+                              GATHER ALL
+                            </button>
+                          )}
+                        </div>
+                        <div className="space-y-3">
+                          {grotto.plantedHerbs.map((herb, index) => {
+                            const now = Date.now();
+                            const isMature = now >= herb.harvestTime;
+                            const remaining = Math.max(0, herb.harvestTime - now);
+                            const progress = calculateProgress(herb.plantTime, herb.harvestTime);
+
+                            return (
+                              <div
+                                key={index}
+                                className={`p-4 rounded-none border transition-all relative overflow-hidden ${isMature
+                                  ? 'bg-green-950/20 border-green-500/50 shadow-lg'
+                                  : 'bg-stone-950/40 border-stone-800'
+                                  }`}
+                              >
+                                <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                                <div className="flex items-start justify-between gap-4 relative z-10">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <span className="font-bold text-stone-200 text-lg uppercase tracking-widest">{herb.herbName}</span>
+                                      {herb.isMutated && (
+                                        <span className="text-[10px] bg-purple-900/20 text-purple-400 px-2 py-0.5 rounded-none border border-purple-500/50 flex items-center gap-1 font-bold uppercase tracking-widest">
+                                          <Sparkles size={10} />
+                                          MUTANT
+                                        </span>
+                                      )}
+                                      <span className="text-stone-400 text-xs bg-stone-950/60 px-2 py-0.5 rounded-none border border-stone-800 font-bold">
+                                        x{herb.isMutated && herb.mutationBonus ? Math.floor(herb.quantity * herb.mutationBonus) : herb.quantity}
                                       </span>
+                                      {isMature && (
+                                        <span className="text-[10px] bg-green-900/20 text-green-400 px-2 py-0.5 rounded-none border border-green-500/50 flex items-center gap-1 font-bold uppercase tracking-widest">
+                                          <CheckCircle size={10} />
+                                          READY
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {!isMature && (
+                                      <div className="mb-3">
+                                        <div className="flex items-center justify-between text-sm mb-2">
+                                          <span className="flex items-center gap-1.5 text-stone-400 uppercase text-[10px] font-bold tracking-widest">
+                                            <Clock size={12} className="text-blue-400" />
+                                            <span>Time Left</span>
+                                          </span>
+                                          <span className="font-bold text-mystic-gold tracking-widest">{formatGrottoTime(remaining)}</span>
+                                        </div>
+                                        <div className="w-full bg-stone-950/60 rounded-none h-4 relative overflow-hidden border border-stone-800">
+                                          <div
+                                            className="bg-emerald-500/30 h-full transition-all duration-1000 relative"
+                                            style={{ width: `${progress}%` }}
+                                          >
+                                            <div className="absolute inset-0 bg-scanlines opacity-20"></div>
+                                          </div>
+                                          <div className="absolute inset-0 flex items-center justify-center">
+                                            <span className="text-[10px] font-bold text-emerald-500 tracking-widest">{progress}%</span>
+                                          </div>
+                                        </div>
+                                      </div>
                                     )}
-                                    <span className="text-stone-400 text-sm bg-stone-700 px-2 py-0.5 rounded">
-                                      x{herb.isMutated && herb.mutationBonus ? Math.floor(herb.quantity * herb.mutationBonus) : herb.quantity}
-                                    </span>
+
                                     {isMature && (
-                                      <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded flex items-center gap-1">
+                                      <p className="text-[10px] text-green-400 flex items-center gap-1 uppercase font-bold tracking-widest">
                                         <CheckCircle size={12} />
-                                        Ready
-                                      </span>
+                                        Mature! Ready for collection.
+                                      </p>
                                     )}
                                   </div>
 
-                                  {!isMature && (
-                                    <div className="mb-3">
-                                      <div className="flex items-center justify-between text-sm mb-2">
-                                        <span className="flex items-center gap-1.5 text-stone-300">
-                                          <Clock size={14} className="text-blue-400" />
-                                          <span>Time Left</span>
-                                        </span>
-                                        <span className="font-bold text-mystic-gold">{formatGrottoTime(remaining)}</span>
-                                      </div>
-                                      <div className="w-full bg-stone-700/50 rounded-full h-2.5 overflow-hidden border border-stone-600">
-                                        <div
-                                          className="bg-gradient-to-r from-mystic-gold to-yellow-500 h-full transition-all duration-1000 shadow-lg"
-                                          style={{ width: `${progress}%` }}
-                                        />
-                                      </div>
-                                      <div className="flex items-center justify-between mt-1.5">
-                                        <p className="text-xs text-stone-500">Growth Progress</p>
-                                        <p className="text-xs font-bold text-mystic-gold">{progress}%</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {isMature && (
-                                    <p className="text-sm text-green-300 flex items-center gap-1">
-                                      <CheckCircle size={14} />
-                                      Mature! Ready for collection.
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  {!isMature && (
-                                    <button
-                                      onClick={() => onSpeedupHerb(index)}
-                                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm font-bold flex items-center gap-1.5 shadow-lg border-2 border-blue-500"
-                                      title="Speed up with Caps"
-                                    >
-                                      <Gauge size={14} />
-                                      Speed
-                                    </button>
-                                  )}
-                                  {isMature && (
-                                    <button
-                                      onClick={() => onHarvestHerb(index)}
-                                      className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-sm font-bold shadow-lg border-2 border-green-500"
-                                    >
-                                      <CheckCircle size={14} className="inline mr-1" />
-                                      Gather
-                                    </button>
-                                  )}
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    {!isMature && (
+                                      <button
+                                        onClick={() => onSpeedupHerb(index)}
+                                        className="px-4 py-2 bg-blue-900/10 text-blue-400 rounded-none hover:bg-blue-900/20 transition-all text-[10px] font-bold flex items-center gap-1.5 border border-blue-900/50 active:scale-95 uppercase tracking-widest"
+                                        title="Speed up with Caps"
+                                      >
+                                        <Gauge size={14} />
+                                        SPEED
+                                      </button>
+                                    )}
+                                    {isMature && (
+                                      <button
+                                        onClick={() => onHarvestHerb(index)}
+                                        className="px-4 py-2 bg-green-900/20 text-green-400 rounded-none hover:bg-green-900/40 transition-all text-[10px] font-bold border border-green-500/50 active:scale-95 uppercase tracking-widest"
+                                      >
+                                        <CheckCircle size={14} className="inline mr-1" />
+                                        GATHER
+                                      </button>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   )}
 
                   {grotto.plantedHerbs.length === 0 && (
-                    <div className="bg-ink-900 p-8 rounded-lg border border-stone-700 text-center">
-                      <Sprout className="mx-auto text-stone-500 mb-3" size={48} />
-                      <p className="text-stone-400">No active production.</p>
-                      <p className="text-stone-500 text-sm mt-2">Head to 'Produce' to start growing supplies.</p>
+                    <div className="bg-stone-900/50 p-8 rounded-none border border-stone-800 text-center">
+                      <Sprout className="mx-auto text-stone-600 mb-3" size={48} />
+                      <p className="text-stone-400 font-bold uppercase tracking-widest">No active production.</p>
+                      <p className="text-stone-500 text-xs mt-2 uppercase">Head to 'Produce' to start growing supplies.</p>
                     </div>
                   )}
                 </>
@@ -538,14 +553,15 @@ const GrottoModal: React.FC<Props> = ({
 
           {activeTab === 'upgrade' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2">
-                <ArrowUp size={20} />
+              <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                <ArrowUp size={20} className="text-mystic-gold" />
                 Acquire/Upgrade Base
               </h3>
               {availableUpgrades.length === 0 ? (
-                <div className="text-center py-12">
-                  <Home className="mx-auto text-stone-500 mb-4" size={48} />
-                  <p className="text-stone-400">
+                <div className="text-center py-12 bg-stone-900/40 border border-stone-800 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  <Home className="mx-auto text-stone-600 mb-4 relative z-10" size={48} />
+                  <p className="text-stone-400 font-bold uppercase tracking-widest relative z-10">
                     {grotto.level === 0
                       ? 'No bases currently available.'
                       : '🎉 Max upgrade level reached!'}
@@ -560,39 +576,40 @@ const GrottoModal: React.FC<Props> = ({
                     return (
                       <div
                         key={config.level}
-                        className={`bg-ink-900 p-5 rounded-lg border-2 shadow-lg transition-all ${canAfford
-                          ? 'border-stone-700 hover:border-mystic-gold hover:shadow-mystic-gold/20'
-                          : 'border-stone-700/50 opacity-75'
+                        className={`bg-stone-900/40 p-5 rounded-none border transition-all relative overflow-hidden group ${canAfford
+                          ? 'border-stone-800 hover:border-mystic-gold shadow-lg'
+                          : 'border-stone-800/50 opacity-75'
                           }`}
                       >
-                        <div className="flex items-start justify-between mb-4 gap-4">
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                        <div className="flex items-start justify-between mb-4 gap-4 relative z-10">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <h4 className="text-xl font-bold text-stone-200">
+                              <h4 className="text-xl font-bold text-stone-200 uppercase tracking-widest">
                                 {config.name}
                               </h4>
-                              <span className="text-stone-400 text-sm bg-stone-800 px-2 py-1 rounded border border-stone-700">
-                                Rank {config.level}
+                              <span className="text-stone-400 text-[10px] bg-stone-950/60 px-2 py-1 rounded-none border border-stone-800 font-bold uppercase tracking-widest">
+                                RANK {config.level}
                               </span>
                             </div>
-                            <p className="text-stone-400 text-sm mb-4">{config.description}</p>
+                            <p className="text-stone-400 text-xs mb-4 uppercase tracking-tight">{config.description}</p>
 
                             <div className="grid grid-cols-3 gap-3 text-sm">
-                              <div className="bg-stone-800 p-3 rounded border border-stone-700">
-                                <span className="text-stone-400 block mb-1">XP Bonus</span>
-                                <span className="text-mystic-gold font-bold text-lg">
+                              <div className="bg-stone-950/40 p-3 rounded-none border border-stone-800">
+                                <span className="text-stone-500 block mb-1 uppercase text-[10px] font-bold tracking-widest">XP Bonus</span>
+                                <span className="text-mystic-gold font-bold text-lg tracking-widest">
                                   +{(config.expRateBonus * 100).toFixed(0)}%
                                 </span>
                               </div>
-                              <div className="bg-stone-800 p-3 rounded border border-stone-700">
-                                <span className="text-stone-400 block mb-1">Growth Rate</span>
-                                <span className="text-green-400 font-bold text-lg">
+                              <div className="bg-stone-950/40 p-3 rounded-none border border-stone-800">
+                                <span className="text-stone-500 block mb-1 uppercase text-[10px] font-bold tracking-widest">Growth Rate</span>
+                                <span className="text-green-400 font-bold text-lg tracking-widest">
                                   +{(config.growthSpeedBonus * 100).toFixed(0)}%
                                 </span>
                               </div>
-                              <div className="bg-stone-800 p-3 rounded border border-stone-700">
-                                <span className="text-stone-400 block mb-1">Supply Slots</span>
-                                <span className="text-stone-200 font-bold text-lg">{config.maxHerbSlots}</span>
+                              <div className="bg-stone-950/40 p-3 rounded-none border border-stone-800">
+                                <span className="text-stone-500 block mb-1 uppercase text-[10px] font-bold tracking-widest">Supply Slots</span>
+                                <span className="text-stone-200 font-bold text-lg tracking-widest">{config.maxHerbSlots}</span>
                               </div>
                             </div>
                           </div>
@@ -601,16 +618,16 @@ const GrottoModal: React.FC<Props> = ({
                             <button
                               onClick={() => onUpgradeGrotto(config.level)}
                               disabled={!canAfford}
-                              className={`px-6 py-3 rounded font-bold transition-colors flex items-center gap-2 shadow-lg ${canAfford
-                                ? 'bg-mystic-gold text-stone-900 hover:bg-yellow-600'
-                                : 'bg-stone-700 text-stone-500 cursor-not-allowed'
+                              className={`px-6 py-3 rounded-none font-bold transition-all flex items-center gap-2 shadow-lg uppercase tracking-widest text-xs ${canAfford
+                                ? 'bg-mystic-gold/20 text-mystic-gold hover:bg-mystic-gold/30 border border-mystic-gold/50 active:scale-95'
+                                : 'bg-stone-800/40 text-stone-500 cursor-not-allowed border border-stone-800'
                                 }`}
                             >
-                              <Coins size={20} />
-                              <span>{config.cost.toLocaleString()}</span>
+                              <Coins size={16} />
+                              <span>[ {config.cost.toLocaleString()} CAPS ]</span>
                             </button>
                             {!canAfford && (
-                              <p className="text-xs text-red-400 text-right">
+                              <p className="text-[10px] text-red-400/80 text-right font-bold uppercase tracking-widest">
                                 Needs {shortage.toLocaleString()} Caps
                               </p>
                             )}
@@ -627,33 +644,35 @@ const GrottoModal: React.FC<Props> = ({
           {activeTab === 'plant' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-stone-200 flex items-center gap-2">
-                  <Sprout size={20} />
+                <h3 className="text-lg font-bold text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                  <Sprout size={20} className="text-green-500" />
                   Produce Supplies
                 </h3>
                 {grotto.level > 0 && (
-                  <div className="text-stone-400 text-sm bg-stone-800 px-3 py-1 rounded border border-stone-700">
+                  <div className="text-stone-400 text-[10px] bg-stone-950/60 px-3 py-1 rounded-none border border-stone-800 font-bold uppercase tracking-widest">
                     Slots: {grotto.plantedHerbs.length} / {currentConfig?.maxHerbSlots || 0}
                   </div>
                 )}
               </div>
 
               {grotto.level === 0 ? (
-                <div className="text-center py-12">
-                  <AlertCircle className="mx-auto text-stone-500 mb-4" size={48} />
-                  <p className="text-stone-400 mb-2">Acquire a base to start production.</p>
+                <div className="text-center py-12 bg-stone-900/40 border border-stone-800 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  <AlertCircle className="mx-auto text-stone-600 mb-4 relative z-10" size={48} />
+                  <p className="text-stone-400 mb-2 font-bold uppercase tracking-widest relative z-10">Acquire a base to start production.</p>
                   <button
                     onClick={() => setActiveTab('upgrade')}
-                    className="px-4 py-2 bg-mystic-gold text-stone-900 font-bold rounded hover:bg-yellow-600 transition-colors mt-4"
+                    className="px-6 py-2 bg-mystic-gold/20 text-mystic-gold font-bold rounded-none hover:bg-mystic-gold/30 transition-all mt-4 uppercase tracking-widest text-xs border border-mystic-gold/50 relative z-10"
                   >
-                    Acquire
+                    [ Acquire ]
                   </button>
                 </div>
               ) : availableHerbs.length === 0 ? (
-                <div className="text-center py-12">
-                  <Sprout className="mx-auto text-stone-500 mb-4" size={48} />
-                  <p className="text-stone-400">No plantable components in inventory.</p>
-                  <p className="text-stone-500 text-sm mt-2">Acquire seeds via scavenging or trade.</p>
+                <div className="text-center py-12 bg-stone-900/40 border border-stone-800 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  <Sprout className="mx-auto text-stone-600 mb-4 relative z-10" size={48} />
+                  <p className="text-stone-400 font-bold uppercase tracking-widest relative z-10">No plantable components in inventory.</p>
+                  <p className="text-stone-500 text-[10px] mt-2 uppercase font-bold tracking-widest relative z-10">Acquire seeds via scavenging or trade.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -676,41 +695,43 @@ const GrottoModal: React.FC<Props> = ({
                     return (
                       <div
                         key={herb.id}
-                        className={`bg-ink-900 p-4 rounded-lg border-2 transition-all ${canPlant
-                          ? 'border-stone-700 hover:border-green-500 shadow-lg hover:shadow-green-500/20'
-                          : 'border-stone-700/50 opacity-75'
+                        className={`bg-stone-900/40 p-4 rounded-none border transition-all relative overflow-hidden group ${canPlant
+                          ? 'border-stone-800 hover:border-green-500 shadow-lg'
+                          : 'border-stone-800/50 opacity-75'
                           }`}
                       >
-                        <div className="flex items-start justify-between mb-3 gap-3">
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                        <div className="flex items-start justify-between mb-3 gap-3 relative z-10">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
                               <span
-                                className="font-bold text-lg"
+                                className="font-bold text-lg uppercase tracking-widest"
                                 style={{ color: getRarityTextColor(herb.rarity) }}
                               >
                                 {herb.name}
                               </span>
-                              <span className="text-xs px-2 py-0.5 rounded bg-stone-800 text-stone-400 border border-stone-700">
+                              <span className="text-[10px] px-2 py-0.5 rounded-none bg-stone-950/60 text-stone-400 border border-stone-800 font-bold uppercase tracking-widest">
                                 {herb.rarity}
                               </span>
                             </div>
 
                             <div className="space-y-1 text-sm text-stone-400 mb-3">
-                              <div className="flex items-center gap-1">
-                                <Clock size={14} />
+                              <div className="flex items-center gap-1.5 uppercase text-[10px] font-bold tracking-widest">
+                                <Clock size={12} className="text-blue-400" />
                                 <span>Cycle: {timeText}</span>
                               </div>
-                              <div>
-                                Yield: {herb.harvestQuantity.min}-{herb.harvestQuantity.max} units
+                              <div className="flex items-center gap-1.5 uppercase text-[10px] font-bold tracking-widest">
+                                <Package size={12} className="text-stone-500" />
+                                <span>Yield: {herb.harvestQuantity.min}-{herb.harvestQuantity.max} units</span>
                               </div>
                               {herb.grottoLevelRequirement && (
-                                <div className={`text-xs ${levelRequirementMet ? 'text-green-400' : 'text-red-400'}`}>
-                                  {levelRequirementMet ? '✓' : '✗'} Needs Base Rank {herb.grottoLevelRequirement}
+                                <div className={`text-[10px] uppercase font-bold tracking-widest ${levelRequirementMet ? 'text-green-400' : 'text-red-400'}`}>
+                                  {levelRequirementMet ? '✓ Rank Met' : `✗ Needs Base Rank ${herb.grottoLevelRequirement}`}
                                 </div>
                               )}
                             </div>
 
-                            <div className={`text-xs ${(!seedItem || seedItem.quantity === 0) ? 'text-red-400' : 'text-stone-500'}`}>
+                            <div className={`text-[10px] uppercase font-bold tracking-widest ${(!seedItem || seedItem.quantity === 0) ? 'text-red-400' : 'text-stone-500'}`}>
                               Seeds: <span className={`font-bold ${(!seedItem || seedItem.quantity === 0) ? 'text-red-300' : 'text-stone-300'}`}>{seedItem?.quantity || 0}</span>
                             </div>
                           </div>
@@ -718,18 +739,18 @@ const GrottoModal: React.FC<Props> = ({
                           <button
                             onClick={() => onPlantHerb(herb.id || herb.name)}
                             disabled={!canPlant}
-                            className={`px-5 py-2.5 rounded-lg font-bold transition-all flex-shrink-0 ${canPlant
-                              ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg border-2 border-green-500'
-                              : 'bg-stone-700 text-stone-500 cursor-not-allowed border-2 border-stone-600'
+                            className={`px-4 py-2 rounded-none font-bold transition-all flex-shrink-0 uppercase tracking-widest text-[10px] ${canPlant
+                              ? 'bg-green-900/20 text-green-400 hover:bg-green-900/40 border border-green-500/50 active:scale-95'
+                              : 'bg-stone-800/40 text-stone-500 cursor-not-allowed border border-stone-800'
                               }`}
                           >
                             {(!seedItem || seedItem.quantity < 1)
-                              ? 'Low Seeds'
+                              ? '[ LOW SEEDS ]'
                               : !levelRequirementMet
-                                ? `Need Lv.${herb.grottoLevelRequirement}`
+                                ? `[ RANK ${herb.grottoLevelRequirement} ]`
                                 : isFull
-                                  ? 'Slots Full'
-                                  : '✓ Grow'}
+                                  ? '[ FULL ]'
+                                  : '[ GROW ]'}
                           </button>
                         </div>
                       </div>
@@ -742,39 +763,41 @@ const GrottoModal: React.FC<Props> = ({
 
           {activeTab === 'enhancement' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2">
-                <Zap size={20} />
+              <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                <Zap size={20} className="text-mystic-gold" />
                 Reactor Overhaul
               </h3>
               {grotto.level === 0 ? (
-                <div className="text-center py-12">
-                  <AlertCircle className="mx-auto text-stone-500 mb-4" size={48} />
-                  <p className="text-stone-400 mb-2">Acquire a base to start overhaul.</p>
+                <div className="text-center py-12 bg-stone-900/40 border border-stone-800 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  <AlertCircle className="mx-auto text-stone-600 mb-4 relative z-10" size={48} />
+                  <p className="text-stone-400 mb-2 font-bold uppercase tracking-widest relative z-10">Acquire a base to start overhaul.</p>
                   <button
                     onClick={() => setActiveTab('upgrade')}
-                    className="px-4 py-2 bg-mystic-gold text-stone-900 font-bold rounded hover:bg-yellow-600 transition-colors mt-4"
+                    className="px-6 py-2 bg-mystic-gold/20 text-mystic-gold font-bold rounded-none hover:bg-mystic-gold/30 transition-all mt-4 uppercase tracking-widest text-xs border border-mystic-gold/50 relative z-10"
                   >
-                    Acquire
+                    [ Acquire ]
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="bg-ink-900 p-5 rounded-lg border border-stone-700 shadow-lg">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2.5 rounded-lg bg-mystic-gold/20 border-2 border-mystic-gold/50">
+                  <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                    <div className="flex items-center gap-3 mb-4 relative z-10">
+                      <div className="p-2.5 rounded-none bg-mystic-gold/10 border border-mystic-gold/50">
                         <Zap className="text-mystic-gold" size={24} />
                       </div>
                       <div className="flex-1">
-                        <span className="text-stone-200 font-bold text-lg block">Current Overhaul Bonus</span>
-                        <p className="text-3xl font-bold text-mystic-gold mt-1">
+                        <span className="text-stone-500 font-bold text-[10px] block uppercase tracking-widest">Current Overhaul Bonus</span>
+                        <p className="text-3xl font-bold text-mystic-gold mt-1 tracking-widest">
                           +{((grotto.spiritArrayEnhancement || 0) * 100).toFixed(0)}%
                         </p>
                       </div>
                     </div>
-                    <div className="bg-stone-800/50 p-3 rounded-lg border border-stone-700/50">
-                      <p className="text-stone-400 text-sm">
-                        <span className="text-stone-300">Base Bonus:</span> +{(grotto.expRateBonus * 100).toFixed(0)}% |{' '}
-                        <span className="text-mystic-gold font-bold">Total Bonus:</span> +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
+                    <div className="bg-stone-950/40 p-3 rounded-none border border-stone-800 relative z-10">
+                      <p className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
+                        <span className="text-stone-400">Base Bonus:</span> +{(grotto.expRateBonus * 100).toFixed(0)}% |{' '}
+                        <span className="text-mystic-gold">Total Bonus:</span> +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
                       </p>
                     </div>
                   </div>
@@ -791,26 +814,27 @@ const GrottoModal: React.FC<Props> = ({
                       return (
                         <div
                           key={enhancement.id}
-                          className={`bg-ink-900 p-5 rounded-lg border-2 transition-all ${canEnhance
-                            ? 'border-stone-700 hover:border-mystic-gold shadow-lg hover:shadow-mystic-gold/20'
-                            : 'border-stone-700/50 opacity-75'
+                          className={`bg-stone-900/40 p-5 rounded-none border transition-all relative overflow-hidden group ${canEnhance
+                            ? 'border-stone-800 hover:border-mystic-gold shadow-lg'
+                            : 'border-stone-800/50 opacity-75'
                             }`}
                         >
-                          <div className="mb-4">
+                          <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                          <div className="mb-4 relative z-10">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="font-bold text-stone-200 text-lg">{enhancement.name}</span>
-                              <span className="text-xs text-stone-500 bg-stone-800 px-2 py-1 rounded border border-stone-700">
+                              <span className="font-bold text-stone-200 text-lg uppercase tracking-widest">{enhancement.name}</span>
+                              <span className="text-[10px] text-stone-400 bg-stone-950/60 px-2 py-1 rounded-none border border-stone-800 font-bold uppercase tracking-widest">
                                 Needs Base Rank {enhancement.grottoLevelRequirement}
                               </span>
                             </div>
-                            <p className="text-stone-400 text-sm mb-4">{enhancement.description}</p>
+                            <p className="text-stone-400 text-xs mb-4 uppercase tracking-tight">{enhancement.description}</p>
 
-                            <div className="bg-stone-800 p-4 rounded-lg border border-stone-700 mb-4">
-                              <div className="text-stone-300 text-base mb-3 font-bold flex items-center gap-2">
-                                <Zap size={18} className="text-mystic-gold" />
+                            <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 mb-4">
+                              <div className="text-mystic-gold text-xs mb-3 font-bold flex items-center gap-2 uppercase tracking-widest">
+                                <Zap size={18} />
                                 Bonus: +{(enhancement.expRateBonus * 100).toFixed(0)}% XP Rate
                               </div>
-                              <div className="text-stone-400 text-sm mb-2 font-medium">Required Materials:</div>
+                              <div className="text-stone-500 text-[10px] mb-2 font-bold uppercase tracking-widest">Required Materials:</div>
                               <div className="flex flex-wrap gap-2">
                                 {enhancement.materials.map((material, idx) => {
                                   const item = player.inventory.find((i) => i.name === material.name);
@@ -818,13 +842,13 @@ const GrottoModal: React.FC<Props> = ({
                                   return (
                                     <span
                                       key={idx}
-                                      className={`text-sm px-3 py-1.5 rounded border ${hasEnough
-                                        ? 'bg-green-900/50 text-green-300 border-green-700'
-                                        : 'bg-red-900/50 text-red-300 border-red-700'
+                                      className={`text-[10px] px-2 py-1 rounded-none border font-bold uppercase tracking-widest ${hasEnough
+                                        ? 'bg-green-950/20 text-green-400 border-green-500/50'
+                                        : 'bg-red-950/20 text-red-400 border-red-500/50'
                                         }`}
                                     >
                                       {material.name} x{material.quantity}
-                                      {item && ` (Held: ${item.quantity})`}
+                                      {item && ` (${item.quantity})`}
                                     </span>
                                   );
                                 })}
@@ -835,16 +859,16 @@ const GrottoModal: React.FC<Props> = ({
                           <button
                             onClick={() => onEnhanceSpiritArray(enhancement.id)}
                             disabled={!canEnhance}
-                            className={`w-full px-4 py-3 rounded-lg font-bold transition-all ${canEnhance
-                              ? 'bg-mystic-gold text-stone-900 hover:bg-yellow-600 shadow-lg border-2 border-yellow-500'
-                              : 'bg-stone-700 text-stone-500 cursor-not-allowed border-2 border-stone-600'
+                            className={`w-full px-4 py-3 rounded-none font-bold transition-all uppercase tracking-widest text-[10px] relative z-10 ${canEnhance
+                              ? 'bg-mystic-gold/20 text-mystic-gold hover:bg-mystic-gold/30 border border-mystic-gold/50 shadow-lg active:scale-95'
+                              : 'bg-stone-800/40 text-stone-500 cursor-not-allowed border border-stone-800'
                               }`}
                           >
                             {!meetsLevelRequirement
-                              ? `Needs Base Rank ${enhancement.grottoLevelRequirement}`
+                              ? `[ NEEDS BASE RANK ${enhancement.grottoLevelRequirement} ]`
                               : !hasMaterials
-                                ? 'Low Materials'
-                                : '✓ Install Overhaul'}
+                                ? '[ LOW MATERIALS ]'
+                                : '[ INSTALL OVERHAUL ]'}
                           </button>
                         </div>
                       );
@@ -857,38 +881,39 @@ const GrottoModal: React.FC<Props> = ({
 
           {activeTab === 'herbarium' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2">
-                <BookOpen size={20} />
+              <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
+                <BookOpen size={20} className="text-purple-500" />
                 Supplies Database
               </h3>
 
               {/* Database Statistics */}
-              <div className="bg-ink-900 p-5 rounded-lg border border-stone-700 shadow-lg">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-purple-400/50 transition-colors">
+              <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 relative z-10">
+                  <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-purple-400/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <BookOpen className="text-purple-400" size={18} />
-                      <div className="text-stone-400 text-xs font-medium">Collected</div>
+                      <div className="text-stone-400 text-[10px] font-bold uppercase tracking-widest">Collected</div>
                     </div>
-                    <div className="text-2xl font-bold text-purple-400">
+                    <div className="text-2xl font-bold text-purple-400 tracking-widest">
                       {grotto.herbarium?.length || 0} / {PLANTABLE_HERBS.length}
                     </div>
                   </div>
-                  <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-mystic-gold/50 transition-colors">
+                  <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-mystic-gold/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <Gauge className="text-mystic-gold" size={18} />
-                      <div className="text-stone-400 text-xs font-medium">Progress</div>
+                      <div className="text-stone-400 text-[10px] font-bold uppercase tracking-widest">Progress</div>
                     </div>
-                    <div className="text-2xl font-bold text-mystic-gold">
+                    <div className="text-2xl font-bold text-mystic-gold tracking-widest">
                       {PLANTABLE_HERBS.length > 0 ? Math.floor(((grotto.herbarium?.length || 0) / PLANTABLE_HERBS.length) * 100) : 0}%
                     </div>
                   </div>
-                  <div className="bg-stone-800/50 p-4 rounded-lg border border-stone-700/50 hover:border-blue-400/50 transition-colors">
+                  <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-blue-400/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <Clock className="text-blue-400" size={18} />
-                      <div className="text-stone-400 text-xs font-medium">Today's Speeds</div>
+                      <div className="text-stone-400 text-[10px] font-bold uppercase tracking-widest">Today's Speeds</div>
                     </div>
-                    <div className="text-2xl font-bold text-blue-400">
+                    <div className="text-2xl font-bold text-blue-400 tracking-widest">
                       {(() => {
                         const today = new Date().toISOString().split('T')[0];
                         const lastReset = grotto.lastSpeedupResetDate || today;
@@ -899,78 +924,85 @@ const GrottoModal: React.FC<Props> = ({
                 </div>
 
                 {/* 图鉴奖励进度 */}
-                {HERBARIUM_REWARDS.map((reward) => {
-                  const isClaimed = player.achievements.includes(`herbarium-${reward.herbCount}`);
-                  const isUnlocked = (grotto.herbarium?.length || 0) >= reward.herbCount;
-                  return (
-                    <div
-                      key={reward.herbCount}
-                      className={`p-3 rounded-lg border mb-2 ${isClaimed
-                        ? 'bg-green-900/30 border-green-600'
-                        : isUnlocked
-                          ? 'bg-yellow-900/30 border-yellow-600'
-                          : 'bg-stone-800 border-stone-700'
-                        }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-stone-200 font-bold">
-                            Collect {reward.herbCount} types
-                            {isClaimed && <span className="ml-2 text-green-400 text-sm">✓ Claimed</span>}
-                            {!isClaimed && isUnlocked && <span className="ml-2 text-yellow-400 text-sm">Available</span>}
-                          </div>
-                          <div className="text-stone-400 text-sm mt-1">
-                            Reward:{' '}
-                            {reward.reward.exp && `${reward.reward.exp} Data `}
-                            {reward.reward.spiritStones && `${reward.reward.spiritStones} Caps `}
-                            {reward.reward.attributePoints && `${reward.reward.attributePoints} Special Points `}
-                            {reward.reward.title && `Title: ${reward.reward.title}`}
+                <div className="space-y-2 relative z-10">
+                  {HERBARIUM_REWARDS.map((reward) => {
+                    const isClaimed = player.achievements.includes(`herbarium-${reward.herbCount}`);
+                    const isUnlocked = (grotto.herbarium?.length || 0) >= reward.herbCount;
+                    return (
+                      <div
+                        key={reward.herbCount}
+                        className={`p-3 rounded-none border transition-all ${isClaimed
+                          ? 'bg-green-950/20 border-green-600/50 opacity-70'
+                          : isUnlocked
+                            ? 'bg-yellow-950/20 border-yellow-600/50 animate-pulse'
+                            : 'bg-stone-950/40 border-stone-800'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-stone-200 font-bold uppercase text-[10px] tracking-widest flex items-center gap-2">
+                              Collect {reward.herbCount} types
+                              {isClaimed && <span className="text-green-400 flex items-center gap-1"><CheckCircle size={10} /> CLAIMED</span>}
+                              {!isClaimed && isUnlocked && <span className="text-yellow-400 flex items-center gap-1 underline underline-offset-2">AVAILABLE</span>}
+                            </div>
+                            <div className="text-stone-500 text-[10px] mt-1 font-bold uppercase tracking-widest">
+                              Reward:{' '}
+                              <span className="text-stone-400">
+                                {reward.reward.exp && `${reward.reward.exp} Data `}
+                                {reward.reward.spiritStones && `${reward.reward.spiritStones} Caps `}
+                                {reward.reward.attributePoints && `${reward.reward.attributePoints} Special Points `}
+                                {reward.reward.title && `Title: ${reward.reward.title}`}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
 
               {/* 灵草列表 */}
-              <div className="bg-ink-900 p-5 rounded-lg border border-stone-700">
-                <h4 className="text-stone-200 font-bold mb-4">Logged Supplies</h4>
-                {grotto.herbarium && grotto.herbarium.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {PLANTABLE_HERBS.map((herb) => {
-                      const isCollected = grotto.herbarium?.includes(herb.name);
-                      return (
-                        <div
-                          key={herb.id}
-                          className={`p-3 rounded-lg border text-center ${isCollected
-                            ? 'bg-stone-800 border-stone-600'
-                            : 'bg-stone-900/50 border-stone-800 opacity-50'
-                            }`}
-                        >
+              <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                <h4 className="text-stone-200 font-bold mb-4 uppercase tracking-widest text-sm relative z-10">Logged Supplies</h4>
+                <div className="relative z-10">
+                  {grotto.herbarium && grotto.herbarium.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {PLANTABLE_HERBS.map((herb) => {
+                        const isCollected = grotto.herbarium?.includes(herb.name);
+                        return (
                           <div
-                            className={`font-bold text-sm mb-1 ${isCollected ? getRarityTextColor(herb.rarity) : 'text-stone-600'
+                            key={herb.id}
+                            className={`p-3 rounded-none border text-center transition-all ${isCollected
+                              ? 'bg-stone-950/60 border-stone-800 shadow-sm'
+                              : 'bg-stone-950/20 border-stone-800/30 opacity-40'
                               }`}
                           >
-                            {herb.name}
-                          </div>
-                          <div className="text-xs text-stone-500">{herb.rarity}</div>
-                          {isCollected && (
-                            <div className="mt-2">
-                              <CheckCircle className="mx-auto text-green-400" size={16} />
+                            <div
+                              className={`font-bold text-[10px] mb-1 uppercase tracking-widest ${isCollected ? getRarityTextColor(herb.rarity) : 'text-stone-600'
+                                }`}
+                            >
+                              {herb.name}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <BookOpen className="mx-auto text-stone-500 mb-3" size={48} />
-                    <p className="text-stone-400">No supplies logged yet.</p>
-                    <p className="text-stone-500 text-sm mt-2">Produce and harvest supplies to log them here.</p>
-                  </div>
-                )}
+                            <div className="text-[9px] text-stone-500 font-bold uppercase tracking-widest">{herb.rarity}</div>
+                            {isCollected && (
+                              <div className="mt-2">
+                                <CheckCircle className="mx-auto text-green-500/70" size={14} />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <BookOpen className="mx-auto text-stone-600 mb-3" size={48} />
+                      <p className="text-stone-400 font-bold uppercase tracking-widest">No supplies logged yet.</p>
+                      <p className="text-stone-500 text-[10px] mt-2 uppercase font-bold tracking-widest">Produce and harvest supplies to log them here.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

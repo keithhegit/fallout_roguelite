@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlayerStats, AdventureResult } from '../types';
+import { ASSETS } from '../constants/assets';
 import { RandomSectTask } from '../services/randomService';
 import {
   initializeEventTemplateLibrary,
@@ -42,17 +43,17 @@ const SectTaskModal: React.FC<Props> = ({
   }, [isOpen, task.id]);
 
   const difficultyColors = {
-    'Easy': 'text-green-400',
-    'Normal': 'text-blue-400',
-    'Hard': 'text-orange-400',
-    'Extreme': 'text-red-400',
+    'Easy': 'text-green-500',
+    'Normal': 'text-blue-500',
+    'Hard': 'text-orange-500',
+    'Extreme': 'text-red-500',
   };
 
   const difficultyBgColors = {
-    'Easy': 'bg-green-900/20 border-green-700',
-    'Normal': 'bg-blue-900/20 border-blue-700',
-    'Hard': 'bg-orange-900/20 border-orange-700',
-    'Extreme': 'bg-red-900/20 border-red-700',
+    'Easy': 'bg-green-900/10 border-green-900/30',
+    'Normal': 'bg-blue-900/10 border-blue-900/30',
+    'Hard': 'bg-orange-900/10 border-orange-900/30',
+    'Extreme': 'bg-red-900/10 border-red-900/30',
   };
 
   const handleStartTask = async () => {
@@ -247,32 +248,36 @@ const SectTaskModal: React.FC<Props> = ({
       }}
     >
       <div
-        className="bg-paper-800 w-full max-w-2xl rounded-lg border border-stone-600 shadow-2xl"
+        className="bg-ink-950 w-full max-w-2xl md:rounded-none border border-stone-800 shadow-2xl relative flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+
         {/* Header */}
-        <div className="p-4 border-b border-stone-600 bg-ink-800 rounded-t flex justify-between items-center">
+        <div className="p-4 border-b border-stone-800 bg-stone-950 z-10 flex justify-between items-center">
           <div>
-            <h3 className="text-xl font-serif text-mystic-gold mb-1">
-              {task.name}
+            <h3 className="text-lg font-bold text-emerald-500 mb-1 uppercase tracking-widest">
+              {task.name.replace(/\s+/g, '_')}
             </h3>
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-0.5 rounded border ${difficultyColors[task.difficulty]} ${difficultyBgColors[task.difficulty]}`}>
-                Diff: {task.difficulty}
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-none border font-bold uppercase tracking-widest ${difficultyColors[task.difficulty]} ${difficultyBgColors[task.difficulty]}`}>
+                DIFF: {task.difficulty.toUpperCase()}
               </span>
-              <span className="text-xs text-stone-400">
-                Duration: {
-                  task.timeCost === 'instant' ? 'Instant' :
-                    task.timeCost === 'short' ? 'Short' :
-                      task.timeCost === 'medium' ? 'Medium' : 'Long'
+              <span className="text-[10px] text-stone-600 uppercase tracking-widest">
+                DURATION: {
+                  task.timeCost === 'instant' ? 'INSTANT' :
+                    task.timeCost === 'short' ? 'SHORT' :
+                      task.timeCost === 'medium' ? 'MEDIUM' : 'LONG'
                 }
               </span>
               {task.recommendedFor && (
                 <div className="flex gap-1 ml-auto">
-                  {task.recommendedFor.highAttack && <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded">High FP Rec</span>}
-                  {task.recommendedFor.highDefense && <span className="text-[10px] bg-blue-900/30 text-blue-400 px-1.5 py-0.5 rounded">High DR Rec</span>}
-                  {task.recommendedFor.highSpirit && <span className="text-[10px] bg-purple-900/30 text-purple-400 px-1.5 py-0.5 rounded">High PER Rec</span>}
-                  {task.recommendedFor.highSpeed && <span className="text-[10px] bg-green-900/30 text-green-400 px-1.5 py-0.5 rounded">High AGI Rec</span>}
+                  {task.recommendedFor.highAttack && <span className="text-[8px] bg-red-900/10 text-red-500 border border-red-900/30 px-1 py-0.5 rounded-none uppercase tracking-tighter">HIGH_FP_REC</span>}
+                  {task.recommendedFor.highDefense && <span className="text-[8px] bg-blue-900/10 text-blue-500 border border-blue-900/30 px-1 py-0.5 rounded-none uppercase tracking-tighter">HIGH_DR_REC</span>}
+                  {task.recommendedFor.highSpirit && <span className="text-[8px] bg-purple-900/10 text-purple-500 border border-purple-900/30 px-1 py-0.5 rounded-none uppercase tracking-tighter">HIGH_PER_REC</span>}
+                  {task.recommendedFor.highSpeed && <span className="text-[8px] bg-green-900/10 text-green-500 border border-green-900/30 px-1 py-0.5 rounded-none uppercase tracking-tighter">HIGH_AGI_REC</span>}
                 </div>
               )}
             </div>
@@ -282,53 +287,80 @@ const SectTaskModal: React.FC<Props> = ({
               e.stopPropagation();
               onClose();
             }}
-            className="text-stone-400 hover:text-white"
+            className="text-stone-600 hover:text-emerald-500 transition-colors"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 z-10 overflow-y-auto max-h-[70vh]">
           {stage === 'preparing' && (
-            <div className="space-y-4">
-              <p className="text-stone-300">{task.description}</p>
+            <div className="space-y-6">
+              <p className="text-[11px] text-stone-500 uppercase tracking-tighter leading-relaxed">
+                {task.description}
+              </p>
 
-              <div className="bg-ink-800 p-4 rounded border border-stone-700">
-                <h4 className="text-sm font-bold text-stone-200 mb-2">Op Rewards</h4>
-                <div className="space-y-1 text-sm text-stone-400">
-                  <div>Commends: <span className="text-mystic-gold">{task.reward.contribution}</span></div>
+              <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-[0.01] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                <h4 className="text-[10px] font-bold text-stone-400 mb-3 uppercase tracking-widest border-b border-stone-800 pb-2">OPERATIONAL_REWARDS_MANIFEST</h4>
+                <div className="space-y-1.5 text-[10px] text-stone-500 uppercase tracking-widest">
+                  <div className="flex justify-between">
+                    <span>COMMENDATIONS:</span>
+                    <span className="text-emerald-500 font-bold">{task.reward.contribution}</span>
+                  </div>
                   {task.reward.exp && (
-                    <div>Neural Data: <span className="text-green-400">{task.reward.exp}</span></div>
+                    <div className="flex justify-between">
+                      <span>NEURAL_DATA:</span>
+                      <span className="text-blue-500 font-bold">{task.reward.exp}</span>
+                    </div>
                   )}
                   {task.reward.spiritStones && (
-                    <div>Caps: <span className="text-blue-400">{task.reward.spiritStones}</span></div>
+                    <div className="flex justify-between">
+                      <span>CAPS:</span>
+                      <span className="text-yellow-500 font-bold">{task.reward.spiritStones}</span>
+                    </div>
                   )}
                   {task.reward.items && task.reward.items.length > 0 && (
-                    <div>Items: {task.reward.items.map((item, idx) => (
-                      <span key={idx} className="text-yellow-400">{item.name} x{item.quantity}</span>
-                    ))}</div>
+                    <div className="flex justify-between flex-wrap gap-2">
+                      <span>EQUIPMENT:</span>
+                      <div className="flex gap-2">
+                        {task.reward.items.map((item, idx) => (
+                          <span key={idx} className="text-stone-300 font-bold">[{item.name.toUpperCase().replace(/\s+/g, '_')} x{item.quantity}]</span>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
                 {task.completionBonus && (
-                  <div className="mt-3 pt-3 border-t border-stone-700">
-                    <div className="text-xs text-stone-500 mb-1">Extra bonus for flawless execution:</div>
-                    <div className="space-y-1 text-xs text-stone-400">
+                  <div className="mt-4 pt-4 border-t border-stone-800 border-dashed">
+                    <div className="text-[9px] text-stone-600 mb-2 uppercase tracking-widest">PERFECT_EXECUTION_BONUS:</div>
+                    <div className="space-y-1 text-[9px] text-stone-500 uppercase tracking-widest">
                       {task.completionBonus.contribution && (
-                        <div>Commends: <span className="text-mystic-gold">+{task.completionBonus.contribution}</span></div>
+                        <div className="flex justify-between">
+                          <span>COMMENDATIONS:</span>
+                          <span className="text-emerald-700">+{task.completionBonus.contribution}</span>
+                        </div>
                       )}
                       {task.completionBonus.exp && (
-                        <div>Neural Data: <span className="text-green-400">+{task.completionBonus.exp}</span></div>
+                        <div className="flex justify-between">
+                          <span>NEURAL_DATA:</span>
+                          <span className="text-blue-700">+{task.completionBonus.exp}</span>
+                        </div>
                       )}
                       {task.completionBonus.spiritStones && (
-                        <div>Caps: <span className="text-blue-400">+{task.completionBonus.spiritStones}</span></div>
+                        <div className="flex justify-between">
+                          <span>CAPS:</span>
+                          <span className="text-yellow-700">+{task.completionBonus.spiritStones}</span>
+                        </div>
                       )}
                     </div>
                   </div>
                 )}
                 {task.successRate && (
-                  <div className="mt-2 text-xs text-stone-500">
-                    Flawless Success Probability: <span className="text-yellow-400">{task.successRate}%</span>
+                  <div className="mt-4 text-[9px] text-stone-700 uppercase tracking-widest flex justify-between">
+                    <span>FLAWLESS_EXECUTION_PROBABILITY:</span>
+                    <span className="text-yellow-600 font-bold">{task.successRate}%</span>
                   </div>
                 )}
               </div>
@@ -341,60 +373,67 @@ const SectTaskModal: React.FC<Props> = ({
                   handleStartTask();
                 }}
                 disabled={loading}
-                className={`w-full py-3 border rounded transition-colors font-serif ${loading
-                  ? 'bg-stone-800 text-stone-600 border-stone-700 cursor-not-allowed'
-                  : 'bg-mystic-jade/20 text-mystic-jade border-mystic-jade hover:bg-mystic-jade/30'
+                className={`w-full py-3 border rounded-none transition-colors font-bold uppercase tracking-widest text-xs ${loading
+                  ? 'bg-stone-900 text-stone-700 border-stone-800 cursor-not-allowed'
+                  : 'bg-emerald-900/20 text-emerald-500 border-emerald-800/50 hover:bg-emerald-900/40'
                   }`}
               >
-                {loading ? 'Executing...' : 'Begin Operation'}
+                {loading ? '[ EXECUTING... ]' : '[ BEGIN_OPERATION ]'}
               </button>
             </div>
           )}
 
           {stage === 'executing' && (
-            <div className="space-y-4">
+            <div className="space-y-6 py-10">
               <div className="text-center">
-                <Loader2 className="w-12 h-12 animate-spin text-mystic-gold mx-auto mb-4" />
-                <p className="text-stone-300 mb-4">Executing Operation...</p>
+                <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mx-auto mb-6 opacity-50" />
+                <p className="text-[10px] text-stone-500 mb-6 uppercase tracking-[0.2em] font-bold">EXECUTING_PROTOCOL...</p>
 
                 {/* Progress Bar */}
-                <div className="w-full bg-stone-700 rounded-full h-4 mb-2">
+                <div className="w-full bg-stone-900 border border-stone-800 h-6 mb-2 relative overflow-hidden">
                   <div
-                    className="bg-mystic-gold h-4 rounded-full transition-all duration-300"
+                    className="bg-emerald-500/30 h-full transition-all duration-300 relative"
                     style={{ width: `${progress}%` }}
-                  />
+                  >
+                    <div className="absolute inset-0 bg-scanlines opacity-20"></div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-emerald-500 tracking-widest">{Math.floor(progress)}%</span>
+                  </div>
                 </div>
-                <p className="text-sm text-stone-400">{Math.floor(progress)}%</p>
               </div>
             </div>
           )}
 
           {stage === 'encounter' && !encounterResult && (
-            <div className="space-y-4">
-              <div className="text-center">
-                <Loader2 className="w-12 h-12 animate-spin text-mystic-gold mx-auto mb-4" />
-                <p className="text-stone-300 mb-4">Executing Operation...</p>
-              </div>
+            <div className="space-y-6 py-10 text-center">
+              <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mx-auto mb-4 opacity-50" />
+              <p className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold">INTERCEPTING_SIGNAL...</p>
             </div>
           )}
 
           {stage === 'encounter' && encounterResult && (
-            <div className="space-y-4">
-              <div className="bg-ink-800 p-4 rounded border border-stone-700">
-                <h4 className="text-lg font-serif text-mystic-gold mb-2">✨ Random Encounter</h4>
-                <p className="text-stone-300 whitespace-pre-wrap mb-4">{encounterResult.story}</p>
+            <div className="space-y-6">
+              <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-[0.01] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                <h4 className="text-sm font-bold text-emerald-500 mb-3 uppercase tracking-widest border-b border-stone-800 pb-2 flex items-center gap-2">
+                  <span className="animate-pulse">⚡</span> RANDOM_ENCOUNTER_DETECTED
+                </h4>
+                <p className="text-[11px] text-stone-500 whitespace-pre-wrap mb-6 uppercase tracking-tighter leading-relaxed">
+                  {encounterResult.story}
+                </p>
 
                 {(encounterResult.expChange !== 0 || encounterResult.spiritStonesChange !== 0 || encounterResult.hpChange !== 0) && (
-                  <div className="space-y-1 text-sm">
+                  <div className="space-y-1.5 text-[10px] uppercase tracking-widest p-3 bg-stone-950 border border-stone-800">
                     {encounterResult.expChange > 0 && (
-                      <div className="text-green-400">Data +{encounterResult.expChange}</div>
+                      <div className="text-blue-500 font-bold">DATA_RECOVERED: +{encounterResult.expChange}</div>
                     )}
                     {encounterResult.spiritStonesChange > 0 && (
-                      <div className="text-blue-400">Caps +{encounterResult.spiritStonesChange}</div>
+                      <div className="text-yellow-500 font-bold">CAPS_FOUND: +{encounterResult.spiritStonesChange}</div>
                     )}
                     {encounterResult.hpChange !== 0 && (
-                      <div className={encounterResult.hpChange > 0 ? 'text-green-400' : 'text-red-400'}>
-                        HP {encounterResult.hpChange > 0 ? '+' : ''}{encounterResult.hpChange}
+                      <div className={encounterResult.hpChange > 0 ? 'text-emerald-500 font-bold' : 'text-red-500 font-bold'}>
+                        VITAL_SIGNS: {encounterResult.hpChange > 0 ? '+' : ''}{encounterResult.hpChange}
                       </div>
                     )}
                   </div>
@@ -403,9 +442,9 @@ const SectTaskModal: React.FC<Props> = ({
 
               <button
                 onClick={handleEncounterContinue}
-                className="w-full py-3 bg-mystic-jade/20 text-mystic-jade border border-mystic-jade hover:bg-mystic-jade/30 rounded transition-colors font-serif"
+                className="w-full py-3 bg-emerald-900/20 text-emerald-500 border border-emerald-800/50 hover:bg-emerald-900/40 rounded-none transition-colors font-bold uppercase tracking-widest text-xs"
               >
-                Resume Operation
+                [ RESUME_OPERATION ]
               </button>
             </div>
           )}
@@ -414,32 +453,42 @@ const SectTaskModal: React.FC<Props> = ({
             const successRate = task.successRate ?? 75;
             const isPerfectCompletion = Math.random() * 100 < successRate;
             return (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-4xl mb-4">{isPerfectCompletion ? '✨' : '✅'}</div>
-                  <p className="text-xl font-serif text-mystic-gold mb-2">
-                    {isPerfectCompletion ? 'Flawless Execution!' : 'Operation Complete!'}
+              <div className="space-y-6">
+                <div className="text-center py-4">
+                  <div className="text-4xl mb-6 grayscale opacity-50">{isPerfectCompletion ? '⭐' : '✓'}</div>
+                  <p className="text-lg font-bold text-emerald-500 mb-2 uppercase tracking-[0.2em]">
+                    {isPerfectCompletion ? 'FLAWLESS_EXECUTION' : 'OPERATION_SUCCESS'}
                   </p>
-                  <p className="text-stone-400">
+                  <p className="text-[10px] text-stone-600 uppercase tracking-widest">
                     {isPerfectCompletion
-                      ? 'You flawlessly executed the operation and earned bonus rewards!'
-                      : 'You successfully completed the operation and earned standard rewards.'}
+                      ? 'OBJECTIVES_SECURED_WITH_MAXIMUM_EFFICIENCY'
+                      : 'OBJECTIVES_SECURED_WITH_STANDARD_PROTOCOL'}
                   </p>
                 </div>
 
                 {encounterResult && (
-                  <div className="bg-ink-800 p-4 rounded border border-stone-700">
-                    <h4 className="text-sm font-bold text-stone-200 mb-2">Encounter Rewards</h4>
-                    <div className="space-y-1 text-sm text-stone-400">
+                  <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-[0.01] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                    <h4 className="text-[10px] font-bold text-stone-400 mb-3 uppercase tracking-widest border-b border-stone-800 pb-2">ADDITIONAL_ENCOUNTER_DATA</h4>
+                    <div className="space-y-1.5 text-[10px] text-stone-500 uppercase tracking-widest">
                       {encounterResult.expChange > 0 && (
-                        <div>Data: <span className="text-green-400">+{encounterResult.expChange}</span></div>
+                        <div className="flex justify-between">
+                          <span>NEURAL_DATA:</span>
+                          <span className="text-blue-500 font-bold">+{encounterResult.expChange}</span>
+                        </div>
                       )}
                       {encounterResult.spiritStonesChange > 0 && (
-                        <div>Caps: <span className="text-blue-400">+{encounterResult.spiritStonesChange}</span></div>
+                        <div className="flex justify-between">
+                          <span>CAPS:</span>
+                          <span className="text-yellow-500 font-bold">+{encounterResult.spiritStonesChange}</span>
+                        </div>
                       )}
                       {encounterResult.hpChange !== 0 && (
-                        <div className={encounterResult.hpChange > 0 ? 'text-green-400' : 'text-red-400'}>
-                          HP: {encounterResult.hpChange > 0 ? '+' : ''}{encounterResult.hpChange}
+                        <div className="flex justify-between">
+                          <span>VITAL_STATUS:</span>
+                          <span className={encounterResult.hpChange > 0 ? 'text-emerald-500 font-bold' : 'text-red-500 font-bold'}>
+                            {encounterResult.hpChange > 0 ? '+' : ''}{encounterResult.hpChange}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -448,9 +497,9 @@ const SectTaskModal: React.FC<Props> = ({
 
                 <button
                   onClick={handleComplete}
-                  className="w-full py-3 bg-mystic-gold/20 text-mystic-gold border border-mystic-gold hover:bg-mystic-gold/30 rounded transition-colors font-serif"
+                  className="w-full py-3 bg-emerald-900/20 text-emerald-500 border border-emerald-800/50 hover:bg-emerald-900/40 rounded-none transition-colors font-bold uppercase tracking-widest text-xs"
                 >
-                  Confirm
+                  [ CONFIRM_AND_EXTRACT ]
                 </button>
               </div>
             );

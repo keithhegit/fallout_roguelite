@@ -1543,7 +1543,7 @@ function App() {
   // 显示欢迎界面
   if (showWelcome) {
     return (
-      <div className="font-terminal text-pip-green min-h-screen bg-pip-dark">
+      <div className="font-mono text-emerald-400 min-h-screen bg-ink-950 relative overflow-hidden">
         <CRTOverlay />
         <WelcomeScreen
           hasSave={hasSave}

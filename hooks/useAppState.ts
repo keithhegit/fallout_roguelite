@@ -7,13 +7,13 @@ import { useState, useCallback } from 'react';
 import {
   Item,
   Shop,
-  ShopItem,
   AdventureType,
   RealmType,
   AdventureResult,
 } from '../types';
 import { BattleReplay } from '../services/battleService';
 import { AutoAdventureConfig } from '../components/AutoAdventureConfigModal';
+import { ItemActionLog } from './useItemActionLog';
 
 export interface AppModalState {
   isInventoryOpen: boolean;
@@ -205,10 +205,7 @@ export function useAppState(): AppState {
   } | null>(null);
 
   // 物品操作日志
-  const [itemActionLog, setItemActionLog] = useState<{
-    text: string;
-    type: string;
-  } | null>(null);
+  const [itemActionLog, setItemActionLog] = useState<ItemActionLog | null>(null);
 
   // 声望事件
   const [reputationEvent, setEvent] = useState<AdventureResult['reputationEvent'] | null>(null);

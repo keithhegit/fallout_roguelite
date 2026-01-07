@@ -1,5 +1,8 @@
-import React, { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { User, Briefcase, Radio, Menu, Map } from 'lucide-react';
 import { PlayerStats, LogEntry } from '../types';
+import { ASSETS } from '../constants/assets';
+import { ItemActionLog } from '../hooks/useItemActionLog';
 import StatsPanel from '../components/StatsPanel';
 import LogPanel from '../components/LogPanel';
 import CombatVisuals from '../components/CombatVisuals';
@@ -26,13 +29,13 @@ interface GameViewProps {
   player: PlayerStats;
   logs: LogEntry[];
   setLogs: React.Dispatch<React.SetStateAction<LogEntry[]>>;
-  visualEffects: any[];
+  visualEffects: unknown[];
   loading: boolean;
   cooldown: number;
   purchaseSuccess: { item: string; quantity: number } | null;
   lotteryRewards: Array<{ type: string; name: string; quantity?: number }>;
   onCloseLotteryRewards?: () => void;
-  itemActionLog: { text: string; type: string } | null;
+  itemActionLog: ItemActionLog | null;
   isMobileSidebarOpen: boolean;
   isMobileStatsOpen: boolean;
   modals: {
@@ -103,6 +106,8 @@ function GameView({
   handlers,
   isDebugModeEnabled = false,
 }: GameViewProps) {
+  const [mobileTab, setMobileTab] = useState<'status' | 'radio'>('radio');
+
   // Calculate pending achievements
   const achievementCount = useMemo(
     () =>
@@ -118,8 +123,25 @@ function GameView({
     [player.lotteryTickets]
   );
 
+  const handleSelectRadioTab = useCallback(() => {
+    setMobileTab('radio');
+    modals.setIsMobileStatsOpen(false);
+    modals.setIsMobileSidebarOpen(false);
+  }, [modals]);
+
+  const handleSelectStatusTab = useCallback(() => {
+    setMobileTab('status');
+    modals.setIsMobileStatsOpen(false);
+    modals.setIsMobileSidebarOpen(false);
+  }, [modals]);
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-stone-900 text-stone-200 overflow-hidden relative">
+    <div className="flex flex-col md:flex-row h-screen bg-ink-950 text-stone-200 overflow-hidden relative crt-screen">
+      {/* CRT Visual Layers */}
+      <div className="crt-noise"></div>
+      <div className="crt-vignette"></div>
+      <div className="scanline-overlay pointer-events-none"></div>
+
       {/* Visual Effects Layer */}
       <CombatVisuals effects={visualEffects} />
 
@@ -144,34 +166,104 @@ function GameView({
           isDebugModeEnabled={isDebugModeEnabled}
         />
 
-        <LogPanel
-          logs={logs}
-          playerName={player.name}
-          className="pb-[23rem] md:pb-0"
-          onClearLogs={() => setLogs([])}
-        />
+        {mobileTab === 'status' ? (
+          <div className="flex-1 bg-ink-950 overflow-y-auto md:hidden animate-fade-in">
+            <StatsPanel player={player} />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col min-h-0 animate-fade-in">
+            <LogPanel
+              logs={logs}
+              playerName={player.name}
+              className="pb-24 md:pb-0"
+              onClearLogs={() => setLogs([])}
+            />
+          </div>
+        )}
 
-        <ActionBar
-          loading={loading}
-          cooldown={cooldown}
-          onMeditate={handlers.onMeditate}
-          onAdventure={handlers.onAdventure}
-          onOpenRealm={handlers.onOpenRealm}
-          onOpenAlchemy={handlers.onOpenAlchemy}
-          onOpenSect={handlers.onOpenSect}
-          autoMeditate={handlers.autoMeditate}
-          autoAdventure={handlers.autoAdventure}
-          onToggleAutoMeditate={handlers.onToggleAutoMeditate}
-          onToggleAutoAdventure={handlers.onToggleAutoAdventure}
-        />
+        <div className={mobileTab === 'radio' ? 'block animate-fade-in' : 'hidden md:block'}>
+          <ActionBar
+            loading={loading}
+            cooldown={cooldown}
+            onMeditate={handlers.onMeditate}
+            onAdventure={handlers.onAdventure}
+            onOpenRealm={handlers.onOpenRealm}
+            onOpenAlchemy={handlers.onOpenAlchemy}
+            onOpenSect={handlers.onOpenSect}
+            autoMeditate={handlers.autoMeditate}
+            autoAdventure={handlers.autoAdventure}
+            onToggleAutoMeditate={handlers.onToggleAutoMeditate}
+            onToggleAutoAdventure={handlers.onToggleAutoAdventure}
+          />
+        </div>
+
+        <nav className="md:hidden bg-ink-950 border-t border-stone-800 grid grid-cols-5 safe-area-footer shrink-0 relative overflow-hidden">
+          {/* Scanline Effect */}
+          <div className="scanline-overlay opacity-50"></div>
+          
+          <button
+            onClick={handleSelectStatusTab}
+            className={`min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-all duration-200 relative z-20 ${
+              mobileTab === 'status'
+                ? 'text-mystic-gold bg-stone-900/50 shadow-[inset_0_0_15px_rgba(203,161,53,0.1)]'
+                : 'text-stone-500 active:bg-stone-900'
+            }`}
+          >
+            <User size={20} className={mobileTab === 'status' ? 'terminal-flicker mb-1' : 'mb-1'} />
+            <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Status</span>
+            {mobileTab === 'status' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mystic-gold"></div>}
+          </button>
+          <button
+            onClick={() => {
+              handlers.onOpenInventory();
+              handleSelectRadioTab();
+            }}
+            className="min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-colors text-stone-500 active:bg-stone-900 relative z-20"
+          >
+            <Briefcase size={20} className="mb-1" />
+            <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Inv</span>
+          </button>
+          <button
+            onClick={handleSelectRadioTab}
+            className={`min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-all duration-200 relative z-20 ${
+              mobileTab === 'radio'
+                ? 'text-mystic-gold bg-stone-900/50 shadow-[inset_0_0_15px_rgba(203,161,53,0.1)]'
+                : 'text-stone-500 active:bg-stone-900'
+            }`}
+          >
+            <Radio size={20} className={mobileTab === 'radio' ? 'terminal-flicker mb-1' : 'mb-1'} />
+            <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Radio</span>
+            {mobileTab === 'radio' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mystic-gold"></div>}
+          </button>
+          <button
+            onClick={() => {
+              handlers.onOpenMenu();
+              handleSelectRadioTab();
+            }}
+            className="min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-colors text-stone-500 active:bg-stone-900 relative z-20"
+          >
+            <Menu size={20} className="mb-1" />
+            <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Data</span>
+          </button>
+          <button
+            onClick={() => {
+              handlers.onOpenRealm();
+              handleSelectRadioTab();
+            }}
+            className="min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-colors text-stone-500 active:bg-stone-900 relative z-20"
+          >
+            <Map size={20} className="mb-1" />
+            <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Map</span>
+          </button>
+        </nav>
       </main>
 
       {/* Auto-Adventure Prompt */}
       {handlers.autoAdventure && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
-          <div className="bg-stone-800/90 backdrop-blur-sm border border-stone-600/50 rounded-lg px-6 py-3 shadow-lg">
+          <div className="bg-ink-950/90 backdrop-blur-sm border border-stone-800 px-6 py-3 shadow-lg">
             <p className="text-stone-300 text-lg md:text-xl font-serif">
-              AUTO-EXPLORING <span className="text-stone-500">Press SPACE to cancel...</span>
+              AUTO-EXPLORING <span className="text-stone-500 uppercase tracking-widest text-xs ml-2">Press SPACE to cancel...</span>
             </p>
           </div>
         </div>
@@ -190,11 +282,12 @@ function GameView({
       />
       {itemActionLog && (
         <ItemActionToast
+          key={itemActionLog.timestamp}
           log={{
             id: '',
             text: itemActionLog.text,
             type: itemActionLog.type as LogEntry['type'],
-            timestamp: Date.now(),
+            timestamp: itemActionLog.timestamp || 0,
           }}
         />
       )}
@@ -203,9 +296,7 @@ function GameView({
       <MobileSidebar
         isOpen={isMobileSidebarOpen}
         onClose={() => modals.setIsMobileSidebarOpen(false)}
-        onOpenStats={handlers.onOpenStats}
         onOpenCultivation={handlers.onOpenCultivation}
-        onOpenInventory={handlers.onOpenInventory}
         onOpenCharacter={handlers.onOpenCharacter}
         onOpenAchievement={handlers.onOpenAchievement}
         onOpenPet={handlers.onOpenPet}
@@ -225,10 +316,17 @@ function GameView({
           onClick={() => modals.setIsMobileStatsOpen(false)}
         >
           <div
-            className="bg-paper-800 w-full h-[80vh] rounded-t-2xl border border-stone-700 shadow-2xl overflow-y-auto"
+            className="bg-ink-950 w-full h-[80vh] border border-stone-800 shadow-2xl overflow-y-auto relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <StatsPanel player={player} />
+            {/* 背景纹理层 */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+            {/* CRT 扫描线效果 */}
+            <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+            
+            <div className="relative z-10">
+              <StatsPanel player={player} />
+            </div>
           </div>
         </div>
       )}

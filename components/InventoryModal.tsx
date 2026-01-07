@@ -13,6 +13,7 @@ import {
   EquipmentSlot,
   RealmType,
 } from '../types';
+import { ASSETS } from '../constants/assets';
 import {
   X,
   Package,
@@ -38,6 +39,7 @@ import {
   getRarityOrder,
   getRarityDisplayName,
   normalizeRarityValue,
+  getRarityGlow,
 } from '../utils/rarityUtils';
 import { getItemStats, normalizeTypeLabel } from '../utils/itemUtils';
 import {
@@ -50,6 +52,16 @@ import {
 import { useDebounce } from '../hooks/useDebounce';
 import { showConfirm } from '../utils/toastUtils';
 import { formatValueChange, formatNumber } from '../utils/formatUtils';
+import { 
+  Zap, 
+  Shield, 
+  Sword, 
+  FlaskConical, 
+  ScrollText, 
+  Boxes, 
+  Dna,
+  CircleHelp
+} from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -138,43 +150,71 @@ const InventoryItem = memo<InventoryItemProps>(
         ? item.reviveChances
         : undefined;
 
+    // Helper to get type icon
+    const getTypeIcon = () => {
+      switch (item.type) {
+        case ItemType.Weapon: return <Sword size={18} />;
+        case ItemType.Armor: return <Shield size={18} />;
+        case ItemType.Pill: return <FlaskConical size={18} />;
+        case ItemType.Consumable: return <Zap size={18} />;
+        case ItemType.Recipe: return <ScrollText size={18} />;
+        case ItemType.Material: return <Boxes size={18} />;
+        case ItemType.AdvancedItem: return <Dna size={18} />;
+        default: return <CircleHelp size={18} />;
+      }
+    };
+
     return (
       <div
-        className={`p-3 rounded border flex flex-col justify-between relative transition-colors ${isEquipped ? 'bg-ink-800 border-mystic-gold shadow-md' : `bg-ink-800 hover:bg-ink-700 ${getRarityBorder(rarity)}`}`}
+        className={`p-3 rounded-none border flex flex-col justify-between relative transition-all duration-300 group overflow-hidden font-mono ${
+          isEquipped 
+            ? 'bg-ink-950 border-yellow-600/50 shadow-[0_0_15px_rgba(202,138,4,0.1)]' 
+            : `bg-stone-950/90 hover:bg-stone-900 ${getRarityBorder(rarity)}`
+        }`}
         onMouseEnter={() => onHover(item)}
         onMouseLeave={() => onHover(null)}
       >
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.02] pointer-events-none"></div>
+        
         {isEquipped && (
-          <div className="absolute top-2 right-2 text-mystic-gold bg-mystic-gold/10 px-2 py-0.5 rounded text-xs border border-mystic-gold/30 flex items-center gap-1">
-            <ShieldCheck size={12} /> Equipped
+          <div className="absolute top-2 right-2 text-yellow-500 bg-yellow-950/20 px-2 py-0.5 rounded-none text-[9px] border border-yellow-900/40 flex items-center gap-1 z-10 animate-pulse uppercase tracking-widest">
+            <ShieldCheck size={10} /> ACTIVE_LINK
           </div>
         )}
 
-        <div>
-          <div className="flex justify-between items-start pr-16 mb-1">
-            <h4 className={getRarityNameClasses(rarity)}>
-              {item.name}{' '}
-              {showLevel && (
-                <span className="text-stone-500 text-xs font-normal ml-1">
-                  + {item.level}
+        <div className="relative z-10">
+          <div className="flex gap-3 mb-3">
+            {/* Item Icon Container */}
+            <div className={`w-12 h-12 rounded-none border flex items-center justify-center shrink-0 ${getRarityBorder(rarity)} bg-ink-950 ${getRarityTextColor(rarity)} shadow-inner`}>
+              {getTypeIcon()}
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-start mb-1">
+                <h4 className={`${getRarityNameClasses(rarity)} truncate text-sm font-bold uppercase tracking-wider`}>
+                  {item.name}
+                  {showLevel && (
+                    <span className="text-stone-600 text-[10px] font-normal ml-1">
+                      +{item.level}
+                    </span>
+                  )}
+                </h4>
+                <span className="text-[10px] bg-ink-950 text-stone-500 px-1.5 py-0.5 rounded-none border border-stone-900 ml-2">
+                  x{item.quantity}
                 </span>
-              )}
-            </h4>
-            <span className="text-xs bg-stone-700 text-stone-300 px-1.5 py-0.5 rounded shrink-0 h-fit">
-              x{item.quantity}
-            </span>
+              </div>
+              
+              <div className="flex gap-2 items-center">
+                <span className={`text-[9px] px-1.5 py-0.5 rounded-none uppercase font-bold tracking-widest ${getRarityBadge(rarity)}`}>
+                  {rarityLabel}
+                </span>
+                <span className="text-[10px] text-stone-600 uppercase tracking-widest font-mono">{typeLabel}</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex gap-2 mb-2">
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded border ${getRarityBadge(rarity)}`}
-            >
-              {rarityLabel}
-            </span>
-            <span className="text-xs text-stone-500 py-0.5">{typeLabel}</span>
-          </div>
-
-          <p className="text-xs text-stone-500 italic mb-3">
+          <p className="text-[11px] text-stone-500 leading-relaxed mb-3 line-clamp-2 italic opacity-80 group-hover:opacity-100 transition-opacity font-mono">
             {item.description}
           </p>
 
@@ -357,16 +397,16 @@ const InventoryItem = memo<InventoryItemProps>(
               {isEquipped ? (
                 <button
                   onClick={() => onUnequipItem(item)}
-                  className="flex-1 bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs py-2 rounded transition-colors border border-stone-500"
+                  className="flex-1 bg-ink-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
                 >
-                  Unequip
+                  DE-EQUIP
                 </button>
               ) : (
                 <button
                   onClick={() => onEquipItem(item)}
-                  className="flex-1 bg-mystic-gold/20 hover:bg-mystic-gold/30 text-mystic-gold text-xs py-2 rounded transition-colors border border-mystic-gold/50"
+                  className="flex-1 bg-ink-950 hover:bg-blue-950/20 text-blue-400 text-[10px] py-2 rounded-none transition-all border border-blue-900/50 hover:border-blue-400 uppercase tracking-widest min-h-[36px]"
                 >
-                  Equip
+                  INITIALIZE
                 </button>
               )}
               {item.type === ItemType.Artifact && onRefineNatalArtifact && (() => {
@@ -382,11 +422,11 @@ const InventoryItem = memo<InventoryItemProps>(
                       }
                     }}
                     disabled={isDisabled}
-                    className={`px-3 text-xs py-2 rounded transition-colors border ${isNatal
-                      ? 'bg-mystic-gold/20 hover:bg-mystic-gold/30 text-mystic-gold border-mystic-gold/50'
+                    className={`px-3 text-[10px] py-2 rounded-none transition-all border uppercase tracking-widest min-h-[36px] ${isNatal
+                      ? 'bg-ink-950 hover:bg-mystic-gold/10 text-mystic-gold border-mystic-gold/50'
                       : isDisabled
-                        ? 'bg-stone-800/50 text-stone-500 border-stone-700/50 cursor-not-allowed opacity-50'
-                        : 'bg-purple-900/20 hover:bg-purple-900/30 text-purple-300 border-purple-700/50'
+                        ? 'bg-ink-950 text-stone-700 border-stone-900 cursor-not-allowed opacity-50'
+                        : 'bg-ink-950 hover:bg-purple-950/20 text-purple-400 border-purple-900/50'
                       }`}
                     title={
                       isNatal
@@ -402,15 +442,15 @@ const InventoryItem = memo<InventoryItemProps>(
               })()}
               <button
                 onClick={() => onUpgradeItem(item)}
-                className="px-3 bg-stone-700 hover:bg-stone-600 text-stone-300 text-xs py-2 rounded transition-colors border border-stone-500"
-                title="Upgrade"
+                className="px-3 bg-ink-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
+                title="CALIBRATE"
               >
                 <Hammer size={14} />
               </button>
               <button
                 onClick={() => onDiscardItem(item)}
-                className="px-3 bg-red-900 hover:bg-red-800 text-red-200 text-xs py-2 rounded transition-colors border border-red-700"
-                title="Discard"
+                className="px-3 bg-ink-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none transition-all border border-red-900/50 hover:border-red-500 uppercase tracking-widest min-h-[36px]"
+                title="PURGE"
               >
                 <Trash2 size={14} />
               </button>
@@ -428,9 +468,9 @@ const InventoryItem = memo<InventoryItemProps>(
                 return isUsable ? (
                   <button
                     onClick={() => onUseItem(item)}
-                    className="flex-1 bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs py-2 rounded transition-colors"
+                    className="flex-1 bg-ink-950 hover:bg-emerald-950/20 text-emerald-400 text-[10px] py-2 rounded-none border border-emerald-900/50 hover:border-emerald-400 uppercase tracking-widest transition-all min-h-[36px]"
                   >
-                    {item.type === ItemType.Recipe ? 'Study' : 'Use'}
+                    {item.type === ItemType.Recipe ? 'ANALYZE' : 'EXECUTE'}
                   </button>
                 ) : null;
               })()}
@@ -489,7 +529,7 @@ const InventoryItem = memo<InventoryItemProps>(
                   ? alreadyOwnedMessage
                   : !canRefineItem
                     ? warningMessage
-                    : 'Install Neural Mod';
+                    : 'INSTALL NEURAL MOD';
 
                 return (
                   <button
@@ -512,28 +552,28 @@ const InventoryItem = memo<InventoryItemProps>(
                         : `Initialize neural link with [${item.name}]?`;
                       showConfirm(
                         confirmMessage,
-                        'Confirm Link',
+                        'CONFIRM LINK',
                         () => {
                           onRefineAdvancedItem(item);
                         }
                       );
                     }}
                     disabled={!canRefineItem || alreadyOwned}
-                    className={`flex-1 text-xs py-2 rounded transition-colors border ${!canRefineItem || alreadyOwned
-                      ? 'bg-stone-800/50 text-stone-500 border-stone-700/50 cursor-not-allowed opacity-50'
-                      : 'bg-purple-900/20 hover:bg-purple-900/40 text-purple-300 border-purple-700/50'
+                    className={`flex-1 bg-ink-950 text-[10px] py-2 rounded-none transition-all border uppercase tracking-widest min-h-[36px] ${!canRefineItem || alreadyOwned
+                      ? 'text-stone-700 border-stone-900/50 cursor-not-allowed'
+                      : 'hover:bg-purple-950/20 text-purple-400 border-purple-900/50 hover:border-purple-400'
                       }`}
                     title={tooltipMessage}
                   >
                     <Sparkles size={14} className="inline mr-1" />
-                    Install
+                    INSTALL
                   </button>
                 );
               })()}
               <button
                 onClick={() => onDiscardItem(item)}
-                className="px-3 bg-red-900 hover:bg-red-800 text-red-200 text-xs py-2 rounded transition-colors border border-red-700"
-                title="丢弃"
+                className="px-3 bg-ink-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none border border-red-900/50 hover:border-red-500 transition-all uppercase tracking-widest min-h-[36px]"
+                title="PURGE"
               >
                 <Trash2 size={14} />
               </button>
@@ -842,104 +882,91 @@ const InventoryModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-[60] p-0 md:p-4 backdrop-blur-sm touch-manipulation"
+      className="fixed inset-0 bg-black/90 flex items-end md:items-center justify-center z-[60] p-0 md:p-4 touch-manipulation crt-screen"
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full h-[80vh] md:h-auto md:max-w-6xl md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-600 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden"
+        className="bg-ink-950 w-full h-[85vh] md:h-auto md:max-w-7xl md:rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden relative z-30"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-3 md:p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 md:rounded-t">
-          <h3 className="text-lg md:text-xl font-serif text-mystic-gold flex items-center gap-2">
-            <Package size={18} className="md:w-5 md:h-5" /> Inventory
-          </h3>
-          <div className="flex gap-2">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
+        <div className="p-4 md:p-6 border-b border-stone-800 flex justify-between items-center bg-stone-950 relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-yellow-500/80 shadow-inner">
+              <Package size={28} />
+            </div>
+            <div>
+              <h3 className="text-xl md:text-2xl font-mono font-bold text-stone-200 tracking-[0.2em] uppercase">
+                PIP-BOY_3000 // INVENTORY
+              </h3>
+              <p className="text-[10px] text-stone-600 font-mono tracking-widest uppercase">
+                NEURAL_LINK_ESTABLISHED // OS_VER_1.0.4
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3 font-mono">
             {onOrganizeInventory && (
               <button
                 onClick={() => {
                   onOrganizeInventory();
-                  setSortByRarity(false); // 整理后切换到原始顺序，以显示整理后的分类排序
+                  setSortByRarity(false);
                 }}
-                className="px-2 md:px-3 py-1.5 md:py-1 rounded text-xs md:text-sm border transition-colors min-h-[44px] md:min-h-0 touch-manipulation bg-blue-900/20 border-blue-700 text-blue-300 hover:bg-blue-900/30"
-                title="合并同类物品并按分类/品质排序"
+                className="px-4 py-2 rounded-none text-[10px] border transition-all bg-stone-950 border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-200 hover:border-stone-700 uppercase tracking-widest"
+                title="AUTO_CATALOG_PROTOCOL"
               >
                 <div className="flex items-center">
-                  <ArrowUpDown size={14} className="inline mr-1" />
-                  Auto-Catalog
+                  <ArrowUpDown size={14} className="inline mr-2" />
+                  AUTO_CATALOG
                 </div>
               </button>
             )}
-            {onBatchUse && (
-              <button
-                onClick={() => setIsBatchUseOpen(true)}
-                className="px-2 md:px-3 py-1.5 md:py-1 rounded text-xs md:text-sm border transition-colors min-h-[44px] md:min-h-0 touch-manipulation bg-green-900/20 border-green-700 text-green-300 hover:bg-green-900/30"
-              >
-                <div className="flex items-center">
-                  <Zap size={14} className="inline mr-1" />
-                  Bulk Use
-                </div>
-              </button>
-            )}
-            <button
-              onClick={() => setIsBatchDiscardOpen(true)}
-              className="px-2 md:px-3 py-1.5 md:py-1 rounded text-xs md:text-sm border transition-colors min-h-[44px] md:min-h-0 touch-manipulation bg-red-900/20 border-red-700 text-red-300 hover:bg-red-900/30"
-            >
-              <div className="flex items-center">
-                <Trash size={14} className="inline mr-1" />
-                Bulk Discard
-              </div>
-            </button>
-            <button
-              onClick={() => setShowEquipment(!showEquipment)}
-              className={`hidden flex items-center justify-center md:flex px-3 py-1 rounded text-sm border transition-colors ${showEquipment
-                ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                : 'bg-stone-700 border-stone-600 text-stone-300'
-                }`}
-            >
-              {showEquipment ? 'Hide' : 'Show'} Gear
-            </button>
             <button
               onClick={onClose}
-              className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
-              aria-label="Close"
-              title="Close"
+              className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50"
+              aria-label="DISCONNECT"
+              title="DISCONNECT"
             >
               <X size={24} />
             </button>
           </div>
         </div>
 
-        {/* 移动端Tab切换 */}
-        <div className="md:hidden border-b border-stone-600 bg-ink-800">
+        {/* Mobile Tab Switcher */}
+        <div className="md:hidden border-b border-stone-800 bg-stone-950 relative z-10 font-mono">
           <div className="flex">
             <button
               onClick={() => setMobileActiveTab('equipment')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${mobileActiveTab === 'equipment'
-                ? 'border-mystic-gold text-mystic-gold bg-mystic-gold/10'
-                : 'border-transparent text-stone-400 hover:text-stone-300'
+              className={`flex-1 px-4 py-3 text-[10px] font-bold transition-colors border-b-2 uppercase tracking-widest ${mobileActiveTab === 'equipment'
+                ? 'border-yellow-600 text-yellow-500 bg-yellow-950/10'
+                : 'border-transparent text-stone-600 hover:text-stone-400'
                 }`}
             >
               <ShieldCheck size={16} className="inline mr-2" />
-              Gear Slots
+              NEURAL_GEAR
             </button>
             <button
               onClick={() => setMobileActiveTab('inventory')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${mobileActiveTab === 'inventory'
-                ? 'border-mystic-gold text-mystic-gold bg-mystic-gold/10'
-                : 'border-transparent text-stone-400 hover:text-stone-300'
+              className={`flex-1 px-4 py-3 text-[10px] font-bold transition-colors border-b-2 uppercase tracking-widest ${mobileActiveTab === 'inventory'
+                ? 'border-yellow-600 text-yellow-500 bg-yellow-950/10'
+                : 'border-transparent text-stone-600 hover:text-stone-400'
                 }`}
             >
               <Package size={16} className="inline mr-2" />
-              Inventory
+              STORAGE_UNITS
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-          {/* 装备面板 */}
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row relative z-10">
+          {/* Equipment Panel */}
           {(showEquipment || mobileActiveTab === 'equipment') && (
             <div
-              className={`w-full md:w-1/2 border-b md:border-b-0 md:border-r border-stone-600 p-3 md:p-4 modal-scroll-container modal-scroll-content ${mobileActiveTab !== 'equipment' ? 'hidden md:block' : ''
+              className={`w-full md:w-1/2 border-b md:border-b-0 md:border-r border-stone-800 p-3 md:p-4 modal-scroll-container modal-scroll-content bg-stone-950/20 ${mobileActiveTab !== 'equipment' ? 'hidden md:block' : ''
                 }`}
             >
               <EquipmentPanel
@@ -951,95 +978,96 @@ const InventoryModal: React.FC<Props> = ({
             </div>
           )}
 
-          {/* 物品列表 */}
+          {/* Item List */}
           <div
-            className={`${showEquipment ? 'w-full md:w-1/2' : 'w-full'} modal-scroll-container modal-scroll-content p-4 flex flex-col ${mobileActiveTab !== 'inventory' ? 'hidden md:flex' : ''
+            className={`${showEquipment ? 'w-full md:w-1/2' : 'w-full'} modal-scroll-container modal-scroll-content p-4 flex flex-col bg-stone-950/5 ${mobileActiveTab !== 'inventory' ? 'hidden md:flex' : ''
               }`}
           >
-            {/* 搜索和筛选 */}
-            <div className="mb-4 flex flex-col gap-3">
-              {/* 搜索框 */}
+            {/* Search and Filters */}
+            <div className="mb-6 flex flex-col gap-4 font-mono">
+              {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400" size={18} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-700" size={18} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Scavenge for loot or descriptions..."
-                  className="w-full pl-10 pr-4 py-2 bg-stone-700 border border-stone-600 rounded text-stone-200 placeholder-stone-500 focus:outline-none focus:border-mystic-gold focus:ring-1 focus:ring-mystic-gold"
+                  placeholder="QUERY_STORAGE_DATABASE..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-stone-950 border border-stone-800 rounded-none text-stone-300 placeholder-stone-800 focus:outline-none focus:border-yellow-900/50 font-mono text-sm tracking-widest uppercase"
                 />
                 {searchQuery && (
                   <button
-                    title="Clear Search"
+                    title="CLEAR_QUERY"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-200"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-700 hover:text-stone-300"
                   >
                     <X size={16} />
                   </button>
                 )}
               </div>
 
-              {/* 筛选工具栏 */}
+              {/* Filter Toolbar */}
               <div className="flex gap-2 items-center flex-wrap">
-                {/* 高级筛选按钮 */}
+                {/* Advanced Filter Button */}
                 <button
                   onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors flex items-center gap-2 ${showAdvancedFilter || rarityFilter !== 'all' || statFilter !== 'all'
-                    ? 'bg-purple-900/20 border-purple-600 text-purple-300'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
+                  className={`px-3 py-1.5 rounded-none text-[10px] border transition-all flex items-center gap-2 uppercase tracking-widest ${showAdvancedFilter || rarityFilter !== 'all' || statFilter !== 'all'
+                    ? 'bg-purple-950/40 border-purple-500/50 text-purple-400'
+                    : 'bg-ink-950 border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-400'
                     }`}
                 >
-                  <SlidersHorizontal size={16} />
-                  Advanced Filter
+                  <SlidersHorizontal size={14} />
+                  SENSORS
                   {(rarityFilter !== 'all' || statFilter !== 'all') && (
-                    <span className="bg-purple-600 text-white text-xs px-1.5 py-0.5 rounded">
-                      Active
+                    <span className="bg-purple-900/50 text-purple-300 text-[9px] px-1 py-0.5 border border-purple-800">
+                      ACTIVE
                     </span>
                   )}
                 </button>
 
-                {/* 稀有度快速筛选 */}
+                {/* Rarity Quick Filters */}
                 <div className="flex gap-1">
                   {(['all', 'common', 'uncommon', 'rare', 'legendary'] as const).map((rarity) => (
                     <button
                       key={rarity}
                       onClick={() => setRarityFilter(rarity)}
-                      className={`px-2 py-1 rounded text-xs border transition-colors ${rarityFilter === rarity
-                        ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                        : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
+                      className={`px-3 py-1.5 rounded-none text-[10px] border transition-all uppercase tracking-widest ${rarityFilter === rarity
+                        ? 'bg-yellow-950/40 border-yellow-600/50 text-yellow-500'
+                        : 'bg-ink-950 border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-400'
                         }`}
                     >
-                      {rarity === 'all' ? 'All' : rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+                      {rarity === 'all' ? 'ALL' : rarity}
                     </button>
                   ))}
                 </div>
 
-                {/* 排序按钮 */}
+                {/* Sort Button */}
                 <button
                   onClick={() => setSortByRarity(!sortByRarity)}
-                  className={`ml-auto px-3 py-1.5 rounded text-sm border transition-colors flex items-center gap-2 ${sortByRarity
-                    ? 'bg-blue-900/20 border-blue-600 text-blue-300'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
+                  className={`ml-auto px-3 py-1.5 rounded-none text-[10px] border transition-all flex items-center gap-2 uppercase tracking-widest ${sortByRarity
+                    ? 'bg-blue-950/40 border-blue-500/50 text-blue-400'
+                    : 'bg-ink-950 border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-400'
                     }`}
                 >
-                  <ArrowUpDown size={16} />
-                  {sortByRarity ? 'Sort by Rarity' : 'No Sorting'}
+                  <ArrowUpDown size={14} />
+                  {sortByRarity ? 'QUALITY_INDEX' : 'ID_SEQUENCE'}
                 </button>
               </div>
 
-              {/* 高级筛选面板 */}
+              {/* Advanced Filter Panel */}
               {showAdvancedFilter && (
-                <div className="bg-stone-800 rounded p-4 border border-stone-600">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Filter size={16} className="text-purple-400" />
-                    <h4 className="text-sm font-bold text-purple-300">Advanced Filter</h4>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="block text-xs text-stone-400 mb-2">Stat Filter</label>
-                    <div className="flex items-center gap-2">
-                      {/* 属性筛选 */}
-                      <div>
-                        <div className="flex gap-2 mb-2">
+                <div className="p-4 bg-ink-950 border border-stone-800 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Filter size={16} className="text-purple-500" />
+                      <h4 className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">ADVANCED_SCAN_PROTOCOLS</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Attribute Filter */}
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-stone-500 uppercase tracking-widest block">Neural_Link_Attribute</label>
+                        <div className="flex gap-2">
                           <select
                             title="Stat Filter"
                             value={statFilter}
@@ -1047,42 +1075,40 @@ const InventoryModal: React.FC<Props> = ({
                               setStatFilter(e.target.value as typeof statFilter);
                               if (e.target.value === 'all') setStatFilterMin(0);
                             }}
-                            className="flex-1 px-2 py-1.5 bg-stone-700 border border-stone-600 rounded text-sm text-stone-200"
+                            className="flex-1 bg-ink-950 border border-stone-800 text-stone-400 text-[10px] px-2 py-2 focus:outline-none focus:border-stone-600 rounded-none uppercase tracking-widest"
                           >
-                            <option value="all">All Stats</option>
-                            <option value="attack">FP</option>
-                            <option value="defense">DR</option>
-                            <option value="hp">HP</option>
-                            <option value="spirit">PER</option>
-                            <option value="physique">END</option>
-                            <option value="speed">AGI</option>
+                            <option value="all">ANY_SIGNAL</option>
+                            <option value="attack">FP_FIREPOWER</option>
+                            <option value="defense">DR_REDUCTION</option>
+                            <option value="hp">HP_VITALITY</option>
+                            <option value="spirit">PER_COGNITION</option>
+                            <option value="physique">END_STAMINA</option>
+                            <option value="speed">AGI_REFLEX</option>
                           </select>
-                        </div>
-                        {statFilter !== 'all' && (
-                          <div className="flex items-center gap-2">
+                          {statFilter !== 'all' && (
                             <input
                               type="number"
                               min={0}
                               value={statFilterMin}
                               onChange={(e) => setStatFilterMin(Math.max(0, parseInt(e.target.value) || 0))}
-                              placeholder="Min Value"
-                              className="w-full px-2 py-1.5 bg-stone-700 border border-stone-600 rounded text-sm text-stone-200"
+                              placeholder="MIN"
+                              className="w-20 bg-ink-950 border border-stone-800 text-stone-300 text-[10px] px-2 py-2 focus:outline-none focus:border-stone-600 rounded-none uppercase tracking-widest"
                             />
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
 
-                      {/* 清除筛选按钮 */}
-                      <div className="flex items-start" style={{ marginTop: '-10px' }}>
+                      {/* Reset Button */}
+                      <div className="flex items-end">
                         <button
                           onClick={() => {
                             setRarityFilter('all');
                             setStatFilter('all');
                             setStatFilterMin(0);
                           }}
-                          className="w-full px-3 py-2 bg-red-900/20 hover:bg-red-900/30 border border-red-700 text-red-300 rounded text-sm transition-colors"
+                          className="w-full py-2 border border-red-900/50 text-red-500 hover:bg-red-950/20 text-[10px] transition-all uppercase tracking-widest"
                         >
-                          Clear All Filters
+                          RESET FILTERS
                         </button>
                       </div>
                     </div>
@@ -1091,233 +1117,92 @@ const InventoryModal: React.FC<Props> = ({
               )}
 
               {/* 分类标签 */}
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => handleCategoryChange('all')}
-                  disabled={isPending}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === 'all'
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => handleCategoryChange('equipment')}
-                  disabled={isPending}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === 'equipment'
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                >
-                  Gear
-                </button>
-                <button
-                  onClick={() => handleCategoryChange('pill')}
-                  disabled={isPending}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === 'pill'
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                >
-                  Meds
-                </button>
-                <button
-                  onClick={() => handleCategoryChange('consumable')}
-                  disabled={isPending}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === 'consumable'
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                >
-                  Provs
-                </button>
-                <button
-                  onClick={() => handleCategoryChange('recipe')}
-                  disabled={isPending}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === 'recipe'
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                >
-                  Schematics
-                </button>
-                <button
-                  onClick={() => handleCategoryChange('advancedItem')}
-                  disabled={isPending}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === 'advancedItem'
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                >
-                  Mods
-                </button>
+              <div className="flex gap-1 flex-wrap font-mono">
+                {[
+                  { id: 'all', label: 'ALL', icon: <Package size={14} /> },
+                  { id: 'equipment', label: 'GEAR', icon: <ShieldCheck size={14} /> },
+                  { id: 'pill', label: 'NEURAL', icon: <Zap size={14} /> },
+                  { id: 'consumable', label: 'SUPPLY', icon: <Archive size={14} /> },
+                  { id: 'recipe', label: 'BLUEPRINT', icon: <FileText size={14} /> },
+                  { id: 'advancedItem', label: 'CORE', icon: <Sparkles size={14} /> },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategoryChange(cat.id as ItemCategory)}
+                    disabled={isPending}
+                    className={`flex items-center gap-2 px-3 py-2 border transition-all whitespace-nowrap text-[10px] uppercase tracking-widest ${selectedCategory === cat.id
+                      ? 'bg-yellow-950/40 border-yellow-600 text-yellow-500'
+                      : 'bg-ink-950 border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
+                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
+                  >
+                    {cat.icon}
+                    {cat.label}
+                  </button>
+                ))}
               </div>
+
               {/* 装备部位细分（仅在装备分类时显示） */}
               {selectedCategory === 'equipment' && (
-                <div className="flex gap-2 flex-wrap">
-                  <button
-                    onClick={() => handleEquipmentSlotChange('all')}
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === 'all'
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    全部装备
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Weapon)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Weapon
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Weapon
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Head)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Head
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Head
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Shoulder)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Shoulder
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Shoulder
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Chest)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Chest
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Chest
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Gloves)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Gloves
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Gloves
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Legs)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Legs
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Legs
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Boots)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Boots
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Boots
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Ring1)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Ring1 ||
-                      selectedEquipmentSlot === EquipmentSlot.Ring2 ||
-                      selectedEquipmentSlot === EquipmentSlot.Ring3 ||
-                      selectedEquipmentSlot === EquipmentSlot.Ring4
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Ring
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Accessory1)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Accessory1 ||
-                      selectedEquipmentSlot === EquipmentSlot.Accessory2
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Accessory
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleEquipmentSlotChange(EquipmentSlot.Artifact1)
-                    }
-                    disabled={isPending}
-                    className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEquipmentSlot === EquipmentSlot.Artifact1 ||
-                      selectedEquipmentSlot === EquipmentSlot.Artifact2
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    Signature
-                  </button>
+                <div className="flex gap-1 flex-wrap font-mono mt-2 p-3 bg-ink-950 border border-stone-800 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.01] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  <div className="relative z-10 flex gap-1 flex-wrap">
+                    <button
+                      onClick={() => handleEquipmentSlotChange('all')}
+                      disabled={isPending}
+                      className={`px-2 py-1 rounded-none text-[9px] border transition-all uppercase tracking-widest ${selectedEquipmentSlot === 'all'
+                        ? 'bg-yellow-950/40 border-yellow-600 text-yellow-500 font-bold'
+                        : 'bg-stone-900/50 border-stone-800 text-stone-500 hover:text-stone-300'
+                        } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
+                    >
+                      ALL SLOTS
+                    </button>
+                    {[
+                      { slot: EquipmentSlot.Weapon, label: 'WEAPON' },
+                      { slot: EquipmentSlot.Head, label: 'HEAD' },
+                      { slot: EquipmentSlot.Shoulder, label: 'SHOULDER' },
+                      { slot: EquipmentSlot.Chest, label: 'CHEST' },
+                      { slot: EquipmentSlot.Gloves, label: 'GLOVES' },
+                      { slot: EquipmentSlot.Legs, label: 'LEGS' },
+                      { slot: EquipmentSlot.Boots, label: 'BOOTS' },
+                      { slot: EquipmentSlot.Ring1, label: 'MODULE' },
+                      { slot: EquipmentSlot.Accessory1, label: 'ACCESSORY' },
+                      { slot: EquipmentSlot.Artifact1, label: 'SIGNATURE' },
+                    ].map(({ slot, label }) => (
+                      <button
+                        key={slot}
+                        onClick={() => handleEquipmentSlotChange(slot)}
+                        disabled={isPending}
+                        className={`px-2 py-1 rounded-none text-[9px] border transition-all uppercase tracking-widest ${selectedEquipmentSlot === slot ||
+                          (slot === EquipmentSlot.Ring1 && (selectedEquipmentSlot === EquipmentSlot.Ring2 || selectedEquipmentSlot === EquipmentSlot.Ring3 || selectedEquipmentSlot === EquipmentSlot.Ring4)) ||
+                          (slot === EquipmentSlot.Accessory1 && selectedEquipmentSlot === EquipmentSlot.Accessory2) ||
+                          (slot === EquipmentSlot.Artifact1 && selectedEquipmentSlot === EquipmentSlot.Artifact2)
+                          ? 'bg-yellow-950/40 border-yellow-600 text-yellow-500 font-bold'
+                          : 'bg-stone-900/50 border-stone-800 text-stone-500 hover:text-stone-300'
+                          } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
-              {/* 排序按钮 */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setSortByRarity(!sortByRarity)}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors flex items-center gap-1.5 ${sortByRarity
-                    ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                    : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    }`}
-                >
-                  <ArrowUpDown size={14} />
-                  {sortByRarity ? 'Sort by Quality' : 'Original Order'}
-                </button>
-                <span className="text-xs text-stone-500">
-                  {filteredAndSortedInventory.length} Items
+              
+              {/* 排序与统计 */}
+              <div className="flex items-center gap-3 font-mono">
+                <div className="flex-1 h-px bg-stone-800/30"></div>
+                <span className="text-[10px] text-stone-600 uppercase tracking-[0.2em]">
+                  {filteredAndSortedInventory.length} OBJECTS DETECTED
                 </span>
+                <div className="flex-1 h-px bg-stone-800/30"></div>
               </div>
             </div>
 
             {/* 物品网格 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 overflow-y-auto custom-scrollbar pr-1">
               {filteredAndSortedInventory.length === 0 ? (
-                <div className="col-span-full text-center text-stone-500 py-10 font-serif">
-                  {selectedCategory === 'all'
-                    ? 'No items found. Explore the wasteland for tech and resources!'
-                    : `No items in this category.`}
+                <div className="col-span-full text-center text-stone-600 py-20 font-mono border border-dashed border-stone-800/20 uppercase tracking-[0.3em] flex flex-col items-center gap-4">
+                  <Package size={40} className="opacity-10" />
+                  <div>No items found. Scavenge for resources.</div>
                 </div>
               ) : (() => {
                 const realmIndex = REALM_ORDER.indexOf(playerRealm as RealmType);
@@ -1355,66 +1240,58 @@ const InventoryModal: React.FC<Props> = ({
         </div>
 
         {/* Stat Comparison Footer */}
-        <div className="p-3 border-t border-stone-600 bg-ink-900 rounded-b text-sm font-serif">
-          <div className="flex items-center justify-center gap-4 mb-2 min-h-[3rem]">
+        <div className="p-4 border-t border-stone-800 bg-ink-950 relative z-10 font-mono overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+          <div className="relative z-10 flex items-center justify-center gap-6 min-h-[3rem]">
             {comparison ? (
-              <div className="flex items-center gap-4">
-                <span className="text-stone-400">Gear Preview:</span>
+              <div className="flex items-center gap-6">
+                <span className="text-[10px] text-stone-500 uppercase tracking-widest">Neural Link Preview:</span>
                 {comparison.attack !== 0 && (
-                  <span
-                    className={`${comparison.attack > 0 ? 'text-mystic-jade' : 'text-mystic-blood'}`}
-                  >
-                    FP {formatValueChange(calculateTotalEquippedStats.attack, calculateTotalEquippedStats.attack + comparison.attack)}
-                  </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">FP_FIREPOWER</span>
+                    <span className={`text-xs ${comparison.attack > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {formatValueChange(calculateTotalEquippedStats.attack, calculateTotalEquippedStats.attack + comparison.attack)}
+                    </span>
+                  </div>
                 )}
                 {comparison.defense !== 0 && (
-                  <span
-                    className={`${comparison.defense > 0 ? 'text-mystic-jade' : 'text-mystic-blood'}`}
-                  >
-                    DR {formatValueChange(calculateTotalEquippedStats.defense, calculateTotalEquippedStats.defense + comparison.defense)}
-                  </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">DR_REDUCTION</span>
+                    <span className={`text-xs ${comparison.defense > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {formatValueChange(calculateTotalEquippedStats.defense, calculateTotalEquippedStats.defense + comparison.defense)}
+                    </span>
+                  </div>
                 )}
                 {comparison.hp !== 0 && (
-                  <span
-                    className={`${comparison.hp > 0 ? 'text-mystic-jade' : 'text-mystic-blood'}`}
-                  >
-                    HP {formatValueChange(calculateTotalEquippedStats.hp, calculateTotalEquippedStats.hp + comparison.hp)}
-                  </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">HP_VITALITY</span>
+                    <span className={`text-xs ${comparison.hp > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {formatValueChange(calculateTotalEquippedStats.hp, calculateTotalEquippedStats.hp + comparison.hp)}
+                    </span>
+                  </div>
                 )}
-                {comparison.attack === 0 &&
-                  comparison.defense === 0 &&
-                  comparison.hp === 0 && (
-                    <span className="text-stone-500">No variation</span>
-                  )}
+                {comparison.attack === 0 && comparison.defense === 0 && comparison.hp === 0 && (
+                  <span className="text-[10px] text-stone-700 uppercase tracking-widest">No variance detected</span>
+                )}
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <span className="text-stone-400">Gear Preview:</span>
-                {calculateTotalEquippedStats.attack > 0 && (
-                  <span className="text-mystic-jade">
-                    FP {formatNumber(calculateTotalEquippedStats.attack)}
-                  </span>
-                )}
-                {calculateTotalEquippedStats.defense > 0 && (
-                  <span className="text-mystic-jade">
-                    DR {formatNumber(calculateTotalEquippedStats.defense)}
-                  </span>
-                )}
-                {calculateTotalEquippedStats.hp > 0 && (
-                  <span className="text-mystic-jade">
-                    HP {formatNumber(calculateTotalEquippedStats.hp)}
-                  </span>
-                )}
-                {calculateTotalEquippedStats.attack === 0 &&
-                  calculateTotalEquippedStats.defense === 0 &&
-                  calculateTotalEquippedStats.hp === 0 && (
-                    <span className="text-stone-500">No gear</span>
-                  )}
+              <div className="flex items-center gap-6">
+                <span className="text-[10px] text-stone-500 uppercase tracking-widest">Active Neural Links:</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">FP_FIREPOWER</span>
+                  <span className="text-xs text-emerald-400">{formatNumber(calculateTotalEquippedStats.attack)}</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">DR_REDUCTION</span>
+                  <span className="text-xs text-emerald-400">{formatNumber(calculateTotalEquippedStats.defense)}</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">HP_VITALITY</span>
+                  <span className="text-xs text-emerald-400">{formatNumber(calculateTotalEquippedStats.hp)}</span>
+                </div>
               </div>
             )}
           </div>
-
-
         </div>
       </div>
 

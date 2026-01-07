@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, Filter, Heart } from 'lucide-react';
 import { Item, ItemType, ItemRarity, PlayerStats } from '../types';
+import { ASSETS } from '../constants/assets';
 import { getRarityTextColor, getRarityBorder } from '../utils/rarityUtils';
 import { normalizeTypeLabel } from '../utils/itemUtils';
 import { showInfo } from '../utils/toastUtils';
@@ -201,203 +202,296 @@ const BatchFeedModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 crt-screen"
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full max-w-4xl max-h-[90vh] rounded-lg border border-stone-600 shadow-2xl flex flex-col overflow-hidden"
+        className="bg-ink-950 w-full max-w-4xl max-h-[90vh] rounded-none border border-stone-800 shadow-2xl flex flex-col overflow-hidden relative font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 rounded-t">
-          <h3 className="text-xl font-serif text-mystic-gold flex items-center gap-2">
-            <Heart size={20} /> Bulk Processing - {pet.name}
-          </h3>
-          <button onClick={onClose} className="text-stone-400 hover:text-white">
-            <X size={24} />
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
+        <div className="p-4 md:p-6 border-b border-stone-800 flex justify-between items-center bg-stone-950/50 relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+              />
+              <Heart size={24} className="relative z-10" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">
+                PET_NOURISHMENT_PROTOCOL
+              </h3>
+              <p className="text-[10px] text-stone-600 tracking-widest uppercase">
+                FEEDING: {pet.name} // RESOURCE_ALLOCATION
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-emerald-500 hover:bg-emerald-950/10 transition-all border border-stone-800 hover:border-emerald-900/50 relative group overflow-hidden"
+            aria-label="DISCONNECT"
+          >
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <X size={24} className="relative z-10" />
           </button>
         </div>
 
-        <div className="p-4 flex-1 overflow-y-auto">
+        <div className="p-4 md:p-6 flex-1 overflow-y-auto relative z-10 custom-scrollbar">
           {/* 筛选器 */}
-          <div className="mb-4 space-y-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2 text-stone-400 text-sm">
-                <Filter size={16} />
-                <span>Category:</span>
+          <div className="mb-6 space-y-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 text-stone-500 text-[10px] uppercase tracking-widest font-bold">
+                <Filter size={14} />
+                <span>CATEGORY_FILTER:</span>
               </div>
-              {(['all', 'pill', 'consumable', 'equipment'] as ItemCategory[]).map((category) => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    setSelectedItems(new Set());
-                    setItemQuantities(new Map());
-                  }}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedCategory === category
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                      : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                    }`}
-                >
-                  {category === 'all'
-                    ? 'All'
-                    : category === 'pill'
-                      ? 'Meds'
-                      : category === 'equipment'
-                        ? 'Gear'
-                        : 'Provs'}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2 text-stone-400 text-sm">
-                <Filter size={16} />
-                <span>Rarity:</span>
-              </div>
-              {(['all', 'common', 'uncommon', 'rare', 'legendary'] as RarityFilter[]).map(
-                (rarity) => (
+              <div className="flex gap-1 flex-wrap">
+                {(['all', 'pill', 'consumable', 'equipment'] as ItemCategory[]).map((category) => (
                   <button
-                    key={rarity}
+                    key={category}
                     onClick={() => {
-                      setSelectedRarity(rarity);
+                      setSelectedCategory(category);
                       setSelectedItems(new Set());
                       setItemQuantities(new Map());
                     }}
-                    className={`px-3 py-1.5 rounded text-sm border transition-colors ${selectedRarity === rarity
-                        ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
-                        : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
-                      }`}
+                    className={`px-3 py-1.5 rounded-none text-[10px] border transition-all uppercase tracking-widest relative group overflow-hidden ${
+                      selectedCategory === category
+                        ? 'bg-emerald-950/20 border-emerald-600 text-emerald-500'
+                        : 'bg-stone-950 border-stone-800 text-stone-600 hover:bg-stone-900 hover:text-stone-400'
+                    }`}
                   >
-                    {rarity === 'all' ? 'All' : rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                      style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                    />
+                    <span className="relative z-10">
+                      {category === 'all'
+                        ? 'ALL'
+                        : category === 'pill'
+                          ? 'MEDS'
+                          : category === 'equipment'
+                            ? 'GEAR'
+                            : 'SUPPLY'}
+                    </span>
                   </button>
-                )
-              )}
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 text-stone-500 text-[10px] uppercase tracking-widest font-bold">
+                <Filter size={14} />
+                <span>SIGNAL_STRENGTH:</span>
+              </div>
+              <div className="flex gap-1 flex-wrap">
+                {(['all', '普通', '稀有', '传说', '仙品'] as RarityFilter[]).map(
+                  (rarity) => (
+                    <button
+                      key={rarity}
+                      onClick={() => {
+                        setSelectedRarity(rarity);
+                        setSelectedItems(new Set());
+                        setItemQuantities(new Map());
+                      }}
+                      className={`px-3 py-1.5 rounded-none text-[10px] border transition-all uppercase tracking-widest relative group overflow-hidden ${
+                        selectedRarity === rarity
+                          ? 'bg-emerald-950/20 border-emerald-600 text-emerald-500'
+                          : 'bg-stone-950 border-stone-800 text-stone-600 hover:bg-stone-900 hover:text-stone-400'
+                      }`}
+                    >
+                      <div 
+                        className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                        style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                      />
+                      <span className="relative z-10">
+                        {rarity === 'all' 
+                          ? 'ALL_SIGNALS' 
+                          : rarity === '普通' ? 'COMMON' 
+                          : rarity === '稀有' ? 'RARE' 
+                          : rarity === '传说' ? 'LEGENDARY' 
+                          : 'DIVINE'}
+                      </span>
+                    </button>
+                  )
+                )}
+              </div>
             </div>
           </div>
 
           {/* 操作栏 */}
-          <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-4 flex-wrap">
+          <div className="mb-6 flex items-center justify-between p-4 bg-stone-950/50 border border-stone-800 relative group overflow-hidden">
+            <div 
+              className="absolute inset-0 opacity-[0.02] pointer-events-none"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <div className="flex items-center gap-4 relative z-10 flex-wrap">
               <button
                 onClick={handleSelectAll}
-                className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-300 rounded text-sm border border-stone-600"
+                className="px-4 py-2 bg-stone-950 hover:bg-stone-900 text-stone-400 hover:text-emerald-500 rounded-none text-[10px] border border-stone-800 transition-all uppercase tracking-widest relative group overflow-hidden"
               >
-                {selectedItems.size === filteredItems.length
-                  ? 'Deselect All'
-                  : 'Select Current'}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                  style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                />
+                <span className="relative z-10">
+                  {selectedItems.size === filteredItems.length
+                    ? 'DESELECT_ALL'
+                    : 'SELECT_CURRENT'}
+                </span>
               </button>
               <button
                 onClick={handleFeedAll}
-                className="px-3 py-1.5 bg-orange-700 hover:bg-orange-600 text-orange-200 rounded text-sm border border-orange-600"
+                className="px-4 py-2 bg-emerald-950/10 hover:bg-emerald-950/20 text-emerald-500/80 hover:text-emerald-500 rounded-none text-[10px] border border-emerald-900/50 hover:border-emerald-500 transition-all uppercase tracking-widest relative group overflow-hidden"
                 title="Process all processable items (Uses total quantity)"
               >
-                Process All ({allFeedableItems.reduce((sum, item) => sum + item.quantity, 0)} Units)
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                  style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                />
+                <span className="relative z-10">PROCESS_ALL ({allFeedableItems.reduce((sum, item) => sum + item.quantity, 0)})</span>
               </button>
-              <span className="text-sm text-stone-400">
-                Selected: {selectedItems.size} / {filteredItems.length} ({totalSelectedQuantity} Units)
-              </span>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-stone-600 uppercase tracking-widest font-bold">
+                  RESOURCES_SELECTED:
+                </span>
+                <span className="text-xs text-emerald-600 font-mono">
+                  {selectedItems.size} TYPES / {totalSelectedQuantity} UNITS
+                </span>
+              </div>
             </div>
             <button
               onClick={handleFeed}
               disabled={selectedItems.size === 0}
-              className={`px-4 py-2 rounded text-sm font-bold transition-colors ${selectedItems.size > 0
-                  ? 'bg-green-900 hover:bg-green-800 text-green-200 border border-green-700'
-                  : 'bg-stone-700 text-stone-500 cursor-not-allowed border border-stone-600'
-                }`}
+              className={`px-6 py-2 rounded-none text-xs font-bold transition-all uppercase tracking-[0.2em] border relative group overflow-hidden ${
+                selectedItems.size > 0
+                  ? 'bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-500 border-emerald-900/50 hover:border-emerald-500'
+                  : 'bg-stone-950 text-stone-700 cursor-not-allowed border-stone-900'
+              }`}
             >
-              Process Selected ({totalSelectedQuantity})
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+              />
+              <span className="relative z-10">EXECUTE_FEED ({totalSelectedQuantity})</span>
             </button>
           </div>
 
           {/* 物品列表 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredItems.length === 0 ? (
-              <div className="col-span-full text-center text-stone-500 py-10">
-                No processable items.
+              <div className="col-span-full text-center text-stone-700 py-20 font-mono border border-dashed border-stone-800/30 uppercase tracking-[0.3em] flex flex-col items-center gap-4 relative">
+                <div 
+                  className="absolute inset-0 opacity-[0.01] pointer-events-none"
+                  style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                />
+                <Heart size={40} className="opacity-20" />
+                <div>NO_PROCESSABLE_OBJECTS_DETECTED</div>
               </div>
             ) : (
               filteredItems.map((item) => {
                 const isSelected = selectedItems.has(item.id);
-                const rarity = item.rarity || 'common';
+                const rarity = item.rarity || '普通';
 
                 return (
                   <div
                     key={item.id}
-                    className={`p-3 rounded border flex flex-col gap-2 transition-colors cursor-pointer ${isSelected
-                        ? 'bg-green-900/30 border-green-600'
-                        : 'bg-ink-800 hover:bg-ink-700 border-stone-700'
-                      }`}
+                    className={`p-4 rounded-none border flex flex-col gap-3 transition-all cursor-pointer relative overflow-hidden group ${
+                      isSelected
+                        ? 'bg-emerald-950/10 border-emerald-600 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                        : 'bg-stone-950/40 hover:bg-stone-900 border-stone-800'
+                    }`}
                     onClick={() => handleToggleItem(item.id)}
                   >
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleToggleItem(item.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="mt-1"
-                      />
+                    {/* Item Background Texture Layer */}
+                    <div 
+                      className={`absolute inset-0 pointer-events-none transition-opacity ${isSelected ? 'opacity-[0.05]' : 'opacity-0 group-hover:opacity-[0.02]'}`}
+                      style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                    />
+                    
+                    {/* Item Background Scanline Effect */}
+                    <div className="absolute inset-0 bg-scanlines opacity-[0.02] pointer-events-none"></div>
+
+                    <div className="flex items-start gap-4 relative z-10">
+                      <div className={`mt-1 w-5 h-5 border flex items-center justify-center shrink-0 transition-all ${
+                        isSelected ? 'border-emerald-500 bg-emerald-950/30' : 'border-stone-700 bg-stone-950'
+                      }`}>
+                        {isSelected && <div className="w-2 h-2 bg-emerald-500 animate-pulse"></div>}
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
+                        <div className="flex items-start justify-between gap-2 mb-2">
                           <h4
-                            className={`font-bold text-sm ${getRarityTextColor(rarity)}`}
+                            className={`font-bold text-[13px] uppercase tracking-wider truncate ${getRarityTextColor(rarity)}`}
                           >
                             {item.name}
                           </h4>
-                          <span className="text-xs bg-stone-700 text-stone-300 px-1.5 py-0.5 rounded shrink-0">
-                            Own: {item.quantity}
+                          <span className="text-[10px] bg-stone-950 text-stone-500 px-1.5 py-0.5 rounded-none border border-stone-900 shrink-0 font-mono">
+                            OWN: {item.quantity}
                           </span>
                         </div>
-                        <div className="flex gap-2 mb-1">
+                        <div className="flex gap-2 mb-2">
                           <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded border ${getRarityBorder(rarity)}`}
+                            className={`text-[9px] px-1.5 py-0.5 rounded-none border uppercase font-bold tracking-widest ${getRarityBorder(rarity)}`}
                           >
-                            {rarity}
+                            {rarity === '普通' ? 'COMMON' : rarity === '稀有' ? 'RARE' : rarity === '传说' ? 'LEGENDARY' : 'DIVINE'}
                           </span>
-                          <span className="text-xs text-stone-500">
+                          <span className="text-[10px] text-stone-600 uppercase tracking-widest font-mono">
                             {normalizeTypeLabel(item.type, item)}
                           </span>
                         </div>
-                        <p className="text-xs text-stone-500 line-clamp-2">
+                        <p className="text-[11px] text-stone-500 line-clamp-2 leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity font-mono italic">
                           {item.description}
                         </p>
                       </div>
                     </div>
                     {isSelected && (
-                      <div className="flex items-center gap-2 pl-8">
-                        <label className="text-xs text-stone-400">Process Quantity:</label>
-                        <input
-                          type="number"
-                          min={1}
-                          max={item.quantity}
-                          value={itemQuantities.get(item.id) || ''}
-                          onChange={(e) => {
-                            const inputValue = e.target.value;
-                            if (inputValue === '') {
-                              // 允许清空，暂时不更新状态
-                              setItemQuantities((prev) => {
-                                const newQty = new Map(prev);
-                                newQty.delete(item.id);
-                                return newQty;
-                              });
-                            } else {
-                              const newValue = parseInt(inputValue, 10);
-                              if (!isNaN(newValue)) {
-                                handleQuantityChange(item.id, newValue);
+                      <div className="flex items-center gap-3 pl-9 pt-2 border-t border-stone-800/50 relative z-10">
+                        <label className="text-[10px] text-stone-600 uppercase tracking-widest font-bold">QUANTITY:</label>
+                        <div className="flex items-center gap-2 bg-stone-950 border border-stone-800 p-1">
+                          <input
+                            type="number"
+                            min={1}
+                            max={item.quantity}
+                            value={itemQuantities.get(item.id) || ''}
+                            onChange={(e) => {
+                              const inputValue = e.target.value;
+                              if (inputValue === '') {
+                                setItemQuantities((prev) => {
+                                  const newQty = new Map(prev);
+                                  newQty.delete(item.id);
+                                  return newQty;
+                                });
+                              } else {
+                                const newValue = parseInt(inputValue, 10);
+                                if (!isNaN(newValue)) {
+                                  handleQuantityChange(item.id, newValue);
+                                }
                               }
-                            }
-                          }}
-                          onBlur={(e) => {
-                            // 失去焦点时，如果为空或无效，设置为1
-                            const inputValue = e.target.value;
-                            if (inputValue === '' || isNaN(parseInt(inputValue, 10))) {
-                              handleQuantityChange(item.id, 1);
-                            }
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="w-20 px-2 py-1 bg-stone-800 border border-stone-600 rounded text-sm text-stone-300 focus:outline-none focus:border-mystic-gold"
-                        />
-                        <span className="text-xs text-stone-500">
+                            }}
+                            onBlur={(e) => {
+                              const inputValue = e.target.value;
+                              if (inputValue === '' || isNaN(parseInt(inputValue, 10))) {
+                                handleQuantityChange(item.id, 1);
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-16 px-2 py-1 bg-transparent text-sm text-emerald-500 focus:outline-none font-bold text-center font-mono"
+                          />
+                        </div>
+                        <span className="text-[10px] text-stone-600 font-mono">
                           / {item.quantity}
                         </span>
                       </div>

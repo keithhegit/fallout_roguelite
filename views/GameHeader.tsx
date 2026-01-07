@@ -127,27 +127,27 @@ function GameHeader({
   }, []);
 
   return (
-    <header className="bg-paper-800 p-2 md:p-4 border-b border-stone-700 flex justify-between items-center shadow-lg z-10 sticky top-0 safe-area-header">
+    <header className="bg-ink-950 p-2 md:p-4 border-b border-stone-800 flex justify-between items-center shadow-lg z-10 sticky top-0 safe-area-header">
       <div className="flex items-center gap-3">
         <h1
           onClick={handleTitleClick}
-          className="text-base md:text-xl font-serif text-mystic-gold tracking-widest cursor-pointer select-none hover:opacity-80 transition-opacity"
+          className="text-sm md:text-xl font-mono text-mystic-gold tracking-widest cursor-pointer select-none hover:opacity-80 transition-opacity uppercase"
           title={
             clickCount > 0 ? `Click ${5 - clickCount} more times for debug mode` : undefined
           }
         >
           Wasteland Survivor
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <span
-            className="text-xs md:text-sm text-stone-400 font-mono px-2 py-1 bg-stone-800 rounded border border-stone-700"
+            className="text-xs md:text-sm text-stone-400 font-mono px-2 py-1 bg-stone-800 rounded-none border border-stone-800"
             title="Current Version"
           >
             v{appVersion}
           </span>
           {onlineCount > 0 && (
             <span
-              className="text-xs md:text-sm text-green-400 font-mono px-2 py-1 bg-green-900/30 rounded border border-green-700 flex items-center gap-1"
+              className="text-xs md:text-sm text-green-400 font-mono px-2 py-1 bg-green-900/30 rounded-none border border-green-700 flex items-center gap-1"
               title="Players Online"
             >
               <Users size={12} />
@@ -159,65 +159,93 @@ function GameHeader({
       {/* Mobile Menu Button */}
       <button
         onClick={onOpenMenu}
-        className="md:hidden flex items-center justify-center w-12 h-12 bg-ink-800 active:bg-stone-700 rounded border border-stone-600 touch-manipulation"
+        className="md:hidden flex items-center justify-center w-12 h-12 bg-ink-800 active:bg-stone-700 rounded-none border border-stone-800 touch-manipulation"
       >
-        <Menu size={24} className="text-stone-200" />
+        <img
+          src={ASSETS.TOP_TAB.MENU}
+          alt="Menu"
+          className="w-6 h-6 object-contain"
+        />
       </button>
       {/* Desktop Buttons */}
       <div className="hidden md:flex gap-2 flex-wrap">
         <button
           onClick={onOpenCultivation}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
-          <BookOpen size={18} />
+          <img
+            src={ASSETS.ICONS.CRAFTING}
+            alt="Mods"
+            className="w-5 h-5 object-contain"
+          />
           <span>Mods</span>
         </button>
         <button
           onClick={onOpenInventory}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
-          <Backpack size={18} />
+          <img
+            src={ASSETS.ICONS.BACKPACK}
+            alt="Inventory"
+            className="w-5 h-5 object-contain"
+          />
           <span>Inventory</span>
         </button>
         <button
           onClick={onOpenCharacter}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
-          <Star size={18} />
+          <img
+            src={ASSETS.BOTTOM_TAB.STATUS}
+            alt="Character"
+            className="w-5 h-5 object-contain"
+          />
           <span>Character</span>
         </button>
         <button
           onClick={onOpenAchievement}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
         >
-          <Trophy size={18} />
+          <img
+            src={ASSETS.ICONS.ACHIEVEMENTS}
+            alt="Trophies"
+            className="w-5 h-5 object-contain"
+          />
           <span>Trophies</span>
           {newAchievementsCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-none w-5 h-5 flex items-center justify-center">
               {newAchievementsCount}
             </span>
           )}
         </button>
         <button
           onClick={onOpenPet}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
         >
-          <Sparkles size={18} />
+          <img
+            src={ASSETS.ICONS.COMPANIONS}
+            alt="Pets"
+            className="w-5 h-5 object-contain"
+          />
           <span>Pets</span>
           {petsCount > 0 && (
-            <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded">
+            <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-none w-5 h-5 flex items-center justify-center">
               {petsCount}
             </span>
           )}
         </button>
         <button
           onClick={onOpenLottery}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
         >
-          <Gift size={18} />
+          <img
+            src={ASSETS.ICONS.GACHA}
+            alt="Gacha"
+            className="w-5 h-5 object-contain"
+          />
           <span>Gacha</span>
           {lotteryTickets > 0 && (
-            <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded">
+            <span className="absolute -top-1 -right-1 bg-yellow-500 text-ink-950 text-[10px] font-bold rounded-none px-1 h-5 flex items-center justify-center min-w-[20px]">
               {lotteryTickets}
             </span>
           )}
@@ -225,13 +253,17 @@ function GameHeader({
         {onOpenDailyQuest && (
           <button
             onClick={onOpenDailyQuest}
-            className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
           >
-            <Calendar size={18} />
+            <img
+              src={ASSETS.ICONS.QUESTS}
+              alt="Bounties"
+              className="w-5 h-5 object-contain"
+            />
             <span>Bounties</span>
             {dailyQuestCompletedCount > 0 &&
               (player.dailyQuests || []).length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-none w-5 h-5 flex items-center justify-center">
                   {dailyQuestCompletedCount}/{(player.dailyQuests || []).length}
                 </span>
               )}
@@ -240,13 +272,13 @@ function GameHeader({
         {onOpenGrotto && (
           <button
             onClick={onOpenGrotto}
-            className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
             title="Base"
           >
             <Home size={18} />
             <span>Base</span>
             {player.grotto && player.grotto.level > 0 && (
-              <span className="text-xs bg-purple-500 text-white px-1.5 py-0.5 rounded">
+              <span className="text-xs bg-purple-500 text-white px-1.5 py-0.5 rounded-none">
                 Lv.{player.grotto.level}
               </span>
             )}
@@ -254,15 +286,19 @@ function GameHeader({
         )}
         <button
           onClick={onOpenSettings}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded border border-stone-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
-          <Settings size={18} />
+          <img
+            src={ASSETS.TOP_TAB.SETTINGS}
+            alt="Settings"
+            className="w-5 h-5 object-contain"
+          />
           <span>Settings</span>
         </button>
         {isDebugModeEnabled && onOpenDebug && (
           <button
             onClick={onOpenDebug}
-            className="flex items-center gap-2 px-3 py-2 bg-red-800 hover:bg-red-700 rounded border border-red-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-red-800 hover:bg-red-700 rounded-none border border-red-600 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
             title="Debug Mode"
           >
             <Bug size={18} />

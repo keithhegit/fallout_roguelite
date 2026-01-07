@@ -2,7 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { PlayerStats, SectRank, RealmType, Item, AdventureResult } from '../types';
 import { SECTS, SECT_RANK_REQUIREMENTS, REALM_ORDER, SECT_RANK_DATA } from '../constants/index';
 import { generateRandomSects, generateRandomSectTasks, generateSectShopItems, RandomSectTask } from '../services/randomService';
-import { X, Users, ShoppingBag, Shield, Scroll, ArrowUp, RefreshCw } from 'lucide-react';
+import { ASSETS } from '../constants/assets';
+import {
+  X, Users, ShoppingBag, Shield, Scroll, ArrowUp, RefreshCw } from 'lucide-react';
 import SectTaskModal from './SectTaskModal';
 import { showConfirm } from '../utils/toastUtils';
 
@@ -159,74 +161,88 @@ const SectModal: React.FC<Props> = ({
   // -- Selection View (Not in a sect) --
   if (!player.sectId) {
     return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div className="bg-paper-800 w-full max-w-4xl rounded border border-stone-600 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
-          <div className="p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 rounded-t">
-            <h3 className="text-xl font-serif text-mystic-gold flex items-center gap-2">
-              <Users size={20} /> Enlist with Factions
-            </h3>
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm font-mono">
+        <div className="bg-ink-950 w-full max-w-4xl rounded-none border border-stone-800 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden relative">
+          {/* 背景纹理 */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+          
+          {/* CRT 效果层 */}
+          <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+          <div className="crt-noise"></div>
+          <div className="crt-vignette"></div>
+
+          <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 rounded-none z-10">
+            <div className="flex items-center gap-3">
+              <h3 className="text-xl font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-2">
+                <Users size={20} /> Faction_Recruitment_Terminal
+              </h3>
+              <div className="hidden md:block px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] uppercase tracking-widest">Scanning_Factions...</div>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={handleRefresh}
-                className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded text-sm flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded-none text-xs flex items-center gap-1.5 transition-colors uppercase tracking-widest relative z-10"
                 title="Refresh Faction List"
               >
                 <RefreshCw size={16} />
-                <span className="hidden md:inline">Refresh</span>
+                <span className="hidden md:inline">[ RE-SCAN ]</span>
               </button>
               <button
                 onClick={onClose}
-                className="text-stone-400 hover:text-white"
+                className="text-stone-500 hover:text-white transition-colors relative z-10"
               >
                 <X size={24} />
               </button>
             </div>
           </div>
 
-          <div className="modal-scroll-container modal-scroll-content p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="modal-scroll-container modal-scroll-content p-6 grid grid-cols-1 md:grid-cols-3 gap-4 bg-ink-950/50 z-10">
             {availableSects.map((sect) => {
               const canJoin =
                 getRealmIndex(player.realm) >= getRealmIndex(sect.reqRealm);
               return (
                 <div
                   key={sect.id}
-                  className="bg-ink-800 border border-stone-700 p-4 rounded flex flex-col"
+                  className="bg-stone-900/40 border border-stone-800 p-4 rounded-none flex flex-col relative group overflow-hidden"
                 >
-                  <h4 className="text-xl font-serif font-bold text-stone-200 mb-2">
-                    {sect.name}
-                  </h4>
-                  <p className="text-stone-400 text-sm mb-4 flex-1">
-                    {sect.description}
-                  </p>
+                  <div className="absolute inset-0 bg-stone-800/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  <div className="relative z-10 flex flex-col h-full">
+                    <h4 className="text-lg font-bold text-emerald-400 mb-2 uppercase tracking-wider">
+                      {sect.name}
+                    </h4>
+                    <p className="text-stone-500 text-xs mb-4 flex-1 uppercase tracking-tighter leading-relaxed">
+                      {sect.description}
+                    </p>
 
-                  <div className="text-xs text-stone-500 mb-4">
-                    Minimum Requirement:{' '}
-                    <span
-                      className={canJoin ? 'text-stone-300' : 'text-red-400'}
+                    <div className="text-[10px] text-stone-600 mb-4 uppercase tracking-widest">
+                      MIN_NEURAL_LINK:{' '}
+                      <span
+                        className={canJoin ? 'text-stone-400' : 'text-red-900'}
+                      >
+                        {sect.reqRealm}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (canJoin) {
+                          onJoinSect(sect.id, sect.name, { exitCost: sect.exitCost });
+                        }
+                      }}
+                      disabled={!canJoin}
+                      className={`
+                        w-full py-2 rounded-none font-bold text-xs transition-colors border touch-manipulation uppercase tracking-widest relative z-10
+                        ${canJoin
+                          ? 'bg-stone-800 text-stone-300 border-stone-700 hover:bg-stone-700 active:bg-stone-600'
+                          : 'bg-stone-950 text-stone-800 border-stone-900 cursor-not-allowed'
+                        }
+                      `}
                     >
-                      {sect.reqRealm}
-                    </span>
+                      {canJoin ? '[ ENLIST_NOW ]' : '[ LINK_INSUFFICIENT ]'}
+                    </button>
                   </div>
-
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (canJoin) {
-                        onJoinSect(sect.id, sect.name, { exitCost: sect.exitCost });
-                      }
-                    }}
-                    disabled={!canJoin}
-                    className={`
-                      w-full py-2 rounded font-serif text-sm transition-colors border touch-manipulation
-                      ${canJoin
-                        ? 'bg-mystic-jade/20 text-mystic-jade border-mystic-jade hover:bg-mystic-jade/30 active:bg-mystic-jade/40'
-                        : 'bg-stone-800 text-stone-600 border-stone-700 cursor-not-allowed'
-                      }
-                    `}
-                  >
-                    {canJoin ? 'Enlist' : 'Rank Insufficient'}
-                  </button>
                 </div>
               );
             })}
@@ -257,25 +273,28 @@ const SectModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full h-[80vh] md:h-auto md:max-w-4xl md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-600 shadow-2xl flex flex-col md:h-[80vh]"
+        className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-4xl md:rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:h-[80vh] relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
         {/* Header */}
-        <div className="p-3 md:p-4 border-b border-stone-600 bg-ink-800 md:rounded-t flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className="text-xl md:text-2xl font-serif text-mystic-gold">
+        <div className="p-3 md:p-4 border-b border-stone-800 bg-stone-950 md:rounded-none flex justify-between items-start relative z-10">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="text-xl md:text-2xl font-bold text-emerald-500 uppercase tracking-wider">
                 {currentSect?.name}
               </h3>
-              <span className="text-[10px] md:text-xs px-2 py-0.5 rounded bg-stone-700 text-stone-300 border border-stone-600 flex items-center gap-1">
-                <Shield size={10} className="text-blue-400" />
+              <div className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] uppercase tracking-widest flex items-center gap-1">
+                <Shield size={10} className="text-emerald-500" />
                 {SECT_RANK_DATA[player.sectRank]?.title || player.sectRank}
-              </span>
+              </div>
             </div>
-            <div className="text-xs md:text-sm text-stone-400 flex gap-4">
+            <div className="text-[10px] md:text-xs text-stone-500 flex gap-4 uppercase tracking-tighter">
               <span>
-                Commendations:{' '}
-                <span className="text-white font-bold">
+                Commendations_Accumulated:{' '}
+                <span className="text-emerald-400 font-bold">
                   {player.sectContribution}
                 </span>
               </span>
@@ -285,16 +304,16 @@ const SectModal: React.FC<Props> = ({
             {activeTab === 'mission' && (
               <button
                 onClick={handleRefresh}
-                className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded text-sm flex items-center gap-1.5 transition-colors min-h-[44px] md:min-h-0 touch-manipulation"
+                className="px-3 py-1.5 bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded-none text-[10px] flex items-center gap-1.5 transition-colors min-h-[44px] md:min-h-0 touch-manipulation uppercase tracking-widest relative z-10"
                 title="Refresh Ops List"
               >
-                <RefreshCw size={16} />
-                <span className="hidden md:inline">Refresh</span>
+                <RefreshCw size={14} />
+                <span className="hidden md:inline">[ RE-SCAN_OPS ]</span>
               </button>
             )}
             <button
               onClick={onClose}
-              className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+              className="text-stone-500 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation transition-colors relative z-10"
             >
               <X size={24} />
             </button>
@@ -302,66 +321,67 @@ const SectModal: React.FC<Props> = ({
         </div>
 
         {/* Navigation */}
-        <div className="flex border-b border-stone-700 bg-ink-900">
+        <div className="flex border-b border-stone-800 bg-ink-950 relative z-10">
           <button
             onClick={() => setActiveTab('hall')}
-            className={`flex-1 py-3 text-sm font-serif transition-colors flex items-center justify-center gap-2 ${activeTab === 'hall' ? 'text-mystic-gold bg-paper-800 border-t-2 border-mystic-gold' : 'text-stone-500 hover:text-stone-300'}`}
+            className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 ${activeTab === 'hall' ? 'text-emerald-400 bg-stone-900/40 border-b-2 border-emerald-500' : 'text-stone-600 hover:text-stone-400 hover:bg-stone-900/20'}`}
           >
-            <Shield size={16} /> Headquarters
+            <Shield size={14} /> Headquarters
           </button>
           <button
             onClick={() => setActiveTab('mission')}
-            className={`flex-1 py-3 text-sm font-serif transition-colors flex items-center justify-center gap-2 ${activeTab === 'mission' ? 'text-mystic-gold bg-paper-800 border-t-2 border-mystic-gold' : 'text-stone-500 hover:text-stone-300'}`}
+            className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 ${activeTab === 'mission' ? 'text-emerald-400 bg-stone-900/40 border-b-2 border-emerald-500' : 'text-stone-600 hover:text-stone-400 hover:bg-stone-900/20'}`}
           >
-            <Scroll size={16} /> Ops Center
+            <Scroll size={14} /> Ops_Center
           </button>
           <button
             onClick={() => setActiveTab('shop')}
-            className={`flex-1 py-3 text-sm font-serif transition-colors flex items-center justify-center gap-2 ${activeTab === 'shop' ? 'text-mystic-gold bg-paper-800 border-t-2 border-mystic-gold' : 'text-stone-500 hover:text-stone-300'}`}
+            className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 ${activeTab === 'shop' ? 'text-emerald-400 bg-stone-900/40 border-b-2 border-emerald-500' : 'text-stone-600 hover:text-stone-400 hover:bg-stone-900/20'}`}
           >
-            <ShoppingBag size={16} /> Quartermaster
+            <ShoppingBag size={14} /> Quartermaster
           </button>
         </div>
 
         {/* Content */}
-        <div className="modal-scroll-container modal-scroll-content p-6 bg-paper-800 max-h-[68vh]">
+        <div className="modal-scroll-container modal-scroll-content p-6 bg-ink-950/50 max-h-[68vh] z-10">
           {/* Main Hall */}
           {activeTab === 'hall' && (
             <div className="space-y-6">
-              <div className="bg-ink-800 p-4 rounded border border-stone-700">
-                <h4 className="font-serif text-lg text-stone-200 mb-2 border-b border-stone-700 pb-2">
-                  Promotion
+              <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 relative overflow-hidden group">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                <h4 className="font-bold text-xs text-stone-400 mb-2 border-b border-stone-800 pb-2 uppercase tracking-widest relative z-10">
+                  Personnel_Promotion_Protocol
                 </h4>
                 {nextRank ? (
-                  <div>
-                    <p className="text-sm text-stone-400 mb-4">
-                      Next Rank:
-                      <span className="text-stone-200 font-bold ml-1">
+                  <div className="relative z-10">
+                    <p className="text-[10px] text-stone-500 mb-4 uppercase tracking-tighter">
+                      Next_Rank_Designation:
+                      <span className="text-emerald-400 font-bold ml-1">
                         {SECT_RANK_DATA[nextRank]?.title || nextRank}
                       </span>
                     </p>
-                    <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                      <div className="bg-ink-900 p-2 rounded">
-                        <span className="text-stone-500 block">Required Commendations</span>
+                    <div className="grid grid-cols-2 gap-4 text-[10px] mb-4 uppercase tracking-widest">
+                      <div className="bg-stone-950 p-2 border border-stone-800">
+                        <span className="text-stone-600 block mb-1">REQ_COMMENDATIONS</span>
                         <span
                           className={
                             player.sectContribution >=
                               (nextReq?.contribution || 0)
-                              ? 'text-mystic-jade'
-                              : 'text-red-400'
+                              ? 'text-emerald-400'
+                              : 'text-red-900'
                           }
                         >
                           {player.sectContribution} / {nextReq?.contribution}
                         </span>
                       </div>
-                      <div className="bg-ink-900 p-2 rounded">
-                        <span className="text-stone-500 block">Required Rank</span>
+                      <div className="bg-stone-950 p-2 border border-stone-800">
+                        <span className="text-stone-600 block mb-1">REQ_NEURAL_LINK</span>
                         <span
                           className={
                             getRealmIndex(player.realm) >=
                               (nextReq?.realmIndex || 0)
-                              ? 'text-mystic-jade'
-                              : 'text-red-400'
+                              ? 'text-emerald-400'
+                              : 'text-red-900'
                           }
                         >
                           {Object.values(RealmType)[nextReq?.realmIndex || 0]}
@@ -371,7 +391,6 @@ const SectModal: React.FC<Props> = ({
                     <button
                       onClick={() => {
                         if (!canPromote) return;
-                        // 如果是晋升到宗主，弹出确认对话框
                         if (nextRank === SectRank.Leader) {
                           showConfirm(
                             'Leading this faction requires challenging the current Overseer in the wastes.\n\nDefeat will result in lost commendations and health. Confirm challenge?',
@@ -381,95 +400,95 @@ const SectModal: React.FC<Props> = ({
                             }
                           );
                         } else {
-                          // 其他等级直接晋升
                           onPromote();
                         }
                       }}
                       disabled={!canPromote}
                       className={`
-                         w-full py-2 rounded font-serif text-sm transition-colors flex items-center justify-center gap-2
+                         w-full py-2 rounded-none font-bold text-xs transition-colors flex items-center justify-center gap-2 border uppercase tracking-widest relative z-10
                          ${canPromote
-                          ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold hover:bg-mystic-gold/30'
-                          : 'bg-stone-800 text-stone-600 border border-stone-700 cursor-not-allowed'
+                          ? 'bg-stone-800 text-stone-300 border-stone-700 hover:bg-stone-700'
+                          : 'bg-stone-950 text-stone-800 border-stone-900 cursor-not-allowed'
                         }
                        `}
                     >
-                      <ArrowUp size={16} /> Request Promotion
+                      <ArrowUp size={16} /> [ EXECUTE_PROMOTION ]
                     </button>
                   </div>
                 ) : (
-                  <div>
+                  <div className="relative z-10">
                     {player.sectRank === SectRank.Elder && (
-                      <div className="mt-4 pt-4 border-t border-stone-700">
-                        <p className="text-sm text-stone-400 mb-2 text-center">
-                          You are an Officer. Do you have the ambition to challenge the current Overseer?
+                      <div className="mt-4 pt-4 border-t border-stone-800">
+                        <p className="text-[10px] text-stone-600 mb-2 text-center uppercase tracking-tighter">
+                          AMBITION_DETECTED. CHALLENGE_OVERSEER?
                         </p>
                         <button
                           onClick={onChallengeLeader}
-                          className="w-full py-3 bg-red-900/30 text-red-400 border border-red-900 hover:bg-red-900/50 rounded font-serif text-base transition-all animate-pulse"
+                          className="w-full py-3 bg-red-950/20 text-red-700 border border-red-900/50 hover:bg-red-950/40 rounded-none font-bold text-sm transition-all animate-pulse uppercase tracking-[0.2em] relative z-10"
                         >
-                          🔥 CHALLENGE OVERSEER 🔥
+                          [ 🔥 CHALLENGE_OVERSEER 🔥 ]
                         </button>
                       </div>
                     )}
-                    <p className="text-mystic-gold text-center py-4">
+                    <p className="text-emerald-500/60 text-center py-4 text-xs uppercase tracking-widest relative z-10">
                       {player.sectRank === SectRank.Leader ? (
                         <div className="space-y-4">
-                          <p>You have become the Overseer, commander of all.</p>
-                          <div className="bg-mystic-gold/10 p-4 rounded border border-mystic-gold/30">
-                            <h5 className="text-mystic-gold font-bold mb-2">Overseer Privileges</h5>
-                            <ul className="text-xs text-stone-400 text-left space-y-1 list-disc list-inside">
-                              <li>Quartermaster exchanges enjoy a <span className="text-mystic-gold">50% discount</span></li>
-                              <li>Further faction management functions will be unlocked later...</li>
+                          <p>OVERSEER_STATUS: ACTIVE. COMMAND_CONFIRMED.</p>
+                          <div className="bg-emerald-500/5 p-4 border border-emerald-500/20">
+                            <h5 className="text-emerald-500 font-bold mb-2 text-[10px] tracking-[0.2em]">OVERSEER_PRIVILEGES</h5>
+                            <ul className="text-[9px] text-stone-600 text-left space-y-1 uppercase tracking-tighter">
+                              <li>• QUARTERMASTER_DISCOUNT: <span className="text-emerald-400">50%_REDUCTION</span></li>
+                              <li>• ADDITIONAL_PROTOCOLS: <span className="text-emerald-500/40">LOCKED_BY_ENCRYPT_ID</span></li>
                             </ul>
                           </div>
                         </div>
-                      ) : 'You are a vital pillar of the community.'}
+                      ) : 'FACTION_PILLAR_STATUS_CONFIRMED.'}
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="bg-ink-800 p-4 rounded border border-stone-700">
-                <h4 className="font-serif text-lg text-stone-200 mb-2 border-b border-stone-700 pb-2">
-                  Discharge
+              <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 relative overflow-hidden group">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                <h4 className="font-bold text-xs text-stone-400 mb-2 border-b border-stone-800 pb-2 uppercase tracking-widest relative z-10">
+                  Personnel_Discharge_Protocol
                 </h4>
-                <p className="text-sm text-stone-500 mb-4">
-                  Leaving the faction will reset all commendations. You can choose Honorable Discharge (pay a fee) or simply Desert (become a target).
+                <p className="text-[10px] text-stone-600 mb-4 uppercase tracking-tighter leading-relaxed relative z-10">
+                  TERMINATING_FACTION_STATUS_WILL_WIPE_COMMENDATIONS. SELECT_PROTOCOL:
                 </p>
                 {currentSect && currentSect.exitCost ? (
-                  <div className="mb-4 p-3 bg-ink-900 rounded border border-stone-600">
-                    <p className="text-xs text-stone-400 mb-2">Honorable Discharge Cost:</p>
-                    <div className="text-xs text-stone-300 space-y-1">
+                  <div className="mb-4 p-3 bg-stone-950 border border-stone-800 relative z-10">
+                    <p className="text-[9px] text-stone-600 mb-2 uppercase tracking-widest">Honorable_Discharge_Fee:</p>
+                    <div className="text-[10px] text-stone-400 space-y-1 uppercase tracking-tighter">
                       {currentSect.exitCost.spiritStones && (
-                        <div>Caps: {currentSect.exitCost.spiritStones}</div>
+                        <div>• CAPS: {currentSect.exitCost.spiritStones}</div>
                       )}
                       {currentSect.exitCost.items && Array.isArray(currentSect.exitCost.items) && currentSect.exitCost.items.map((item, idx) => (
-                        <div key={idx}>{item.name} x{item.quantity}</div>
+                        <div key={idx}>• {item.name.toUpperCase()} x{item.quantity}</div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-4 p-3 bg-ink-900 rounded border border-stone-600">
-                    <p className="text-xs text-stone-400 mb-2">Honorable Discharge Cost:</p>
-                    <div className="text-xs text-stone-300 space-y-1">
-                      <div>Caps: 300</div>
-                      <div>Mutant Weed x5</div>
+                  <div className="mb-4 p-3 bg-stone-950 border border-stone-800 relative z-10">
+                    <p className="text-[9px] text-stone-600 mb-2 uppercase tracking-widest">Standard_Discharge_Fee:</p>
+                    <div className="text-[10px] text-stone-400 space-y-1 uppercase tracking-tighter">
+                      <div>• CAPS: 300</div>
+                      <div>• MUTANT_WEED x5</div>
                     </div>
                   </div>
                 )}
-                <div className="flex gap-2">
+                <div className="flex gap-2 relative z-10">
                   <button
                     onClick={onSafeLeaveSect}
-                    className="flex-1 px-4 py-2 border border-yellow-900 text-yellow-400 hover:bg-yellow-900/20 rounded text-sm transition-colors"
+                    className="flex-1 px-4 py-2 border border-emerald-900/50 text-emerald-500/80 hover:bg-emerald-900/20 rounded-none text-[10px] uppercase tracking-widest transition-colors font-bold"
                   >
-                    Honorable Discharge
+                    [ HONORABLE_DISCHARGE ]
                   </button>
                   <button
                     onClick={onLeaveSect}
-                    className="flex-1 px-4 py-2 border border-red-900 text-red-400 hover:bg-red-900/20 rounded text-sm transition-colors"
+                    className="flex-1 px-4 py-2 border border-red-900/50 text-red-500/80 hover:bg-red-900/20 rounded-none text-[10px] uppercase tracking-widest transition-colors font-bold"
                   >
-                    Desert Faction
+                    [ DESERT_FACTION ]
                   </button>
                 </div>
               </div>
@@ -479,36 +498,36 @@ const SectModal: React.FC<Props> = ({
           {/* Mission Hall */}
           {activeTab === 'mission' && (
             <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-4 flex-shrink-0 flex-wrap gap-2">
-                <h4 className="font-serif text-lg text-stone-200">Operations List</h4>
+              <div className="flex justify-between items-center mb-4 flex-shrink-0 flex-wrap gap-2 relative z-10">
+                <h4 className="font-bold text-sm text-emerald-500 uppercase tracking-widest">OPERATIONS_CENTER_V2.0</h4>
                 <div className="flex items-center gap-2">
                   <select
                     value={realmFilter}
                     onChange={(e) => setRealmFilter(e.target.value as RealmType | 'all')}
-                    className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded text-sm transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-stone-900 text-emerald-500 border border-stone-800 rounded-none text-[10px] uppercase tracking-widest transition-colors cursor-pointer outline-none focus:border-emerald-500/50"
                     title="Filter Ops by Rank"
                   >
-                    <option value="all">All Ranks</option>
+                    <option value="all">[ ALL_RANKS ]</option>
                     {REALM_ORDER.map((realm) => (
                       <option key={realm} value={realm}>
-                        {realm}
+                        [ {realm.toUpperCase()} ]
                       </option>
                     ))}
                   </select>
                   <button
                     onClick={handleRefresh}
-                    className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded text-sm flex items-center gap-1.5 transition-colors"
+                    className="px-3 py-1.5 bg-stone-900 hover:bg-stone-800 text-emerald-500 border border-stone-800 rounded-none text-[10px] flex items-center gap-1.5 transition-colors uppercase tracking-widest"
                     title="Refresh Ops List"
                   >
-                    <RefreshCw size={16} />
-                    <span>Refresh</span>
+                    <RefreshCw size={14} />
+                    <span>[ REFRESH ]</span>
                   </button>
                 </div>
               </div>
               <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
                 {filteredTasks.length === 0 ? (
-                  <div className="col-span-full text-center text-stone-500 py-10 font-serif">
-                    No operations matching current filters
+                  <div className="col-span-full text-center text-stone-600 py-10 uppercase tracking-widest text-[10px]">
+                    NO_OPERATIONS_AVAILABLE_FOR_CURRENT_PARAMETERS
                   </div>
                 ) : (
                   filteredTasks.map((task) => {
@@ -521,14 +540,14 @@ const SectModal: React.FC<Props> = ({
                         const realmIndex = REALM_ORDER.indexOf(player.realm);
                         const minRealmIndex = REALM_ORDER.indexOf(task.minRealm);
                         if (realmIndex < minRealmIndex) {
-                          reasons.push('Rank Insufficient');
+                          reasons.push('RANK_INSUFFICIENT');
                         }
                       }
                       if (
                         task.cost?.spiritStones &&
                         player.spiritStones < task.cost.spiritStones
                       ) {
-                        reasons.push('Caps Insufficient');
+                        reasons.push('CAPS_INSUFFICIENT');
                       }
                       if (task.cost?.items && Array.isArray(player.inventory)) {
                         for (const itemReq of task.cost.items) {
@@ -536,7 +555,7 @@ const SectModal: React.FC<Props> = ({
                             (i) => i.name === itemReq.name
                           );
                           if (!item || item.quantity < itemReq.quantity) {
-                            reasons.push(`Missing ${itemReq.name}`);
+                            reasons.push(`MISSING_${itemReq.name.toUpperCase().replace(/\s+/g, '_')}`);
                             break;
                           }
                         }
@@ -550,36 +569,36 @@ const SectModal: React.FC<Props> = ({
                         const dailyTaskCount = player.dailyTaskCount || {};
                         const currentCount = dailyTaskCount[task.id] || 0;
                         if (currentCount >= TASK_DAILY_LIMIT) {
-                          reasons.push(`Today's completion limit (${TASK_DAILY_LIMIT}) reached`);
+                          reasons.push(`DAILY_LIMIT_REACHED_${TASK_DAILY_LIMIT}`);
                         }
                       }
                       return {
                         canComplete: reasons.length === 0,
-                        reasons: reasons.join('、'),
+                        reasons: reasons.join(' / '),
                       };
                     })();
 
                     const timeCostText = {
-                      instant: 'Instant',
-                      short: 'Short',
-                      medium: 'Medium',
-                      long: 'Long',
+                      instant: 'INSTANT',
+                      short: 'SHORT',
+                      medium: 'MEDIUM',
+                      long: 'LONG',
                     }[task.timeCost];
 
                     // Op quality color config
                     const qualityColors = {
-                      普通: 'text-stone-400 border-stone-600 bg-stone-900/20',
-                      稀有: 'text-blue-400 border-blue-600 bg-blue-900/20',
-                      传说: 'text-purple-400 border-purple-600 bg-purple-900/20',
-                      仙品: 'text-yellow-400 border-yellow-600 bg-yellow-900/20',
+                      普通: 'text-stone-400 border-stone-800 bg-stone-900/40',
+                      稀有: 'text-blue-400 border-blue-900/30 bg-blue-900/10',
+                      传说: 'text-purple-400 border-purple-900/30 bg-purple-900/10',
+                      仙品: 'text-yellow-400 border-yellow-900/30 bg-yellow-900/10',
                     };
 
                     // Difficulty color config
                     const difficultyColors = {
-                      简单: 'text-green-400',
-                      普通: 'text-blue-400',
-                      困难: 'text-orange-400',
-                      极难: 'text-red-400',
+                      简单: 'text-green-500',
+                      普通: 'text-blue-500',
+                      困难: 'text-orange-500',
+                      极难: 'text-red-500',
                     };
 
                     // Check rank requirement
@@ -590,154 +609,90 @@ const SectModal: React.FC<Props> = ({
                     return (
                       <div
                         key={task.id}
-                        className={`bg-ink-800 p-4 rounded border flex flex-col ${task.quality === '仙品'
-                          ? 'border-yellow-600/50 shadow-lg shadow-yellow-900/20'
+                        className={`bg-stone-900/40 p-4 rounded-none border relative overflow-hidden flex flex-col group ${task.quality === '仙品'
+                          ? 'border-yellow-600/30'
                           : task.quality === '传说'
-                            ? 'border-purple-600/50 shadow-md shadow-purple-900/10'
-                            : 'border-stone-700'
+                            ? 'border-purple-600/30'
+                            : 'border-stone-800'
                           }`}
                       >
-                        <div className="flex items-start justify-between mb-1">
-                          <h4 className="font-serif font-bold text-stone-200 flex-1">
-                            {task.name}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                        <div className="flex items-start justify-between mb-2 relative z-10">
+                          <h4 className="font-bold text-stone-300 flex-1 uppercase tracking-wider text-xs">
+                            {task.name.replace(/\s+/g, '_')}
                             {task.isDailySpecial && (
-                              <span className="text-xs text-yellow-400 ml-2 animate-pulse">
-                                ⭐ Daily Special
+                              <span className="text-[9px] text-yellow-500 ml-2 animate-pulse">
+                                [ DAILY_SPECIAL ]
                               </span>
                             )}
                           </h4>
                           {task.quality && (
-                            <span className={`text-xs px-2 py-0.5 rounded border ${qualityColors[task.quality]}`}>
-                              {task.quality === '仙品' ? 'Legendary' : task.quality === '传说' ? 'Epic' : task.quality === '稀有' ? 'Rare' : 'Common'}
+                            <span className={`text-[9px] px-1.5 py-0.5 border rounded-none uppercase tracking-widest font-bold ${qualityColors[task.quality]}`}>
+                              {task.quality === '仙品' ? 'LEGENDARY' : task.quality === '传说' ? 'EPIC' : task.quality === '稀有' ? 'RARE' : 'COMMON'}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-stone-500 mb-3 flex-1">
+                        <p className="text-[10px] text-stone-500 mb-4 flex-1 uppercase tracking-tighter leading-relaxed relative z-10">
                           {task.description}
                         </p>
 
                         {/* 任务标签 */}
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <span className={`text-xs px-2 py-0.5 rounded border ${difficultyColors[task.difficulty]} bg-stone-900/30 border-stone-600`}>
-                            Diff: {task.difficulty === '简单' ? 'Easy' : task.difficulty === '普通' ? 'Normal' : task.difficulty === '困难' ? 'Hard' : 'Extreme'}
+                        <div className="flex flex-wrap gap-2 mb-4 relative z-10">
+                          <span className={`text-[9px] px-1.5 py-0.5 border border-stone-800 bg-stone-950/50 uppercase tracking-widest ${difficultyColors[task.difficulty]}`}>
+                            DIFF: {task.difficulty === '简单' ? 'EASY' : task.difficulty === '普通' ? 'NORMAL' : task.difficulty === '困难' ? 'HARD' : 'EXTREME'}
                           </span>
                           {task.minRealm && (
-                            <span className={`text-xs px-2 py-0.5 rounded border ${meetsRealmRequirement
-                              ? 'text-green-400 border-green-600 bg-green-900/20'
-                              : 'text-red-400 border-red-600 bg-red-900/20'
+                            <span className={`text-[9px] px-1.5 py-0.5 border uppercase tracking-widest ${meetsRealmRequirement
+                              ? 'text-emerald-500 border-emerald-900/30 bg-emerald-900/10'
+                              : 'text-red-500 border-red-900/30 bg-red-900/10'
                               }`}>
-                              Rank: {task.minRealm}
-                              {!meetsRealmRequirement && ' (Low)'}
+                              RANK: {task.minRealm.toUpperCase()}
+                              {!meetsRealmRequirement && ' [INSUFFICIENT]'}
                             </span>
                           )}
                         </div>
 
-                        <div className="space-y-2 mb-4">
+                        <div className="space-y-1.5 mb-4 p-2 bg-stone-950/50 border border-stone-800/50 relative z-10">
                           {task.cost && (
-                            <div className="text-xs text-red-400">
-                              Cost:{' '}
+                            <div className="text-[9px] text-red-400 uppercase tracking-widest flex flex-wrap gap-x-2">
+                              <span className="text-red-900">COST:</span>
                               {task.cost.spiritStones && (
-                                <span>{task.cost.spiritStones} Caps</span>
+                                <span>{task.cost.spiritStones} CAPS</span>
                               )}
                               {task.cost.items &&
                                 task.cost.items && Array.isArray(task.cost.items) && task.cost.items.map((item, idx) => (
                                   <span key={idx}>
-                                    {idx > 0 && '、'}
-                                    {item.quantity} {item.name}
+                                    {item.quantity} {item.name.toUpperCase().replace(/\s+/g, '_')}
                                   </span>
                                 ))}
                             </div>
                           )}
-                          <div className="text-xs text-stone-400">
-                            Reward:{' '}
-                            <span className="text-mystic-gold">
-                              {task.reward.contribution} Commends
+                          <div className="text-[9px] text-stone-400 uppercase tracking-widest flex flex-wrap gap-x-2">
+                            <span className="text-stone-700">REWARD:</span>
+                            <span className="text-emerald-600">
+                              {task.reward.contribution} COMMENDS
                             </span>
                             {task.reward.exp && (
-                              <span>、{task.reward.exp} Data</span>
+                              <span className="text-blue-600">{task.reward.exp} DATA</span>
                             )}
                             {task.reward.spiritStones && (
-                              <span>、{task.reward.spiritStones} Caps</span>
+                              <span className="text-yellow-600">{task.reward.spiritStones} CAPS</span>
                             )}
-                            {task.reward.items &&
-                              task.reward.items.map((item, idx) => (
-                                <span key={idx}>
-                                  {idx === 0 && '、'}
-                                  {item.quantity} {item.name}
-                                </span>
-                              ))}
                           </div>
-                          <div className="text-xs text-stone-500">
-                            Time: {timeCostText}
+                          <div className="text-[9px] text-stone-600 uppercase tracking-widest">
+                            TIME: {timeCostText}
                           </div>
-                          {task.successRate && (
-                            <div className="text-xs text-yellow-400">
-                              Perfect Success Probability: {task.successRate}%
-                            </div>
-                          )}
-                          {task.completionBonus && (
-                            <div className="text-xs text-purple-400">
-                              Extra rewards for perfect execution
-                            </div>
-                          )}
-                          {task.typeBonus && player.lastCompletedTaskType === task.type && (
-                            <div className="text-xs text-green-400 font-bold">
-                              ⚡ Consecutive Op Bonus: +{task.typeBonus}%
-                            </div>
-                          )}
-                          {task.recommendedFor && (() => {
-                            const recommendations: string[] = [];
-                            if (task.recommendedFor.highAttack && player.attack > 50) {
-                              recommendations.push('High FP');
-                            }
-                            if (task.recommendedFor.highDefense && player.defense > 50) {
-                              recommendations.push('High DR');
-                            }
-                            if (task.recommendedFor.highSpirit && player.spirit > 50) {
-                              recommendations.push('High PER');
-                            }
-                            if (task.recommendedFor.highSpeed && player.speed > 50) {
-                              recommendations.push('High AGI');
-                            }
-                            return recommendations.length > 0 ? (
-                              <div className="text-xs text-blue-400">
-                                💡 Rec: {recommendations.join(', ')}
-                              </div>
-                            ) : null;
-                          })()}
-                          {(() => {
-                            const today = new Date().toISOString().split('T')[0];
-                            const lastReset = player.lastTaskResetDate || today;
-                            const TASK_DAILY_LIMIT = 3; // Max 3 times per op per day
-
-                            if (lastReset === today) {
-                              const dailyTaskCount = player.dailyTaskCount || {};
-                              const currentCount = dailyTaskCount[task.id] || 0;
-                              return (
-                                <div className="text-xs text-stone-500">
-                                  Today's Completions: {currentCount} / {TASK_DAILY_LIMIT}
-                                </div>
-                              );
-                            }
-                            return null;
-                          })()}
                         </div>
 
                         <button
-                          onClick={() => {
-                            if (!taskStatus.canComplete && taskStatus.reasons) {
-                              // If incomplete, show tooltip but allow click for details
-                              // Actual check performed on op execution
-                            }
-                            setSelectedTask(task);
-                          }}
-                          className={`w-full py-2 rounded text-sm ${!taskStatus.canComplete
-                            ? 'bg-stone-800 text-stone-400 border border-stone-600 hover:bg-stone-700'
-                            : 'bg-stone-700 hover:bg-stone-600 text-stone-200'
+                          onClick={() => setSelectedTask(task)}
+                          className={`w-full py-2 rounded-none text-[10px] font-bold uppercase tracking-widest transition-colors relative z-10 ${!taskStatus.canComplete
+                            ? 'bg-stone-900 text-stone-600 border border-stone-800 cursor-not-allowed'
+                            : 'bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border border-emerald-800/50'
                             }`}
-                          title={!taskStatus.canComplete ? `Requirement Not Met: ${taskStatus.reasons}` : ''}
+                          title={!taskStatus.canComplete ? `SYSTEM_ERROR: ${taskStatus.reasons}` : ''}
                         >
-                          {!taskStatus.canComplete ? `Incomplete (${taskStatus.reasons})` : 'Accept Op'}
+                          {!taskStatus.canComplete ? '[ INCOMPLETE ]' : '[ ACCEPT_OPERATION ]'}
                         </button>
                       </div>
                     );
@@ -749,144 +704,149 @@ const SectModal: React.FC<Props> = ({
 
           {/* Treasure Pavilion */}
           {activeTab === 'shop' && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center mb-4">
+            <div className="space-y-4 relative z-10">
+              <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h4 className="font-serif text-lg text-stone-200">Quartermaster</h4>
-                  <div className="text-xs text-stone-400 mt-1 flex items-center gap-2">
+                  <h4 className="font-bold text-sm text-emerald-500 uppercase tracking-widest">QUARTERMASTER_V4.2</h4>
+                  <div className="text-[10px] text-stone-500 mt-2 flex items-center gap-2">
                     <button
                       onClick={() => setShopFloor(1)}
-                      className={`px-2 py-1 rounded text-xs ${shopFloor === 1 ? 'bg-stone-700 text-stone-200' : 'bg-stone-800 text-stone-500'}`}
+                      className={`px-2 py-1 rounded-none border text-[9px] uppercase tracking-widest transition-colors ${shopFloor === 1 ? 'bg-emerald-900/20 text-emerald-500 border-emerald-800/50' : 'bg-stone-900 text-stone-600 border-stone-800 hover:text-stone-400'}`}
                     >
-                      Level 1
+                      [ LEVEL_01 ]
                     </button>
                     <button
                       onClick={() => player.sectContribution >= 5000 && setShopFloor(2)}
                       disabled={player.sectContribution < 5000}
-                      className={`px-2 py-1 rounded text-xs ${shopFloor === 2 ? 'bg-stone-700 text-stone-200' : 'bg-stone-800 text-stone-500'} ${player.sectContribution < 5000 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`px-2 py-1 rounded-none border text-[9px] uppercase tracking-widest transition-colors ${shopFloor === 2 ? 'bg-emerald-900/20 text-emerald-500 border-emerald-800/50' : 'bg-stone-900 text-stone-600 border-stone-800'} ${player.sectContribution < 5000 ? 'opacity-30 cursor-not-allowed' : 'hover:text-stone-400'}`}
                     >
-                      Level 2 {player.sectContribution >= 5000 ? '✓' : '(Requires 5000 Commendations)'}
+                      [ LEVEL_02 {player.sectContribution >= 5000 ? '[ ACCESS_GRANTED ]' : '[ ACCESS_DENIED_5000_COMMENDS ]'} ]
                     </button>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   {shopRefreshCooldown > 0 ? (
-                    <span className="text-xs text-stone-400">
-                      {Math.floor(shopRefreshCooldown / 60)}:{(shopRefreshCooldown % 60).toString().padStart(2, '0')} until restock
+                    <span className="text-[9px] text-stone-600 uppercase tracking-widest">
+                      {Math.floor(shopRefreshCooldown / 60)}:{(shopRefreshCooldown % 60).toString().padStart(2, '0')} UNTIL_RESTOCK
                     </span>
                   ) : (
-                    <span className="text-xs text-green-400">Restock Available</span>
+                    <span className="text-[9px] text-emerald-600 uppercase tracking-widest animate-pulse">RESTOCK_AVAILABLE</span>
                   )}
                   <button
                     onClick={handleShopRefresh}
                     disabled={shopRefreshCooldown > 0}
-                    className={`px-3 py-1.5 rounded text-sm border flex items-center gap-1.5 transition-colors ${shopRefreshCooldown > 0
-                      ? 'bg-stone-800 text-stone-600 border-stone-700 cursor-not-allowed'
-                      : 'bg-blue-700 hover:bg-blue-600 text-stone-200 border-blue-600'
+                    className={`px-3 py-1.5 rounded-none text-[10px] border flex items-center gap-1.5 transition-colors uppercase tracking-widest font-bold ${shopRefreshCooldown > 0
+                      ? 'bg-stone-900 text-stone-700 border-stone-800 cursor-not-allowed'
+                      : 'bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border-emerald-800/50'
                       }`}
-                    title={shopRefreshCooldown > 0 ? `Wait ${Math.floor(shopRefreshCooldown / 60)}m ${shopRefreshCooldown % 60}s` : 'Refresh Quartermaster (5min CD)'}
+                    title={shopRefreshCooldown > 0 ? `WAIT ${Math.floor(shopRefreshCooldown / 60)}M ${shopRefreshCooldown % 60}S` : 'RESTOCK_QUARTERMASTER_5MIN_CD'}
                   >
-                    <RefreshCw size={16} />
-                    <span>Restock</span>
+                    <RefreshCw size={14} />
+                    <span>[ RESTOCK ]</span>
                   </button>
                 </div>
               </div>
-              {(shopFloor === 1 ? sectShopItems : sectShopItemsFloor2).map((item, idx) => {
-                const quantity = buyQuantities[idx] || 1;
-                // Overseer enjoys 50% discount
-                const baseCost = player.sectRank === SectRank.Leader ? Math.ceil(item.cost * 0.5) : item.cost;
-                const totalCost = baseCost * quantity;
-                const canBuy = player.sectContribution >= totalCost;
+              <div className="space-y-3">
+                {(shopFloor === 1 ? sectShopItems : sectShopItemsFloor2).map((item, idx) => {
+                  const quantity = buyQuantities[idx] || 1;
+                  // Overseer enjoys 50% discount
+                  const baseCost = player.sectRank === SectRank.Leader ? Math.ceil(item.cost * 0.5) : item.cost;
+                  const totalCost = baseCost * quantity;
+                  const canBuy = player.sectContribution >= totalCost;
 
-                return (
-                  <div
-                    key={idx}
-                    className="bg-ink-800 p-3 rounded border border-stone-700 flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-stone-200">
-                        {item.name}
-                        {player.sectRank === SectRank.Leader && (
-                          <span className="text-[10px] ml-2 px-1 bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/30 rounded">
-                            Overseer Perk: 50% Off
-                          </span>
-                        )}
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-stone-900/40 p-3 rounded-none border border-stone-800 relative overflow-hidden flex items-center justify-between group"
+                    >
+                      <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                      <div className="relative z-10 flex-1">
+                        <div className="font-bold text-stone-300 uppercase tracking-wider text-xs flex items-center gap-2">
+                          {item.name.replace(/\s+/g, '_')}
+                          {player.sectRank === SectRank.Leader && (
+                            <span className="text-[8px] px-1 bg-yellow-900/20 text-yellow-500 border border-yellow-900/50 rounded-none">
+                              OVERSEER_PERK: 50% OFF
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-stone-600 mt-1 uppercase tracking-tighter max-w-md">
+                          {item.item.description}
+                        </div>
                       </div>
-                      <div className="text-xs text-stone-500">
-                        {item.item.description}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-mystic-gold font-bold">
-                        {baseCost} Commends
-                        {quantity > 1 && (
-                          <span className="text-xs text-stone-400 ml-1">
-                            x{quantity} = {totalCost}
-                          </span>
-                        )}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 border border-stone-600 rounded">
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className="text-right">
+                          <div className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
+                            {baseCost} COMMENDS
+                          </div>
+                          {quantity > 1 && (
+                            <div className="text-[8px] text-stone-600 uppercase tracking-widest">
+                              TOTAL: {totalCost}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center border border-stone-800 bg-stone-950">
+                            <button
+                              onClick={() =>
+                                setBuyQuantities((prev) => ({
+                                  ...prev,
+                                  [idx]: Math.max(1, (prev[idx] || 1) - 1),
+                                }))
+                              }
+                              className="px-2 py-1 text-stone-600 hover:text-emerald-500 transition-colors"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              min="1"
+                              value={quantity}
+                              onChange={(e) => {
+                                const val = Math.max(
+                                  1,
+                                  parseInt(e.target.value) || 1
+                                );
+                                setBuyQuantities((prev) => ({
+                                  ...prev,
+                                  [idx]: val,
+                                }));
+                              }}
+                              className="w-10 text-center bg-transparent text-emerald-500 border-0 focus:outline-none text-[10px] font-bold"
+                            />
+                            <button
+                              onClick={() =>
+                                setBuyQuantities((prev) => ({
+                                  ...prev,
+                                  [idx]: (prev[idx] || 1) + 1,
+                                }))
+                              }
+                              className="px-2 py-1 text-stone-600 hover:text-emerald-500 transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
                           <button
-                            onClick={() =>
-                              setBuyQuantities((prev) => ({
-                                ...prev,
-                                [idx]: Math.max(1, (prev[idx] || 1) - 1),
-                              }))
-                            }
-                            className="px-2 py-1 text-stone-400 hover:text-white"
-                          >
-                            -
-                          </button>
-                          <input
-                            type="number"
-                            min="1"
-                            value={quantity}
-                            onChange={(e) => {
-                              const val = Math.max(
-                                1,
-                                parseInt(e.target.value) || 1
-                              );
-                              setBuyQuantities((prev) => ({
-                                ...prev,
-                                [idx]: val,
-                              }));
+                            onClick={() => {
+                              onBuy(item.item, baseCost, quantity);
+                              setBuyQuantities((prev) => ({ ...prev, [idx]: 1 }));
                             }}
-                            className="w-12 text-center bg-transparent text-stone-200 border-0 focus:outline-none"
-                          />
-                          <button
-                            onClick={() =>
-                              setBuyQuantities((prev) => ({
-                                ...prev,
-                                [idx]: (prev[idx] || 1) + 1,
-                              }))
-                            }
-                            className="px-2 py-1 text-stone-400 hover:text-white"
+                            disabled={!canBuy}
+                            className={`
+                              px-3 py-1.5 rounded-none text-[10px] border font-bold uppercase tracking-widest transition-colors
+                              ${canBuy
+                                ? 'bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-500 border-emerald-800/50'
+                                : 'bg-stone-900 text-stone-700 border-stone-800 cursor-not-allowed'
+                              }
+                            `}
                           >
-                            +
+                            [ EXCHANGE ]
                           </button>
                         </div>
-                        <button
-                          onClick={() => {
-                            onBuy(item.item, baseCost, quantity);
-                            setBuyQuantities((prev) => ({ ...prev, [idx]: 1 }));
-                          }}
-                          disabled={!canBuy}
-                          className={`
-                            px-3 py-1.5 rounded text-xs border
-                            ${canBuy
-                              ? 'bg-stone-700 hover:bg-stone-600 text-stone-200 border-stone-600'
-                              : 'bg-stone-900 text-stone-600 border-stone-800 cursor-not-allowed'
-                            }
-                          `}
-                        >
-                          Exchange
-                        </button>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

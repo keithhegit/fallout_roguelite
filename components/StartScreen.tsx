@@ -168,143 +168,160 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
     const baseColor = getRarityTextColor(rarity as ItemRarity);
     switch (rarity) {
       case '稀有':
-        return `${baseColor} border-blue-500`;
+        return `${baseColor} border-blue-500/50`;
       case '传说':
-        return `${baseColor} border-purple-500`;
+        return `${baseColor} border-purple-500/50`;
       case '仙品':
-        return `${baseColor} border-yellow-500`;
+        return `${baseColor} border-emerald-500/50`;
       default:
-        return `${baseColor} border-stone-500`;
+        return `${baseColor} border-stone-800`;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 flex items-center justify-center z-50 p-4 overflow-y-auto touch-manipulation">
-      <div className="bg-paper-800 border-2 border-mystic-gold rounded-lg p-4 md:p-8 max-w-2xl w-full shadow-2xl my-auto">
-        <div className="text-center mb-4 md:mb-8">
-          <h1 className="text-2xl md:text-4xl font-serif font-bold text-mystic-gold tracking-widest mb-2">
-            Wasteland Survivor
+    <div className="fixed inset-0 bg-ink-950 flex items-center justify-center z-50 p-4 overflow-y-auto touch-manipulation crt-screen">
+      {/* 背景纹理层 */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+        style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+      />
+
+      {/* CRT Visual Layers */}
+      <div className="crt-noise opacity-[0.02]"></div>
+      <div className="crt-vignette"></div>
+      <div className="scanline-overlay opacity-[0.04]"></div>
+
+      <div className="bg-ink-950/90 border-2 border-stone-800 rounded-none p-6 md:p-10 max-w-2xl w-full shadow-[0_0_30px_rgba(0,0,0,0.5)] my-auto relative z-30 backdrop-blur-md overflow-hidden">
+        {/* 内置背景纹理 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.02] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+
+        <div className="text-center mb-8 relative z-10">
+          <h1 className="text-2xl md:text-4xl font-mono font-bold text-emerald-500 tracking-[0.3em] mb-3 uppercase">
+            [ USER_REGISTRATION ]
           </h1>
-          <p className="text-stone-400 text-sm md:text-lg">Embark on your journey of survival</p>
+          <div className="flex items-center justify-center gap-4">
+            <div className="h-[1px] w-8 bg-emerald-500/20"></div>
+            <p className="text-stone-500 text-[10px] md:text-xs font-mono tracking-[0.4em] uppercase">Vault-Tec Personnel Entry</p>
+            <div className="h-[1px] w-8 bg-emerald-500/20"></div>
+          </div>
         </div>
 
-        <div className="space-y-4 md:space-y-6">
+        <div className="space-y-6 md:space-y-8 relative z-10">
           {/* 输入名称 */}
-          <div>
-            <label className="block text-stone-300 mb-2 font-semibold flex items-center gap-2 text-sm md:text-base">
-              <User size={18} className="md:w-5 md:h-5" />
-              Name Of Survival
+          <div className="space-y-3">
+            <label className="block text-emerald-500/60 font-mono text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 font-bold">
+              <User size={14} className="text-emerald-500/40" />
+              SUBJECT_IDENTITY
             </label>
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Enter your wasteland handle..."
-              className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-stone-700 border border-stone-600 rounded text-stone-200 placeholder-stone-500 focus:outline-none focus:border-mystic-jade focus:ring-2 focus:ring-mystic-jade/50 text-sm md:text-base"
-              maxLength={20}
-            />
+            <div className="relative group">
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder="Enter subject name..."
+                className="w-full px-5 py-4 bg-stone-900/40 border-2 border-stone-800 rounded-none text-stone-200 placeholder-stone-700 focus:outline-none focus:border-emerald-500/40 transition-all font-mono text-sm uppercase tracking-widest"
+                maxLength={20}
+              />
+              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-emerald-500/10 scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500 origin-left" />
+            </div>
           </div>
 
-          {/* 天赋选择（只显示，不可修改） */}
-          <div>
-            <label className="block text-stone-300 mb-2 font-semibold flex items-center gap-2 text-sm md:text-base">
-              <Sparkles size={18} className="md:w-5 md:h-5" />
-              Innate Perk (Randomly generated, permanent)
+          {/* 天赋选择 */}
+          <div className="space-y-3">
+            <label className="block text-emerald-500/60 font-mono text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 font-bold">
+              <Sparkles size={14} className="text-emerald-500/40" />
+              GENETIC_PERK_ANALYSIS
             </label>
             <div
-              className={`p-3 md:p-4 rounded border-2 ${getRarityColor(selectedTalent?.rarity || '普通')} bg-stone-800/50`}
+              className={`p-5 rounded-none border-2 bg-stone-900/20 relative overflow-hidden group/perk transition-all hover:bg-stone-900/30 ${getRarityColor(selectedTalent?.rarity || '普通')}`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg md:text-xl font-bold">
-                  {selectedTalent?.name}
-                </h3>
-                <span
-                  className={`px-2 py-1 rounded text-[10px] md:text-xs font-semibold ${getRarityColor(selectedTalent?.rarity || '普通')}`}
-                >
-                  {selectedTalent?.rarity}
-                </span>
-              </div>
-              <p className="text-stone-300 mb-2 md:mb-3 text-xs md:text-sm">
-                {selectedTalent?.description}
-              </p>
-              <div className="grid grid-cols-2 gap-2 text-xs md:text-sm">
-                {selectedTalent?.effects.attack && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Sword size={14} className="md:w-4 md:h-4 text-red-400" />
-                    <span>Firepower +{selectedTalent.effects.attack}</span>
-                  </div>
-                )}
-                {selectedTalent?.effects.defense && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Shield size={14} className="md:w-4 md:h-4 text-blue-400" />
-                    <span>Defense +{selectedTalent.effects.defense}</span>
-                  </div>
-                )}
-                {selectedTalent?.effects.hp && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Heart size={14} className="md:w-4 md:h-4 text-pink-400" />
-                    <span>HP +{selectedTalent.effects.hp}</span>
-                  </div>
-                )}
-                {selectedTalent?.effects.spirit && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Zap size={14} className="md:w-4 md:h-4 text-yellow-400" />
-                    <span>Neural +{selectedTalent.effects.spirit}</span>
-                  </div>
-                )}
-                {selectedTalent?.effects.physique && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Shield
-                      size={14}
-                      className="md:w-4 md:h-4 text-green-400"
-                    />
-                    <span>Physique +{selectedTalent.effects.physique}</span>
-                  </div>
-                )}
-                {selectedTalent?.effects.speed && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Zap size={14} className="md:w-4 md:h-4 text-cyan-400" />
-                    <span>Speed +{selectedTalent.effects.speed}</span>
-                  </div>
-                )}
-                {selectedTalent?.effects.expRate && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Sparkles
-                      size={14}
-                      className="md:w-4 md:h-4 text-purple-400"
-                    />
-                    <span>
-                      Data Rate +
-                      {Math.round(selectedTalent.effects.expRate * 100)}%
-                    </span>
-                  </div>
-                )}
-                {selectedTalent?.effects.luck && (
-                  <div className="flex items-center gap-1 text-stone-300">
-                    <Sparkles
-                      size={14}
-                      className="md:w-4 md:h-4 text-yellow-400"
-                    />
-                    <span>Luck +{selectedTalent.effects.luck}</span>
-                  </div>
-                )}
+              {/* Background pattern */}
+              <div className="absolute inset-0 opacity-0 group-hover/perk:opacity-[0.02] transition-opacity pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base md:text-lg font-bold uppercase tracking-[0.2em] text-stone-200 group-hover/perk:text-emerald-400 transition-colors">
+                    {selectedTalent?.name}
+                  </h3>
+                  <span
+                    className={`px-3 py-1 rounded-none text-[9px] font-bold uppercase tracking-[0.3em] border-2 bg-stone-950/60 ${getRarityColor(selectedTalent?.rarity || '普通')}`}
+                  >
+                    {selectedTalent?.rarity}
+                  </span>
+                </div>
+                <p className="text-stone-400 mb-5 text-[11px] md:text-xs leading-relaxed font-mono uppercase tracking-tight opacity-80 group-hover/perk:opacity-100 transition-opacity">
+                  {selectedTalent?.description}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-stone-800/50 pt-4">
+                  {selectedTalent?.effects.attack && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Sword size={12} className="opacity-50" />
+                      <span className="uppercase">ATK +{selectedTalent.effects.attack}</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.defense && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Shield size={12} className="opacity-50" />
+                      <span className="uppercase">DEF +{selectedTalent.effects.defense}</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.hp && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Heart size={12} className="opacity-50" />
+                      <span className="uppercase">HP +{selectedTalent.effects.hp}</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.spirit && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Zap size={12} className="opacity-50" />
+                      <span className="uppercase">SPI +{selectedTalent.effects.spirit}</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.physique && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Shield size={12} className="opacity-50" />
+                      <span className="uppercase">PHY +{selectedTalent.effects.physique}</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.speed && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Zap size={12} className="opacity-50" />
+                      <span className="uppercase">SPD +{selectedTalent.effects.speed}</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.expRate && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Sparkles size={12} className="opacity-50" />
+                      <span className="uppercase">DATA +{Math.round(selectedTalent.effects.expRate * 100)}%</span>
+                    </div>
+                  )}
+                  {selectedTalent?.effects.luck && (
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500 group-hover/perk:text-emerald-500/70 transition-colors">
+                      <Sparkles size={12} className="opacity-50" />
+                      <span className="uppercase">LUCK +{selectedTalent.effects.luck}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <p className="text-[10px] md:text-xs text-stone-500 mt-2">
-              * Perks are randomized at the start and cannot be changed.
+            <p className="text-[9px] text-stone-600 font-mono uppercase tracking-widest pl-2 border-l border-stone-800">
+              * Genetic perks are randomized and immutable post-initialization.
             </p>
           </div>
 
           {/* 难度选择 */}
-          <div>
-            <label className="block text-stone-300 mb-2 font-semibold flex items-center gap-2 text-sm md:text-base">
-              <TriangleAlert size={18} className="md:w-5 md:h-5" />
-              Game Difficulty
+          <div className="space-y-4">
+            <label className="block text-emerald-500/60 font-mono text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 font-bold">
+              <TriangleAlert size={14} className="text-emerald-500/40" />
+              OPERATION_PROTOCOL
             </label>
-            <div className="space-y-2">
-              <label className={`flex items-center gap-3 p-3 bg-stone-800/50 rounded border-2 cursor-pointer transition-colors ${difficulty === 'easy'
-                ? 'border-green-500 bg-green-900/20'
-                : 'border-stone-700 hover:border-mystic-jade/50'
+            <div className="grid grid-cols-1 gap-3">
+              <label className={`group/opt flex items-center gap-5 p-4 rounded-none border-2 cursor-pointer transition-all duration-300 relative overflow-hidden ${difficulty === 'easy'
+                ? 'border-emerald-500/40 bg-emerald-500/5'
+                : 'border-stone-800 bg-stone-900/10 hover:border-stone-700'
                 }`}>
                 <input
                   type="radio"
@@ -312,20 +329,22 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
                   value="easy"
                   checked={difficulty === 'easy'}
                   onChange={handleDifficultyChange}
-                  className="w-4 h-4 text-green-500 accent-green-500"
+                  className="w-5 h-5 accent-emerald-500 z-10"
                 />
-                <div className="flex-1">
+                <div className="flex-1 relative z-10">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-green-400">Easy Mode</span>
+                    <span className={`font-mono font-bold text-xs uppercase tracking-[0.2em] transition-colors ${difficulty === 'easy' ? 'text-emerald-400' : 'text-stone-500 group-hover/opt:text-stone-300'}`}>Standard Protocol</span>
                   </div>
-                  <p className="text-xs text-stone-400 mt-1">
-                    No death penalty. Suitable for new recruits.
-                  </p>
+                  <p className="text-[9px] text-stone-600 mt-1 uppercase tracking-widest transition-colors group-hover/opt:text-stone-500">No lethal consequences. Recommended for initial deployment.</p>
                 </div>
+                {difficulty === 'easy' && (
+                  <div className="absolute right-0 top-0 h-full w-1 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                )}
               </label>
-              <label className={`flex items-center gap-3 p-3 bg-stone-800/50 rounded border-2 cursor-pointer transition-colors ${difficulty === 'normal'
-                ? 'border-yellow-500 bg-yellow-900/20'
-                : 'border-stone-700 hover:border-mystic-jade/50'
+              
+              <label className={`group/opt flex items-center gap-5 p-4 rounded-none border-2 cursor-pointer transition-all duration-300 relative overflow-hidden ${difficulty === 'normal'
+                ? 'border-yellow-500/40 bg-yellow-500/5'
+                : 'border-stone-800 bg-stone-900/10 hover:border-stone-700'
                 }`}>
                 <input
                   type="radio"
@@ -333,20 +352,22 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
                   value="normal"
                   checked={difficulty === 'normal'}
                   onChange={handleDifficultyChange}
-                  className="w-4 h-4 text-yellow-500 accent-yellow-500"
+                  className="w-5 h-5 accent-yellow-500 z-10"
                 />
-                <div className="flex-1">
+                <div className="flex-1 relative z-10">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-yellow-400">Normal Mode</span>
+                    <span className={`font-mono font-bold text-xs uppercase tracking-[0.2em] transition-colors ${difficulty === 'normal' ? 'text-yellow-400' : 'text-stone-500 group-hover/opt:text-stone-300'}`}>Hardcore Protocol</span>
                   </div>
-                  <p className="text-xs text-stone-400 mt-1">
-                    Death results in partial stat loss (10-20%) and equipment loss (1-3 items).
-                  </p>
+                  <p className="text-[9px] text-stone-600 mt-1 uppercase tracking-widest transition-colors group-hover/opt:text-stone-500">Death results in partial stat and equipment loss.</p>
                 </div>
+                {difficulty === 'normal' && (
+                  <div className="absolute right-0 top-0 h-full w-1 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+                )}
               </label>
-              <label className={`flex items-center gap-3 p-3 bg-stone-800/50 rounded border-2 cursor-pointer transition-colors ${difficulty === 'hard'
-                ? 'border-red-500 bg-red-900/20'
-                : 'border-stone-700 hover:border-mystic-jade/50'
+
+              <label className={`group/opt flex items-center gap-5 p-4 rounded-none border-2 cursor-pointer transition-all duration-300 relative overflow-hidden ${difficulty === 'hard'
+                ? 'border-red-500/40 bg-red-500/5'
+                : 'border-stone-800 bg-stone-900/10 hover:border-stone-700'
                 }`}>
                 <input
                   type="radio"
@@ -354,50 +375,55 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
                   value="hard"
                   checked={difficulty === 'hard'}
                   onChange={handleDifficultyChange}
-                  className="w-4 h-4 text-red-500 accent-red-500"
+                  className="w-5 h-5 accent-red-500 z-10"
                 />
-                <div className="flex-1">
+                <div className="flex-1 relative z-10">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-red-400">Hard Mode</span>
+                    <span className={`font-mono font-bold text-xs uppercase tracking-[0.2em] transition-colors ${difficulty === 'hard' ? 'text-red-400' : 'text-stone-500 group-hover/opt:text-stone-300'}`}>Survival Protocol</span>
                   </div>
-                  <p className="text-xs text-stone-400 mt-1">
-                    Death deletes save data. For true wastelanders.
-                  </p>
+                  <p className="text-[9px] text-stone-600 mt-1 uppercase tracking-widest transition-colors group-hover/opt:text-stone-500">Death deletes all subject data. For true wastelanders.</p>
                 </div>
+                {difficulty === 'hard' && (
+                  <div className="absolute right-0 top-0 h-full w-1 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                )}
               </label>
             </div>
-            <p className="text-[10px] md:text-xs text-stone-500 mt-2">
-              * Difficulty can be viewed in settings later, but should be chosen now.
-            </p>
           </div>
-          {/* 隐藏的文件输入 */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4">
+            <button
+              onClick={handleStart}
+              disabled={!playerName.trim()}
+              className="group/btn relative w-full py-5 bg-emerald-500 text-ink-950 font-bold text-base rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-3 uppercase tracking-[0.2em] border-2 border-emerald-500 overflow-hidden"
+            >
+              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/btn:opacity-[0.05] transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+              <Sparkles size={20} className="relative z-10" />
+              <span className="relative z-10">Initialize</span>
+            </button>
+            <button
+              onClick={handleImportClick}
+              className="group/btn relative w-full py-5 bg-stone-900/40 text-stone-400 font-bold text-base rounded-none transition-all duration-300 border-2 border-stone-800 hover:border-emerald-500/40 hover:text-emerald-500 flex items-center justify-center gap-3 uppercase tracking-[0.2em] overflow-hidden"
+            >
+              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/btn:opacity-[0.03] transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+              <Upload size={18} className="relative z-10" />
+              <span className="relative z-10">Import Data</span>
+            </button>
+          </div>
+          
           <input
             ref={fileInputRef}
             type="file"
             accept=".json,.txt"
             onChange={handleImportSave}
             className="hidden"
-            aria-label="导入存档文件"
           />
+        </div>
 
-          {/* 开始按钮 */}
-          <button
-            onClick={handleStart}
-            disabled={!playerName.trim()}
-            className="w-full py-3 md:py-4 bg-gradient-to-r from-mystic-gold to-yellow-600 active:from-yellow-600 active:to-mystic-gold text-stone-900 font-bold text-base md:text-lg rounded-lg transition-all duration-300 shadow-lg active:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[56px] md:min-h-0 touch-manipulation"
-          >
-            <Sparkles size={20} className="md:w-6 md:h-6" />
-            Start Survival Journey
-          </button>
-
-          {/* 导入存档按钮 */}
-          <button
-            onClick={handleImportClick}
-            className="w-full py-2.5 md:py-3 bg-gradient-to-r from-stone-500 to-stone-600 active:from-stone-600 active:to-stone-500 text-stone-200 font-bold text-sm md:text-base rounded-lg transition-all duration-300 shadow-lg active:shadow-xl flex items-center justify-center gap-2 min-h-[48px] md:min-h-0 touch-manipulation border border-stone-500"
-          >
-            <Upload size={18} className="md:w-5 md:h-5" />
-            Import Save
-          </button>
+        {/* Footer info */}
+        <div className="mt-10 pt-6 border-t border-stone-800/50 text-center opacity-30 text-[9px] font-mono tracking-[0.4em] uppercase pointer-events-none">
+          Subject status: Healthy // Equipment: Minimal // Clearance: Level 1
         </div>
       </div>
     </div>

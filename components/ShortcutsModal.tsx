@@ -8,6 +8,7 @@ import {
   checkShortcutConflict,
 } from '../utils/shortcutUtils';
 import { showError, showSuccess } from '../utils/toastUtils';
+import { ASSETS } from '../constants/assets';
 
 interface ShortcutsModalProps {
   isOpen: boolean;
@@ -227,73 +228,117 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4 touch-manipulation"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 crt-screen"
       onClick={onClose}
     >
       <div
-        className="bg-stone-800 md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-700 w-full h-[90vh] md:h-auto md:max-w-2xl md:max-h-[90vh] flex flex-col"
+        className="bg-ink-950 w-full max-w-2xl rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-stone-800 border-b border-stone-700 p-3 md:p-4 flex justify-between items-center md:rounded-t-2xl flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <Keyboard size={20} className="text-mystic-gold" />
-            <h2 className="text-lg md:text-xl font-serif text-mystic-gold">
-              Key Bindings
-            </h2>
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+        
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
+        <div className="bg-stone-950/50 border-b border-stone-800 p-4 md:p-6 flex justify-between items-center relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+              />
+              <Keyboard size={24} className="relative z-10" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">KEY_BINDINGS</h2>
+              <p className="text-[10px] text-stone-600 tracking-widest uppercase">INPUT_MAPPING // PROTOCOL_V1.0</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {!isEditing ? (
               <>
                 {onUpdateShortcuts && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 rounded text-sm transition-colors"
+                    className="h-10 px-4 bg-emerald-950/10 hover:bg-emerald-950/20 text-emerald-500/80 hover:text-emerald-500 border border-emerald-900/50 hover:border-emerald-600 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px] font-bold relative group overflow-hidden"
                   >
-                    <Edit2 size={16} />
-                    <span>Edit</span>
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                      style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                    />
+                    <Edit2 size={14} className="relative z-10" />
+                    <span className="relative z-10">RECONFIGURE</span>
                   </button>
                 )}
                 <button
                   onClick={onClose}
-                  className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+                  className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50 relative group overflow-hidden"
+                  aria-label="ABORT"
                 >
-                  <X size={24} />
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                    style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                  />
+                  <X size={24} className="relative z-10" />
                 </button>
               </>
             ) : (
               <>
                 <button
                   onClick={handleResetAll}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 rounded text-sm transition-colors"
+                  className="h-10 px-4 bg-stone-950 hover:bg-stone-900 text-stone-500 hover:text-stone-200 border border-stone-800 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px] font-bold relative group overflow-hidden"
                 >
-                  <RotateCcw size={16} />
-                  <span>Reset All</span>
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                    style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                  />
+                  <RotateCcw size={14} className="relative z-10" />
+                  <span className="relative z-10">RESET_DEFAULTS</span>
                 </button>
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-mystic-gold hover:bg-yellow-600 text-stone-900 rounded text-sm transition-colors font-semibold"
+                  className="h-10 px-4 bg-emerald-950/10 hover:bg-emerald-950/20 text-emerald-500/80 hover:text-emerald-500 border border-emerald-900/50 hover:border-emerald-600 transition-all flex items-center gap-2 uppercase tracking-widest text-[10px] font-bold relative group overflow-hidden"
                 >
-                  <Save size={16} />
-                  <span>Save</span>
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                    style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                  />
+                  <Save size={14} className="relative z-10" />
+                  <span className="relative z-10">COMMIT</span>
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 rounded text-sm transition-colors"
+                  className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50 relative group overflow-hidden"
                 >
-                  Cancel
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+                    style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+                  />
+                  <X size={24} className="relative z-10" />
                 </button>
               </>
             )}
           </div>
         </div>
 
-        <div className="modal-scroll-container modal-scroll-content p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10 max-h-[70vh]">
           {categories.map((category) => (
-            <div key={category}>
-              <h3 className="font-bold text-mystic-gold mb-3 text-lg">
-                {category}
-              </h3>
-              <div className="space-y-2">
+            <div key={category} className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/50 to-transparent" />
+                <h3 className="font-bold text-emerald-500/80 text-xs uppercase tracking-[0.2em]">
+                  {category}
+                </h3>
+                <div className="h-px flex-[4] bg-transparent" />
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2">
                 {shortcutsByCategory[category].map((shortcut, index) => {
                   const actionId = getActionId(shortcut);
                   const isEditingThis = editingActionId === actionId;
@@ -316,17 +361,24 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
                   return (
                     <div
                       key={index}
-                      className={`flex items-center justify-between p-3 bg-stone-900/50 border rounded transition-colors ${isEditingThis
-                        ? 'border-mystic-gold border-2'
+                      className={`flex items-center justify-between p-3 bg-stone-900/20 border transition-all rounded-none relative group/item ${isEditingThis
+                        ? 'border-emerald-500 bg-emerald-900/10 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
                         : conflictActionId === actionId
-                          ? 'border-red-500 border-2'
-                          : 'border-stone-700'
+                          ? 'border-red-900/50 bg-red-900/5'
+                          : 'border-stone-800/50 hover:border-stone-700 hover:bg-stone-900/40'
                         }`}
                     >
-                      <span className="text-stone-300 flex-1">
+                      {/* 悬停纹理 */}
+                      <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/item:opacity-[0.02] transition-opacity"
+                        style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
+
+                      <span className={`text-xs font-bold uppercase tracking-wider relative z-10 ${
+                        isEditingThis ? 'text-emerald-400' : 'text-stone-400'
+                      }`}>
                         {shortcut.description}
                       </span>
-                      <div className="flex items-center gap-2">
+                      
+                      <div className="flex items-center gap-2 relative z-10">
                         {isEditing && actionId ? (
                           <>
                             <button
@@ -341,27 +393,27 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
                                   setEditingActionId(null);
                                 }
                               }}
-                              className={`px-3 py-1.5 border rounded text-sm font-mono transition-colors min-w-[120px] ${isEditingThis
-                                ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold outline-none ring-2 ring-mystic-gold'
-                                : 'bg-stone-700 border-stone-600 text-stone-300 hover:bg-stone-600'
+                              className={`px-4 py-2 border rounded-none text-xs font-mono transition-all min-w-[140px] ${isEditingThis
+                                ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                                : 'bg-stone-900/60 border-stone-800 text-stone-500 hover:border-stone-700 hover:text-stone-300'
                                 }`}
                               tabIndex={0}
                               autoFocus={isEditingThis}
                             >
                               {isEditingThis
-                                ? 'Press keys...'
+                                ? '>>> LISTENING <<<'
                                 : formatShortcut(displayShortcut)}
                             </button>
                             <button
                               onClick={() => actionId && handleResetOne(actionId)}
-                              className="p-1.5 text-stone-400 hover:text-stone-200 transition-colors"
+                              className="p-2 text-stone-600 hover:text-red-400 transition-colors"
                               title="Reset to default"
                             >
-                              <RotateCcw size={16} />
+                              <RotateCcw size={14} />
                             </button>
                           </>
                         ) : (
-                          <kbd className="px-3 py-1.5 bg-stone-700 border border-stone-600 rounded text-sm font-mono text-mystic-gold">
+                          <kbd className="px-3 py-1.5 bg-stone-900/60 border border-stone-800 rounded-none text-[10px] font-mono text-emerald-500/70 font-bold tracking-widest">
                             {formatShortcut(displayShortcut)}
                           </kbd>
                         )}
@@ -373,25 +425,39 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
             </div>
           ))}
 
-          <div className="pt-4 border-t border-stone-700 space-y-2">
+          <div className="pt-6 border-t border-stone-800 space-y-4 relative z-10">
             {isEditing && (
-              <div className="bg-blue-900/30 border border-blue-700 rounded p-3">
-                <div className="flex items-start gap-2">
-                  <AlertCircle size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-blue-300">
-                    <p className="font-semibold mb-1">Edit Mode Tips:</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Click a binding button, then press your desired key combination</li>
-                      <li>Conflicts will trigger a warning</li>
-                      <li>Click the reset icon to restore a single default</li>
-                      <li>Click "Reset All" to restore all defaults</li>
+              <div className="bg-emerald-900/5 border border-emerald-900/30 rounded-none p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={16} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <div className="text-[10px] text-emerald-500/70 leading-relaxed font-bold uppercase tracking-widest">
+                    <p className="text-emerald-500 mb-2 underline decoration-emerald-500/30 underline-offset-4">
+                      PROTOCOL: REBINDING_INSTRUCTIONS
+                    </p>
+                    <ul className="space-y-1.5">
+                      <li className="flex gap-2">
+                        <span className="text-emerald-500/40">01.</span>
+                        <span>SELECT BINDING SLOT TO INITIALIZE LISTENING MODE</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-emerald-500/40">02.</span>
+                        <span>INPUT DESIRED KEY COMBINATION ON PHYSICAL INTERFACE</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-emerald-500/40">03.</span>
+                        <span>SYSTEM WILL AUTO-VALIDATE AGAINST CONFLICTS</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-emerald-500/40">04.</span>
+                        <span>COMMIT CHANGES VIA SAVE COMMAND TO PERSIST CONFIG</span>
+                      </li>
                     </ul>
                   </div>
                 </div>
               </div>
             )}
-            <p className="text-xs text-stone-500 text-center">
-              Note: Shortcuts are disabled while typing in input fields (except ESC)
+            <p className="text-[10px] text-stone-600 text-center font-bold uppercase tracking-[0.2em]">
+              SYSTEM_NOTICE: INTERFACE_INPUTS_PRIORITIZED_OVER_SHORTCUTS
             </p>
           </div>
         </div>

@@ -17,6 +17,7 @@ import {
   ItemRarity,
   ItemType,
 } from '../types';
+import { ASSETS } from '../constants/assets';
 import { REALM_ORDER, RARITY_MULTIPLIERS } from '../constants/index';
 import { generateShopItems } from '../services/shopService';
 import { showError, showConfirm } from '../utils/toastUtils';
@@ -232,16 +233,21 @@ const ShopModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="bg-paper-800 w-full h-[80vh] md:h-auto md:max-w-4xl md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-600 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden"
+        className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-4xl md:rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-3 md:p-4 border-b border-stone-600 flex justify-between items-center bg-ink-800 md:rounded-t">
+        {/* 背景纹理层 */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+
+        <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 md:rounded-none z-10">
           <div>
-            <h3 className="text-lg md:text-xl font-serif text-mystic-gold flex items-center gap-2">
+            <h3 className="text-lg md:text-xl font-bold text-mystic-gold flex items-center gap-2 uppercase tracking-tighter">
               <ShoppingBag size={18} className="md:w-5 md:h-5" />
               {shop.name}
             </h3>
-            <p className="text-sm text-stone-400 mt-1">{shop.description}</p>
+            <p className="text-[10px] text-stone-500 mt-1 uppercase font-bold tracking-widest">{shop.description}</p>
             {shop.reputationRequired && (
               <p className="text-xs text-yellow-400 mt-1">
                 Rep Required: {shop.reputationRequired} (Current: {player.reputation || 0})
@@ -255,7 +261,7 @@ const ShopModal: React.FC<Props> = ({
             {onOpenInventory && (
               <button
                 onClick={onOpenInventory}
-                className="flex items-center gap-1 px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 rounded border border-stone-600 transition-colors text-sm"
+                className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 hover:bg-stone-800 text-stone-200 rounded-none border border-stone-800 transition-colors text-sm"
                 title="View Inventory"
               >
                 <Box size={16} />
@@ -283,7 +289,7 @@ const ShopModal: React.FC<Props> = ({
                     }
                   );
                 }}
-                className="flex items-center gap-1 px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-200 rounded border border-stone-600 transition-colors text-sm"
+                className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 hover:bg-stone-800 text-stone-200 rounded-none border border-stone-800 transition-colors text-sm"
                 title={`Spend ${shop.refreshCost || 100} Caps to restock items`}
               >
                 <RefreshCw size={16} />
@@ -293,7 +299,7 @@ const ShopModal: React.FC<Props> = ({
             )}
             <button
               onClick={onClose}
-              className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+              className="text-stone-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
             >
               <X size={24} />
             </button>
@@ -301,54 +307,54 @@ const ShopModal: React.FC<Props> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-stone-600 bg-stone-900">
+        <div className="flex border-b border-stone-800 bg-stone-950 z-10">
           <button
             onClick={() => setActiveTab('buy')}
-            className={`flex-1 px-4 py-3 font-bold transition-colors ${activeTab === 'buy'
-              ? 'bg-ink-800 text-mystic-gold border-b-2 border-mystic-gold'
-              : 'text-stone-400 hover:text-stone-200'
+            className={`flex-1 px-4 py-3 font-bold transition-all text-xs tracking-widest ${activeTab === 'buy'
+              ? 'bg-stone-900 text-mystic-gold border-b-2 border-mystic-gold'
+              : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900'
               }`}
           >
-            BUY
+            BUY ITEMS
           </button>
           <button
             onClick={() => setActiveTab('sell')}
-            className={`flex-1 px-4 py-3 font-bold transition-colors ${activeTab === 'sell'
-              ? 'bg-ink-800 text-mystic-gold border-b-2 border-mystic-gold'
-              : 'text-stone-400 hover:text-stone-200'
+            className={`flex-1 px-4 py-3 font-bold transition-all text-xs tracking-widest ${activeTab === 'sell'
+              ? 'bg-stone-900 text-mystic-gold border-b-2 border-mystic-gold'
+              : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900'
               }`}
           >
-            SELL
+            SELL INVENTORY
           </button>
         </div>
 
         {/* Content Area */}
-        <div className="modal-scroll-container modal-scroll-content p-4">
+        <div className="modal-scroll-container modal-scroll-content p-4 z-10">
           {activeTab === 'buy' ? (
             <div>
               <div className="mb-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-stone-400">
-                    Caps Holding:{' '}
-                    <span className="text-mystic-gold font-bold">
+                  <span className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
+                    CAPS BALANCE:{' '}
+                    <span className="text-mystic-gold">
                       {player.spiritStones}
                     </span>
                   </span>
-                  <span className={`text-sm ${getShopTypeColor(shop.type)}`}>
-                    {shop.type}
+                  <span className={`text-[10px] uppercase font-bold tracking-widest ${getShopTypeColor(shop.type)}`}>
+                    {shop.type} VENDOR
                   </span>
                 </div>
                 {/* 物品分类筛选器 */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-2 text-stone-400 text-sm">
-                    <Filter size={16} />
-                    <span>分类:</span>
+                  <div className="flex items-center gap-1.5 text-stone-500 text-[10px] uppercase font-bold tracking-widest">
+                    <Filter size={12} />
+                    <span>Filter:</span>
                   </div>
                   <button
                     onClick={() => setSelectedTypeFilter('all')}
-                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${selectedTypeFilter === 'all'
+                    className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === 'all'
                       ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
-                      : 'bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-700'
+                      : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                       }`}
                   >
                     All
@@ -357,9 +363,9 @@ const ShopModal: React.FC<Props> = ({
                     <button
                       key={type}
                       onClick={() => setSelectedTypeFilter(type)}
-                      className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${selectedTypeFilter === type
+                      className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === type
                         ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
-                        : 'bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-700'
+                        : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                         }`}
                     >
                       {type}
@@ -378,9 +384,9 @@ const ShopModal: React.FC<Props> = ({
                     return (
                       <div
                         key={shopItem.id}
-                        className={`bg-stone-900 rounded-lg p-4 border-2 ${canBuy
-                          ? getRarityBorder(shopItem.rarity)
-                          : 'border-stone-700 opacity-60'
+                        className={`bg-stone-900/50 rounded-none p-4 border ${canBuy
+                          ? getRarityBorder(shopItem.rarity).replace('border-2', 'border')
+                          : 'border-stone-800 opacity-60'
                           }`}
                       >
                         <div className="flex justify-between items-start mb-2">
@@ -395,7 +401,7 @@ const ShopModal: React.FC<Props> = ({
                             </span>
                           </div>
                           <span
-                            className={`text-xs px-2 py-1 rounded ${getRarityBorder(shopItem.rarity)} ${getRarityTextColor(shopItem.rarity)}`}
+                            className={`text-xs px-2 py-1 rounded-none border ${getRarityBorder(shopItem.rarity).replace('border-2', 'border')} ${getRarityTextColor(shopItem.rarity)}`}
                           >
                             {shopItem.rarity}
                           </span>
@@ -456,7 +462,7 @@ const ShopModal: React.FC<Props> = ({
 
                           {/* 数量控制和购买按钮 */}
                           <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1 border border-stone-600 rounded bg-stone-800">
+                            <div className="flex items-center gap-1 border border-stone-800 rounded-none bg-stone-900">
                               <button
                                 onClick={() =>
                                   setBuyQuantities((prev) => ({
@@ -467,7 +473,7 @@ const ShopModal: React.FC<Props> = ({
                                     ),
                                   }))
                                 }
-                                className="px-2 py-1 text-stone-400 hover:text-white hover:bg-stone-700 transition-colors"
+                                className="px-2 py-1 text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
                               >
                                 -
                               </button>
@@ -494,7 +500,7 @@ const ShopModal: React.FC<Props> = ({
                                     [shopItem.id]: (prev[shopItem.id] || 1) + 1,
                                   }))
                                 }
-                                className="px-2 py-1 text-stone-400 hover:text-white hover:bg-stone-700 transition-colors"
+                                className="px-2 py-1 text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
                               >
                                 +
                               </button>
@@ -514,12 +520,12 @@ const ShopModal: React.FC<Props> = ({
                                 (buyQuantities[shopItem.id] || 1) >
                                 player.spiritStones
                               }
-                              className={`px-3 py-1.5 rounded text-sm font-bold transition-colors flex-1 min-w-[70px] ${canBuy &&
+                              className={`px-3 py-1.5 rounded-none text-sm font-bold transition-all flex-1 min-w-[70px] ${canBuy &&
                                 shopItem.price *
                                 (buyQuantities[shopItem.id] || 1) <=
                                 player.spiritStones
-                                ? 'bg-mystic-gold/20 hover:bg-mystic-gold/30 text-mystic-gold border border-mystic-gold/50'
-                                : 'bg-stone-700 text-stone-500 cursor-not-allowed'
+                                ? 'bg-mystic-gold/20 hover:bg-mystic-gold/30 text-mystic-gold border border-mystic-gold/50 active:scale-95'
+                                : 'bg-stone-800 text-stone-500 cursor-not-allowed'
                                 }`}
                               title={
                                 !canBuy
@@ -533,7 +539,7 @@ const ShopModal: React.FC<Props> = ({
                                     : ''
                               }
                             >
-                              BUY
+                              PURCHASE
                             </button>
                           </div>
                         </div>
@@ -547,58 +553,55 @@ const ShopModal: React.FC<Props> = ({
             <div>
               <div className="mb-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-stone-400">
-                    Caps Holding:{' '}
-                    <span className="text-mystic-gold font-bold">
+                  <span className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
+                    CAPS BALANCE:{' '}
+                    <span className="text-mystic-gold">
                       {player.spiritStones}
                     </span>
                   </span>
-                  <span className="text-sm text-stone-500">
-                    Sellable: {sellableItems.length}
+                  <span className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
+                    SELECTED: <span className="text-mystic-gold">{selectedItems.size}</span>
                   </span>
                 </div>
                 {/* 批量操作栏 */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={handleSelectAll}
-                      className="px-3 py-1.5 bg-stone-700 hover:bg-stone-600 text-stone-300 rounded text-sm border border-stone-600"
+                      className="px-3 py-1 bg-stone-900 hover:bg-stone-800 text-stone-300 rounded-none text-[10px] font-bold uppercase tracking-widest border border-stone-800 transition-all"
                     >
                       {selectedItems.size === sellableItems.length
-                        ? 'Deselect All'
-                        : 'Select All'}
+                        ? 'DESELECT ALL'
+                        : 'SELECT ALL'}
                     </button>
-                    <span className="text-sm text-stone-400">
-                      Selected: {selectedItems.size} / {sellableItems.length}
-                    </span>
                   </div>
                   <button
                     onClick={handleBatchSell}
                     disabled={selectedItems.size === 0}
-                    className={`px-4 py-2 rounded text-sm font-bold transition-colors flex items-center gap-2 ${selectedItems.size > 0
-                      ? 'bg-green-900/20 hover:bg-green-900/30 text-green-400 border border-green-700/50'
-                      : 'bg-stone-700 text-stone-500 cursor-not-allowed border border-stone-600'
+                    className={`px-4 py-1.5 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${selectedItems.size > 0
+                      ? 'bg-red-900/20 hover:bg-red-900/30 text-red-400 border border-red-900/50 active:scale-95'
+                      : 'bg-stone-900 text-stone-600 cursor-not-allowed border border-stone-800'
                       }`}
                   >
-                    <Trash size={16} />
-                    Bulk Sell ({selectedItems.size})
+                    <Trash size={12} />
+                    BULK SELL ({selectedItems.size})
                   </button>
                 </div>
-                {/* 物品分类筛选器 */}
-                <div className="space-y-2">
+                {/* 过滤器 */}
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-2 text-stone-400 text-sm">
-                      <Filter size={16} />
-                      <span>Category:</span>
+                    <div className="flex items-center gap-1.5 text-stone-500 text-[10px] uppercase font-bold tracking-widest">
+                      <Filter size={12} />
+                      <span>Type:</span>
                     </div>
                     <button
                       onClick={() => {
                         setSelectedTypeFilter('all');
                         setSelectedItems(new Set());
                       }}
-                      className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${selectedTypeFilter === 'all'
+                      className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === 'all'
                         ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
-                        : 'bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-700'
+                        : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                         }`}
                     >
                       All
@@ -610,9 +613,9 @@ const ShopModal: React.FC<Props> = ({
                           setSelectedTypeFilter(type);
                           setSelectedItems(new Set());
                         }}
-                        className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${selectedTypeFilter === type
+                        className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === type
                           ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
-                          : 'bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-700'
+                          : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                           }`}
                       >
                         {type}
@@ -620,9 +623,9 @@ const ShopModal: React.FC<Props> = ({
                     ))}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-2 text-stone-400 text-sm">
-                      <Filter size={16} />
-                      <span>Category:</span>
+                    <div className="flex items-center gap-1.5 text-stone-500 text-[10px] uppercase font-bold tracking-widest">
+                      <Box size={12} />
+                      <span>Rarity:</span>
                     </div>
                     {(['all', '普通', '稀有', '传说', '仙品'] as const).map(
                       (rarity) => (
@@ -632,9 +635,9 @@ const ShopModal: React.FC<Props> = ({
                             setSelectedRarity(rarity);
                             setSelectedItems(new Set());
                           }}
-                          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${selectedRarity === rarity
+                          className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedRarity === rarity
                             ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
-                            : 'bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-700'
+                            : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                             }`}
                         >
                           {rarity === 'all' ? 'All' : rarity}
@@ -652,95 +655,61 @@ const ShopModal: React.FC<Props> = ({
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {sellableItems.map((item) => {
-                    // 找到对应的商店物品来计算出售价格
-                    const shopItem = shop.items.find(
-                      (si) => si.name === item.name
-                    );
-                    const sellPrice =
-                      shopItem?.sellPrice || calculateItemSellPrice(item);
+                    const shopItem = shop.items.find((si) => si.name === item.name);
+                    const sellPrice = shopItem?.sellPrice || calculateItemSellPrice(item);
                     const rarity = item.rarity || '普通';
                     const isSelected = selectedItems.has(item.id);
 
                     return (
                       <div
                         key={item.id}
-                        className={`bg-stone-900 rounded-lg p-4 border-2 cursor-pointer transition-colors ${isSelected
-                          ? 'bg-green-900/30 border-green-600'
-                          : getRarityBorder(rarity)
+                        className={`bg-stone-900/50 rounded-none p-4 border cursor-pointer transition-all ${isSelected
+                          ? 'bg-mystic-gold/10 border-mystic-gold'
+                          : getRarityBorder(rarity).replace('border-2', 'border')
                           }`}
                         onClick={() => handleToggleItem(item.id)}
                       >
                         <div className="flex items-start gap-2 mb-2">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => handleToggleItem(item.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="mt-1"
-                          />
+                          <div className={`mt-1 w-4 h-4 border flex items-center justify-center ${isSelected ? 'bg-mystic-gold border-mystic-gold' : 'border-stone-600'}`}>
+                            {isSelected && <X size={12} className="text-ink-950" />}
+                          </div>
                           <div className="flex-1">
-                            <h4
-                              className={`font-bold ${getRarityTextColor(rarity)}`}
-                            >
+                            <h4 className={`font-bold ${getRarityTextColor(rarity)}`}>
                               {item.name}
                               {item.level && item.level > 0 && (
-                                <span className="text-xs text-stone-500 ml-1">
-                                  +{item.level}
-                                </span>
+                                <span className="text-xs text-stone-500 ml-1">+{item.level}</span>
                               )}
                             </h4>
                             <span className="text-xs text-stone-500">
                               {normalizeTypeLabel(item.type, item)}
+                              {item.quantity > 1 && ` x${item.quantity}`}
                             </span>
                           </div>
-                          <span className="text-xs bg-stone-700 text-stone-300 px-1.5 py-0.5 rounded">
-                            x{item.quantity}
+                          <span className={`text-xs px-2 py-1 rounded-none border ${getRarityBorder(rarity).replace('border-2', 'border')} ${getRarityTextColor(rarity)}`}>
+                            {rarity}
                           </span>
                         </div>
-                        <p className="text-sm text-stone-400 mb-3">
+                        <p className="text-sm text-stone-400 mb-3 line-clamp-2">
                           {item.description}
                         </p>
                         {item.effect && (
                           <div className="text-xs text-stone-400 mb-3 space-y-1">
-                            {item.effect.attack && (
-                              <div>Damage +{formatNumber(item.effect.attack)}</div>
-                            )}
-                            {item.effect.defense && (
-                              <div>Defense +{formatNumber(item.effect.defense)}</div>
-                            )}
-                            {item.effect.hp && (
-                              <div>HP +{formatNumber(item.effect.hp)}</div>
-                            )}
-                            {item.effect.exp && (
-                              <div>Data +{formatNumber(item.effect.exp)}</div>
-                            )}
-                            {item.effect.spirit && (
-                              <div>Perception +{formatNumber(item.effect.spirit)}</div>
-                            )}
-                            {item.effect.physique && (
-                              <div>Endurance +{formatNumber(item.effect.physique)}</div>
-                            )}
-                            {item.effect.speed && (
-                              <div>Agility +{formatNumber(item.effect.speed)}</div>
-                            )}
+                            {item.effect.attack && <div>Damage +{formatNumber(item.effect.attack)}</div>}
+                            {item.effect.defense && <div>Defense +{formatNumber(item.effect.defense)}</div>}
+                            {item.effect.hp && <div>HP +{formatNumber(item.effect.hp)}</div>}
                           </div>
                         )}
-                        <div className="flex items-center justify-between mt-3">
-                          <div className="flex items-center gap-1 text-green-400">
-                            <Coins size={16} />
-                            <span className="font-bold">{formatNumber(sellPrice)}</span>
-                            {item.quantity > 1 && (
-                              <span className="text-xs text-stone-500">
-                                (Total: {formatNumber(sellPrice * item.quantity)})
-                              </span>
-                            )}
+                        <div className="flex items-center justify-between mt-4">
+                          <div className="flex items-center gap-1 text-mystic-gold">
+                            <Coins size={14} />
+                            <span className="font-bold">{formatNumber(sellPrice * (item.quantity || 1))}</span>
                           </div>
-                          <button
+                            <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onSellItem(item);
+                              onSellItem(item, item.quantity);
                             }}
-                            className="px-4 py-2 bg-green-900/20 hover:bg-green-900/30 text-green-400 rounded text-sm font-bold transition-colors border border-green-700/50"
+                            className="px-3 py-1 text-xs bg-stone-900 hover:bg-stone-800 text-stone-300 border border-stone-800 transition-colors rounded-none font-bold"
                           >
                             SELL
                           </button>

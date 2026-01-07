@@ -1,6 +1,7 @@
 import React, { useState, } from 'react';
 import { X, Sword, Shield, Zap, Heart, } from 'lucide-react';
 import { PlayerStats, DaoCombiningChallengeState } from '../types';
+import { ASSETS } from '../constants/assets';
 import { HEAVEN_EARTH_SOUL_BOSSES, DAO_COMBINING_CHALLENGE_CONFIG } from '../constants/index';
 import { executePlayerAction, executeEnemyTurn, checkBattleEnd, calculateBattleRewards } from '../services/battleService';
 
@@ -205,52 +206,65 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-paper-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-stone-600 shadow-2xl">
-        <div className="flex items-center justify-between p-6 border-b border-stone-600 bg-ink-800 rounded-t">
-          <h2 className="text-2xl font-serif text-mystic-gold">
-            The Apex Challenge: Wasteland Entities
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+      <div className="bg-ink-950 rounded-none max-w-4xl w-full max-h-[90vh] overflow-hidden border border-stone-800 shadow-2xl relative flex flex-col group">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+        {/* CRT 扫描线效果 */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        
+        <div className="flex items-center justify-between p-6 border-b border-stone-800 bg-stone-950 relative z-10">
+          <h2 className="text-2xl font-bold uppercase tracking-widest text-emerald-500">
+            [ APEX_CHALLENGE: ENTITY_NEUTRALIZATION ]
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-stone-400 hover:text-white transition-colors p-1"
           >
             <X size={24} />
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto relative z-10">
           {/* Challenge Briefing */}
-          <div className="mb-6 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
-            <h3 className="text-lg font-semibold text-blue-300 mb-2">
-              MISSION BRIEFING
+          <div className="mb-6 p-4 bg-stone-900/40 border border-stone-800 rounded-none">
+            <h3 className="text-sm font-bold text-emerald-500 mb-2 uppercase tracking-widest">
+              > MISSION_BRIEFING
             </h3>
-            <p className="text-stone-300">
+            <p className="text-stone-300 text-sm leading-relaxed">
               To cross the final frontier and achieve Apex status, you must neutralize a high-threat Wasteland Entity. Proving your combat superiority is mandatory for final elevation.
             </p>
-            <div className="mt-2 text-sm text-stone-400">
-              <p>• Requires Guardian IX / Spirit Severing IX</p>
-              <p>• Requires Wasteland Essence Requisition</p>
-              <p>• Requires Superior Biological Parameters</p>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-[10px] text-stone-500 uppercase tracking-widest font-bold">
+              <p>• Guardian IX / Spirit Severing IX required</p>
+              <p>• Wasteland Essence Requisition required</p>
+              <p>• Superior Biological Parameters required</p>
               <p>• Engagement Limit: {DAO_COMBINING_CHALLENGE_CONFIG.maxBossAttempts} per target</p>
             </div>
           </div>
 
           {/* Requirement Check */}
           {!canChallengeDaoCombining() && (
-            <div className="mb-6 p-4 bg-red-900/20 border border-red-800/50 rounded-lg">
-              <h3 className="text-lg font-semibold text-red-300 mb-2">
-                CRITICAL REQUIREMENTS NOT MET
+            <div className="mb-6 p-4 bg-red-900/10 border border-red-900/30 rounded-none">
+              <h3 className="text-sm font-bold text-red-500 mb-2 uppercase tracking-widest">
+                ! CRITICAL_REQUIREMENTS_NOT_MET
               </h3>
-              <ul className="text-stone-300 space-y-1">
+              <ul className="text-stone-400 text-xs space-y-1 uppercase tracking-wider">
                 {player.realm !== DAO_COMBINING_CHALLENGE_CONFIG.requiredRealm && (
-                  <li>• Rank insufficient: Need {DAO_COMBINING_CHALLENGE_CONFIG.requiredRealm}</li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-red-900 rounded-full"></span>
+                    Rank insufficient: Need {DAO_COMBINING_CHALLENGE_CONFIG.requiredRealm}
+                  </li>
                 )}
                 {player.realmLevel < DAO_COMBINING_CHALLENGE_CONFIG.requiredRealmLevel && (
-                  <li>• Level insufficient: Need IX</li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-red-900 rounded-full"></span>
+                    Level insufficient: Need IX
+                  </li>
                 )}
                 {!player.heavenEarthMarrow && (
-                  <li>• Requisition missing: Need Wasteland Essence</li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-red-900 rounded-full"></span>
+                    Requisition missing: Need Wasteland Essence
+                  </li>
                 )}
               </ul>
             </div>
@@ -267,53 +281,55 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
               return (
                 <div
                   key={bossId}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${isSelected
-                      ? 'border-blue-500 bg-blue-900/30'
+                  className={`p-4 border-2 rounded-none cursor-pointer transition-all relative group/card ${isSelected
+                      ? 'border-emerald-500 bg-emerald-900/10'
                       : isMaxAttempts
-                        ? 'border-red-900/50 bg-red-900/10 opacity-60'
-                        : 'border-stone-700 bg-ink-800/50 hover:border-blue-700'
+                        ? 'border-red-900/30 bg-red-900/5 opacity-60 grayscale'
+                        : 'border-stone-800 bg-stone-900/40 hover:border-emerald-800'
                     }`}
                   onClick={() => !isMaxAttempts && handleSelectBoss(bossId)}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-stone-100">{boss.name}</h3>
-                    <span className={`text-sm font-medium ${getDifficultyColor(boss.difficulty)}`}>
-                      {boss.difficulty === 'easy' ? 'Easy' :
-                        boss.difficulty === 'normal' ? 'Normal' :
-                          boss.difficulty === 'hard' ? 'Hard' : 'Extreme'}
-                    </span>
-                  </div>
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-bold text-stone-100 uppercase tracking-widest">{boss.name}</h3>
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 border ${isSelected ? 'border-emerald-500/50' : 'border-stone-700'} ${getDifficultyColor(boss.difficulty)}`}>
+                        {boss.difficulty}
+                      </span>
+                    </div>
 
-                  <p className="text-sm text-stone-400 mb-3">
-                    {boss.description}
-                  </p>
+                    <p className="text-xs text-stone-500 mb-4 leading-relaxed line-clamp-2 italic">
+                      "{boss.description}"
+                    </p>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs text-stone-300">
-                    <div className="flex items-center">
-                      <Sword size={12} className="mr-1 text-stone-500" />
-                      <span>ATK: {boss.baseStats.attack.toLocaleString()}</span>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                      <div className="flex items-center justify-between border-b border-stone-800/50 pb-1">
+                        <span className="text-[10px] text-stone-500 uppercase font-bold">ATK</span>
+                        <span className="text-[10px] text-stone-300 font-mono">{boss.baseStats.attack.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-stone-800/50 pb-1">
+                        <span className="text-[10px] text-stone-500 uppercase font-bold">DEF</span>
+                        <span className="text-[10px] text-stone-300 font-mono">{boss.baseStats.defense.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-stone-800/50 pb-1">
+                        <span className="text-[10px] text-stone-500 uppercase font-bold">HP</span>
+                        <span className="text-[10px] text-stone-300 font-mono">{boss.baseStats.hp.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-stone-800/50 pb-1">
+                        <span className="text-[10px] text-stone-500 uppercase font-bold">AP</span>
+                        <span className="text-[10px] text-stone-300 font-mono">{boss.baseStats.spirit.toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <Shield size={12} className="mr-1 text-stone-500" />
-                      <span>DEF: {boss.baseStats.defense.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Heart size={12} className="mr-1 text-stone-500" />
-                      <span>HP: {boss.baseStats.hp.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Zap size={12} className="mr-1 text-stone-500" />
-                      <span>AP: {boss.baseStats.spirit.toLocaleString()}</span>
-                    </div>
-                  </div>
 
-                  <div className="mt-2 flex justify-between items-center">
-                    <span className="text-xs text-stone-500">
-                      Attempts: {attempts}/{DAO_COMBINING_CHALLENGE_CONFIG.maxBossAttempts}
-                    </span>
-                    {isMaxAttempts && (
-                      <span className="text-xs text-red-400">ENGAGEMENT LIMIT REACHED</span>
-                    )}
+                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-tighter">
+                      <span className={isMaxAttempts ? 'text-red-500' : 'text-stone-600'}>
+                        Attempts: {attempts}/{DAO_COMBINING_CHALLENGE_CONFIG.maxBossAttempts}
+                      </span>
+                      {isMaxAttempts && (
+                        <span className="text-red-500/70">[ LOCKED ]</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -322,35 +338,35 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
 
           {/* Battle Result */}
           {challengeState.battleResult && (
-            <div className={`mb-6 p-4 rounded-lg ${challengeState.battleResult.victory
-                ? 'bg-green-900/20 border border-green-800/50'
-                : 'bg-red-900/20 border border-red-800/50'
+            <div className={`mb-6 p-4 rounded-none border ${challengeState.battleResult.victory
+                ? 'bg-emerald-900/10 border-emerald-800/50'
+                : 'bg-red-900/10 border-red-800/50'
               }`}>
-              <h3 className={`text-lg font-semibold mb-2 ${challengeState.battleResult.victory ? 'text-green-300' : 'text-red-300'}`}>
-                {challengeState.battleResult.victory ? 'MISSION SUCCESS' : 'MISSION FAILURE'}
+              <h3 className={`text-sm font-bold mb-2 uppercase tracking-widest ${challengeState.battleResult.victory ? 'text-emerald-500' : 'text-red-500'}`}>
+                {challengeState.battleResult.victory ? '> MISSION_SUCCESS' : '! MISSION_FAILURE'}
               </h3>
-              <p className="text-stone-300">
+              <p className="text-stone-300 text-xs leading-relaxed uppercase tracking-wider font-bold">
                 {challengeState.battleResult.summary}
               </p>
             </div>
           )}
 
           {/* 行动按钮 */}
-          <div className="flex justify-end space-x-3">
+          <div className="flex justify-end gap-4 mt-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="px-6 py-2 text-stone-500 border border-stone-800 rounded-none hover:bg-stone-900 hover:text-stone-300 transition-all uppercase tracking-widest font-bold text-xs"
             >
-              取消
+              [ CANCEL ]
             </button>
 
             {canChallengeDaoCombining() && selectedBossId && (
               <button
                 onClick={handleStartChallenge}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="px-8 py-2 bg-emerald-900/20 text-emerald-500 border border-emerald-800 rounded-none hover:bg-emerald-900/40 transition-all uppercase tracking-widest font-bold text-xs shadow-[0_0_15px_rgba(16,185,129,0.1)]"
                 disabled={!selectedBossId}
               >
-                开始挑战
+                [ COMMENCE_ENGAGEMENT ]
               </button>
             )}
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Github, Check } from 'lucide-react';
+import { ASSETS } from '../constants/assets';
 
 interface Props {
   isOpen: boolean;
@@ -171,48 +172,74 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4 touch-manipulation"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 crt-screen"
       onClick={onClose}
     >
       <div
-        className="bg-stone-800 md:rounded-t-2xl md:rounded-b-lg border-0 md:border border-stone-700 w-full h-[90vh] md:h-auto md:max-w-4xl md:max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-ink-950 w-full max-w-4xl rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 背景纹理层 */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+        
+        {/* CRT Visual Layers */}
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
+        <div className="crt-noise"></div>
+        <div className="crt-vignette"></div>
+
         {/* 头部 */}
-        <div className="z-50 bg-stone-800 border-b border-stone-700 p-4 flex justify-between items-center shrink-0">
-          <h2 className="text-lg md:text-xl font-serif text-mystic-gold flex items-center gap-2">
-            Revision Notes
-            <span className="text-sm text-stone-400 font-mono">
-              v{currentVersion}
-            </span>
-          </h2>
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-stone-800 bg-stone-950/50 relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
+                style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+              />
+              <Github size={24} className="relative z-10" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">REVISION_CHRONICLES</h2>
+              <p className="text-[10px] text-stone-600 tracking-widest uppercase">FIRMWARE_V{currentVersion} // STABLE_BUILD</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-200 transition-colors"
+            className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50 relative group overflow-hidden"
+            aria-label="ABORT"
           >
-            <X size={24} />
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity"
+              style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+            />
+            <X size={24} className="relative z-10" />
           </button>
         </div>
 
         {/* 内容区域 */}
-        <div className="modal-scroll-container modal-scroll-content p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10 max-h-[80vh]">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-stone-400">Loading...</div>
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="w-12 h-12 border-2 border-emerald-900 border-t-emerald-500 animate-spin"></div>
+              <div className="text-emerald-500 font-bold uppercase tracking-[0.2em] text-xs animate-pulse">SYNCHRONIZING_DATA...</div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* 当前版本状态 */}
               {isLatest && latestVersion && (
-                <div className="bg-green-900/30 border border-green-700/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Check size={20} className="text-green-400" />
-                    <span className="text-green-400 font-semibold">
-                      Up to Date
-                    </span>
+                <div className="bg-emerald-900/10 border border-emerald-800/50 rounded-none p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center bg-emerald-900/20 border border-emerald-800/50 text-emerald-500">
+                    <Check size={24} />
                   </div>
-                  <div className="text-sm text-green-300">
-                    Running latest version v{currentVersion}
+                  <div>
+                    <div className="text-emerald-500 font-bold uppercase tracking-widest text-sm">
+                      > STATUS_OPTIMAL
+                    </div>
+                    <div className="text-[10px] text-emerald-600/80 uppercase tracking-widest font-bold">
+                      Running latest firmware build v{currentVersion}
+                    </div>
                   </div>
                 </div>
               )}
@@ -222,71 +249,73 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 href="https://github.com/JeasonLoop/react-xiuxian-game"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 rounded-lg px-4 py-3 transition-colors"
+                className="flex items-center justify-center gap-3 w-full bg-stone-900/40 hover:bg-stone-800 text-stone-300 border border-stone-800 rounded-none px-4 py-3.5 transition-all font-bold uppercase tracking-widest text-xs"
               >
-                <Github size={18} />
-                <span>Visit Repository</span>
-                <Check size={16} className="ml-auto" />
+                <Github size={18} className="text-emerald-500" />
+                <span>[ VISIT_CENTRAL_REPOSITORY ]</span>
+                <Check size={16} className="ml-auto text-emerald-500" />
               </a>
 
               {/* 变更日志 */}
-              <div>
-                <h3 className="text-lg font-semibold text-stone-200 mb-4">
-                  Change Log
-                </h3>
-                <div className="space-y-6">
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 border-b border-stone-800 pb-2">
+                  <div className="w-1.5 h-4 bg-emerald-500"></div>
+                  <h3 className="text-sm font-bold text-stone-100 uppercase tracking-widest">
+                    CHRONOLOGICAL_LOGS
+                  </h3>
+                </div>
+                
+                <div className="space-y-8">
                   {versions.map((version, idx) => (
                     <div
                       key={version.version}
-                      className={`border rounded-lg overflow-hidden ${idx === 0 && isLatest
-                          ? 'border-green-700/50 bg-green-900/10'
-                          : 'border-stone-700 bg-stone-900/30'
+                      className={`rounded-none overflow-hidden relative group/version ${idx === 0 && isLatest
+                          ? 'border-l-4 border-emerald-500 bg-emerald-900/5'
+                          : 'border-l-4 border-stone-800 bg-stone-900/40'
                         }`}
                     >
                       {/* 版本标题 */}
-                      <div className="bg-stone-800/50 border-b border-stone-700 px-4 py-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg font-semibold text-mystic-gold">
-                              v{version.version}
-                            </span>
-                            {idx === 0 && isLatest && (
-                              <span className="text-xs bg-green-700/50 text-green-300 px-2 py-1 rounded">
-                                Latest
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-sm text-stone-400">
-                            {version.date}
+                      <div className="px-4 py-3 flex items-center justify-between border-b border-stone-800/30">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-mono font-bold text-emerald-500">
+                            v{version.version}
                           </span>
+                          {idx === 0 && isLatest && (
+                            <span className="text-[10px] bg-emerald-900/30 text-emerald-500 border border-emerald-800/50 px-2 py-0.5 font-bold uppercase tracking-widest">
+                              ACTIVE_BUILD
+                            </span>
+                          )}
                         </div>
+                        <span className="text-[10px] text-stone-600 font-bold uppercase tracking-widest">
+                          {version.date}
+                        </span>
                       </div>
 
                       {/* 版本内容 */}
-                      <div className="p-4 space-y-4">
+                      <div className="p-5 space-y-6">
                         {version.changes.map((change, changeIdx) => (
-                          <div key={changeIdx} className="space-y-2">
+                          <div key={changeIdx} className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <span className="text-base">
+                              <span className="text-lg grayscale opacity-70">
                                 {getCategoryIcon(change.category)}
                               </span>
-                              <h4 className="font-semibold text-stone-300">
-                                {formatCategoryName(change.category)}
+                              <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
+                                > {formatCategoryName(change.category)}
                               </h4>
                             </div>
-                            <ul className="list-none space-y-1.5 ml-6">
+                            <ul className="space-y-2 ml-4">
                               {change.items.map((item, itemIdx) => (
                                 <li
                                   key={itemIdx}
-                                  className="text-sm text-stone-400 flex items-start gap-2"
+                                  className="text-xs text-stone-400 flex items-start gap-3 group/item"
                                 >
-                                  <span className="text-stone-600 mt-1.5 flex-shrink-0">•</span>
+                                  <span className="text-emerald-900 mt-1 font-bold flex-shrink-0 group-hover/item:text-emerald-500 transition-colors">>></span>
                                   <span
-                                    className="flex-1"
+                                    className="flex-1 leading-relaxed tracking-wide"
                                     dangerouslySetInnerHTML={{
                                       __html: item
-                                        .replace(/\*\*(.+?)\*\*/g, '<strong class="text-stone-300">$1</strong>')
-                                        .replace(/`(.+?)`/g, '<code class="bg-stone-800 px-1 rounded text-stone-300">$1</code>'),
+                                        .replace(/\*\*(.+?)\*\*/g, '<strong class="text-stone-200 font-bold">$1</strong>')
+                                        .replace(/`(.+?)`/g, '<code class="bg-stone-950 border border-stone-800 px-1.5 py-0.5 rounded-none text-emerald-500 font-mono text-[10px]">$1</code>'),
                                     }}
                                   />
                                 </li>

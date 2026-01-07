@@ -85,22 +85,22 @@ This plan transforms `cloud-spirit-cultivation` into **Wasteland Survivor** - a 
 
 #### 1.1 Create Localization System
 
-- [ ] Create `locales/` directory structure
-- [ ] Implement i18n hook or context
-- [ ] Create translation JSON files (en/zh)
+- [x] Create `locales/` directory structure
+- [x] Implement i18n context (`LocaleContext`)
+- [x] Create translation JSON files (en) and wire basic usage
 
 ```
 locales/
 ├── en/
-│   ├── common.json      # UI strings
-│   ├── realms.json      # Realm names & descriptions
-│   ├── talents.json     # Talent names & descriptions
-│   ├── items.json       # Item names & descriptions
-│   ├── pets.json        # Pet names & descriptions
-│   ├── sects.json       # Faction names & descriptions
-│   └── events.json      # Event text
-└── zh/
-    └── ... (mirror structure)
+│   ├── achievements.json
+│   ├── common.json
+│   ├── companions.json
+│   ├── events.json
+│   ├── factions.json
+│   ├── items.json
+│   ├── realms.json
+│   └── talents.json
+└── zh/ (planned mirror; not yet created)
 ```
 
 #### 1.2 Key Files to Modify
@@ -124,11 +124,11 @@ locales/
 
 #### 2.1 Layout Changes
 
-- [ ] Convert desktop-first layout to mobile-first
-- [ ] Implement single-column vertical layout
-- [ ] Add bottom navigation bar (like mobile games)
-- [ ] Optimize modal sizes for mobile screens
-- [ ] Implement touch-friendly button sizes (min 44px)
+- [x] Convert desktop-first layout to mobile-first
+- [x] Implement single-column vertical layout
+- [x] Add bottom navigation bar (like mobile games)
+- [x] Optimize modal sizes for mobile screens
+- [x] Implement touch-friendly button sizes (min 44px)
 
 #### 2.2 Key CSS/Component Changes
 
@@ -153,6 +153,11 @@ locales/
 ### Phase 3: Theme Replacement (Re-skinning)
 
 > **Priority: MEDIUM** | **Estimated: 3-4 days**
+
+#### 3.0 Current Status (as-is in repo)
+
+- CRT/Pip-Boy screen material layer is available (scanlines/noise/vignette utilities exist) and is being applied incrementally across key screens/modals.
+- Some core modals are already terminalized (e.g. AutoAdventureConfig, Battle result/log), but many legacy components still use `mystic-gold` and older border/spacing patterns.
 
 #### 3.1 Visual Theme Changes
 
@@ -210,9 +215,9 @@ bucket = "./dist"
 
 ---
 
-## 4. Detailed File Change List
+## 4. Detailed File Change List（Updated）
 
-### Constants Files (22 files)
+### 4.1 Constants & Game Data（已基本完成废土化）
 
 | File | Lines | Changes |
 |------|-------|---------|
@@ -234,18 +239,31 @@ bucket = "./dist"
 | [shop.ts](file:///d:/Code/fallout_roguelike/constants/shop.ts) | 8KB | Translate shop items |
 | [spiritualRoots.ts](file:///d:/Code/fallout_roguelike/constants/spiritualRoots.ts) | 3KB | Translate to mutation types |
 
-### Component Files (Priority)
+> 当前代码中，核心常量和文案已基本完成英文化+废土主题重构（参考 `new/题材改版初稿.md` 及 `constants/` 目录）。后续以“查漏补缺”为主，而不是大规模翻译。
 
-| Component | Changes |
-|-----------|---------|
-| [StartScreen.tsx](file:///d:/Code/fallout_roguelike/components/StartScreen.tsx) | New wasteland intro, English text |
-| [WelcomeScreen.tsx](file:///d:/Code/fallout_roguelike/components/WelcomeScreen.tsx) | Wasteland theme, English |
-| [CharacterModal.tsx](file:///d:/Code/fallout_roguelike/components/CharacterModal.tsx) | Use translated strings |
-| [InventoryModal.tsx](file:///d:/Code/fallout_roguelike/components/InventoryModal.tsx) | Use translated strings |
-| [SectModal.tsx](file:///d:/Code/fallout_roguelike/components/SectModal.tsx) | Rename to FactionModal |
-| [PetModal.tsx](file:///d:/Code/fallout_roguelike/components/PetModal.tsx) | Rename to CompanionModal |
-| [LotteryModal.tsx](file:///d:/Code/fallout_roguelike/components/LotteryModal.tsx) | Rename to SalvageModal |
-| [AlchemyModal.tsx](file:///d:/Code/fallout_roguelike/components/AlchemyModal.tsx) | Rename to CraftingModal |
+### 4.2 Component Files（UI / UX 优先级）
+
+| Component | Changes / Status |
+|-----------|------------------|
+| [WelcomeScreen.tsx](file:///d:/Code/fallout_roguelike/components/WelcomeScreen.tsx) | 首屏体验，使用废土主题与新 Logo，已基础完成，后续配合新美术迭代 |
+| [StartScreen.tsx](file:///d:/Code/fallout_roguelike/components/StartScreen.tsx) | 角色创建/开局，引导进入废土世界，已英文化，需强化品牌感与背景图 |
+| [GameView.tsx](file:///d:/Code/fallout_roguelike/views/GameView.tsx) | 主游戏视图，负责布局、日志流与 Stats/MobileSidebar，目前为“上日志+下操作栏”结构，后续需要与底部 Tab 导航整合 |
+| [GameHeader.tsx](file:///d:/Code/fallout_roguelike/views/GameHeader.tsx) | 顶部导航，含菜单与核心入口，需收敛为移动端紧凑版（保留语言切换、设置等） |
+| [ActionBar.tsx](file:///d:/Code/fallout_roguelike/views/ActionBar.tsx) | 核心操作按钮区（Train/Scavenge/Explore/Craft/Faction），后续与底部 Tab 分工：Tab 负责“系统级入口”，ActionBar 负责“当前频道内操作” |
+| [MobileSidebar.tsx](file:///d:/Code/fallout_roguelike/components/MobileSidebar.tsx) | 移动端抽屉，目前承担过多入口角色，计划收敛为“更多/设置”与部分次要入口 |
+| [NotificationToast.tsx](file:///d:/Code/fallout_roguelike/views/NotificationToast.tsx) | 奖励提示与操作反馈，需统一颜色/阴影/动效，与美术规范对齐 |
+| [StatsPanel.tsx](file:///d:/Code/fallout_roguelike/components/StatsPanel.tsx) | 属性面板，将作为底部 Tab 中 Status 的主内容，需要适配竖屏全屏/抽屉样式 |
+| [InventoryModal.tsx](file:///d:/Code/fallout_roguelike/components/InventoryModal.tsx) | 已有 PIP-BOY 风格 Header/筛选区与部分物品卡壳；仍残留 `mystic-gold` 与细节风格漂移，需继续收敛 tokens 并完善“物品卡体系” |
+| [EquipmentPanel.tsx](file:///d:/Code/fallout_roguelike/components/EquipmentPanel.tsx) | 已终端化：扫描线层、槽位网格、术语与按钮一致；后续接入“图标位/稀有度框”美术资源提升识别度 |
+| [CharacterModal.tsx](file:///d:/Code/fallout_roguelike/components/CharacterModal.tsx) | 大部分区域已偏终端风（字体/术语/扫描线层）；仍存在局部粗边框与旧配色，需统一为同一套组件规范 |
+| [AutoAdventureConfigModal.tsx](file:///d:/Code/fallout_roguelike/components/AutoAdventureConfigModal.tsx) | 已终端化：协议配置弹窗统一扫描线/术语/按钮与输入控件风格 |
+| [BattleModal.tsx](file:///d:/Code/fallout_roguelike/components/BattleModal.tsx) | 已终端化：战斗结果/日志展示重排，信息区与交互按钮统一；后续与回合制界面做一致化 |
+| [TurnBasedBattleModal.tsx](file:///d:/Code/fallout_roguelike/components/TurnBasedBattleModal.tsx) | 回合制交互仍保留较多旧风格（如 `mystic-gold`），需要按终端规范重构 |
+| [SectModal.tsx](file:///d:/Code/fallout_roguelike/components/SectModal.tsx) | 派系系统 UI，后续配合派系徽章与装饰元素 |
+| [PetModal.tsx](file:///d:/Code/fallout_roguelike/components/PetModal.tsx) | 伙伴系统 UI，展示伙伴插画/图标与技能 |
+| [LotteryModal.tsx](file:///d:/Code/fallout_roguelike/components/LotteryModal.tsx) | 抽奖/补给箱 UI，后续结合掉落动画与奖励卡片 |
+| [AlchemyModal.tsx](file:///d:/Code/fallout_roguelike/components/AlchemyModal.tsx) | 制作/炼制 UI，配合药剂/部件图标 |
+| 所有 *Modal.tsx | 统一走“全屏或 Bottom Sheet + 固定 Header + 滚动内容”样式（参考 `views/README.md` 与 `new/H5移动端UI与美术升级计划.md`） |
 
 ---
 
@@ -266,22 +284,72 @@ Only display names and descriptions change, not underlying mechanics.
 
 ---
 
-## 6. Verification Plan
+## 6. Verification & Deployment Plan（Updated）
 
-### Automated Tests
+### 6.1 Automated Tests
 
 Currently no automated tests exist in the repository. Recommend adding:
 
 - [ ] Unit tests for i18n hook
 - [ ] Snapshot tests for key components
 
-### Manual Verification
+### 6.1.1 Current Quality Gates
+
+- ESLint: currently failing (existing backlog of unused vars / prefer-const, etc.)
+- TypeScript typecheck: currently failing (mixed localized string unions and legacy typing debt)
+
+### 6.2 Manual Verification（功能 & 视觉）
 
 1. **Language Check**: All UI shows English text
 2. **Theme Check**: All visuals match wasteland aesthetic
 3. **Mobile Check**: Game playable on 375px width (iPhone SE)
 4. **Gameplay Check**: Complete one full game loop (create character → adventure → breakthrough)
-5. **Deploy Check**: Site accessible on Cloudflare Pages URL
+5. **Deploy Check**: Site accessible on Cloudflare Pages URL（含 AI 事件正常工作）
+
+### 6.3 Cloudflare Pages Deployment（当前方案）
+
+本项目已采用 **Cloudflare Pages + Wrangler Action** 的标准部署流程，配置位于：  
+- GitHub Actions Workflow: [deploy.yml](file:///d:/Code/fallout_roguelike/.github/workflows/deploy.yml)  
+- 构建工具：Vite（`pnpm build`）  
+- 静态资源输出目录：`dist/`
+
+**部署流水线：**
+
+1. 推送到 `main` 或 `master` 分支，触发 `Deploy to Cloudflare Pages` workflow
+2. Workflow 步骤：
+   - Checkout 代码
+   - 安装 Node.js 20 与 pnpm 8
+   - `pnpm install --frozen-lockfile`
+   - `pnpm build`（带上 AI 相关环境变量）
+   - 使用 `cloudflare/wrangler-action@v3` 执行：`pages deploy dist --project-name=wasteland-survivor`
+
+**Cloudflare 侧环境变量建议：**
+
+- Secrets（机密）
+  - `VITE_AI_KEY`：AI 提供商的 API Key（在 Actions 中作为 `secrets.VITE_AI_KEY`，同时在 Cloudflare Pages 项目中也配置同名环境变量）
+  - `CLOUDFLARE_API_TOKEN`：用于 wrangler action 部署权限
+  - `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 账户 ID
+
+- Vars（非机密配置）
+  - `VITE_AI_PROVIDER`：`glm` / `siliconflow` / `openai` 等，默认 `glm`
+  - 如需自定义代理网关：`VITE_AI_API_URL`（会被 `vite.config.ts` 中的 `getProxyTarget` 解析）
+
+**本地开发环境变量：**
+
+在项目根目录创建 `.env.local`（不提交到 Git）：
+
+```bash
+VITE_AI_KEY=your-local-dev-key
+# 可选
+VITE_AI_PROVIDER=glm
+# VITE_AI_API_URL=https://your-proxy-gateway.example.com/v1
+```
+
+### 6.4 Domain & Routing
+
+- Cloudflare Pages 项目名：`wasteland-survivor`
+- 默认访问域名：`https://wasteland-survivor.pages.dev`（具体以 Cloudflare 面板显示为准）
+- SPA 路由：当前为单入口应用，Vite 默认入口为 `index.html`，Cloudflare Pages 对 Vite 有内置支持，如未来引入前端路由方案，可在 Pages 项目设置中开启 SPA 模式（All routes → `index.html`）
 
 ---
 
