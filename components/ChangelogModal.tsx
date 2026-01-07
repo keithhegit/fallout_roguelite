@@ -235,7 +235,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   </div>
                   <div>
                     <div className="text-emerald-500 font-bold uppercase tracking-widest text-sm">
-                      > STATUS_OPTIMAL
+                      {'>'} STATUS_OPTIMAL
                     </div>
                     <div className="text-[10px] text-emerald-600/80 uppercase tracking-widest font-bold">
                       Running latest firmware build v{currentVersion}
@@ -300,7 +300,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                 {getCategoryIcon(change.category)}
                               </span>
                               <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
-                                > {formatCategoryName(change.category)}
+                                {'>'} {formatCategoryName(change.category)}
                               </h4>
                             </div>
                             <ul className="space-y-2 ml-4">
@@ -309,7 +309,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                   key={itemIdx}
                                   className="text-xs text-stone-400 flex items-start gap-3 group/item"
                                 >
-                                  <span className="text-emerald-900 mt-1 font-bold flex-shrink-0 group-hover/item:text-emerald-500 transition-colors">>></span>
+                                  <span className="text-emerald-900 mt-1 font-bold flex-shrink-0 group-hover/item:text-emerald-500 transition-colors">{'>>'}</span>
                                   <span
                                     className="flex-1 leading-relaxed tracking-wide"
                                     dangerouslySetInnerHTML={{
@@ -337,4 +337,3 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
 };
 
 export default ChangelogModal;
-

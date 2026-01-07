@@ -1521,6 +1521,7 @@ const CharacterModal: React.FC<Props> = ({
                     </div>
                   </div>
                 </div>
+              </div>
               )}
 
               {/* Traits Display (Immutable) */}
