@@ -117,7 +117,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
 
     if (!isMet) {
       // 未达到目标分数，判定失败
-      const failMessage = tribulationState.tribulationLevel === '长生天劫' && longevityChallenges
+      const failMessage = tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges
         ? `Phase ${currentChallengeIndex + 1} Failure! The Celestial Grid collapsed. Structural integrity lost...`
         : 'Celestial Grid Failure! System can no longer process moves. Radiation overload imminent...';
 
@@ -230,7 +230,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
 
   // 初始化解密游戏（金丹期、元婴期、化神期）
   const initializePuzzle = useCallback(() => {
-    if (tribulationState.tribulationLevel === '金丹天劫') {
+    if (tribulationState.tribulationLevel === 'Elite Storm') {
       // 金丹期：数字序列找规律
       // 使用所有功法数量来决定游戏难度（随法门数上升）
       const artCount = player.cultivationArts?.length || 0;
@@ -243,7 +243,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       setShowHint(false);
       setHintUsed(false);
       setRevealedPositions([]);
-    } else if (tribulationState.tribulationLevel === '元婴天劫') {
+    } else if (tribulationState.tribulationLevel === 'Master Storm') {
       // 元婴期：2048游戏（使用天地精华品质和整体实力决定难度）
       const essenceQuality = player.heavenEarthEssence
         ? (HEAVEN_EARTH_ESSENCES[player.heavenEarthEssence]?.quality || 50)
@@ -264,7 +264,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       setShowHint(false);
       setHintUsed(false);
       setRevealedPositions([]);
-    } else if (tribulationState.tribulationLevel === '化神天劫') {
+    } else if (tribulationState.tribulationLevel === 'Grandmaster Storm') {
       // 化神期：符文序列（使用天地之髓品质决定难度）
       const marrowQuality = player.heavenEarthMarrow
         ? (HEAVEN_EARTH_MARROWS[player.heavenEarthMarrow]?.quality || 50)
@@ -279,7 +279,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       setShowHint(false);
       setHintUsed(false);
       setRevealedPositions([]);
-    } else if (tribulationState.tribulationLevel === '长生天劫') {
+    } else if (tribulationState.tribulationLevel === 'Eternal Storm') {
       // 长生天劫：五重考验
       const ruleCount = player.longevityRules?.length || 0;
       const puzzleData = generateLongevityPuzzle(ruleCount);
@@ -381,7 +381,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       const puzzleData = puzzle.data || puzzle;
       const targetScore = puzzleData.targetScore || 2048;
       isCorrect = game2048Score >= targetScore;
-    } else if (tribulationState.tribulationLevel === '长生天劫' && longevityChallenges) {
+    } else if (tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges) {
       // 长生天劫：检查当前考验的答案
       const challenge = longevityChallenges.challenges[currentChallengeIndex];
       if (challenge.type === '八卦阵') {
@@ -403,7 +403,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
 
     if (isCorrect) {
       // 如果是长生天劫，检查是否还有下一个考验
-      if (tribulationState.tribulationLevel === '长生天劫' && longevityChallenges) {
+      if (tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges) {
         if (currentChallengeIndex < longevityChallenges.challenges.length - 1) {
           // 进入下一个考验
           const nextIndex = currentChallengeIndex + 1;
@@ -443,7 +443,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
         failMessage = 'Rune Deduction Failed! The energy surge consumes you...';
       } else if (puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局') {
         failMessage = 'Celestial Grid Failed! Energy targets unmet. System meltdown initiated...';
-      } else if (tribulationState.tribulationLevel === '长生天劫') {
+      } else if (tribulationState.tribulationLevel === 'Eternal Storm') {
         failMessage = `Phase ${currentChallengeIndex + 1} Failure! Your journey ends here...`;
       }
       const tribulationResult: TribulationResult = {
@@ -462,10 +462,10 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     if (!tribulationState.isOpen || isProcessing) return;
 
     // 金丹期、元婴期、化神期、长生天劫特殊处理：先进行解密游戏
-    if (tribulationState.tribulationLevel === '金丹天劫' ||
-      tribulationState.tribulationLevel === '元婴天劫' ||
-      tribulationState.tribulationLevel === '化神天劫' ||
-      tribulationState.tribulationLevel === '长生天劫') {
+    if (tribulationState.tribulationLevel === 'Elite Storm' ||
+      tribulationState.tribulationLevel === 'Master Storm' ||
+      tribulationState.tribulationLevel === 'Grandmaster Storm' ||
+      tribulationState.tribulationLevel === 'Eternal Storm') {
       initializePuzzle();
       return;
     }
@@ -605,7 +605,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4">
               <Sparkles className="text-purple-400 w-6 h-6 sm:w-8 sm:h-8" />
               <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-purple-300">
-                {tribulationState.tribulationLevel.replace('天劫', ' Spike')}
+                {tribulationState.tribulationLevel.replace('Storm', 'Spike')}
               </h2>
               <Sparkles className="text-purple-400 w-6 h-6 sm:w-8 sm:h-8" />
             </div>
@@ -621,7 +621,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
               <div className="text-center">
                 <Grid3X3 className="text-purple-400 mx-auto mb-4 sm:mb-6 w-8 h-8 sm:w-10 sm:h-10" />
                 <h3 className="text-lg sm:text-xl md:text-2xl text-purple-300 font-serif mb-2 sm:mb-3">
-                  {tribulationState.tribulationLevel === '长生天劫' && longevityChallenges ? (
+                  {tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges ? (
                     <>Phase {currentChallengeIndex + 1}: {puzzle.type}</>
                   ) : (
                     puzzle.puzzleType === '数字序列' ? 'Data Sequence Deduction' :
@@ -631,20 +631,20 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                             'Encryption Override'
                   )}
                 </h3>
-                {tribulationState.tribulationLevel === '长生天劫' && longevityChallenges && (
+                {tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges && (
                   <p className="text-sm text-yellow-400 mb-2">
                     Progress: {currentChallengeIndex + 1}/{longevityChallenges.challenges.length}
                   </p>
                 )}
                 <p className="text-xs sm:text-sm md:text-base text-stone-400 mb-4 sm:mb-6">
-                  {tribulationState.tribulationLevel === '长生天劫' && puzzle.data?.description ? puzzle.data.description : puzzle.description}
+                  {tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.data?.description ? puzzle.data.description : puzzle.description}
                 </p>
 
                 {/* 数字序列游戏 */}
-                {(puzzle.puzzleType === '数字序列' || (tribulationState.tribulationLevel === '长生天劫' && puzzle.type === '八卦阵')) && (
+                {(puzzle.puzzleType === '数字序列' || (tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '八卦阵')) && (
                   <div className="mb-6">
                     <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 flex-wrap">
-                      {(tribulationState.tribulationLevel === '长生天劫' && puzzle.type === '八卦阵' ? puzzle.data?.sequence : puzzle.sequence)?.map((num: number, index: number) => (
+                      {(tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '八卦阵' ? puzzle.data?.sequence : puzzle.sequence)?.map((num: number, index: number) => (
                         <div
                           key={index}
                           className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-900/50 border-2 border-purple-500 rounded-lg flex items-center justify-center text-xl sm:text-2xl font-bold text-purple-200"
@@ -758,12 +758,12 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                 })()}
 
                 {/* 符文序列游戏 */}
-                {(puzzle.puzzleType === '符文序列' || (tribulationState.tribulationLevel === '长生天劫' && puzzle.type === '符文序列')) && (
+                {(puzzle.puzzleType === '符文序列' || (tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '符文序列')) && (
                   <div className="mb-6">
                     <div className="mb-4">
                       <label className="block text-sm text-stone-400 mb-2">Target Sequence:</label>
                       <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 flex-wrap">
-                        {(tribulationState.tribulationLevel === '长生天劫' && puzzle.type === '符文序列' ? puzzle.data?.targetSequence : puzzle.targetSequence)?.map((symbol: string, index: number) => (
+                        {(tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '符文序列' ? puzzle.data?.targetSequence : puzzle.targetSequence)?.map((symbol: string, index: number) => (
                           <div
                             key={index}
                             className="w-12 h-12 sm:w-14 sm:h-14 bg-green-900/50 border-2 border-green-500 rounded-lg flex items-center justify-center text-lg sm:text-xl font-bold text-green-200"

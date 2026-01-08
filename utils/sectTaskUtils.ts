@@ -70,7 +70,7 @@ export const sectTaskUtils = {
    * 尝试获取进阶物品奖励
    */
   tryGetAdvancedItem: (player: PlayerStats, task: RandomSectTask): { item: any | null; message: string } => {
-    if (task.difficulty !== '极难' || task.quality !== '仙品') {
+    if (task.difficulty !== 'Extreme' || task.quality !== 'Mythic') {
       return { item: null, message: '' };
     }
 

@@ -156,7 +156,7 @@ const MobileSidebar: React.FC<Props> = ({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-ink-800">
-            <h2 className="text-lg font-mono text-mystic-gold uppercase tracking-widest">Menu</h2>
+            <h2 className="text-lg font-mono text-amber-400 uppercase tracking-widest">Menu</h2>
             <button
               onClick={onClose}
               className="text-stone-400 active:text-white min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"

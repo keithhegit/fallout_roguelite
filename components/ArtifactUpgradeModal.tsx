@@ -129,18 +129,18 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
         {/* 强化动画覆盖层 */}
         {isUpgrading && (
           <div className="absolute inset-0 bg-ink-950/90 z-[60] flex items-center justify-center">
-            <div className="text-center p-8 border border-mystic-gold/30 bg-ink-900 relative">
+            <div className="text-center p-8 border border-amber-500/30 bg-ink-900 relative">
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute inset-0 scanline-overlay opacity-10"></div>
               </div>
               <div className="relative w-24 h-24 mx-auto mb-6">
-                <div className="absolute inset-0 border-2 border-mystic-gold/20 rounded-none animate-ping"></div>
-                <div className="absolute inset-0 border-2 border-mystic-gold border-t-transparent rounded-none animate-spin"></div>
+                <div className="absolute inset-0 border-2 border-amber-500/20 rounded-none animate-ping"></div>
+                <div className="absolute inset-0 border-2 border-amber-500 border-t-transparent rounded-none animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="text-mystic-gold animate-pulse" size={32} />
+                  <Sparkles className="text-amber-400 animate-pulse" size={32} />
                 </div>
               </div>
-              <div className="text-mystic-gold text-xl font-bold animate-pulse uppercase tracking-[0.2em]">
+              <div className="text-amber-400 text-xl font-bold animate-pulse uppercase tracking-[0.2em]">
                 CALIBRATING...
               </div>
               <div className="text-stone-500 text-[10px] mt-4 uppercase tracking-widest">
@@ -151,7 +151,7 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
         )}
 
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-ink-900 rounded-none relative z-10">
-          <h3 className="text-lg font-mono text-mystic-gold flex items-center gap-2 uppercase tracking-widest">
+          <h3 className="text-lg font-mono text-amber-400 flex items-center gap-2 uppercase tracking-widest">
             <Hammer size={18} /> Artifact Calibration
           </h3>
           <button onClick={onClose} className="text-stone-500 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -248,7 +248,7 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
               <span className={`uppercase tracking-widest ${playerStones >= costStones ? 'text-stone-500' : 'text-red-500'}`}>
                 Energy Credits Required
               </span>
-              <span className={`font-bold ${playerStones >= costStones ? 'text-mystic-gold' : 'text-red-500'}`}>
+              <span className={`font-bold ${playerStones >= costStones ? 'text-amber-400' : 'text-red-500'}`}>
                 {playerStones} / {costStones}
               </span>
             </div>
@@ -334,7 +334,7 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
             className={`
               w-full py-4 rounded-none font-bold text-sm transition-all relative overflow-hidden uppercase tracking-[0.3em] min-h-[52px]
               ${canAfford && !isUpgrading
-                ? 'bg-ink-950 text-mystic-gold hover:bg-stone-900 border border-mystic-gold active:scale-[0.98]'
+                ? 'bg-ink-950 text-amber-400 hover:bg-stone-900 border border-amber-500 active:scale-[0.98]'
                 : 'bg-ink-950 text-stone-700 cursor-not-allowed border border-stone-900'}
             `}
           >

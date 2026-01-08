@@ -29,6 +29,13 @@ import {
   Search,
   Filter,
   SlidersHorizontal,
+  Shield,
+  Sword,
+  FlaskConical,
+  ScrollText,
+  Boxes,
+  Dna,
+  CircleHelp,
 } from 'lucide-react';
 import { REALM_ORDER, SPIRITUAL_ROOT_NAMES, FOUNDATION_TREASURES, HEAVEN_EARTH_ESSENCES, HEAVEN_EARTH_MARROWS, LONGEVITY_RULES } from '../constants/index';
 import EquipmentPanel from './EquipmentPanel';
@@ -40,8 +47,8 @@ import {
   getRarityBadge,
   getRarityOrder,
   getRarityDisplayName,
+  getRarityTextColor,
   normalizeRarityValue,
-  getRarityGlow,
 } from '../utils/rarityUtils';
 import { getItemStats, normalizeTypeLabel } from '../utils/itemUtils';
 import {
@@ -54,16 +61,6 @@ import {
 import { useDebounce } from '../hooks/useDebounce';
 import { showConfirm } from '../utils/toastUtils';
 import { formatValueChange, formatNumber } from '../utils/formatUtils';
-import { 
-  Zap, 
-  Shield, 
-  Sword, 
-  FlaskConical, 
-  ScrollText, 
-  Boxes, 
-  Dna,
-  CircleHelp
-} from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -158,7 +155,7 @@ const InventoryItem = memo<InventoryItemProps>(
         case ItemType.Weapon: return <Sword size={18} />;
         case ItemType.Armor: return <Shield size={18} />;
         case ItemType.Pill: return <FlaskConical size={18} />;
-        case ItemType.Consumable: return <Zap size={18} />;
+        // case ItemType.Consumable: return <Zap size={18} />;
         case ItemType.Recipe: return <ScrollText size={18} />;
         case ItemType.Material: return <Boxes size={18} />;
         case ItemType.AdvancedItem: return <Dna size={18} />;
@@ -208,7 +205,7 @@ const InventoryItem = memo<InventoryItemProps>(
               </div>
               
               <div className="flex gap-2 items-center">
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-none uppercase font-bold tracking-widest ${getRarityBadge(rarity)}`}>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded-none uppercase font-bold tracking-widest border ${getRarityBadge(rarity)}`}>
                   {rarityLabel}
                 </span>
                 <span className="text-[10px] text-stone-600 uppercase tracking-widest font-mono">{typeLabel}</span>
@@ -291,7 +288,7 @@ const InventoryItem = memo<InventoryItemProps>(
           )}
 
           {isNatal && (
-            <div className="text-xs text-mystic-gold mb-2 flex items-center gap-1">
+            <div className="text-xs text-amber-400 mb-2 flex items-center gap-1">
               <Sparkles size={12} />
               <span className="font-bold">Signature Gear (Stats +50%)</span>
             </div>
@@ -425,7 +422,7 @@ const InventoryItem = memo<InventoryItemProps>(
                     }}
                     disabled={isDisabled}
                     className={`px-3 text-[10px] py-2 rounded-none transition-all border uppercase tracking-widest min-h-[36px] ${isNatal
-                      ? 'bg-ink-950 hover:bg-mystic-gold/10 text-mystic-gold border-mystic-gold/50'
+                      ? 'bg-bunker-900 hover:bg-amber-500/10 text-amber-400 border-amber-500/50'
                       : isDisabled
                         ? 'bg-ink-950 text-stone-700 border-stone-900 cursor-not-allowed opacity-50'
                         : 'bg-ink-950 hover:bg-purple-950/20 text-purple-400 border-purple-900/50'
@@ -850,7 +847,7 @@ const InventoryModal: React.FC<Props> = ({
     // For items without equipmentSlot (like some Rings/Accessories/Artifacts),
     // try to find a relevant slot based on type
     if (!slot) {
-      const slots = getEquipmentSlotsByType(hoveredItem.type);
+      const slots = getEquipmentSlotsByType(hoveredItem.type as ItemType);
       if (slots.length > 0) {
         // Find an empty slot or use the first one
         slot = slots.find(s => !equippedItems[s]) || slots[0];
@@ -1032,7 +1029,7 @@ const InventoryModal: React.FC<Props> = ({
                   {(['all', 'common', 'uncommon', 'rare', 'legendary'] as const).map((rarity) => (
                     <button
                       key={rarity}
-                      onClick={() => setRarityFilter(rarity)}
+                      onClick={() => setRarityFilter(rarity.charAt(0).toUpperCase() + rarity.slice(1) as ItemRarity)}
                       className={`px-3 py-1.5 rounded-none text-[10px] border transition-all uppercase tracking-widest ${rarityFilter === rarity
                         ? 'bg-yellow-950/40 border-yellow-600/50 text-yellow-500'
                         : 'bg-ink-950 border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-400'

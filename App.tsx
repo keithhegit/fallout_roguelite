@@ -14,6 +14,7 @@ import {
   EquipmentSlot,
   TribulationState,
   TribulationResult,
+  RealmType,
 } from './types';
 import WelcomeScreen from './components/WelcomeScreen';
 import StartScreen from './components/StartScreen';
@@ -354,7 +355,7 @@ function App() {
       const isNewPlayer = prevPlayerNameRef.current !== null &&
         prevPlayerNameRef.current !== player.name;
       const isInitialState = player.exp === 0 &&
-        player.realm === 'QiRefining' &&
+        player.realm === RealmType.QiRefining &&
         player.realmLevel === 1;
 
       if (isNewPlayer && isInitialState) {

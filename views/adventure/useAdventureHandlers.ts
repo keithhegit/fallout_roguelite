@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayerStats, AdventureType, ShopType, RealmType, AdventureResult } from '../../types';
+import { PlayerStats, AdventureType, ShopType, RealmType, AdventureResult, RiskLevel } from '../../types';
 import { REALM_ORDER, HEAVEN_EARTH_SOUL_BOSSES } from '../../constants/index';
 import {
   shouldTriggerBattle,
@@ -45,7 +45,7 @@ interface UseAdventureHandlersProps {
   onOpenBattleModal: (replay: BattleReplay) => void;
   onOpenTurnBasedBattle?: (params: {
     adventureType: AdventureType;
-    riskLevel?: '低' | '中' | '高' | '极度危险';
+    riskLevel?: RiskLevel;
     realmMinRealm?: RealmType;
     bossId?: string; // 指定的天地之魄BOSS ID（用于事件模板）
   }) => void; // 打开回合制战斗
@@ -102,7 +102,7 @@ export function useAdventureHandlers({
    */
   const handleBattle = async (
     battleType: AdventureType,
-    riskLevel: '低' | '中' | '高' | '极度危险',
+    riskLevel: RiskLevel,
     realmMinRealm: RealmType,
     bossId?: string,
     huntSectId?: string,
@@ -180,7 +180,7 @@ export function useAdventureHandlers({
   const executeAdventure = async (
     adventureType: AdventureType,
     realmName?: string,
-    riskLevel?: '低' | '中' | '高' | '极度危险',
+    riskLevel?: RiskLevel,
     realmMinRealm?: RealmType,
   ) => {
     if (!player) {
@@ -216,7 +216,7 @@ export function useAdventureHandlers({
         addLog('⚠️ 你感受到了一股强烈的杀意！宗门追杀者出现了！', 'danger');
 
         // 使用公共函数处理战斗
-        const huntRiskLevel = huntLevel >= 3 ? '极度危险' : huntLevel >= 2 ? '高' : huntLevel >= 1 ? '中' : '低';
+        const huntRiskLevel = huntLevel >= 3 ? 'Extreme' : huntLevel >= 2 ? 'High' : huntLevel >= 1 ? 'Medium' : 'Low';
         const battleRes = await handleBattle(
           'sect_challenge',
           huntRiskLevel,

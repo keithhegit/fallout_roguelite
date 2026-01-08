@@ -57,11 +57,11 @@ const SectTreasureVaultModal: React.FC<Props> = ({
       const roll = Math.random();
       let targetRarity: ItemRarity = '普通';
 
-      if (roll < rarityChances['Exotic']) {
-        targetRarity = 'Exotic';
-      } else if (roll < rarityChances['Exotic'] + rarityChances['Legendary']) {
+      if (roll < rarityChances['Mythic']) {
+        targetRarity = 'Mythic';
+      } else if (roll < rarityChances['Mythic'] + rarityChances['Legendary']) {
         targetRarity = 'Legendary';
-      } else if (roll < rarityChances['Exotic'] + rarityChances['Legendary'] + rarityChances['Rare']) {
+      } else if (roll < rarityChances['Mythic'] + rarityChances['Legendary'] + rarityChances['Rare']) {
         targetRarity = 'Rare';
       } else {
         targetRarity = 'Common';
@@ -218,7 +218,7 @@ const SectTreasureVaultModal: React.FC<Props> = ({
                             (item.rarity as any) === 'Rare' ? 'text-blue-400 border-blue-900/50 bg-blue-950/30' :
                             'text-stone-400 border-stone-800 bg-stone-950/30'
                           }`}>
-                            {item.rarity === 'Exotic' ? 'LEGENDARY' : item.rarity === 'Legendary' ? 'EPIC' : item.rarity === 'Rare' ? 'RARE' : 'COMMON'}
+                            {item.rarity === 'Mythic' ? 'LEGENDARY' : item.rarity === 'Legendary' ? 'EPIC' : item.rarity === 'Rare' ? 'RARE' : 'COMMON'}
                           </span>
                         )}
                         <span className="text-[9px] text-stone-500 px-1.5 py-0.5 rounded-none border border-stone-800 uppercase tracking-widest">

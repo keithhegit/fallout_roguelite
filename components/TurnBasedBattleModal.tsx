@@ -14,6 +14,7 @@ import {
   Item,
   PlayerStats,
   RealmType,
+  RiskLevel,
 } from '../types';
 import {
   executePlayerAction,
@@ -29,7 +30,7 @@ interface TurnBasedBattleModalProps {
   isOpen: boolean;
   player: PlayerStats;
   adventureType: 'normal' | 'lucky' | 'secret_realm' | 'sect_challenge' | 'dao_combining_challenge';
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme';
+  riskLevel?: RiskLevel;
   realmMinRealm?: RealmType;
   bossId?: string; // 指定的天地之魄BOSS ID（用于事件模板）
   autoAdventure?: boolean; // 是否在自动历练模式下
@@ -39,7 +40,7 @@ interface TurnBasedBattleModalProps {
       hpLoss: number;
       expChange: number;
       spiritChange: number;
-      adventureType?: 'normal' | 'lucky' | 'secret_realm' | 'sect_challenge';
+      adventureType?: 'normal' | 'lucky' | 'secret_realm' | 'sect_challenge' | 'dao_combining_challenge';
       items?: Array<{
         name: string;
         type: string;
@@ -108,7 +109,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
       initializeTurnBasedBattle(
         player,
         adventureType,
-        riskLevel,
+        riskLevel as any,
         realmMinRealm as any,
         undefined,
         bossId
@@ -595,8 +596,8 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
             <div className="text-xs text-stone-500 uppercase tracking-widest">
               Turn-Based Combat · Round {battleState.round}
             </div>
-            <div className="flex items-center gap-2 text-lg font-serif text-mystic-gold">
-              <Sword size={18} className="text-mystic-gold" />
+            <div className="flex items-center gap-2 text-lg font-terminal text-amber-400">
+              <Sword size={18} className="text-amber-400" />
               {enemyUnit.name}
               <span className="text-[11px] text-stone-400 bg-ink-800 px-2 py-0.5 rounded border border-stone-700">
                 {enemyUnit.realm}
@@ -1086,7 +1087,13 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                                   item.rarity === '稀有' ? 'text-blue-400' :
                                     'text-stone-400'
                                 }`}>
-                                {item.rarity}
+                                {item.rarity === '仙品'
+                                  ? 'Prototype'
+                                  : item.rarity === '传说'
+                                    ? 'Legendary'
+                                    : item.rarity === '稀有'
+                                      ? 'Rare'
+                                      : item.rarity}
                               </span>
                             </div>
                             {hasBattleEffect ? (
@@ -1095,20 +1102,37 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                                   {item.battleEffect.description}
                                 </div>
                                 <div className="text-xs text-stone-500 mt-1">
-                                  {item.battleEffect.cost?.lifespan && `消耗寿命: ${item.battleEffect.cost.lifespan}年`}
-                                  {item.battleEffect.cost?.maxHp && `消耗气血上限: ${typeof item.battleEffect.cost.maxHp === 'number' && item.battleEffect.cost.maxHp < 1 ? `${(item.battleEffect.cost.maxHp * 100).toFixed(0)}%` : item.battleEffect.cost.maxHp}`}
-                                  {item.battleEffect.cost?.hp && `消耗气血: ${item.battleEffect.cost.hp}`}
-                                  {item.battleEffect.cost?.spirit && `消耗神识: ${item.battleEffect.cost.spirit}`}
+                                  {(() => {
+                                    const costs: string[] = [];
+                                    if (item.battleEffect.cost?.lifespan) {
+                                      costs.push(`Life Cost: ${item.battleEffect.cost.lifespan}y`);
+                                    }
+                                    if (item.battleEffect.cost?.maxHp) {
+                                      const maxHpCost = item.battleEffect.cost.maxHp;
+                                      const display =
+                                        typeof maxHpCost === 'number' && maxHpCost < 1
+                                          ? `${(maxHpCost * 100).toFixed(0)}%`
+                                          : String(maxHpCost);
+                                      costs.push(`Max HP Cost: ${display}`);
+                                    }
+                                    if (item.battleEffect.cost?.hp) {
+                                      costs.push(`HP Cost: ${item.battleEffect.cost.hp}`);
+                                    }
+                                    if (item.battleEffect.cost?.spirit) {
+                                      costs.push(`PER Cost: ${item.battleEffect.cost.spirit}`);
+                                    }
+                                    return costs.join(' · ');
+                                  })()}
                                 </div>
                               </>
                             ) : (
                               <div className="text-xs text-stone-500 mt-1">
-                                该进阶物品没有战斗效果
+                                No combat effect.
                               </div>
                             )}
                             {isOnCooldown && (
                               <div className="text-xs text-red-400 mt-1">
-                                冷却中: {item.cooldown} 回合
+                                Cooldown: {item.cooldown} turns
                               </div>
                             )}
                           </button>

@@ -157,7 +157,7 @@ const BatchReleaseModal: React.FC<Props> = ({
         <div className="p-4 border-b border-stone-600 bg-ink-800 rounded-t flex justify-between items-center sticky top-0 z-10">
           <div className="flex items-center gap-2">
             <Trash2 className="text-red-400" size={20} />
-            <h3 className="text-xl font-serif text-mystic-gold">Bulk Companion Release</h3>
+            <h3 className="text-xl font-serif text-amber-400">Bulk Companion Release</h3>
           </div>
           <button
             onClick={onClose}
@@ -283,7 +283,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                           setSelectedPets(new Set());
                         }}
                         className={`px-2 py-1 rounded text-xs border transition-colors ${selectedRarity === rarity
-                            ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                             : 'bg-stone-800 border-stone-600 text-stone-400 hover:bg-stone-700'
                           }`}
                       >
@@ -302,7 +302,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                           setSelectedPets(new Set());
                         }}
                         className={`px-2 py-1 rounded text-xs border transition-colors ${selectedSpecies === 'all'
-                            ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                             : 'bg-stone-800 border-stone-600 text-stone-400 hover:bg-stone-700'
                           }`}
                       >
@@ -316,7 +316,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                             setSelectedPets(new Set());
                           }}
                           className={`px-2 py-1 rounded text-xs border transition-colors ${selectedSpecies === species
-                              ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                               : 'bg-stone-800 border-stone-600 text-stone-400 hover:bg-stone-700'
                             }`}
                         >
@@ -337,7 +337,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                           setSelectedPets(new Set());
                         }}
                         className={`px-2 py-1 rounded text-xs border transition-colors ${selectedEvolution === stage
-                            ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                             : 'bg-stone-800 border-stone-600 text-stone-400 hover:bg-stone-700'
                           }`}
                       >
@@ -357,7 +357,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                           setSelectedPets(new Set());
                         }}
                         className={`px-2 py-1 rounded text-xs border transition-colors ${selectedActive === active
-                            ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                             : 'bg-stone-800 border-stone-600 text-stone-400 hover:bg-stone-700'
                           }`}
                       >
@@ -525,4 +525,3 @@ const BatchReleaseModal: React.FC<Props> = ({
 };
 
 export default BatchReleaseModal;
-

@@ -159,7 +159,7 @@ itemTypes.forEach(type => {
 
       GENERATED_SHOP_ITEMS.push({
         name: item.name,
-        type: item.type,
+        type: item.type as ItemType,
         description: item.description,
         rarity: item.rarity,
         price,

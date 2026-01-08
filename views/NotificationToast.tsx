@@ -51,7 +51,7 @@ export function ItemActionToast({ log }: ItemActionToastProps) {
       case 'danger':
         return `${baseClass} border-mystic-blood text-red-100 bg-red-900/90`;
       case 'special':
-        return `${baseClass} border-mystic-gold text-amber-100 bg-amber-900/90`;
+        return `${baseClass} border-amber-500 text-amber-100 bg-amber-900/90`;
       default:
         return `${baseClass} border-stone-600 text-stone-300 bg-ink-800/90`;
     }
@@ -84,17 +84,17 @@ export function LotteryRewardsToast({ rewards, onClose }: LotteryRewardsProps) {
       onClick={onClose}
     >
       <div
-        className="bg-stone-900 border-2 border-mystic-gold p-1 rounded-lg shadow-[0_0_50px_rgba(203,161,53,0.3)] max-w-md w-[90%] animate-in zoom-in duration-500"
+        className="bg-stone-900 border-2 border-amber-500 p-1 rounded-lg shadow-[0_0_50px_rgba(245,158,11,0.3)] max-w-md w-[90%] animate-in zoom-in duration-500"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-stone-800 rounded px-6 py-8 flex flex-col items-center gap-6">
           <div className="relative">
-            <div className="absolute inset-0 bg-mystic-gold/20 rounded-full blur-xl animate-pulse" />
+            <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl animate-pulse" />
             <div className="relative text-5xl">🎁</div>
           </div>
 
           <div className="text-center">
-            <div className="text-2xl font-serif text-mystic-gold font-bold tracking-widest">
+            <div className="text-2xl font-serif text-amber-400 font-bold tracking-widest">
               机缘到手
             </div>
             <div className="text-stone-400 text-sm mt-1">恭喜道友获得以下宝物</div>
@@ -104,11 +104,11 @@ export function LotteryRewardsToast({ rewards, onClose }: LotteryRewardsProps) {
             {rewards.map((reward, idx) => (
               <div
                 key={idx}
-                className="bg-stone-900/50 border border-stone-700 rounded-lg px-4 py-3 flex items-center justify-between group hover:border-mystic-gold/50 transition-colors animate-in slide-in-from-bottom duration-300"
+                className="bg-stone-900/50 border border-stone-700 rounded-lg px-4 py-3 flex items-center justify-between group hover:border-amber-500/50 transition-colors animate-in slide-in-from-bottom duration-300"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-mystic-gold shadow-[0_0_5px_rgba(203,161,53,1)]" />
+                  <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,1)]" />
                   <span className="font-semibold text-stone-200">{reward.name}</span>
                 </div>
                 {reward.quantity !== undefined && (

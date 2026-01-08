@@ -133,7 +133,7 @@ const ShopModal: React.FC<Props> = ({
     if (activeTab === 'buy') {
       const types = new Set<ItemType>();
       // 使用原始商店物品列表，不根据境界过滤（显示所有物品类型）
-      shop.items.forEach((item) => types.add(item.type));
+      shop.items.forEach((item) => types.add(item.type as ItemType));
       return Array.from(types);
     } else {
       const types = new Set<ItemType>();
@@ -145,7 +145,9 @@ const ShopModal: React.FC<Props> = ({
           );
           return !isEquipped;
         })
-        .forEach((item) => types.add(item.type));
+        .forEach((item) =>
+          types.add(item.type === '材料' ? ItemType.Material : item.type)
+        );
       return Array.from(types);
     }
   }, [
@@ -243,7 +245,7 @@ const ShopModal: React.FC<Props> = ({
 
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 md:rounded-none z-10">
           <div>
-            <h3 className="text-lg md:text-xl font-bold text-mystic-gold flex items-center gap-2 uppercase tracking-tighter">
+            <h3 className="text-lg md:text-xl font-bold text-amber-400 flex items-center gap-2 uppercase tracking-tighter">
               <ShoppingBag size={18} className="md:w-5 md:h-5" />
               {shop.name}
             </h3>
@@ -311,7 +313,7 @@ const ShopModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('buy')}
             className={`flex-1 px-4 py-3 font-bold transition-all text-xs tracking-widest ${activeTab === 'buy'
-              ? 'bg-stone-900 text-mystic-gold border-b-2 border-mystic-gold'
+              ? 'bg-stone-900 text-amber-400 border-b-2 border-amber-500'
               : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900'
               }`}
           >
@@ -320,7 +322,7 @@ const ShopModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('sell')}
             className={`flex-1 px-4 py-3 font-bold transition-all text-xs tracking-widest ${activeTab === 'sell'
-              ? 'bg-stone-900 text-mystic-gold border-b-2 border-mystic-gold'
+              ? 'bg-stone-900 text-amber-400 border-b-2 border-amber-500'
               : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900'
               }`}
           >
@@ -336,7 +338,7 @@ const ShopModal: React.FC<Props> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
                     CAPS BALANCE:{' '}
-                    <span className="text-mystic-gold">
+                    <span className="text-amber-400">
                       {player.spiritStones}
                     </span>
                   </span>
@@ -353,7 +355,7 @@ const ShopModal: React.FC<Props> = ({
                   <button
                     onClick={() => setSelectedTypeFilter('all')}
                     className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === 'all'
-                      ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                       : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                       }`}
                   >
@@ -364,7 +366,7 @@ const ShopModal: React.FC<Props> = ({
                       key={type}
                       onClick={() => setSelectedTypeFilter(type)}
                       className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === type
-                        ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                         : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                         }`}
                     >
@@ -443,7 +445,7 @@ const ShopModal: React.FC<Props> = ({
                           {/* 价格和描述 */}
                           <div className="flex flex-col space-y-1">
                             <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-1 text-mystic-gold">
+                              <div className="flex items-center gap-1 text-amber-400">
                                 <Coins size={14} />
                                 <span className="font-bold">{formatNumber(shopItem.price)}</span>
                               </div>
@@ -524,7 +526,7 @@ const ShopModal: React.FC<Props> = ({
                                 shopItem.price *
                                 (buyQuantities[shopItem.id] || 1) <=
                                 player.spiritStones
-                                ? 'bg-mystic-gold/20 hover:bg-mystic-gold/30 text-mystic-gold border border-mystic-gold/50 active:scale-95'
+                                ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/50 active:scale-95'
                                 : 'bg-stone-800 text-stone-500 cursor-not-allowed'
                                 }`}
                               title={
@@ -555,12 +557,12 @@ const ShopModal: React.FC<Props> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
                     CAPS BALANCE:{' '}
-                    <span className="text-mystic-gold">
+                    <span className="text-amber-400">
                       {player.spiritStones}
                     </span>
                   </span>
                   <span className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
-                    SELECTED: <span className="text-mystic-gold">{selectedItems.size}</span>
+                    SELECTED: <span className="text-amber-400">{selectedItems.size}</span>
                   </span>
                 </div>
                 {/* 批量操作栏 */}
@@ -600,7 +602,7 @@ const ShopModal: React.FC<Props> = ({
                         setSelectedItems(new Set());
                       }}
                       className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === 'all'
-                        ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                         : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                         }`}
                     >
@@ -614,7 +616,7 @@ const ShopModal: React.FC<Props> = ({
                           setSelectedItems(new Set());
                         }}
                         className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedTypeFilter === type
-                          ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
+                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                           : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                           }`}
                       >
@@ -636,7 +638,7 @@ const ShopModal: React.FC<Props> = ({
                             setSelectedItems(new Set());
                           }}
                           className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedRarity === rarity
-                            ? 'bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/50'
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                             : 'bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800'
                             }`}
                         >
@@ -664,13 +666,13 @@ const ShopModal: React.FC<Props> = ({
                       <div
                         key={item.id}
                         className={`bg-stone-900/50 rounded-none p-4 border cursor-pointer transition-all ${isSelected
-                          ? 'bg-mystic-gold/10 border-mystic-gold'
+                          ? 'bg-amber-500/10 border-amber-500'
                           : getRarityBorder(rarity).replace('border-2', 'border')
                           }`}
                         onClick={() => handleToggleItem(item.id)}
                       >
                         <div className="flex items-start gap-2 mb-2">
-                          <div className={`mt-1 w-4 h-4 border flex items-center justify-center ${isSelected ? 'bg-mystic-gold border-mystic-gold' : 'border-stone-600'}`}>
+                          <div className={`mt-1 w-4 h-4 border flex items-center justify-center ${isSelected ? 'bg-amber-500 border-amber-500' : 'border-stone-600'}`}>
                             {isSelected && <X size={12} className="text-ink-950" />}
                           </div>
                           <div className="flex-1">
@@ -700,7 +702,7 @@ const ShopModal: React.FC<Props> = ({
                           </div>
                         )}
                         <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center gap-1 text-mystic-gold">
+                          <div className="flex items-center gap-1 text-amber-400">
                             <Coins size={14} />
                             <span className="font-bold">{formatNumber(sellPrice * (item.quantity || 1))}</span>
                           </div>

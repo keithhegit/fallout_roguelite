@@ -3,6 +3,7 @@ import {
   AdventureType,
   PlayerStats,
   RealmType,
+  RiskLevel,
   ItemRarity,
   ItemType,
   EquipmentSlot,
@@ -177,17 +178,21 @@ const ENEMY_TITLES = [
 // 根据风险等级计算战斗难度
 const getBattleDifficulty = (
   adventureType: AdventureType,
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme'
+  riskLevel?: RiskLevel
 ): number => {
   if (adventureType === 'secret_realm' && riskLevel) {
     // 秘境根据风险等级调整难度（扩大差异使风险等级名称与实际难度匹配）
-    const riskMultipliers = {
+    const riskMultipliers: Record<string, number> = {
       Low: 0.6,      // Lower difficulty, good for farming
       Medium: 1.0,       // Standard difficulty
       High: 1.5,       // Increased difficulty, more challenging
       'Extreme': 2.2, // Significantly increased difficulty, truly "Extremely Dangerous"
+      '低': 0.6,
+      '中': 1.0,
+      '高': 1.5,
+      '极度危险': 2.2,
     };
-    return riskMultipliers[riskLevel];
+    return riskMultipliers[riskLevel] || 1.0;
   }
   // 非秘境使用固定难度
   const baseDifficulty: Record<AdventureType, number> = {
@@ -258,7 +263,7 @@ const generateLoot = (
   enemyStrength: number,
   adventureType: AdventureType,
   playerRealm: RealmType,
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme'
+  riskLevel?: RiskLevel
 ): AdventureResult['itemObtained'][] => {
   const lootItems: AdventureResult['itemObtained'][] = [];
   // 用于追踪已选择的物品，避免重复（装备类物品按名称+稀有度去重）
@@ -290,19 +295,19 @@ const generateLoot = (
     const roll = Math.random();
     if (adventureType === 'secret_realm') {
       // 秘境：根据风险等级调整稀有度概率
-      if (riskLevel === 'Extreme') {
+      if (riskLevel === 'Extreme' || riskLevel === '极度危险') {
         // Extremely Dangerous: Higher chance for top-tier items (lower base chance to prevent inflation)
         if (roll < 0.05 + realmBonusImmortal) return 'Mythic'; // 10% reduction
         if (roll < 0.20 + realmBonusLegend) return 'Legendary'; // 30% reduction
         if (roll < 0.70 + realmBonusRare) return 'Rare'; // 15% reduction
         return 'Common';
-      } else if (riskLevel === 'High') {
+      } else if (riskLevel === 'High' || riskLevel === '高') {
         // High Risk: Higher probability
         if (roll < 0.12 + realmBonusImmortal) return 'Mythic';
         if (roll < 0.4 + realmBonusLegend) return 'Legendary';
         if (roll < 0.75 + realmBonusRare) return 'Rare';
         return 'Common';
-      } else if (riskLevel === 'Medium') {
+      } else if (riskLevel === 'Medium' || riskLevel === '中') {
         // Medium Risk: Medium probability
         if (roll < 0.08 + realmBonusImmortal) return 'Mythic';
         if (roll < 0.3 + realmBonusLegend) return 'Legendary';
@@ -658,7 +663,7 @@ const calculateActionCount = (
 const createEnemy = async (
   player: PlayerStats,
   adventureType: AdventureType,
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme',
+  riskLevel?: RiskLevel,
   realmMinRealm?: RealmType,
   sectMasterId?: string | null,
   huntSectId?: string | null,
@@ -842,7 +847,7 @@ const createEnemy = async (
     }
   } else if (adventureType === 'secret_realm') {
     // Secret Realm Adventure: adjust enemy strength distribution based on risk level
-    if (riskLevel === 'Extreme') {
+    if (riskLevel === 'Extreme' || riskLevel === '极度危险') {
       // Extremely Dangerous: 15% Weak, 45% Normal, 40% Tough
       if (strengthRoll < 0.15) {
         strengthMultiplier = 0.85 + Math.random() * 0.15; // 0.85 - 1.0
@@ -854,7 +859,7 @@ const createEnemy = async (
         strengthMultiplier = 1.2 + Math.random() * 0.3; // 1.2 - 1.5
         strengthVariance = { min: 1.1, max: 1.6 }; // Reduced from 1.2-1.8
       }
-    } else if (riskLevel === 'High') {
+    } else if (riskLevel === 'High' || riskLevel === '高') {
       // High Risk: 20% Weak, 50% Normal, 30% Tough
       if (strengthRoll < 0.2) {
         strengthMultiplier = 0.75 + Math.random() * 0.15; // 0.75 - 0.9
@@ -866,7 +871,7 @@ const createEnemy = async (
         strengthMultiplier = 1.1 + Math.random() * 0.25; // 1.1 - 1.35
         strengthVariance = { min: 1.0, max: 1.5 };
       }
-    } else if (riskLevel === 'Medium') {
+    } else if (riskLevel === 'Medium' || riskLevel === '中') {
       // Medium Risk: 30% Weak, 55% Normal, 15% Tough
       if (strengthRoll < 0.3) {
         strengthMultiplier = 0.65 + Math.random() * 0.2; // 0.65 - 0.85
@@ -1157,7 +1162,7 @@ export const shouldTriggerBattle = (
 export const resolveBattleEncounter = async (
   player: PlayerStats,
   adventureType: AdventureType,
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme',
+  riskLevel?: RiskLevel,
   realmMinRealm?: RealmType,
   realmName?: string,
   huntSectId?: string | null,
@@ -1390,14 +1395,18 @@ export const resolveBattleEncounter = async (
 
   // Adjust reward multiplier based on risk level
   const getRewardMultiplier = (
-    riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme'
+    riskLevel?: RiskLevel
   ): number => {
     if (!riskLevel) return 1.0;
-    const multipliers = {
+    const multipliers: Record<string, number> = {
       Low: 1.0,
       Medium: 1.3,
       High: 1.6,
       'Extreme': 2.2,
+      '低': 1.0,
+      '中': 1.3,
+      '高': 1.6,
+      '极度危险': 2.2,
     };
     return multipliers[riskLevel];
   };
@@ -1549,7 +1558,7 @@ export const calculateBattleRewards = (
   battleState: BattleState,
   player: PlayerStats,
   adventureType?: AdventureType,
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme'
+  riskLevel?: RiskLevel
 ): {
   expChange: number;
   spiritChange: number;
@@ -1566,16 +1575,20 @@ export const calculateBattleRewards = (
 
   // 根据风险等级调整奖励倍数
   const getRewardMultiplier = (
-    riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme'
+    riskLevel?: RiskLevel
   ): number => {
     if (!riskLevel) return 1.0;
-    const multipliers = {
+    const multipliers: Record<string, number> = {
       Low: 1.0,
       Medium: 1.3,
       High: 1.6,
       'Extreme': 2.2,
+      '低': 1.0,
+      '中': 1.3,
+      '高': 1.6,
+      '极度危险': 2.2,
     };
-    return multipliers[riskLevel];
+    return multipliers[riskLevel] || 1.0;
   };
 
   const riskRewardMultiplier =
@@ -1672,7 +1685,7 @@ export const calculateBattleRewards = (
 export const initializeTurnBasedBattle = async (
   player: PlayerStats,
   adventureType: AdventureType,
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme',
+  riskLevel?: RiskLevel,
   realmMinRealm?: RealmType,
   sectMasterId?: string | null,
   bossId?: string // 指定的天地之魄BOSS ID（用于事件模板）

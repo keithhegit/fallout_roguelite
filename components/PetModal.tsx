@@ -111,7 +111,7 @@ const PetModal: React.FC<Props> = ({
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
         
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 z-10">
-          <h2 className="text-lg md:text-xl font-serif text-mystic-gold">
+          <h2 className="text-lg md:text-xl font-serif text-amber-400">
             Creature Taming System
           </h2>
           <button
@@ -649,7 +649,7 @@ const PetModal: React.FC<Props> = ({
         {selectedPetId && (
           <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60] p-4">
             <div className="bg-stone-800 rounded-lg border border-stone-700 w-full max-w-md p-6">
-              <h3 className="text-lg font-bold mb-4 text-mystic-gold">
+              <h3 className="text-lg font-bold mb-4 text-amber-400">
                 Select Processing Method
               </h3>
 

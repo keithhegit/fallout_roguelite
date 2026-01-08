@@ -360,6 +360,10 @@ export function useEquipmentHandlers({
         稀有: 100,
         传说: 200,
         仙品: 500,
+        Common: 50,
+        Rare: 100,
+        Legendary: 200,
+        Mythic: 500,
       };
       const hpCost = hpCostMap[rarity];
 

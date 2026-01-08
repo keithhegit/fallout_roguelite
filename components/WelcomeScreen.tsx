@@ -140,15 +140,15 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
           className="text-center mb-10 sm:mb-16 px-4 animate-fade-in"
           style={{ animationDelay: '0.2s' }}
         >
-          <h1 className="text-3xl sm:text-5xl font-mono font-bold text-mystic-gold tracking-[0.2em] mb-4 drop-shadow-[0_0_10px_rgba(203,161,53,0.5)] uppercase">
+          <h1 className="text-3xl sm:text-5xl font-mono font-bold text-amber-400 tracking-[0.2em] mb-4 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)] uppercase">
             Wasteland Survivor
           </h1>
           <div className="flex items-center justify-center gap-4">
-            <div className="h-[1px] w-8 bg-mystic-gold/30"></div>
-            <p className="text-mystic-gold/60 text-xs sm:text-sm font-mono tracking-[0.3em] uppercase">
+            <div className="h-[1px] w-8 bg-amber-500/30"></div>
+            <p className="text-amber-400/60 text-xs sm:text-sm font-mono tracking-[0.3em] uppercase">
               Terminal v2.1.0
             </p>
-            <div className="h-[1px] w-8 bg-mystic-gold/30"></div>
+            <div className="h-[1px] w-8 bg-amber-500/30"></div>
           </div>
         </div>
 

@@ -38,7 +38,7 @@ export const findEmptyEquipmentSlot = (
 ): EquipmentSlot | null => {
   // 对于戒指、首饰、法宝，即使有equipmentSlot属性，也要优先查找空槽位
   // 忽略物品的equipmentSlot属性，因为多槽位装备应该优先使用空槽位
-  const slots = getEquipmentSlotsByType(item.type);
+  const slots = getEquipmentSlotsByType(item.type as ItemType);
   if (slots.length > 0) {
     // 优先查找空槽位（明确检查是否为 undefined 或 null，确保空槽位检查正确）
     // 遍历所有可能的槽位，找到第一个空的就返回
@@ -73,7 +73,7 @@ export const isItemEquipped = (
   equippedItems: Partial<Record<EquipmentSlot, string>>
 ): boolean => {
   // 对于戒指、首饰、法宝，即使没有equipmentSlot也可以根据type检查所有同类型槽位
-  const slots = getEquipmentSlotsByType(item.type);
+  const slots = getEquipmentSlotsByType(item.type as ItemType);
   if (slots.length > 0) {
     return slots.some((slot) => equippedItems[slot] === item.id);
   }
@@ -98,7 +98,7 @@ export const findItemEquippedSlot = (
   equippedItems: Partial<Record<EquipmentSlot, string>>
 ): EquipmentSlot | null => {
   // 对于戒指、首饰、法宝，即使没有equipmentSlot也可以根据type查找所有同类型槽位
-  const slots = getEquipmentSlotsByType(item.type);
+  const slots = getEquipmentSlotsByType(item.type as ItemType);
   if (slots.length > 0) {
     const equippedSlot = slots.find((slot) => equippedItems[slot] === item.id);
     return equippedSlot || null;

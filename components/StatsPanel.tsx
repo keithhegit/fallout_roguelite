@@ -59,7 +59,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
         className="md:hidden flex items-center justify-between w-full p-2 bg-ink-900 rounded-none border border-stone-700 mb-2 touch-manipulation"
       >
         <div className="text-center flex-1">
-          <h2 className="text-lg font-mono font-bold text-mystic-gold tracking-[0.2em] uppercase">
+          <h2 className="text-lg font-mono font-bold text-amber-400 tracking-[0.2em] uppercase">
             {player.name}
           </h2>
           <div className="text-stone-400 text-xs mt-0.5 font-mono uppercase tracking-wider">
@@ -78,7 +78,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
 
       {/* Desktop Header */}
       <div className="hidden md:block text-center mb-4 border-b-2 border-stone-800 pb-4">
-        <h2 className="text-2xl font-mono font-bold text-mystic-gold tracking-[0.2em] uppercase">
+        <h2 className="text-2xl font-mono font-bold text-amber-400 tracking-[0.2em] uppercase">
           {player.name}
         </h2>
         <div className="text-stone-400 text-sm mt-1 font-mono uppercase tracking-wider">
@@ -239,11 +239,11 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
           <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Coins
               size={14}
-              className="md:w-[18px] md:h-[18px] text-mystic-gold"
+              className="md:w-[18px] md:h-[18px] text-amber-400"
             />
             <div>
               <div className="text-[10px] md:text-xs text-stone-500 uppercase">Bottle Caps</div>
-              <div className="text-mystic-gold font-bold text-xs md:text-base">
+              <div className="text-amber-400 font-bold text-xs md:text-base">
                 {formatNumber(player.spiritStones)}
               </div>
             </div>

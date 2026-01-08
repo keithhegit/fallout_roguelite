@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayerStats } from '../../types';
+import { PlayerStats, RealmType } from '../../types';
 import { REALM_DATA, REALM_ORDER } from '../../constants/index';
 import { getRandomBreakthroughDescription } from '../../services/templateService';
 import { getRealmIndex, calculateBreakthroughAttributePoints } from '../../utils/attributeUtils';
@@ -188,7 +188,7 @@ export function useBreakthroughHandlers({
 
         // 计算金丹法数（如果晋升到金丹期）
         let goldenCoreMethodCount = prev.goldenCoreMethodCount;
-        if (isRealmUpgrade && nextRealm === '金丹期') {
+        if (isRealmUpgrade && nextRealm === RealmType.GoldenCore) {
           goldenCoreMethodCount = calculateGoldenCoreMethodCount(prev);
         }
 

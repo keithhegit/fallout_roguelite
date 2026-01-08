@@ -9,6 +9,7 @@ import {
   EquipmentSlot,
   Pet,
   RealmType,
+  RiskLevel,
 } from '../../types';
 import {
   REALM_ORDER,
@@ -72,7 +73,7 @@ const applyResultToPlayer = (
     isSecretRealm: boolean;
     adventureType: AdventureType;
     realmName?: string;
-    riskLevel?: string;
+    riskLevel?: RiskLevel;
     battleContext?: BattleReplay | null;
     petSkillCooldowns?: Record<string, number>;
     addLog: (msg: string, type?: string) => void;
@@ -661,7 +662,7 @@ const applyResultToPlayer = (
       }
     }
   } else if (currentRealmIndex >= REALM_ORDER.indexOf(RealmType.LongevityRealm)) {
-    const rulesChance = isSecretRealm && riskLevel === 'Extreme Danger' ? 0.12 : (adventureType === 'dao_combining_challenge' ? 0.4 : 0.02);
+    const rulesChance = isSecretRealm && riskLevel === 'Extreme' ? 0.12 : (adventureType === 'dao_combining_challenge' ? 0.4 : 0.02);
     if (Math.random() < rulesChance) {
       const rules = Object.values(LONGEVITY_RULES);
       const currentRules = prev.longevityRules || [];
@@ -770,7 +771,7 @@ const applyResultToPlayer = (
   }
 
   // Lifespan loss
-  const lifespanLoss = isSecretRealm ? 1.0 : (riskLevel === 'Low' ? 0.3 : riskLevel === 'Medium' ? 0.6 : riskLevel === 'High' ? 1.0 : riskLevel === 'Extreme Danger' ? 1.5 : 0.4);
+  const lifespanLoss = isSecretRealm ? 1.0 : (riskLevel === 'Low' ? 0.3 : riskLevel === 'Medium' ? 0.6 : riskLevel === 'High' ? 1.0 : riskLevel === 'Extreme' ? 1.5 : 0.4);
   newLifespan = Math.max(0, Math.min(prev.maxLifespan, newLifespan + (result.lifespanChange || 0) - lifespanLoss));
 
   // 灵根变化
@@ -839,7 +840,7 @@ const applyResultToPlayer = (
 
 export async function executeAdventureCore({
   result, battleContext, petSkillCooldowns, player, setPlayer, addLog, triggerVisual, onOpenBattleModal, realmName, adventureType, riskLevel, skipBattle, skipReputationEvent, onReputationEvent, onPauseAutoAdventure
-}: ExecuteAdventureCoreProps & { riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme Danger'; }) {
+}: ExecuteAdventureCoreProps & { riskLevel?: RiskLevel; }) {
   // Visual Effects
   const safeHpChange = result.hpChange || 0;
   if (safeHpChange < 0) {

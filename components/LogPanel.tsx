@@ -37,7 +37,7 @@ const LogItem = React.memo<{ log: LogEntry }>(({ log }) => {
       case 'danger':
         return `${baseClass} border-mystic-blood text-red-100 bg-red-900/10`;
       case 'special':
-        return `${baseClass} border-mystic-gold text-amber-100 bg-amber-900/10`;
+        return `${baseClass} border-amber-500 text-amber-100 bg-amber-900/10`;
       default:
         return `${baseClass} border-stone-600 text-stone-300 bg-ink-800/50`;
     }

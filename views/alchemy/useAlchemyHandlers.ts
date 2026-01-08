@@ -34,7 +34,7 @@ export function useAlchemyHandlers({
   const handleCraft = async (recipe: Recipe) => {
     // 先触发炼丹开始动画
     if (triggerVisual) {
-      triggerVisual('alchemy', '🔥 炼丹中...', 'text-mystic-gold');
+      triggerVisual('alchemy', '🔥 炼丹中...', 'text-amber-400');
     }
 
     // 延迟一下，让用户看到炼丹过程
@@ -71,7 +71,7 @@ export function useAlchemyHandlers({
       if (triggerVisual) {
         // 延迟触发成功动画，让用户看到完整的炼丹过程
         setTimeout(() => {
-          triggerVisual('alchemy', `✨ ${recipe.result.name}`, 'text-mystic-gold');
+          triggerVisual('alchemy', `✨ ${recipe.result.name}`, 'text-amber-400');
         }, 200);
       }
 

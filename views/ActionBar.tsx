@@ -93,9 +93,9 @@ function ActionBar({
             flex flex-col items-center justify-center p-4 md:p-4 rounded-none border-2 transition-all duration-200 group touch-manipulation min-h-[90px] md:min-h-[100px] w-full
             ${loading || cooldown > 0
               ? 'bg-stone-800 border-stone-800 text-stone-500 cursor-not-allowed'
-              : 'bg-ink-800 border-stone-800 active:border-mystic-gold active:bg-ink-700 text-stone-200'
+              : 'bg-ink-800 border-stone-800 active:border-amber-500 active:bg-ink-700 text-stone-200'
             }
-            ${autoAdventure ? 'border-mystic-gold border-2' : ''}
+            ${autoAdventure ? 'border-amber-500 border-2' : ''}
           `}
         >
           <img
@@ -121,7 +121,7 @@ function ActionBar({
           className={`
             absolute top-1 right-1 p-1 rounded-none transition-all duration-200
             ${autoAdventure
-              ? 'bg-mystic-gold/80 text-stone-900 hover:bg-mystic-gold'
+              ? 'bg-amber-500/80 text-stone-900 hover:bg-amber-500'
               : 'bg-stone-700/80 text-stone-400 hover:bg-stone-600'
             }
           `}

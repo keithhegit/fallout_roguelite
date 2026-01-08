@@ -54,7 +54,7 @@ const ReputationEventModal: React.FC<Props> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-stone-800 border-b border-stone-700 p-3 md:p-4 flex justify-between items-center">
-          <h2 className="text-lg md:text-xl font-serif text-mystic-gold">
+          <h2 className="text-lg md:text-xl font-serif text-amber-400">
             📜 {title}
           </h2>
           <button
@@ -124,4 +124,3 @@ const ReputationEventModal: React.FC<Props> = ({
 };
 
 export default ReputationEventModal;
-

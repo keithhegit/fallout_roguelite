@@ -167,7 +167,11 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
 
     setChallengeState(prev => ({
       ...prev,
-      battleResult: result
+      battleResult: {
+        ...result,
+        playerHpBefore: player.hp,
+        playerHpAfter: player.hp - (result.hpLoss || 0)
+      }
     }));
 
     // 更新挑战次数

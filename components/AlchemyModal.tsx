@@ -49,7 +49,7 @@ const AlchemyModal: React.FC<Props> = ({
         </div>
 
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-ink-900 rounded-none relative z-10">
-          <h3 className="text-lg md:text-xl font-mono text-mystic-gold flex items-center gap-2 uppercase tracking-widest">
+          <h3 className="text-lg md:text-xl font-mono text-amber-400 flex items-center gap-2 uppercase tracking-widest">
             <FlaskConical size={18} className="md:w-5 md:h-5" /> Chemical Lab
           </h3>
           <button
@@ -64,7 +64,7 @@ const AlchemyModal: React.FC<Props> = ({
           <div className="col-span-full mb-2 bg-ink-900/50 p-3 rounded-none border border-stone-800 text-xs md:text-sm text-stone-500 flex justify-between font-mono uppercase tracking-widest">
             <span>
               Caps Holding:
-              <span className="text-mystic-gold font-bold ml-2">
+              <span className="text-amber-400 font-bold ml-2">
                 {player.spiritStones}
               </span>
             </span>
@@ -78,9 +78,9 @@ const AlchemyModal: React.FC<Props> = ({
             return (
               <div
                 key={idx}
-                className="bg-ink-950 border border-stone-800 rounded-none p-4 flex flex-col relative group hover:border-mystic-gold transition-colors"
+                className="bg-ink-950 border border-stone-800 rounded-none p-4 flex flex-col relative group hover:border-amber-500 transition-colors"
               >
-                <div className="absolute top-0 left-0 w-1 h-full bg-stone-800 group-hover:bg-mystic-gold/50 transition-colors"></div>
+                <div className="absolute top-0 left-0 w-1 h-full bg-stone-800 group-hover:bg-amber-500/50 transition-colors"></div>
                 <div className="flex justify-between items-start mb-3">
                   <h4 className="text-base md:text-lg font-mono font-bold text-stone-200 uppercase tracking-wider">
                     {recipe.name}
@@ -122,7 +122,7 @@ const AlchemyModal: React.FC<Props> = ({
                       <span className="text-stone-400">CAPS COST</span>
                       <span
                         className={
-                          canAfford ? 'text-mystic-gold' : 'text-red-500'
+                          canAfford ? 'text-amber-400' : 'text-red-500'
                         }
                       >
                         {recipe.cost}
@@ -141,7 +141,7 @@ const AlchemyModal: React.FC<Props> = ({
                   className={`
                     w-full py-2.5 rounded-none font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all uppercase tracking-[0.2em] min-h-[44px]
                     ${canAfford && hasIngredients
-                      ? 'bg-ink-950 text-mystic-gold hover:bg-stone-900 border border-mystic-gold active:scale-95'
+                      ? 'bg-ink-950 text-amber-400 hover:bg-stone-900 border border-amber-500 active:scale-95'
                       : 'bg-ink-950 text-stone-700 cursor-not-allowed border border-stone-800'
                     }
                   `}

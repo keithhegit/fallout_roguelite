@@ -64,6 +64,10 @@ export const TRIBULATION_RARITY_BONUS: Record<ItemRarity, number> = {
   'Rare': 0.03,
   'Legendary': 0.06,
   'Mythic': 0.12,
+  '普通': 0,
+  '稀有': 0.03,
+  '传说': 0.06,
+  '仙品': 0.12,
 };
 
 // Natal Relic Extra Bonus

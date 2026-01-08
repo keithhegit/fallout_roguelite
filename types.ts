@@ -61,7 +61,25 @@ export enum ItemType {
   AdvancedItem = 'Advanced Tech',
 }
 
-export type ItemRarity = 'Common' | 'Rare' | 'Legendary' | 'Mythic';
+export type ItemRarity =
+  | 'Common'
+  | 'Rare'
+  | 'Legendary'
+  | 'Mythic'
+  | '普通'
+  | '稀有'
+  | '传说'
+  | '仙品';
+
+export type RiskLevel =
+  | 'Low'
+  | 'Medium'
+  | 'High'
+  | 'Extreme'
+  | '低'
+  | '中'
+  | '高'
+  | '极度危险';
 
 // Equipment Slot Enum
 export enum EquipmentSlot {
@@ -85,7 +103,7 @@ export enum EquipmentSlot {
 export interface Item {
   id: string;
   name: string;
-  type: ItemType;
+  type: ItemType | '材料';
   description: string;
   quantity: number;
   rarity?: ItemRarity; // Defaults to 'Common' if undefined
@@ -143,7 +161,7 @@ export interface SecretRealm {
   description: string;
   minRealm: RealmType;
   cost: number; // Spirit stones to enter
-  riskLevel: 'Low' | 'Medium' | 'High' | 'Extreme';
+  riskLevel: RiskLevel;
   drops: string[]; // Description of potential drops
 }
 
@@ -203,6 +221,7 @@ export interface TitleSetEffect {
 }
 
 export interface PlayerStats {
+  id?: string;
   name: string;
   realm: RealmType;
   realmLevel: number; // 1-9
@@ -687,7 +706,7 @@ export interface ExplorationLocation {
   description: string;
   minRealm: RealmType;
   cost: number; // 进入消耗
-  riskLevel: 'Low' | 'Medium' | 'High' | 'Extreme';
+  riskLevel: RiskLevel;
   eventTypes: AdventureType[];
   specialEncounters?: string[]; // 特殊奇遇ID列表
 }
@@ -1045,7 +1064,7 @@ export interface BattleState {
   // 战斗信息
   enemyStrengthMultiplier?: number; // 敌人强度倍数（用于奖励计算）
   adventureType: AdventureType; // 历练类型
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extreme'; // 风险等级
+  riskLevel?: RiskLevel; // 风险等级
   // 灵宠系统
   activePet?: Pet | null; // 激活的灵宠
   petSkillCooldowns?: Record<string, number>; // 灵宠技能冷却
@@ -1123,7 +1142,7 @@ export interface GrottoConfig {
 // ==================== 天劫系统类型定义 ====================
 
 // 天劫等级
-export type TribulationLevel = '金丹天劫' | '元婴天劫' | '化神天劫' | '合道天劫' | '长生天劫';
+export type TribulationLevel = 'Elite Storm' | 'Master Storm' | 'Grandmaster Storm' | 'Fusion Storm' | 'Eternal Storm';
 
 // 天劫阶段
 export type TribulationStage = '准备中' | '第一道雷劫' | '第二道雷劫' | '第三道雷劫' | '渡劫完成' | '渡劫失败';

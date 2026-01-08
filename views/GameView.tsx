@@ -5,7 +5,7 @@ import { ASSETS } from '../constants/assets';
 import { ItemActionLog } from '../hooks/useItemActionLog';
 import StatsPanel from '../components/StatsPanel';
 import LogPanel from '../components/LogPanel';
-import CombatVisuals from '../components/CombatVisuals';
+import CombatVisuals, { VisualEffect } from '../components/CombatVisuals';
 import MobileSidebar from '../components/MobileSidebar';
 import GameHeader from './GameHeader';
 import ActionBar from './ActionBar';
@@ -29,7 +29,7 @@ interface GameViewProps {
   player: PlayerStats;
   logs: LogEntry[];
   setLogs: React.Dispatch<React.SetStateAction<LogEntry[]>>;
-  visualEffects: unknown[];
+  visualEffects: VisualEffect[];
   loading: boolean;
   cooldown: number;
   purchaseSuccess: { item: string; quantity: number } | null;
@@ -205,13 +205,13 @@ function GameView({
             onClick={handleSelectStatusTab}
             className={`min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-all duration-200 relative z-20 ${
               mobileTab === 'status'
-                ? 'text-mystic-gold bg-stone-900/50 shadow-[inset_0_0_15px_rgba(203,161,53,0.1)]'
+                ? 'text-amber-400 bg-stone-900/50 shadow-[inset_0_0_15px_rgba(245,158,11,0.1)]'
                 : 'text-stone-500 active:bg-stone-900'
             }`}
           >
             <User size={20} className={mobileTab === 'status' ? 'terminal-flicker mb-1' : 'mb-1'} />
             <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Status</span>
-            {mobileTab === 'status' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mystic-gold"></div>}
+            {mobileTab === 'status' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500"></div>}
           </button>
           <button
             onClick={() => {
@@ -227,13 +227,13 @@ function GameView({
             onClick={handleSelectRadioTab}
             className={`min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-all duration-200 relative z-20 ${
               mobileTab === 'radio'
-                ? 'text-mystic-gold bg-stone-900/50 shadow-[inset_0_0_15px_rgba(203,161,53,0.1)]'
+                ? 'text-amber-400 bg-stone-900/50 shadow-[inset_0_0_15px_rgba(245,158,11,0.1)]'
                 : 'text-stone-500 active:bg-stone-900'
             }`}
           >
             <Radio size={20} className={mobileTab === 'radio' ? 'terminal-flicker mb-1' : 'mb-1'} />
             <span className="text-[10px] font-serif uppercase tracking-wider font-bold">Radio</span>
-            {mobileTab === 'radio' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mystic-gold"></div>}
+            {mobileTab === 'radio' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500"></div>}
           </button>
           <button
             onClick={() => {

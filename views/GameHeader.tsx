@@ -132,7 +132,7 @@ function GameHeader({
       <div className="flex items-center gap-3">
         <h1
           onClick={handleTitleClick}
-          className="text-sm md:text-xl font-mono text-mystic-gold tracking-widest cursor-pointer select-none hover:opacity-80 transition-opacity uppercase"
+          className="text-sm md:text-xl font-mono text-amber-400 tracking-widest cursor-pointer select-none hover:opacity-80 transition-opacity uppercase"
           title={
             clickCount > 0 ? `Click ${5 - clickCount} more times for debug mode` : undefined
           }

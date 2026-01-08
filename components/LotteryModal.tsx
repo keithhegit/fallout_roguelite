@@ -86,10 +86,10 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 animate-in fade-in duration-500">
         <div className="relative w-64 h-64 flex items-center justify-center">
           {/* 八卦阵背景 */}
-          <div className="absolute inset-0 border-4 border-mystic-gold/20 rounded-full animate-bagua flex items-center justify-center">
-            <div className="w-[90%] h-[90%] border-2 border-mystic-gold/10 rounded-full border-dashed" />
+          <div className="absolute inset-0 border-4 border-amber-500/20 rounded-full animate-bagua flex items-center justify-center">
+            <div className="w-[90%] h-[90%] border-2 border-amber-500/10 rounded-full border-dashed" />
             <div className="absolute inset-0 flex items-center justify-center opacity-20">
-              <div className="text-4xl text-mystic-gold font-bold">☯</div>
+              <div className="text-4xl text-amber-400 font-bold">☯</div>
             </div>
           </div>
 
@@ -114,7 +114,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
           ))}
 
           {/* 中心光点 */}
-          <div className="relative z-10 w-16 h-16 bg-mystic-gold rounded-full shadow-[0_0_50px_rgba(203,161,53,0.8)] flex items-center justify-center animate-pulse">
+          <div className="relative z-10 w-16 h-16 bg-amber-500 rounded-full shadow-[0_0_50px_rgba(245,158,11,0.8)] flex items-center justify-center animate-pulse">
             <Sparkles
               className="text-white w-8 h-8 animate-spin"
               style={{ animationDuration: '3s' }}
@@ -123,7 +123,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
         </div>
 
         <div className="mt-12 text-center">
-          <div className="text-2xl font-serif text-mystic-gold tracking-[0.5em] animate-pulse">
+          <div className="text-2xl font-serif text-amber-400 tracking-[0.5em] animate-pulse">
             ACCESSING DATABASE...
           </div>
           <div className="mt-2 text-stone-500 text-sm">Querying Supply Manifest</div>
@@ -131,8 +131,8 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
 
         {/* 氛围装饰 */}
         <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-24 opacity-30">
-          <div className="w-1 h-32 bg-gradient-to-t from-transparent via-mystic-gold to-transparent" />
-          <div className="w-1 h-32 bg-gradient-to-t from-transparent via-mystic-gold to-transparent" />
+          <div className="w-1 h-32 bg-gradient-to-t from-transparent via-amber-500 to-transparent" />
+          <div className="w-1 h-32 bg-gradient-to-t from-transparent via-amber-500 to-transparent" />
         </div>
       </div>
     );

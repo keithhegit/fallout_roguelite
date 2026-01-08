@@ -662,8 +662,8 @@ const CharacterModal: React.FC<Props> = ({
         
         <div className="p-3 md:p-4 border-b border-stone-800 bg-ink-950 flex justify-between items-center relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-mystic-gold animate-pulse"></div>
-            <h2 className="text-lg md:text-xl font-mono text-mystic-gold uppercase tracking-[0.2em]">
+            <div className="w-2 h-2 bg-amber-500 animate-pulse"></div>
+            <h2 className="text-lg md:text-xl font-mono text-amber-400 uppercase tracking-[0.2em]">
               SPECIAL PROFILE
             </h2>
           </div>
@@ -684,7 +684,7 @@ const CharacterModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('character')}
             className={`flex-1 px-4 py-3 text-xs font-bold transition-all uppercase tracking-[0.2em] border-r border-stone-800/50 relative group overflow-hidden ${activeTab === 'character'
-              ? 'bg-stone-900/50 text-mystic-gold'
+              ? 'bg-stone-900/50 text-amber-400'
               : 'text-stone-600 hover:text-stone-400 hover:bg-stone-900/30'
               }`}
           >
@@ -697,13 +697,13 @@ const CharacterModal: React.FC<Props> = ({
               PROFILE INFO
             </div>
             {activeTab === 'character' && (
-              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-mystic-gold shadow-[0_0_8px_rgba(212,175,55,0.5)]" />
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.45)]" />
             )}
           </button>
           <button
             onClick={() => setActiveTab('statistics')}
             className={`flex-1 px-4 py-3 text-xs font-bold transition-all uppercase tracking-[0.2em] relative group overflow-hidden ${activeTab === 'statistics'
-              ? 'bg-stone-900/50 text-mystic-gold'
+              ? 'bg-stone-900/50 text-amber-400'
               : 'text-stone-600 hover:text-stone-400 hover:bg-stone-900/30'
               }`}
           >
@@ -716,7 +716,7 @@ const CharacterModal: React.FC<Props> = ({
               STATISTICS
             </div>
             {activeTab === 'statistics' && (
-              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-mystic-gold shadow-[0_0_8px_rgba(212,175,55,0.5)]" />
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.45)]" />
             )}
           </button>
         </div>
@@ -770,7 +770,7 @@ const CharacterModal: React.FC<Props> = ({
                                 </div>
                               ))}
                               {effects.specialEffect && (
-                                <div className="text-[10px] text-mystic-gold mt-2 border-t border-stone-800/50 pt-2 font-mono italic uppercase tracking-widest">
+                                <div className="text-[10px] text-amber-400 mt-2 border-t border-stone-800/50 pt-2 font-mono italic uppercase tracking-widest">
                                   MOD: {effects.specialEffect}
                                 </div>
                               )}
@@ -921,7 +921,7 @@ const CharacterModal: React.FC<Props> = ({
                                 <div key={idx} className="text-[10px] text-purple-300 uppercase tracking-tighter">{text}</div>
                               ))}
                               {effects.specialEffect && (
-                                <div className="text-[10px] text-mystic-gold mt-2 border-t border-stone-800/50 pt-2 font-mono italic uppercase tracking-widest">
+                                <div className="text-[10px] text-amber-400 mt-2 border-t border-stone-800/50 pt-2 font-mono italic uppercase tracking-widest">
                                   OVERDRIVE: {effects.specialEffect}
                                 </div>
                               )}
@@ -1003,7 +1003,7 @@ const CharacterModal: React.FC<Props> = ({
                                 <div key={idx} className="text-[10px] text-red-300 uppercase tracking-tighter">{text}</div>
                               ))}
                               {effects.specialEffect && (
-                                <div className="text-[10px] text-mystic-gold mt-2 border-t border-stone-800/50 pt-2 font-mono italic uppercase tracking-widest">
+                                <div className="text-[10px] text-amber-400 mt-2 border-t border-stone-800/50 pt-2 font-mono italic uppercase tracking-widest">
                                   CRITICAL: {effects.specialEffect}
                                 </div>
                               )}
@@ -1156,7 +1156,7 @@ const CharacterModal: React.FC<Props> = ({
                                   </div>
                                 )}
                                 {effects.specialEffect && (
-                                  <div className="text-[10px] text-mystic-gold mt-1 uppercase tracking-tighter italic">
+                                  <div className="text-[10px] text-amber-400 mt-1 uppercase tracking-tighter italic">
                                     PROTOCOL: {effects.specialEffect}
                                   </div>
                                 )}
@@ -1308,9 +1308,9 @@ const CharacterModal: React.FC<Props> = ({
                       {totalStats.speed}
                     </span>
                   </div>
-                  <div className="flex flex-col border-l-2 border-mystic-gold/30 pl-3">
+                  <div className="flex flex-col border-l-2 border-amber-500/30 pl-3">
                     <span className="text-[9px] text-stone-600 uppercase tracking-widest mb-1">Reputation (REP)</span>
-                    <span className="text-base text-mystic-gold font-mono font-bold">
+                    <span className="text-base text-amber-400 font-mono font-bold">
                       {player.reputation || 0}
                     </span>
                   </div>

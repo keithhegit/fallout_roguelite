@@ -58,6 +58,9 @@ const GrottoModal: React.FC<Props> = ({
       plantedHerbs: [],
       lastHarvestTime: null,
       spiritArrayEnhancement: 0,
+      herbarium: [],
+      dailySpeedupCount: 0,
+      lastSpeedupResetDate: new Date().toISOString().split('T')[0],
     };
   }, [player.grotto]);
 
@@ -212,8 +215,8 @@ const GrottoModal: React.FC<Props> = ({
         {/* Header */}
         <div className="bg-stone-950 p-4 border-b border-stone-800 flex items-center justify-between flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
-            <Home className="text-mystic-gold" size={24} />
-            <h2 className="text-xl font-serif text-mystic-gold tracking-widest font-bold">BASE</h2>
+            <Home className="text-amber-400" size={24} />
+            <h2 className="text-xl font-serif text-amber-400 tracking-widest font-bold">BASE</h2>
             {grotto.level > 0 && (
               <span className="text-xs px-2 py-1 rounded-none bg-stone-900 text-stone-300 border border-stone-800">
                 {currentConfig?.name || `Rank ${grotto.level}`}
@@ -234,7 +237,7 @@ const GrottoModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'overview'
-              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              ? 'bg-ink-950 text-amber-400 border-b-2 border-b-amber-500'
               : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
@@ -244,7 +247,7 @@ const GrottoModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('upgrade')}
             className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'upgrade'
-              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              ? 'bg-ink-950 text-amber-400 border-b-2 border-b-amber-500'
               : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
@@ -254,7 +257,7 @@ const GrottoModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('plant')}
             className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 relative flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'plant'
-              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              ? 'bg-ink-950 text-amber-400 border-b-2 border-b-amber-500'
               : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
@@ -269,7 +272,7 @@ const GrottoModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('enhancement')}
             className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 font-bold border-r border-stone-800 ${activeTab === 'enhancement'
-              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              ? 'bg-ink-950 text-amber-400 border-b-2 border-b-amber-500'
               : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
@@ -279,7 +282,7 @@ const GrottoModal: React.FC<Props> = ({
           <button
             onClick={() => setActiveTab('herbarium')}
             className={`px-6 py-3 transition-colors whitespace-nowrap flex items-center gap-2 flex-shrink-0 relative font-bold ${activeTab === 'herbarium'
-              ? 'bg-ink-950 text-mystic-gold border-b-2 border-b-mystic-gold'
+              ? 'bg-ink-950 text-amber-400 border-b-2 border-b-amber-500'
               : 'text-stone-400 hover:text-stone-200 hover:bg-stone-900'
               }`}
           >
@@ -306,7 +309,7 @@ const GrottoModal: React.FC<Props> = ({
                   </p>
                   <button
                     onClick={() => setActiveTab('upgrade')}
-                    className="px-6 py-3 bg-mystic-gold text-ink-950 font-bold rounded-none hover:bg-yellow-400 transition-all shadow-lg active:scale-95"
+                    className="px-6 py-3 bg-amber-500 text-ink-950 font-bold rounded-none hover:bg-amber-400 transition-all shadow-lg active:scale-95"
                   >
                     ACQUIRE BASE
                   </button>
@@ -324,18 +327,18 @@ const GrottoModal: React.FC<Props> = ({
                           </h3>
                           <p className="text-stone-400 text-sm mt-1 uppercase tracking-tight">{currentConfig?.description}</p>
                         </div>
-                        <span className="text-mystic-gold text-sm bg-mystic-gold/10 px-3 py-1 rounded-none border border-mystic-gold/50 font-bold tracking-widest">
+                        <span className="text-amber-400 text-sm bg-amber-500/10 px-3 py-1 rounded-none border border-amber-500/50 font-bold tracking-widest">
                           RANK {grotto.level}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-mystic-gold/50 transition-colors">
+                        <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-amber-500/50 transition-colors">
                           <div className="flex items-center gap-2 mb-2">
-                            <Zap className="text-mystic-gold" size={18} />
+                            <Zap className="text-amber-400" size={18} />
                             <span className="text-stone-400 text-xs font-bold uppercase tracking-widest">XP Bonus</span>
                           </div>
-                          <p className="text-2xl font-bold text-mystic-gold">
+                          <p className="text-2xl font-bold text-amber-400">
                             +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
                           </p>
                           {grotto.spiritArrayEnhancement > 0 && (
@@ -485,7 +488,7 @@ const GrottoModal: React.FC<Props> = ({
                                             <Clock size={12} className="text-blue-400" />
                                             <span>Time Left</span>
                                           </span>
-                                          <span className="font-bold text-mystic-gold tracking-widest">{formatGrottoTime(remaining)}</span>
+                                          <span className="font-bold text-amber-400 tracking-widest">{formatGrottoTime(remaining)}</span>
                                         </div>
                                         <div className="w-full bg-stone-950/60 rounded-none h-4 relative overflow-hidden border border-stone-800">
                                           <div
@@ -554,7 +557,7 @@ const GrottoModal: React.FC<Props> = ({
           {activeTab === 'upgrade' && (
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
-                <ArrowUp size={20} className="text-mystic-gold" />
+                <ArrowUp size={20} className="text-amber-400" />
                 Acquire/Upgrade Base
               </h3>
               {availableUpgrades.length === 0 ? (
@@ -577,7 +580,7 @@ const GrottoModal: React.FC<Props> = ({
                       <div
                         key={config.level}
                         className={`bg-stone-900/40 p-5 rounded-none border transition-all relative overflow-hidden group ${canAfford
-                          ? 'border-stone-800 hover:border-mystic-gold shadow-lg'
+                          ? 'border-stone-800 hover:border-amber-500 shadow-lg'
                           : 'border-stone-800/50 opacity-75'
                           }`}
                       >
@@ -597,7 +600,7 @@ const GrottoModal: React.FC<Props> = ({
                             <div className="grid grid-cols-3 gap-3 text-sm">
                               <div className="bg-stone-950/40 p-3 rounded-none border border-stone-800">
                                 <span className="text-stone-500 block mb-1 uppercase text-[10px] font-bold tracking-widest">XP Bonus</span>
-                                <span className="text-mystic-gold font-bold text-lg tracking-widest">
+                                <span className="text-amber-400 font-bold text-lg tracking-widest">
                                   +{(config.expRateBonus * 100).toFixed(0)}%
                                 </span>
                               </div>
@@ -619,7 +622,7 @@ const GrottoModal: React.FC<Props> = ({
                               onClick={() => onUpgradeGrotto(config.level)}
                               disabled={!canAfford}
                               className={`px-6 py-3 rounded-none font-bold transition-all flex items-center gap-2 shadow-lg uppercase tracking-widest text-xs ${canAfford
-                                ? 'bg-mystic-gold/20 text-mystic-gold hover:bg-mystic-gold/30 border border-mystic-gold/50 active:scale-95'
+                                ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/50 active:scale-95'
                                 : 'bg-stone-800/40 text-stone-500 cursor-not-allowed border border-stone-800'
                                 }`}
                             >
@@ -662,7 +665,7 @@ const GrottoModal: React.FC<Props> = ({
                   <p className="text-stone-400 mb-2 font-bold uppercase tracking-widest relative z-10">Acquire a base to start production.</p>
                   <button
                     onClick={() => setActiveTab('upgrade')}
-                    className="px-6 py-2 bg-mystic-gold/20 text-mystic-gold font-bold rounded-none hover:bg-mystic-gold/30 transition-all mt-4 uppercase tracking-widest text-xs border border-mystic-gold/50 relative z-10"
+                    className="px-6 py-2 bg-amber-500/20 text-amber-400 font-bold rounded-none hover:bg-amber-500/30 transition-all mt-4 uppercase tracking-widest text-xs border border-amber-500/50 relative z-10"
                   >
                     [ Acquire ]
                   </button>
@@ -764,7 +767,7 @@ const GrottoModal: React.FC<Props> = ({
           {activeTab === 'enhancement' && (
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-stone-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
-                <Zap size={20} className="text-mystic-gold" />
+                <Zap size={20} className="text-amber-400" />
                 Reactor Overhaul
               </h3>
               {grotto.level === 0 ? (
@@ -774,7 +777,7 @@ const GrottoModal: React.FC<Props> = ({
                   <p className="text-stone-400 mb-2 font-bold uppercase tracking-widest relative z-10">Acquire a base to start overhaul.</p>
                   <button
                     onClick={() => setActiveTab('upgrade')}
-                    className="px-6 py-2 bg-mystic-gold/20 text-mystic-gold font-bold rounded-none hover:bg-mystic-gold/30 transition-all mt-4 uppercase tracking-widest text-xs border border-mystic-gold/50 relative z-10"
+                    className="px-6 py-2 bg-amber-500/20 text-amber-400 font-bold rounded-none hover:bg-amber-500/30 transition-all mt-4 uppercase tracking-widest text-xs border border-amber-500/50 relative z-10"
                   >
                     [ Acquire ]
                   </button>
@@ -784,12 +787,12 @@ const GrottoModal: React.FC<Props> = ({
                   <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
                     <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
                     <div className="flex items-center gap-3 mb-4 relative z-10">
-                      <div className="p-2.5 rounded-none bg-mystic-gold/10 border border-mystic-gold/50">
-                        <Zap className="text-mystic-gold" size={24} />
+                      <div className="p-2.5 rounded-none bg-amber-500/10 border border-amber-500/50">
+                        <Zap className="text-amber-400" size={24} />
                       </div>
                       <div className="flex-1">
                         <span className="text-stone-500 font-bold text-[10px] block uppercase tracking-widest">Current Overhaul Bonus</span>
-                        <p className="text-3xl font-bold text-mystic-gold mt-1 tracking-widest">
+                        <p className="text-3xl font-bold text-amber-400 mt-1 tracking-widest">
                           +{((grotto.spiritArrayEnhancement || 0) * 100).toFixed(0)}%
                         </p>
                       </div>
@@ -797,7 +800,7 @@ const GrottoModal: React.FC<Props> = ({
                     <div className="bg-stone-950/40 p-3 rounded-none border border-stone-800 relative z-10">
                       <p className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">
                         <span className="text-stone-400">Base Bonus:</span> +{(grotto.expRateBonus * 100).toFixed(0)}% |{' '}
-                        <span className="text-mystic-gold">Total Bonus:</span> +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
+                        <span className="text-amber-400">Total Bonus:</span> +{((grotto.expRateBonus + (grotto.spiritArrayEnhancement || 0)) * 100).toFixed(0)}%
                       </p>
                     </div>
                   </div>
@@ -815,7 +818,7 @@ const GrottoModal: React.FC<Props> = ({
                         <div
                           key={enhancement.id}
                           className={`bg-stone-900/40 p-5 rounded-none border transition-all relative overflow-hidden group ${canEnhance
-                            ? 'border-stone-800 hover:border-mystic-gold shadow-lg'
+                            ? 'border-stone-800 hover:border-amber-500 shadow-lg'
                             : 'border-stone-800/50 opacity-75'
                             }`}
                         >
@@ -830,7 +833,7 @@ const GrottoModal: React.FC<Props> = ({
                             <p className="text-stone-400 text-xs mb-4 uppercase tracking-tight">{enhancement.description}</p>
 
                             <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 mb-4">
-                              <div className="text-mystic-gold text-xs mb-3 font-bold flex items-center gap-2 uppercase tracking-widest">
+                              <div className="text-amber-400 text-xs mb-3 font-bold flex items-center gap-2 uppercase tracking-widest">
                                 <Zap size={18} />
                                 Bonus: +{(enhancement.expRateBonus * 100).toFixed(0)}% XP Rate
                               </div>
@@ -860,7 +863,7 @@ const GrottoModal: React.FC<Props> = ({
                             onClick={() => onEnhanceSpiritArray(enhancement.id)}
                             disabled={!canEnhance}
                             className={`w-full px-4 py-3 rounded-none font-bold transition-all uppercase tracking-widest text-[10px] relative z-10 ${canEnhance
-                              ? 'bg-mystic-gold/20 text-mystic-gold hover:bg-mystic-gold/30 border border-mystic-gold/50 shadow-lg active:scale-95'
+                              ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/50 shadow-lg active:scale-95'
                               : 'bg-stone-800/40 text-stone-500 cursor-not-allowed border border-stone-800'
                               }`}
                           >
@@ -899,12 +902,12 @@ const GrottoModal: React.FC<Props> = ({
                       {grotto.herbarium?.length || 0} / {PLANTABLE_HERBS.length}
                     </div>
                   </div>
-                  <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-mystic-gold/50 transition-colors">
+                  <div className="bg-stone-950/40 p-4 rounded-none border border-stone-800 hover:border-amber-500/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
-                      <Gauge className="text-mystic-gold" size={18} />
+                      <Gauge className="text-amber-400" size={18} />
                       <div className="text-stone-400 text-[10px] font-bold uppercase tracking-widest">Progress</div>
                     </div>
-                    <div className="text-2xl font-bold text-mystic-gold tracking-widest">
+                    <div className="text-2xl font-bold text-amber-400 tracking-widest">
                       {PLANTABLE_HERBS.length > 0 ? Math.floor(((grotto.herbarium?.length || 0) / PLANTABLE_HERBS.length) * 100) : 0}%
                     </div>
                   </div>

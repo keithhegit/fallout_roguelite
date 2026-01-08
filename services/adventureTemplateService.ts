@@ -1,4 +1,4 @@
-import { AdventureResult, AdventureType, ItemRarity, RealmType, EquipmentSlot, ItemType } from '../types';
+import { AdventureResult, AdventureType, ItemRarity, RealmType, EquipmentSlot, ItemType, RiskLevel } from '../types';
 import {
   REALM_ORDER,
   LOTTERY_PRIZES,
@@ -29,7 +29,7 @@ interface AdventureEventTemplate {
   spiritStonesChange: number;
   eventColor: 'normal' | 'gain' | 'danger' | 'special';
   adventureType: AdventureType;
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extremely Dangerous';
+  riskLevel?: RiskLevel;
   // 可选字段
   itemObtained?: AdventureResult['itemObtained'];
   itemsObtained?: AdventureResult['itemsObtained'];
@@ -40,6 +40,7 @@ interface AdventureEventTemplate {
   reputationEvent?: AdventureResult['reputationEvent'];
   inheritanceLevelChange?: number;
   triggerSecretRealm?: boolean;
+  isLucky?: boolean;
   spiritualRootsChange?: AdventureResult['spiritualRootsChange'];
   lifespanChange?: number;
   lotteryTicketsChange?: number;
@@ -782,7 +783,7 @@ function generateLuckyEventTemplate(index: number, forcedRarity?: ItemRarity): A
  * 生成秘境探索事件模板
  */
 function generateSecretRealmEventTemplate(index: number): AdventureEventTemplate {
-  const riskLevels: Array<'Low' | 'Medium' | 'High' | 'Extremely Dangerous'> = ['Low', 'Medium', 'High', 'Extremely Dangerous'];
+  const riskLevels: Array<RiskLevel> = ['Low', 'Medium', 'High', 'Extreme'];
   const riskLevel = selectFromArray(riskLevels, index);
 
   const encounters = ['guardian beast', 'extinct treasure', 'trap mechanism', 'treasury inheritance', 'other cultivators'];
@@ -805,23 +806,23 @@ function generateSecretRealmEventTemplate(index: number): AdventureEventTemplate
     Low: { exp: [50, 300], stones: [100, 600] },
     Medium: { exp: [100, 500], stones: [200, 1000] },
     High: { exp: [200, 800], stones: [400, 1500] },
-    'Extremely Dangerous': { exp: [400, 1200], stones: [800, 2500] },
+    Extreme: { exp: [400, 1200], stones: [800, 2500] },
   } as const;
 
   const rewards = baseRewards[riskLevel];
 
   return {
     story: selectFromArray(stories, index),
-    hpChange: riskLevel === 'Extremely Dangerous'
+    hpChange: riskLevel === 'Extreme'
       ? -randomInt(index, 50, 150, 540)
       : -randomInt(index, 20, 80, 550),
     expChange: randomInt(index, rewards.exp[0], rewards.exp[1], 560),
     spiritStonesChange: randomInt(index, rewards.stones[0], rewards.stones[1], 570),
-    eventColor: riskLevel === 'Extremely Dangerous' ? 'danger' : 'gain',
+    eventColor: riskLevel === 'Extreme' ? 'danger' : 'gain',
     adventureType: 'secret_realm',
     riskLevel,
     itemObtained: randomChance(index, 0.6, 580) ? generateRandomItem(rarity, index) : undefined,
-    attributeReduction: riskLevel === 'Extremely Dangerous' && randomChance(index, 0.3, 590) ? {
+    attributeReduction: riskLevel === 'Extreme' && randomChance(index, 0.3, 590) ? {
       attack: randomInt(index, 20, 70, 600),
       defense: randomInt(index, 15, 45, 610),
     } : undefined,
@@ -1350,7 +1351,7 @@ export function isEventTemplateLibraryInitialized(): boolean {
  */
 export function getRandomEventTemplate(
   adventureType: AdventureType = 'normal',
-  riskLevel?: 'Low' | 'Medium' | 'High' | 'Extremely Dangerous',
+  riskLevel?: RiskLevel,
   playerRealm?: RealmType,
   playerRealmLevel?: number
 ): AdventureEventTemplate | null {
@@ -1402,18 +1403,18 @@ export function getRandomEventTemplate(
       Low: Math.max(0.25, 1.0 - realmProgress * 1.5),      // Low realm: high probability, High realm: low probability
       Medium: 1.0 - realmProgress * 0.5,                      // Medium probability
       High: 0.3 + realmProgress * 0.7,                      // High realm: high probability
-      'Extremely Dangerous': Math.min(0.8, realmProgress * 1.2),       // Only high realm players are likely to encounter
+      Extreme: Math.min(0.8, realmProgress * 1.2),       // Only high realm players are likely to encounter
     };
 
     // Randomly select risk level based on weights
     const totalWeight = Object.values(riskWeights).reduce((a, b) => a + b, 0);
     let random = Math.random() * totalWeight;
-    let selectedRiskLevel: 'Low' | 'Medium' | 'High' | 'Extremely Dangerous' = 'Low';
+    let selectedRiskLevel: RiskLevel = 'Low';
 
     for (const [level, weight] of Object.entries(riskWeights)) {
       random -= weight;
       if (random <= 0) {
-        selectedRiskLevel = level as 'Low' | 'Medium' | 'High' | 'Extremely Dangerous';
+        selectedRiskLevel = level as RiskLevel;
         break;
       }
     }
@@ -1891,4 +1892,3 @@ export function templateToAdventureResult(
 
   return result;
 }
-

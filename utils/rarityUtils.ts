@@ -15,9 +15,9 @@ export const getRarityTextColor = (rarity: ItemRarity | undefined): string => {
     case '传说':
       return 'text-purple-400';
     case '仙品':
-      return 'text-yellow-400';
+      return 'text-amber-400';
     default:
-      return 'text-stone-300';
+      return 'text-steel-400';
   }
 };
 
@@ -28,16 +28,16 @@ export const getRarityNameClasses = (rarity: ItemRarity | undefined): string => 
   const base = 'font-bold transition-colors duration-300 cursor-default ';
   switch (rarity) {
     case '稀有':
-      return base + 'text-stone-300 hover:text-blue-400';
+      return base + 'text-steel-400 hover:text-blue-400';
     case '传说':
-       return base + 'text-stone-300 hover:text-purple-400';
+      return base + 'text-steel-400 hover:text-purple-400';
     case '仙品':
       return (
         base +
-        'text-stone-300 hover:text-mystic-gold hover:drop-shadow-[0_0_8px_rgba(203,161,53,0.5)]'
+        'text-steel-400 hover:text-amber-400 hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.45)]'
       );
     default:
-      return base + 'text-stone-300 hover:text-stone-100';
+      return base + 'text-steel-400 hover:text-stone-100';
   }
 };
 
@@ -47,13 +47,13 @@ export const getRarityNameClasses = (rarity: ItemRarity | undefined): string => 
 export const getRarityBorder = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
     case '稀有':
-      return 'border-blue-800';
+      return 'border-blue-500';
     case '传说':
-      return 'border-purple-800';
+      return 'border-purple-500';
     case '仙品':
-      return 'border-mystic-gold';
+      return 'border-amber-500';
     default:
-      return 'border-stone-700';
+      return 'border-steel-500';
   }
 };
 
@@ -63,13 +63,13 @@ export const getRarityBorder = (rarity: ItemRarity | undefined): string => {
 export const getRarityColor = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
     case '稀有':
-      return 'border-blue-600 bg-blue-900/20';
+      return 'border-blue-500 bg-blue-950/20';
     case '传说':
-      return 'border-purple-600 bg-purple-900/20';
+      return 'border-purple-500 bg-purple-950/20';
     case '仙品':
-      return 'border-yellow-600 bg-yellow-900/20';
+      return 'border-amber-500 bg-amber-950/20';
     default:
-      return 'border-stone-600 bg-stone-800';
+      return 'border-steel-500 bg-stone-900/40';
   }
 };
 
@@ -79,13 +79,13 @@ export const getRarityColor = (rarity: ItemRarity | undefined): string => {
 export const getRarityBadge = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
     case '稀有':
-      return 'bg-blue-900/40 text-blue-300 border-blue-700';
+      return 'bg-blue-950/30 text-blue-400 border-blue-500/50';
     case '传说':
-      return 'bg-purple-900/40 text-purple-300 border-purple-700';
+      return 'bg-purple-950/30 text-purple-400 border-purple-500/50';
     case '仙品':
-      return 'bg-yellow-900/40 text-yellow-300 border-yellow-700';
+      return 'bg-amber-950/30 text-amber-400 border-amber-500/50';
     default:
-      return 'bg-stone-700 text-stone-400 border-stone-600';
+      return 'bg-stone-950/40 text-steel-400 border-steel-500/50';
   }
 };
 
@@ -95,11 +95,11 @@ export const getRarityBadge = (rarity: ItemRarity | undefined): string => {
 export const getRarityGlow = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
     case '稀有':
-      return 'shadow-[0_0_10px_rgba(96,165,250,0.15)]';
+      return 'shadow-[0_0_10px_rgba(59,130,246,0.2)]';
     case '传说':
-      return 'shadow-[0_0_15px_rgba(192,132,252,0.2)]';
+      return 'shadow-[0_0_15px_rgba(168,85,247,0.2)]';
     case '仙品':
-      return 'shadow-[0_0_20px_rgba(203,161,53,0.25)]';
+      return 'shadow-[0_0_20px_rgba(245,158,11,0.3)]';
     default:
       return 'shadow-none';
   }
@@ -114,6 +114,10 @@ export const getRarityOrder = (rarity: ItemRarity | undefined): number => {
     传说: 4,
     稀有: 3,
     普通: 2,
+    Mythic: 5,
+    Legendary: 4,
+    Rare: 3,
+    Common: 2,
   };
   return rarityOrder[rarity || '普通'];
 };
@@ -156,4 +160,3 @@ export const normalizeRarityValue = (rarity?: ItemRarity | string): ItemRarity =
   const key = String(rarity).toLowerCase();
   return rarityAliasMap[key] || (rarity as ItemRarity);
 };
-

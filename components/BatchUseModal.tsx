@@ -192,7 +192,7 @@ const BatchUseModal: React.FC<Props> = ({
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
 
         <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 md:rounded-none z-10">
-          <h3 className="text-xl font-bold text-mystic-gold flex items-center gap-2 uppercase tracking-tighter">
+          <h3 className="text-xl font-bold text-amber-400 flex items-center gap-2 uppercase tracking-tighter">
             <Zap size={20} /> Bulk Consumption
           </h3>
           <button onClick={onClose} className="text-stone-400 hover:text-white transition-colors">
@@ -218,7 +218,7 @@ const BatchUseModal: React.FC<Props> = ({
                   }}
                   className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest border transition-all ${
                     selectedCategory === category
-                      ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                       : 'bg-stone-900 border-stone-800 text-stone-500 hover:text-stone-300 hover:bg-stone-800'
                   }`}
                 >
@@ -247,7 +247,7 @@ const BatchUseModal: React.FC<Props> = ({
                     }}
                     className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest border transition-all ${
                       selectedRarity === rarity
-                        ? 'bg-mystic-gold/20 border-mystic-gold text-mystic-gold'
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-400'
                         : 'bg-stone-900 border-stone-800 text-stone-500 hover:text-stone-300 hover:bg-stone-800'
                     }`}
                   >
@@ -270,7 +270,7 @@ const BatchUseModal: React.FC<Props> = ({
                   : 'Select Current'}
               </button>
               <div className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
-                Selected: <span className="text-stone-300">{selectedItems.size} / {filteredItems.length}</span> (<span className="text-mystic-gold">{totalSelectedQuantity} Units</span>)
+                Selected: <span className="text-stone-300">{selectedItems.size} / {filteredItems.length}</span> (<span className="text-amber-400">{totalSelectedQuantity} Units</span>)
               </div>
             </div>
             <button
@@ -309,7 +309,7 @@ const BatchUseModal: React.FC<Props> = ({
                     onClick={() => handleToggleItem(item.id)}
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`mt-1 w-4 h-4 border border-stone-700 flex items-center justify-center transition-colors ${isSelected ? 'bg-mystic-gold border-mystic-gold' : 'bg-stone-950'}`}>
+                      <div className={`mt-1 w-4 h-4 border border-stone-700 flex items-center justify-center transition-colors ${isSelected ? 'bg-amber-500 border-amber-500' : 'bg-stone-950'}`}>
                         {isSelected && <div className="w-2 h-2 bg-stone-950"></div>}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -370,4 +370,3 @@ const BatchUseModal: React.FC<Props> = ({
 };
 
 export default BatchUseModal;
-

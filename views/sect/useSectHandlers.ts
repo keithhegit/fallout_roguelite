@@ -314,7 +314,7 @@ export function useSectHandlers({
             {
               name: si.name,
               type: ItemType.Material,
-              rarity: task.quality === '仙品' ? '仙品' : '传说',
+              rarity: task.quality === 'Mythic' ? '仙品' : '传说',
             },
             si.quantity || 1
           );

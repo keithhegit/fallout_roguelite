@@ -24,6 +24,10 @@ interface GenerateItemsOptions {
  */
 function getRarityWeight(rarity: ItemRarity): number {
   const weights: Record<ItemRarity, number> = {
+    Common: 40,
+    Rare: 30,
+    Legendary: 20,
+    Mythic: 10,
     普通: 40,
     稀有: 30,
     传说: 20,

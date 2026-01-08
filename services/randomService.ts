@@ -4,7 +4,7 @@ import { getItemFromConstants } from '../utils/itemConstantsUtils';
 
 const randomId = () => Math.random().toString(36).slice(2, 9);
 
-// 秘境名称池 - 按风险等级分类
+// Realm Name Pool - Categorized by Risk Level
 const REALM_NAMES_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[]> = {
   'Low': [
     'Mystic Realm', 'Star Ruins', 'Beast Mountain Outer', 'Herb Garden', 'Breeze Valley',
@@ -32,7 +32,7 @@ const REALM_NAMES_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[
   ]
 };
 
-// 秘境描述池 - 按风险等级分类
+// Realm Description Pool - Categorized by Risk Level
 const REALM_DESCRIPTIONS_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[]> = {
   'Low': [
     'Rich in spiritual energy, suitable for cultivation, relatively safe.',
@@ -124,227 +124,228 @@ const REALM_DESCRIPTIONS_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', 
   ]
 };
 
-// 掉落物池
+// Drop Item Pool
 const DROP_ITEMS = [
-  '妖兽材料',
-  '稀有草药',
-  '攻击法器',
-  '剑修功法',
-  '残破灵宝',
-  '剑意草',
-  '雷属性至宝',
-  '仙品丹药材料',
-  '天阶功法',
-  '上古遗物',
-  '灵兽内丹',
-  '炼器材料',
-  '符箓',
-  '阵法图',
-  '传承玉简',
-  '仙草',
-  '灵矿',
-  '法宝碎片',
+  'Mutant Parts',
+  'Bio Sample',
+  'Rare Herbs',
+  'Med Supplies',
+  'Weapon Mod',
+  'Damaged Relic',
+  'Pre-War Artifact',
+  'Circuit Diagram',
+  'Data Holotape',
+  'Fusion Core',
+  'Energy Cell',
+  'Alloy Plate',
+  'Scrap Metal',
+  'Rare Mineral',
+  'Fusion Cell',
+  'Stimpak',
+  'Rad-X',
+  'Mentats',
+  'Buffout',
 ];
 
-// 宗门名称和描述绑定池（名称和描述一一对应）
+// Faction Data Pool (Names and Descriptions)
 const SECT_DATA: Array<{ name: string; description: string }> = [
-  { name: '云灵宗', description: '正道大宗，门风清正，适合大部分修士。' },
-  { name: '烈阳宗', description: '坐落于火山之上，专修火法，行事霸道。' },
-  { name: '万剑门', description: '一剑破万法。门徒皆为剑痴，攻击力极强。' },
-  { name: '天音寺', description: '佛门圣地，慈悲为怀，防御力出众。' },
-  { name: '太虚观', description: '道门正统，修炼速度极快。' },
-  { name: '血魔宗', description: '魔道宗门，行事狠辣，但实力强大。' },
-  { name: '青莲剑派', description: '剑修圣地，剑法精妙。' },
-  { name: '玄天宗', description: '正道大宗，底蕴深厚。' },
-  { name: '九幽门', description: '魔道宗门，阴险狡诈。' },
-  { name: '星辰阁', description: '神秘组织，掌握星辰之力。' },
-  { name: '龙族圣地', description: '龙族后裔建立的宗门，血脉强大。' },
-  { name: '凤凰宫', description: '凤凰血脉传承，涅槃重生。' },
-  { name: '雷神殿', description: '专修雷法，攻击力极强。' },
-  { name: '冰魄宗', description: '冰属性修士的圣地，防御力强。' },
-  { name: '毒王谷', description: '毒修聚集地，擅长用毒。' },
-  { name: '幻月门', description: '幻术宗门，擅长迷惑敌人。' },
-  { name: '金刚寺', description: '体修宗门，肉身强大。' },
-  { name: '阴阳教', description: '阴阳调和，攻防兼备。' }
+  { name: 'Haven Outpost', description: 'A stable settlement. Trades food, meds, and clean water.' },
+  { name: 'Sunfire Gang', description: 'Pyromaniacs and raiders. Known for arson and ambushes.' },
+  { name: 'Brotherhood of Steel', description: 'Military order. Hoards advanced tech. Heavy armor presence.' },
+  { name: 'The Sanctuary Clinic', description: 'Field medics and caretakers. Neutral… until threatened.' },
+  { name: 'The Institute', description: 'Covert research network. Synth rumors persist.' },
+  { name: 'Bloodcap Raiders', description: 'Raiders with a taste for violence. No negotiations.' },
+  { name: 'Greenblade Company', description: 'Mercenary outfit. Fast strikes, close-quarters specialists.' },
+  { name: 'The Minutemen', description: 'Citizen militia. Answers distress calls—sometimes.' },
+  { name: 'The Railroad', description: 'Underground operators. Codes, safehouses, and secrets.' },
+  { name: 'Starlight Surveyors', description: 'Scavengers of satellites and signal towers. Obsessed with data.' },
+  { name: 'Dragonblood Tribe', description: 'Heavily modified humans. Tough, proud, territorial.' },
+  { name: 'Phoenix Reclaimers', description: 'Salvage-and-rebuild zealots. "Nothing stays broken."' },
+  { name: 'Thunder Legion', description: 'Generator lords. Controls power grids and energy weapons.' },
+  { name: 'Cryo Wardens', description: 'Cold storage keepers. Guards of sealed facilities and vaults.' },
+  { name: 'Venom Works', description: 'Chem-brewers. Poison, antidotes, and everything between.' },
+  { name: 'Mirage Syndicate', description: 'Scammers and infiltrators. Masters of misdirection.' },
+  { name: 'Iron Temple', description: 'Hardcore survivalists. Armor plating, discipline, endurance.' },
+  { name: 'The Balance Collective', description: 'Pragmatists. Trades in favors, intel, and uneasy alliances.' }
 ];
 
-// 任务名称池（按类型分类）
+// Task Name Pool (Categorized by Type)
 const TASK_NAMES_BY_TYPE: Record<TaskType, string[]> = {
-  patrol: ['山门巡逻', '宗门巡视', '边界巡查', '治安维护'],
-  donate_stone: ['上交灵石', '捐献灵石', '资助宗门'],
-  donate_herb: ['上交草药', '捐献灵草', '提供药材'],
-  collect: ['收集材料', '采集资源', '收集物资'],
-  hunt: ['猎杀妖兽', '除妖任务', '妖兽清剿', '除魔卫道'],
-  alchemy: ['炼制丹药', '炼丹任务', '炼制灵丹', '炼制仙丹'],
-  forge: ['炼制法宝', '炼器任务', '锻造法器', '炼制灵宝'],
-  teach: ['教导弟子', '指导修炼', '传授功法', '培养新人'],
-  defend: ['守护宗门', '防御任务', '宗门守卫', '护山大阵'],
-  explore: ['探索遗迹', '遗迹探索', '古墓探索', '秘境探索'],
-  trade: ['贸易任务', '护送商队', '交易任务', '商业往来'],
-  research: ['研究功法', '功法研究', '参悟心法', '钻研道法'],
-  cultivate: ['培育灵草', '种植灵药', '培育仙草', '灵田管理'],
-  maintain: ['维护阵法', '修复法阵', '阵法维护', '护山大阵维护'],
-  diplomacy: ['外交任务', '宗门交流', '友好往来', '结盟任务'],
-  trial: ['试炼任务', '宗门试炼', '考验任务', '历练任务'],
-  rescue: ['救援任务', '营救同门', '救援行动', '紧急救援'],
-  investigate: ['调查任务', '情报收集', '探查任务', '侦查任务'],
-  battle: ['宗门比武', '挑战同门', '切磋交流', '实力证明'],
-  treasure_hunt: ['寻宝任务', '寻找遗宝', '探宝行动', '寻获机缘'],
-  escort: ['护送要人', '护送长老', '护送物资', '护送任务'],
-  assassination: ['暗杀任务', '清除威胁', '秘密行动', '刺杀目标'],
-  artifact_repair: ['修复法宝', '重铸法器', '法宝维护', '法器修复'],
-  spirit_beast: ['驯服灵兽', '捕捉妖兽', '灵兽契约', '收服坐骑'],
-  sect_war: ['宗门战争', '征伐任务', '攻伐行动', '战争任务'],
-  inheritance: ['传承试炼', '接受传承', '传承考验', '获得传承'],
-  tribulation: ['渡劫护法', '天劫试炼', '渡劫任务', '天劫考验'],
-  alchemy_master: ['炼丹大师', '炼制仙丹', '丹道考验', '炼丹宗师'],
+  patrol: ['Perimeter Patrol', 'Security Sweep', 'Border Watch', 'Night Watch'],
+  donate_stone: ['Contribute Caps', 'Fund the Outpost', 'Donation Run', 'Supply Donation'],
+  donate_herb: ['Donate Meds', 'Medical Supply Drop', 'Chem Donation', 'Clinic Support'],
+  collect: ['Scavenge Run', 'Material Collection', 'Scrap Pickup', 'Resource Harvest'],
+  hunt: ['Hostile Hunt', 'Creature Cull', 'Threat Removal', 'Clean the Zone'],
+  alchemy: ['Cook Chems', 'Synth Lab Shift', 'Med Production', 'Chem Batch'],
+  forge: ['Forge Gear', 'Weapon Mod Build', 'Workshop Shift', 'Arms Assembly'],
+  teach: ['Train Recruits', 'Drill Session', 'Combat Basics', 'Field Training'],
+  defend: ['Outpost Defense', 'Hold the Line', 'Fortify the Gate', 'Defensive Stand'],
+  explore: ['Ruins Expedition', 'Site Survey', 'Facility Recon', 'Deep Dive'],
+  trade: ['Caravan Trade', 'Trade Mission', 'Market Run', 'Exchange Deal'],
+  research: ['Tech Research', 'Data Analysis', 'Signal Study', 'Lab Report'],
+  cultivate: ['Greenhouse Duty', 'Crop Tending', 'Hydroponics Shift', 'Farm Maintenance'],
+  maintain: ['System Maintenance', 'Generator Repair', 'Turret Service', 'Infrastructure Fix'],
+  diplomacy: ['Faction Liaison', 'Negotiation Run', 'Alliance Talk', 'Neutral Meeting'],
+  trial: ['Proving Grounds', 'Survival Trial', 'Hazard Course', 'Combat Trial'],
+  rescue: ['Rescue Op', 'Emergency Extraction', 'Recovery Mission', 'Search & Rescue'],
+  investigate: ['Incident Report', 'Strange Signal', 'Missing Supplies', 'Intel Check'],
+  battle: ['Combat Operation', 'Arena Spar', 'Firefight', 'Proof of Strength'],
+  treasure_hunt: ['Relic Recovery', 'Lost Tech Hunt', 'Cache Search', 'Artifact Retrieval'],
+  escort: ['VIP Escort', 'Supply Escort', 'Courier Guard', 'Caravan Protection'],
+  assassination: ['Target Elimination', 'Covert Hit', 'Silent Strike', 'Remove the Threat'],
+  artifact_repair: ['Repair Pre-War Tech', 'Restore Relic', 'Fix Equipment', 'Restoration Job'],
+  spirit_beast: ['Tame the Beast', 'Capture Specimen', 'Companion Bond', 'Creature Handling'],
+  sect_war: ['Faction Skirmish', 'Territory Clash', 'Offensive Push', 'War Campaign'],
+  inheritance: ['Legacy Protocol', 'Secure the Archive', 'Holotape Recovery', 'Claim the Record'],
+  tribulation: ['Rad Storm Run', 'Exposure Event', 'Containment Breach', 'Storm Survival'],
+  alchemy_master: ['Master Chemist Trial', 'Legendary Chem Batch', 'Prototype Synthesis', 'Expert Cook'],
 };
 
-// 任务描述池（按类型分类）
+// Task Description Pool (Categorized by Type)
 const TASK_DESCRIPTIONS_BY_TYPE: Record<TaskType, string[]> = {
   patrol: [
-    '在宗门附近巡视，驱逐野兽，维护治安。',
-    '巡查宗门边界，确保安全。',
-    '维护宗门周边的秩序。',
+    'Patrol the perimeter and report any movement near [LOCATION].',
+    'Clear minor threats and keep the route to [LOCATION] safe.',
+    'Check checkpoints. No heroics—just keep it quiet.',
   ],
   donate_stone: [
-    '为宗门捐献灵石，支持宗门发展。',
-    '上交灵石以换取贡献。',
-    '资助宗门的日常运营。',
+    'Donate caps to support repairs and ammo stock.',
+    'The outpost needs funding. Every cap counts.',
+    'Drop off caps. Keep the receipt—trust no one.',
   ],
   donate_herb: [
-    '为宗门提供草药，支持炼丹。',
-    '上交收集的灵草，换取贡献。',
-    '捐献药材以支持宗门炼丹。',
+    'Deliver meds to the clinic. No questions asked.',
+    'Donate chems and bandages. Sickbay is overflowing.',
+    'Supplies first. Sentiment later.',
   ],
   collect: [
-    '收集宗门需要的炼器材料。',
-    '前往指定地点采集资源。',
-    '收集任务所需的物资。',
+    'Collect usable scrap from [LOCATION].',
+    'Retrieve parts and bring them back intact.',
+    'Keep an eye on [ENEMY]. They like shiny things too.',
   ],
   hunt: [
-    '猎杀威胁宗门安全的妖兽。',
-    '清除宗门附近的妖兽威胁。',
-    '执行除妖任务，维护宗门安全。',
+    'Hunt down [ENEMY] near [LOCATION].',
+    'Eliminate the threat before it spreads.',
+    'Bring proof. No proof, no pay.',
   ],
   alchemy: [
-    '为宗门炼制指定丹药，需要丹方和材料。',
-    '使用宗门提供的材料炼制丹药。',
-    '炼制高级丹药，需要一定的炼丹造诣。',
+    'Cook a batch of chems using the provided recipe.',
+    'Produce meds for field kits. Quality matters.',
+    'Keep the lab sealed. Contamination kills.',
   ],
   forge: [
-    '为宗门炼制法宝，需要炼器材料。',
-    '使用珍贵材料锻造法器。',
-    '炼制强大的法宝，需要炼器技能。',
+    'Assemble weapon mods from collected parts.',
+    'Craft gear for patrol units. Test before delivery.',
+    'If it jams, it’s on you.',
   ],
   teach: [
-    '指导新入门的弟子修炼，需要一定境界。',
-    '传授修炼心得，培养新人。',
-    '为弟子答疑解惑，指导修炼。',
+    'Train new recruits. They need to survive their first week.',
+    'Run drills and improve [TARGET] morale.',
+    'Teach them to reload before they pray.',
   ],
   defend: [
-    '守护宗门，抵御外敌入侵，可能触发战斗。',
-    '参与宗门防御，保护同门。',
-    '守卫宗门要地，防止敌人破坏。',
+    'Defend the outpost from [ENEMY].',
+    'Hold positions until the alarm clears.',
+    'Protect civilians. Everything else is expendable.',
   ],
   explore: [
-    '探索附近的遗迹，寻找宝物，可能获得意外收获。',
-    '深入古墓探索，寻找传承。',
-    '探索秘境，寻找机缘。',
+    'Explore [LOCATION] and mark hazards on the map.',
+    'Retrieve any usable tech you can carry.',
+    'Signal may drop. Plan your exit.',
   ],
   trade: [
-    '护送重要物资到指定地点，可能遭遇劫匪。',
-    '执行贸易任务，促进宗门交流。',
-    '护送商队，确保物资安全。',
+    'Escort a trade deal to [LOCATION].',
+    'Keep the caravan alive. Merchants talk.',
+    'No shots unless necessary.',
   ],
   research: [
-    '研究宗门功法，需要时间，可获得修为提升。',
-    '参悟心法，提升修炼速度。',
-    '钻研道法，加深对修炼的理解。',
+    'Analyze recovered data from [LOCATION].',
+    'Research improves survival odds. Keep it documented.',
+    'If you can’t explain it, you don’t understand it.',
   ],
   cultivate: [
-    '培育灵草，需要时间，可获得草药奖励。',
-    '管理灵田，培育珍稀灵药。',
-    '种植仙草，需要耐心和技巧。',
+    'Tend crops and keep the greenhouse stable.',
+    'Harvest supplies for rations and meds.',
+    'Pests are small. Problems are not.',
   ],
   maintain: [
-    '维护宗门的护山大阵，需要材料。',
-    '修复损坏的阵法，确保宗门安全。',
-    '维护防御法阵，需要阵法知识。',
+    'Repair critical systems. Power outages attract trouble.',
+    'Maintain turrets around [LOCATION].',
+    'Bring tools. Borrowing gets you killed.',
   ],
   diplomacy: [
-    '执行外交任务，需要高境界，可能获得特殊奖励。',
-    '代表宗门与其他势力交流。',
-    '促进宗门间的友好关系。',
+    'Meet a faction contact at [LOCATION].',
+    'Keep it civil. Words are cheaper than bullets.',
+    'Bring caps. And backup.',
   ],
   trial: [
-    '参加宗门试炼，高风险高回报。',
-    '接受宗门考验，证明实力。',
-    '完成试炼任务，获得丰厚奖励。',
+    'Complete a survival trial in [LOCATION].',
+    'This is a test. Failure is expensive.',
+    'Do it clean. Do it fast.',
   ],
   rescue: [
-    '救援遇险的同门，可能遭遇战斗。',
-    '执行紧急救援任务。',
-    '营救被困的宗门弟子。',
+    'Rescue [TARGET] from [LOCATION].',
+    'Extraction window is short. Move.',
+    'Leave no one behind—unless you must.',
   ],
   investigate: [
-    '调查异常情况，需要强大的神识。',
-    '收集情报，探查敌情。',
-    '侦查任务，需要谨慎和智慧。',
+    'Investigate suspicious activity near [LOCATION].',
+    'Follow the trail. Document everything.',
+    'Assume someone is lying. Start there.',
   ],
   battle: [
-    '与同门切磋，提升实战能力，可能获得战斗经验。',
-    '参加宗门比武，证明自己的实力。',
-    '挑战同门高手，检验修炼成果。',
+    'Engage in a controlled fight to gain experience.',
+    'Win clean. No collateral damage.',
+    'Treat wounds after. Not before.',
   ],
   treasure_hunt: [
-    '寻找传说中的宝物，需要运气和实力，可能获得稀有物品。',
-    '探索未知区域，寻找遗落的宝物。',
-    '根据线索寻找珍贵物品，考验智慧和运气。',
+    'Find the cache rumored at [LOCATION].',
+    'Bring back [ITEM]. If it exists.',
+    'Luck helps. Preparation helps more.',
   ],
   escort: [
-    '护送重要人物或物资，可能遭遇敌人袭击。',
-    '护送宗门长老前往目的地，责任重大。',
-    '护送珍贵物资，确保安全送达。',
+    'Escort [TARGET] to [DESTINATION].',
+    'Ambush likely near [LOCATION]. Stay sharp.',
+    'If the client dies, you don’t get paid.',
   ],
   assassination: [
-    '执行秘密刺杀任务，需要强大的实力和隐蔽能力。',
-    '清除对宗门有威胁的目标，高风险高回报。',
-    '执行暗杀任务，需要谨慎和实力。',
+    'Eliminate the target at [LOCATION]. Quiet preferred.',
+    'No witnesses. No signatures.',
+    'In and out. Don’t make it personal.',
   ],
   artifact_repair: [
-    '修复损坏的法宝，需要炼器材料和技能。',
-    '重铸破损的法器，恢复其威力。',
-    '维护宗门的法宝，确保其正常运转。',
+    'Repair damaged equipment using recovered parts.',
+    'Restoration requires patience and clean tools.',
+    'Test it twice before handing it over.',
   ],
   spirit_beast: [
-    '驯服强大的灵兽，需要实力和耐心，可能获得灵宠。',
-    '捕捉妖兽，将其收为坐骑或灵宠。',
-    '与灵兽建立契约，获得强大的伙伴。',
+    'Capture a specimen near [LOCATION].',
+    'Non-lethal preferred. Dead specimens teach less.',
+    'If it bites, it’s yours.',
   ],
   sect_war: [
-    '参与宗门战争，与敌对势力战斗，可能获得大量奖励。',
-    '征伐敌对宗门，为宗门开疆拓土。',
-    '参与大规模战斗，考验实力和勇气。',
+    'Participate in a faction clash near [LOCATION].',
+    'Hold territory. Deny resources.',
+    'War is logistics. Start with ammo.',
   ],
   inheritance: [
-    '接受宗门传承，获得强大的功法和技能。',
-    '通过传承试炼，获得前辈的传承。',
-    '接受传承考验，证明自己的资质。',
+    'Recover archived knowledge from [LOCATION].',
+    'Bring back holotapes intact. Data is fragile.',
+    'History is power. Treat it that way.',
   ],
   tribulation: [
-    '为同门护法渡劫，需要强大的实力，可能获得天劫奖励。',
-    '参与天劫试炼，获得天劫之力。',
-    '协助同门渡劫，获得功德和奖励。',
+    'Survive the rad storm at [LOCATION].',
+    'Radiation spiking. Keep your mask sealed.',
+    'If you pass out, you fail.',
   ],
   alchemy_master: [
-    '炼制传说中的仙丹，需要极高的炼丹造诣，可能获得稀有丹药。',
-    '接受炼丹大师的考验，证明炼丹实力。',
-    '炼制顶级丹药，考验炼丹技艺。',
+    'Synthesize a high-grade chem with strict quality control.',
+    'One mistake ruins the batch—and your lungs.',
+    'Deliver the prototype. Keep a sample.',
   ],
 };
 
-// 任务类型配置接口
+// Task Type Configuration Interface
 interface TaskTypeConfig {
   realmOffset: number;
   requiresCombat?: boolean;
@@ -364,18 +365,18 @@ interface TaskTypeConfig {
   ) => RandomSectTask['reward'];
 }
 
-// 物品池定义
+// Item Pool Definitions
 const ITEM_POOLS = {
-  herbs: ['聚灵草', '紫猴花', '天灵草', '血参', '灵芝'],
-  materials: ['炼器石', '妖兽内丹', '灵矿', '符纸', '精铁', '玄铁', '星辰石'],
-  alchemy: ['聚灵草', '紫猴花', '天灵草', '血参'],
-  forge: ['炼器石', '精铁', '灵矿', '妖兽内丹'],
-  maintain: ['炼器石', '符纸', '灵矿'],
-  repair: ['炼器石', '精铁', '玄铁', '星辰石'],
-  masterAlchemy: ['万年灵乳', '九叶芝草', '龙鳞果', '仙晶'],
+  herbs: ['Mutfruit', 'Glowing Fungus', 'Bloodleaf', 'Healing Herb', 'Brain Fungus'],
+  materials: ['Scrap Metal', 'Mutant Parts', 'Rare Mineral', 'Circuit Board', 'Steel', 'Tungsten', 'Star Core'],
+  alchemy: ['Mutfruit', 'Glowing Fungus', 'Bloodleaf', 'Healing Herb'],
+  forge: ['Scrap Metal', 'Steel', 'Rare Mineral', 'Mutant Parts'],
+  maintain: ['Scrap Metal', 'Circuit Board', 'Rare Mineral'],
+  repair: ['Scrap Metal', 'Steel', 'Tungsten', 'Star Core'],
+  masterAlchemy: ['Pure Water', 'Rare Isotope', 'Fusion Cell', 'Quantum Particle'],
 };
 
-// 任务类型详细配置
+// Detailed Task Type Configurations
 const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
   patrol: {
     realmOffset: 0,
@@ -417,7 +418,7 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
     }),
     getReward: (rank, diff, qual, realm) => ({
       contribution: Math.floor((25 + Math.random() * 35) * rank * diff * qual * realm),
-      items: [{ name: '聚气丹', quantity: Math.floor(diff * qual) }]
+      items: [{ name: 'Stimpak', quantity: Math.floor(diff * qual) }]
     })
   },
   hunt: {
@@ -440,7 +441,7 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
     }),
     getReward: (rank, diff, qual, realm) => ({
       contribution: Math.floor((30 + Math.random() * 40) * rank * diff * qual * realm),
-      items: [{ name: '聚气丹', quantity: Math.floor((2 + Math.random() * 3) * diff * qual) }]
+      items: [{ name: 'Stimpak', quantity: Math.floor((2 + Math.random() * 3) * diff * qual) }]
     })
   },
   forge: {
@@ -505,7 +506,7 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
     realmOffset: 0,
     getReward: (rank, diff, qual, realm) => ({
       contribution: Math.floor((15 + Math.random() * 25) * rank * diff * qual * realm),
-      items: [{ name: '聚灵草', quantity: Math.floor((3 + Math.random() * 5) * diff * qual) }]
+      items: [{ name: 'Healing Herb', quantity: Math.floor((3 + Math.random() * 5) * diff * qual) }]
     })
   },
   maintain: {
@@ -607,7 +608,7 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
     }),
     getReward: (rank, diff, qual, realm) => ({
       contribution: Math.floor((30 + Math.random() * 40) * rank * diff * qual * realm),
-      items: [{ name: '强化石', quantity: Math.floor((1 + Math.random() * 2) * diff * qual) }]
+      items: [{ name: 'Weapon Mod', quantity: Math.floor((1 + Math.random() * 2) * diff * qual) }]
     })
   },
   spirit_beast: {
@@ -670,7 +671,7 @@ const TASK_TYPE_CONFIGS: Record<TaskType, TaskTypeConfig> = {
   }
 };
 
-// 任务品质配置
+// Task Quality Configuration
 const TASK_QUALITY_CONFIG: Record<TaskQuality, {
   probability: number;
   rewardMultiplier: number;
@@ -698,49 +699,49 @@ const TASK_QUALITY_CONFIG: Record<TaskQuality, {
   },
 };
 
-// 任务品质类型
+// Task Quality Types
 export type TaskQuality = 'Common' | 'Rare' | 'Legendary' | 'Mythic';
 
-// 任务类型扩展
+// Task Type Extensions
 export type TaskType =
-  | 'patrol'           // 巡逻
-  | 'donate_stone'     // 上交灵石
-  | 'donate_herb'      // 上交草药
-  | 'collect'          // 收集
-  | 'hunt'             // 猎杀
-  | 'alchemy'          // 炼制丹药
-  | 'forge'            // 炼制法宝
-  | 'teach'            // 教导弟子
-  | 'defend'           // 守护宗门
-  | 'explore'          // 探索遗迹
-  | 'trade'            // 贸易任务
-  | 'research'         // 研究功法
-  | 'cultivate'        // 培育灵草
-  | 'maintain'         // 维护阵法
-  | 'diplomacy'        // 外交任务
-  | 'trial'            // 试炼任务
-  | 'rescue'           // 救援任务
-  | 'investigate'      // 调查任务
-  | 'battle'           // 战斗任务（新增）
-  | 'treasure_hunt'    // 寻宝任务（新增）
-  | 'escort'           // 护送任务（新增）
-  | 'assassination'    // 刺杀任务（新增）
-  | 'artifact_repair'  // 法宝修复（新增）
-  | 'spirit_beast'     // 灵兽驯服（新增）
-  | 'sect_war'         // 宗门战争（新增）
-  | 'inheritance'      // 传承任务（新增）
-  | 'tribulation'      // 渡劫任务（新增）
-  | 'alchemy_master';  // 炼丹大师（新增）
+  | 'patrol'           // Patrol
+  | 'donate_stone'     // Donate Caps
+  | 'donate_herb'      // Donate Meds
+  | 'collect'          // Collect
+  | 'hunt'             // Hunt
+  | 'alchemy'          // Cook Chems
+  | 'forge'            // Forge Gear
+  | 'teach'            // Train Recruits
+  | 'defend'           // Defend Outpost
+  | 'explore'          // Explore Ruins
+  | 'trade'            // Trade Mission
+  | 'research'         // Tech Research
+  | 'cultivate'        // Greenhouse Duty
+  | 'maintain'         // System Maintenance
+  | 'diplomacy'        // Faction Liaison
+  | 'trial'            // Survival Trial
+  | 'rescue'           // Rescue Op
+  | 'investigate'      // Investigate
+  | 'battle'           // Combat Operation (New)
+  | 'treasure_hunt'    // Cache Search (New)
+  | 'escort'           // VIP Escort (New)
+  | 'assassination'    // Elimination (New)
+  | 'artifact_repair'  // Tech Repair (New)
+  | 'spirit_beast'     // Creature Tame (New)
+  | 'sect_war'         // Faction War (New)
+  | 'inheritance'      // Legacy Protocol (New)
+  | 'tribulation'      // Rad Storm Run (New)
+  | 'alchemy_master';  // Master Chemist (New)
 
 export interface RandomSectTask {
   id: string;
   name: string;
   description: string;
   type: TaskType;
-  difficulty: 'Easy' | 'Normal' | 'Hard' | 'Extreme'; // 任务难度
-  quality: TaskQuality; // 任务品质
-  minRealm?: RealmType; // 最低境界要求
-  recommendedRealm?: RealmType; // 推荐境界
+  difficulty: 'Easy' | 'Normal' | 'Hard' | 'Extreme'; // Task Difficulty
+  quality: TaskQuality; // Task Quality
+  minRealm?: RealmType; // Min Realm Requirement
+  recommendedRealm?: RealmType; // Recommended Realm
   cost?: {
     spiritStones?: number;
     items?: { name: string; quantity: number }[];
@@ -752,27 +753,27 @@ export interface RandomSectTask {
     items?: { name: string; quantity: number }[];
   };
   timeCost: 'instant' | 'short' | 'medium' | 'long';
-  // 新增字段
-  completionBonus?: { // 完美完成奖励
+  // New Fields
+  completionBonus?: { // Perfect Completion Bonus
     contribution?: number;
     exp?: number;
     spiritStones?: number;
     items?: { name: string; quantity: number }[];
   };
-  specialReward?: { // 特殊奖励（低概率触发）
+  specialReward?: { // Special Reward (Low Chance)
     type: 'equipment' | 'cultivationArt' | 'rareMaterial' | 'title';
     item?: { name: string; quantity: number };
   };
-  requiresCombat?: boolean; // 是否需要战斗
-  successRate?: number; // 成功率（0-100），影响是否完美完成
-  isDailySpecial?: boolean; // 是否为每日特殊任务
-  recommendedFor?: { // 推荐给特定属性的玩家
-    highAttack?: boolean; // 高攻击力
-    highDefense?: boolean; // 高防御力
-    highSpirit?: boolean; // 高神识
-    highSpeed?: boolean; // 高速度
+  requiresCombat?: boolean; // Requires Combat
+  successRate?: number; // Success Rate (0-100), affects Perfect Completion
+  isDailySpecial?: boolean; // Is Daily Special Task
+  recommendedFor?: { // Recommended for specific attributes
+    highAttack?: boolean; // High Attack
+    highDefense?: boolean; // High Defense
+    highSpirit?: boolean; // High Spirit
+    highSpeed?: boolean; // High Speed
   };
-  typeBonus?: number; // 任务类型连续完成加成（百分比）
+  typeBonus?: number; // Streak Bonus (Percentage)
 }
 
 // Helper to get random item by quality
@@ -791,7 +792,7 @@ const getRandomItemByQuality = (quality: TaskQuality): { name: string } | undefi
   return undefined;
 };
 
-// 生成随机秘境
+// Generate Random Realms
 export const generateRandomRealms = (
   playerRealm: RealmType,
   count: number = 6
@@ -800,7 +801,7 @@ export const generateRandomRealms = (
   const realms: SecretRealm[] = [];
 
   for (let i = 0; i < count; i++) {
-    // 随机选择境界要求（不能超过玩家境界太多）
+    // Randomly choose realm requirement (cannot exceed player realm too much)
     const maxRealmIndex = Math.min(
       playerRealmIndex + 2,
       REALM_ORDER.length - 1
@@ -811,7 +812,7 @@ export const generateRandomRealms = (
       minRealmIndex;
     const minRealm = REALM_ORDER[realmIndex];
 
-    // 随机选择风险等级
+    // Randomly choose risk level
     const riskLevels: ('Low' | 'Medium' | 'High' | 'Extreme')[] = [
       'Low',
       'Medium',
@@ -820,27 +821,27 @@ export const generateRandomRealms = (
     ];
     const riskLevel = riskLevels[Math.floor(Math.random() * riskLevels.length)];
 
-    // 根据风险等级和境界计算成本
+    // Calculate cost based on risk level and realm
     const baseCost = 50 + realmIndex * 50;
     const riskMultiplier =
-      riskLevel === '低'
+      riskLevel === 'Low'
         ? 0.8
-        : riskLevel === '中'
+        : riskLevel === 'Medium'
           ? 1
-          : riskLevel === '高'
+          : riskLevel === 'High'
             ? 1.5
             : 2;
     const cost = Math.floor(
       baseCost * riskMultiplier * (0.9 + Math.random() * 0.2)
     );
 
-    // 根据风险等级选择对应的名称和描述
+    // Choose corresponding name and description based on risk level
     const availableNames = REALM_NAMES_BY_RISK[riskLevel];
     const availableDescriptions = REALM_DESCRIPTIONS_BY_RISK[riskLevel];
     const name = availableNames[Math.floor(Math.random() * availableNames.length)];
     const description = availableDescriptions[Math.floor(Math.random() * availableDescriptions.length)];
 
-    // 随机生成掉落物（2-4个）
+    // Randomly generate drops (2-4 items)
     const dropCount = 2 + Math.floor(Math.random() * 3);
     const drops: string[] = [];
     const usedDrops = new Set<string>();
@@ -867,7 +868,7 @@ export const generateRandomRealms = (
   return realms;
 };
 
-// 生成随机宗门
+// Generate Random Factions
 export const generateRandomSects = (
   playerRealm: RealmType,
   count: number = 6
@@ -876,7 +877,7 @@ export const generateRandomSects = (
   const sects: SectInfo[] = [];
 
   for (let i = 0; i < count; i++) {
-    // 随机选择境界要求
+    // Randomly choose realm requirement
     const maxRealmIndex = Math.min(
       playerRealmIndex + 1,
       REALM_ORDER.length - 1
@@ -884,14 +885,14 @@ export const generateRandomSects = (
     const realmIndex = Math.floor(Math.random() * (maxRealmIndex + 1));
     const reqRealm = REALM_ORDER[realmIndex];
 
-    // 随机选择一个宗门（名称和描述绑定）
+    // Randomly choose a faction (Name and Description bound)
     const sectData = SECT_DATA[Math.floor(Math.random() * SECT_DATA.length)];
     const name = sectData.name;
     const description = sectData.description;
 
-    // 根据境界随机分配宗门等级
+    // Randomly assign faction grade based on realm
     const grades: SectGrade[] = ['C', 'B', 'A', 'S'];
-    const gradeWeights = [0.4, 0.3, 0.2, 0.1]; // C最多，S最少
+    const gradeWeights = [0.4, 0.3, 0.2, 0.1]; // C is most common, S is rarest
     let grade: SectGrade = 'C';
     const rand = Math.random();
     if (rand < gradeWeights[0]) grade = 'C';
@@ -899,7 +900,7 @@ export const generateRandomSects = (
     else if (rand < gradeWeights[0] + gradeWeights[1] + gradeWeights[2]) grade = 'A';
     else grade = 'S';
 
-    // 根据等级设置退出代价
+    // Set exit cost based on grade
     const exitCostMultiplier = {
       'C': 1,
       'B': 2,
@@ -915,7 +916,7 @@ export const generateRandomSects = (
       grade,
       exitCost: {
         spiritStones: Math.floor(300 * exitCostMultiplier),
-        items: [{ name: '聚灵草', quantity: Math.floor(5 * exitCostMultiplier) }],
+        items: [{ name: 'Healing Herb', quantity: Math.floor(5 * exitCostMultiplier) }],
       },
     });
   }
@@ -923,20 +924,20 @@ export const generateRandomSects = (
   return sects;
 };
 
-// 根据玩家境界计算任务收益倍数
+// Calculate reward multiplier based on player realm
 const getRealmMultiplier = (playerRealm: RealmType, taskRealm: RealmType): number => {
   const playerIndex = REALM_ORDER.indexOf(playerRealm);
   const taskIndex = REALM_ORDER.indexOf(taskRealm);
   const diff = playerIndex - taskIndex;
 
-  if (diff < -1) return 0.5;      // 境界太低，收益减半
-  if (diff === -1) return 0.8;   // 境界略低，收益80%
-  if (diff === 0) return 1.0;    // 境界匹配，正常收益
-  if (diff === 1) return 0.9;    // 境界略高，收益90%
-  return 0.7;                     // 境界太高，收益70%
+  if (diff < -1) return 0.5;      // Realm too low, reward halved
+  if (diff === -1) return 0.8;   // Realm slightly low, 80% reward
+  if (diff === 0) return 1.0;    // Realm matches, normal reward
+  if (diff === 1) return 0.9;    // Realm slightly high, 90% reward
+  return 0.7;                     // Realm too high, 70% reward
 };
 
-// 根据任务类型和玩家境界确定推荐境界
+// Determine recommended realm based on task type and player realm
 const getRecommendedRealm = (type: TaskType, playerRealm: RealmType): RealmType => {
   const playerIndex = REALM_ORDER.indexOf(playerRealm);
   const config = TASK_TYPE_CONFIGS[type];
@@ -948,16 +949,16 @@ const getRecommendedRealm = (type: TaskType, playerRealm: RealmType): RealmType 
   return REALM_ORDER[recommendedIndex];
 };
 
-// 生成任务品质
+// Generate Task Quality
 const generateTaskQuality = (): TaskQuality => {
   const rand = Math.random();
-  if (rand < 0.6) return '普通';
-  if (rand < 0.85) return '稀有';
-  if (rand < 0.97) return '传说';
-  return '仙品';
+  if (rand < 0.6) return 'Common';
+  if (rand < 0.85) return 'Rare';
+  if (rand < 0.97) return 'Legendary';
+  return 'Mythic';
 };
 
-// 生成随机宗门任务
+// Generate Random Faction Tasks
 export const generateRandomSectTasks = (
   playerRank: string,
   playerRealm: RealmType,
@@ -965,7 +966,7 @@ export const generateRandomSectTasks = (
 ): RandomSectTask[] => {
   const tasks: RandomSectTask[] = [];
 
-  // 所有任务类型
+  // All task types
   const allTaskTypes: TaskType[] = [
     'patrol', 'donate_stone', 'donate_herb', 'collect', 'hunt',
     'alchemy', 'forge', 'teach', 'defend', 'explore',
@@ -976,47 +977,47 @@ export const generateRandomSectTasks = (
     'tribulation', 'alchemy_master',
   ];
 
-  // 根据等级调整奖励基数
+  // Adjust reward base based on rank
   const rankMultiplier =
-    playerRank === '外门弟子'
+    playerRank === 'Candidate'
       ? 1
-      : playerRank === '内门弟子'
+      : playerRank === 'Member'
         ? 1.5
-        : playerRank === '真传弟子'
+        : playerRank === 'Elite'
           ? 2
           : 3;
 
-  // 难度配置
-  const difficulties: Array<'简单' | '普通' | '困难' | '极难'> = ['简单', '普通', '困难', '极难'];
+  // Difficulty configurations
+  const difficulties: Array<'Easy' | 'Normal' | 'Hard' | 'Extreme'> = ['Easy', 'Normal', 'Hard', 'Extreme'];
 
   for (let i = 0; i < count; i++) {
-    // 随机选择任务类型
+    // Randomly choose task type
     const type = allTaskTypes[Math.floor(Math.random() * allTaskTypes.length)];
 
-    // 从对应类型的名称和描述池中选择
+    // Choose from corresponding name and description pool
     const names = TASK_NAMES_BY_TYPE[type];
     const descriptions = TASK_DESCRIPTIONS_BY_TYPE[type];
     let name = names[Math.floor(Math.random() * names.length)];
     const description = descriptions[Math.floor(Math.random() * descriptions.length)];
 
-    // 生成任务品质
+    // Generate task quality
     const quality = generateTaskQuality();
     const qualityConfig = TASK_QUALITY_CONFIG[quality];
 
-    // 确定推荐境界
+    // Determine recommended realm
     const recommendedRealm = getRecommendedRealm(type, playerRealm);
-    const minRealm = recommendedRealm; // 最低境界等于推荐境界
+    const minRealm = recommendedRealm; // Min realm equals recommended realm
 
-    // 随机选择难度
+    // Randomly choose difficulty
     const difficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
     const difficultyMultiplier = {
-      '简单': 0.7,
-      '普通': 1.0,
-      '困难': 1.5,
-      '极难': 2.5,
+      'Easy': 0.7,
+      'Normal': 1.0,
+      'Hard': 1.5,
+      'Extreme': 2.5,
     }[difficulty];
 
-    // 计算境界收益倍数
+    // Calculate realm reward multiplier
     const realmMultiplier = getRealmMultiplier(playerRealm, recommendedRealm);
 
     let cost: RandomSectTask['cost'] = {};
@@ -1032,16 +1033,16 @@ export const generateRandomSectTasks = (
     ];
     const timeCost = timeCosts[Math.floor(Math.random() * timeCosts.length)];
 
-    // 使用 TASK_TYPE_CONFIGS 配置来生成奖励和消耗，避免重复代码
+    // Use TASK_TYPE_CONFIGS configuration to generate rewards and costs, avoiding duplicate code
     const taskConfig = TASK_TYPE_CONFIGS[type];
     if (taskConfig) {
-      // 使用配置中的 getCost 函数生成消耗
+      // Use getCost function from config to generate cost
       if (taskConfig.getCost) {
         const configCost = taskConfig.getCost(difficultyMultiplier);
         cost = { ...cost, ...configCost };
       }
 
-      // 使用配置中的 getReward 函数生成奖励
+      // Use getReward function from config to generate reward
       if (taskConfig.getReward) {
         const configReward = taskConfig.getReward(
           rankMultiplier,
@@ -1056,31 +1057,31 @@ export const generateRandomSectTasks = (
         };
       }
     } else {
-      // 如果没有配置，使用默认值（防御性处理）
+      // If no config, use default values (defensive handling)
       reward.contribution = Math.floor(
         (10 + Math.random() * 40) * rankMultiplier * difficultyMultiplier * qualityConfig.rewardMultiplier * realmMultiplier
       ) + qualityConfig.contributionBonus;
     }
 
-    // 确定是否需要战斗（使用配置中的信息）
+    // Determine if combat is required (using info from config)
     const requiresCombat = taskConfig?.requiresCombat ?? false;
 
-    // 计算成功率（基于难度和品质）
+    // Calculate success rate (based on difficulty and quality)
     const baseSuccessRate = {
-      '简单': 90,
-      '普通': 75,
-      '困难': 60,
-      '极难': 45,
+      'Easy': 90,
+      'Normal': 75,
+      'Hard': 60,
+      'Extreme': 45,
     }[difficulty];
     const qualityBonus = {
-      '普通': 0,
-      '稀有': 5,
-      '传说': 10,
-      '仙品': 15,
+      'Common': 0,
+      'Rare': 5,
+      'Legendary': 10,
+      'Mythic': 15,
     }[quality];
     const successRate = Math.min(100, baseSuccessRate + qualityBonus);
 
-    // 生成完美完成奖励（基础奖励的20-50%）
+    // Generate perfect completion reward (20-50% of base reward)
     const completionBonusMultiplier = 0.2 + Math.random() * 0.3;
     const completionBonus: RandomSectTask['completionBonus'] = {
       contribution: Math.floor(reward.contribution * completionBonusMultiplier),
@@ -1092,7 +1093,7 @@ export const generateRandomSectTasks = (
       completionBonus.spiritStones = Math.floor(reward.spiritStones * completionBonusMultiplier);
     }
 
-    // 特殊奖励（低概率，仅高品质任务）
+    // Special reward (low probability, high quality tasks only)
     let specialReward: RandomSectTask['specialReward'] | undefined;
     if (quality === 'Legendary' || quality === 'Mythic') {
       const specialItem = getRandomItemByQuality(quality);
@@ -1111,21 +1112,21 @@ export const generateRandomSectTasks = (
       };
     }
 
-    // 每日特殊任务（5%概率，高奖励）
+    // Daily special task (5% chance, high reward)
     const isDailySpecial = Math.random() < 0.05;
     if (isDailySpecial) {
-      // 特殊任务奖励翻倍
+      // Double rewards for special tasks
       reward.contribution = Math.floor(reward.contribution * 2);
       if (reward.exp) reward.exp = Math.floor(reward.exp * 2);
       if (reward.spiritStones) reward.spiritStones = Math.floor(reward.spiritStones * 2);
-      name = `【每日特殊】${name}`;
+      name = `[Daily Special] ${name}`;
     }
 
-    // 任务推荐系统（使用配置中的信息）
+    // Task recommendation system (using info from config)
     const recommendedFor: RandomSectTask['recommendedFor'] = taskConfig?.recommendedFor || {};
 
-    // 任务类型连续完成加成（根据任务类型计算）
-    const typeBonus = Math.floor(Math.random() * 20) + 5; // 5-25%加成
+    // Streak bonus (calculated by task type)
+    const typeBonus = Math.floor(Math.random() * 20) + 5; // 5-25% bonus
 
     tasks.push({
       id: `task-${randomId()}`,
@@ -1153,7 +1154,7 @@ export const generateRandomSectTasks = (
 };
 
 const createPillItem = (pillName: string, cost: number, defaultItem?: Partial<Item>): { name: string; cost: number; item: Omit<Item, 'id'> } => {
-  // 优先从常量池获取
+  // Priority: get from constants pool
   const itemFromConstants = getItemFromConstants(pillName);
   if (itemFromConstants) {
     return {
@@ -1173,7 +1174,7 @@ const createPillItem = (pillName: string, cost: number, defaultItem?: Partial<It
     };
   }
 
-  // 如果常量池中没有，尝试从丹药定义获取
+  // If not in constants pool, try to get from chem definitions
   const pillDef = getPillDefinition(pillName);
   if (pillDef) {
     return {
@@ -1191,15 +1192,15 @@ const createPillItem = (pillName: string, cost: number, defaultItem?: Partial<It
     };
   }
 
-  // 如果常量中没有，使用默认值（如回血丹）
+  // If still not found, use default (e.g., Healing Pill)
   if (defaultItem) {
     return { name: pillName, cost, item: { ...defaultItem, name: pillName, quantity: 1 } as Omit<Item, 'id'> };
   }
-  throw new Error(`物品定义未找到: ${pillName}`);
+  throw new Error(`Item definition not found: ${pillName}`);
 };
 
 /**
- * 从常量池创建物品项（用于商店）
+ * Create item entry from constants pool (for shops)
  */
 const createItemFromConstants = (itemName: string, cost: number): { name: string; cost: number; item: Omit<Item, 'id'> } | null => {
   const itemFromConstants = getItemFromConstants(itemName);
@@ -1224,78 +1225,39 @@ const createItemFromConstants = (itemName: string, cost: number): { name: string
   };
 };
 
-// 宗门商店物品池（用于生成藏宝阁物品）- 从常量池获取
+// Faction shop item pool (used to generate armory items)
 const SECT_SHOP_ITEM_POOL: Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> = [
-  // 从常量池获取的物品
-  createItemFromConstants('Scrap Metal', 10) || { name: 'Scrap Metal', cost: 10, item: { name: 'Scrap Metal', type: ItemType.Material, description: 'Basic material for crafting.', quantity: 1, rarity: 'Common' } },
+  createItemFromConstants('Reinforcement Kit', 10),
   createPillItem('Energy Drink', 20),
-  createItemFromConstants('Mutant Flower', 50) || { name: 'Mutant Flower', cost: 50, item: { name: 'Mutant Flower', type: ItemType.Herb, description: 'A rare flower from the wasteland.', quantity: 1, rarity: 'Rare' } },
-  createPillItem('洗髓丹', 100),
-  createPillItem('筑基丹', 1000),
-  createItemFromConstants('高阶妖丹', 500) || { name: '高阶妖丹', cost: 500, item: { name: '高阶妖丹', type: ItemType.Material, description: '强大妖兽的内丹，灵气逼人。', quantity: 1, rarity: '稀有' } },
-  createItemFromConstants('聚灵草', 25) || { name: '聚灵草', cost: 25, item: { name: '聚灵草', type: ItemType.Herb, description: '吸收天地灵气的草药。', quantity: 1, rarity: '普通' } },
-  createItemFromConstants('玄铁', 40) || { name: '玄铁', cost: 40, item: { name: '玄铁', type: ItemType.Material, description: '珍贵的炼器材料。', quantity: 1, rarity: '稀有' } },
-  createItemFromConstants('星辰石', 60) || { name: '星辰石', cost: 60, item: { name: '星辰石', type: ItemType.Material, description: '蕴含星辰之力的稀有矿石。', quantity: 1, rarity: '稀有' } },
-  createItemFromConstants('精铁', 20) || { name: '精铁', cost: 20, item: { name: '精铁', type: ItemType.Material, description: '优质的炼器材料。', quantity: 1, rarity: '普通' } },
-  createItemFromConstants('天灵草', 35) || { name: '天灵草', cost: 35, item: { name: '天灵草', type: ItemType.Herb, description: '珍贵的灵草，可用于炼制高级丹药。', quantity: 1, rarity: '稀有' } },
-  createPillItem('凝神丹', 80),
-  createPillItem('强体丹', 80),
-  // 回血丹可能不在常量池，使用默认值
-  createPillItem('回血丹', 15, { type: ItemType.Pill, description: '快速恢复气血。', rarity: '普通', effect: { hp: 50 } }),
-  // 装备类物品 - 尝试从常量池获取，如果不存在则使用默认值
-  createItemFromConstants('青钢剑', 300) || { name: '青钢剑', cost: 300, item: { name: '青钢剑', type: ItemType.Weapon, description: '青钢锻造的利剑，攻击力不俗。', quantity: 1, rarity: '稀有', isEquippable: true, equipmentSlot: EquipmentSlot.Weapon, effect: { attack: 35, speed: 5 } } },
-  // 其他不在常量池的物品保留原样（这些可能是特殊物品，需要后续添加到常量池）
-  { name: '强化石', cost: 30, item: { name: '强化石', type: ItemType.Material, description: '用于强化法宝的珍贵材料。', quantity: 1, rarity: '稀有' } },
-  { name: '宗门制式剑', cost: 150, item: { name: '宗门制式剑', type: ItemType.Weapon, description: '宗门统一配发的制式武器，基础攻击力。', quantity: 1, rarity: '普通', isEquippable: true, equipmentSlot: EquipmentSlot.Weapon, effect: { attack: 15 } } },
-  { name: '宗门制式甲', cost: 120, item: { name: '宗门制式甲', type: ItemType.Armor, description: '宗门统一配发的制式护甲，基础防御力。', quantity: 1, rarity: '普通', isEquippable: true, equipmentSlot: EquipmentSlot.Chest, effect: { defense: 12, hp: 30 } } },
-  { name: '玄铁甲', cost: 400, item: { name: '玄铁甲', type: ItemType.Armor, description: '玄铁打造的护甲，防御力强劲。', quantity: 1, rarity: '稀有', isEquippable: true, equipmentSlot: EquipmentSlot.Chest, effect: { defense: 40, hp: 80 } } },
-  { name: '灵玉护符', cost: 250, item: { name: '灵玉护符', type: ItemType.Accessory, description: '蕴含灵气的护符，可提升神识。', quantity: 1, rarity: '稀有', isEquippable: true, equipmentSlot: EquipmentSlot.Accessory1, effect: { spirit: 20, hp: 50 } } },
-  { name: '经验符', cost: 200, item: { name: '经验符', type: ItemType.Material, description: '使用后下次修炼获得双倍经验。', quantity: 1, rarity: '稀有' } },
-  { name: '幸运符', cost: 180, item: { name: '幸运符', type: ItemType.Material, description: '使用后短时间内提升幸运值，增加奇遇概率。', quantity: 1, rarity: '稀有' } },
-  { name: '护体符', cost: 150, item: { name: '护体符', type: ItemType.Material, description: '使用后短时间内提升防御力。', quantity: 1, rarity: '普通' } },
-  { name: '聚灵符', cost: 220, item: { name: '聚灵符', type: ItemType.Material, description: '使用后短时间内提升修炼速度。', quantity: 1, rarity: '稀有' } },
-  createItemFromConstants('妖兽内丹', 80) || { name: '妖兽内丹', cost: 80, item: { name: '妖兽内丹', type: ItemType.Material, description: '妖兽的内丹，可用于炼丹或炼器。', quantity: 1, rarity: '普通' } },
-  createItemFromConstants('符纸', 30) || { name: '符纸', cost: 30, item: { name: '符纸', type: ItemType.Material, description: '制作符箓的基础材料。', quantity: 1, rarity: '普通' } },
-  createItemFromConstants('灵矿', 45) || { name: '灵矿', cost: 45, item: { name: '灵矿', type: ItemType.Material, description: '蕴含灵气的矿石，炼器材料。', quantity: 1, rarity: '普通' } },
+  createItemFromConstants('Mutant Flower', 50),
+  createPillItem('Bone-Hardener', 100),
+  createPillItem('Evolution Catalyst', 1000),
+  createItemFromConstants('High-Grade Core', 500),
 ].filter((item): item is { name: string; cost: number; item: Omit<Item, 'id'> } => item !== null);
 
-// 二楼高级物品池 - 从常量池获取
+// Floor 2 high-tier pool
 const SECT_SHOP_ITEM_POOL_FLOOR2: Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> = [
-  // 从常量池获取的物品
-  createItemFromConstants('天外陨铁', 800) || { name: '天外陨铁', cost: 800, item: { name: '天外陨铁', type: ItemType.Material, description: '来自天外的神秘金属，炼制仙器的材料。', quantity: 1, rarity: '传说' } },
-  createItemFromConstants('仙晶', 1500) || { name: '仙晶', cost: 1500, item: { name: '仙晶', type: ItemType.Material, description: '蕴含仙气的晶石，极其珍贵。', quantity: 1, rarity: '仙品' } },
-  createPillItem('九转金丹', 3000),
-  createPillItem('天元丹', 2000),
-  createItemFromConstants('万年灵乳', 1200) || { name: '万年灵乳', cost: 1200, item: { name: '万年灵乳', type: ItemType.Material, description: '万年灵脉中凝聚的精华，炼制仙丹的珍贵材料。', quantity: 1, rarity: '传说' } },
-  createItemFromConstants('九叶芝草', 1000) || { name: '九叶芝草', cost: 1000, item: { name: '九叶芝草', type: ItemType.Herb, description: '九叶灵芝，炼制仙丹的顶级材料。', quantity: 1, rarity: '传说' } },
-  createItemFromConstants('龙鳞果', 900) || { name: '龙鳞果', cost: 900, item: { name: '龙鳞果', type: ItemType.Herb, description: '龙族栖息地生长的灵果，蕴含龙族血脉之力。', quantity: 1, rarity: '传说' } },
-  // 装备类物品 - 尝试从常量池获取
-  createItemFromConstants('星辰剑', 2000) || { name: '星辰剑', cost: 2000, item: { name: '星辰剑', type: ItemType.Weapon, description: '蕴含星辰之力的宝剑，威力强大。', quantity: 1, rarity: '传说', isEquippable: true, equipmentSlot: EquipmentSlot.Weapon, effect: { attack: 80, spirit: 30, speed: 15 } } },
-  // 其他不在常量池的物品保留原样（这些可能是特殊物品，需要后续添加到常量池）
-  { name: '龙鳞甲', cost: 2500, item: { name: '龙鳞甲', type: ItemType.Armor, description: '龙鳞制成的护甲，防御力极强。', quantity: 1, rarity: '传说', isEquippable: true, equipmentSlot: EquipmentSlot.Chest, effect: { defense: 90, hp: 200, physique: 25 } } },
-  { name: '仙灵护符', cost: 1800, item: { name: '仙灵护符', type: ItemType.Accessory, description: '仙气缭绕的护符，可大幅提升属性。', quantity: 1, rarity: '传说', isEquippable: true, equipmentSlot: EquipmentSlot.Accessory1, effect: { spirit: 50, hp: 150, exp: 100 } } },
-  { name: '天阶功法残卷', cost: 3500, item: { name: '天阶功法残卷', type: ItemType.Material, description: '天阶功法的残卷，可用于学习或研究。', quantity: 1, rarity: '传说' } },
-  { name: '仙品法宝碎片', cost: 4000, item: { name: '仙品法宝碎片', type: ItemType.Material, description: '仙品法宝的碎片，可用于修复或炼制。', quantity: 1, rarity: '仙品' } },
-  { name: '传承玉简', cost: 3000, item: { name: '传承玉简', type: ItemType.Material, description: '记录着强大传承的玉简，使用后可获得传承。', quantity: 1, rarity: '传说' } },
-  { name: '仙品丹药材料包', cost: 2500, item: { name: '仙品丹药材料包', type: ItemType.Material, description: '包含多种仙品丹药材料的礼包。', quantity: 1, rarity: '仙品' } },
-  { name: '灵兽契约符', cost: 2200, item: { name: '灵兽契约符', type: ItemType.Material, description: '用于与灵兽建立契约的符箓。', quantity: 1, rarity: '传说' } },
-  { name: '天劫护符', cost: 2800, item: { name: '天劫护符', type: ItemType.Accessory, description: '可抵御天劫的护符，渡劫时使用。', quantity: 1, rarity: '传说', isEquippable: true, equipmentSlot: EquipmentSlot.Accessory2, effect: { defense: 60, hp: 300 } } },
-].filter((item): item is { name: string; cost: number; item: Omit<Item, 'id'> } => item !== null);
+  createPillItem('Survival Protocol', 2000),
+  createPillItem('Breakthrough Cocktail', 3000),
+  createPillItem('Apex Serum', 3500),
+  createPillItem('Phoenix Protocol', 4000),
+  createPillItem('Eternity Serum', 5000),
+];
 
-// 生成宗门商店物品（藏宝阁物品，每次刷新4-8个）
+// Generate faction shop items (refresh 4-8 items each time)
 export const generateSectShopItems = (floor: 1 | 2 = 1): Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> => {
-  const itemCount = 4 + Math.floor(Math.random() * 5); // 4-8个物品
+  const itemCount = 4 + Math.floor(Math.random() * 5); // 4-8 items
   const items: Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> = [];
   const usedItems = new Set<string>();
 
-  // 根据楼层选择物品池
+  // Choose pool by floor
   const itemPool = floor === 2 ? SECT_SHOP_ITEM_POOL_FLOOR2 : SECT_SHOP_ITEM_POOL;
 
   for (let i = 0; i < itemCount; i++) {
-    // 随机选择一个物品
+    // Randomly select an item
     let selectedItem = itemPool[Math.floor(Math.random() * itemPool.length)];
 
-    // 避免重复（但如果池子不够大，允许少量重复）
+    // Avoid duplicates (allow limited repeats if pool is too small)
     let attempts = 0;
     while (usedItems.has(selectedItem.name) && attempts < 10 && usedItems.size < itemPool.length) {
       selectedItem = itemPool[Math.floor(Math.random() * itemPool.length)];
@@ -1308,4 +1270,3 @@ export const generateSectShopItems = (floor: 1 | 2 = 1): Array<{ name: string; c
 
   return items;
 };
-

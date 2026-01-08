@@ -263,7 +263,7 @@ const DebugModal: React.FC<Props> = ({
         itemNames.add(item.name);
         items.push({
           name: item.name,
-          type: item.type,
+          type: item.type as ItemType,
           description: item.description,
           rarity: item.rarity,
           effect: item.effect,
@@ -315,7 +315,7 @@ const DebugModal: React.FC<Props> = ({
           itemNames.add(item.name);
           items.push({
             name: item.name,
-            type: item.type,
+            type: item.type === '材料' ? ItemType.Material : item.type,
             description: item.description,
             rarity: item.rarity,
             effect: item.effect,
@@ -334,7 +334,7 @@ const DebugModal: React.FC<Props> = ({
         itemNames.add(shopItem.item.name);
         items.push({
           name: shopItem.item.name,
-          type: shopItem.item.type,
+          type: shopItem.item.type as ItemType,
           description: shopItem.item.description,
           rarity: shopItem.item.rarity,
           effect: shopItem.item.effect,

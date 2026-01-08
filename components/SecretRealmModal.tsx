@@ -138,7 +138,7 @@ const SecretRealmModal: React.FC<Props> = ({
                     <span className="text-stone-500">Entry Cost</span>
                     <span
                       className={
-                        canAfford ? 'text-mystic-gold' : 'text-red-500'
+                        canAfford ? 'text-amber-400' : 'text-red-500'
                       }
                     >
                       {realm.cost} Caps

@@ -15,7 +15,7 @@ interface Props {
   onJoinSect: (sectId: string, sectName?: string, sectInfo?: { exitCost?: { spiritStones?: number; items?: { name: string; quantity: number }[] } }) => void;
   onLeaveSect: () => void;
   onSafeLeaveSect: () => void;
-  onTask: (task: RandomSectTask, encounterResult?: AdventureResult) => void;
+  onTask: (task: RandomSectTask, encounterResult?: AdventureResult, isPerfectCompletion?: boolean) => void;
   onPromote: () => void;
   onBuy: (item: Partial<Item>, cost: number, quantity?: number) => void;
   onChallengeLeader: () => void;
@@ -587,18 +587,18 @@ const SectModal: React.FC<Props> = ({
 
                     // Op quality color config
                     const qualityColors = {
-                      普通: 'text-stone-400 border-stone-800 bg-stone-900/40',
-                      稀有: 'text-blue-400 border-blue-900/30 bg-blue-900/10',
-                      传说: 'text-purple-400 border-purple-900/30 bg-purple-900/10',
-                      仙品: 'text-yellow-400 border-yellow-900/30 bg-yellow-900/10',
+                      Common: 'text-stone-400 border-stone-800 bg-stone-900/40',
+                      Rare: 'text-blue-400 border-blue-900/30 bg-blue-900/10',
+                      Legendary: 'text-purple-400 border-purple-900/30 bg-purple-900/10',
+                      Mythic: 'text-yellow-400 border-yellow-900/30 bg-yellow-900/10',
                     };
 
                     // Difficulty color config
                     const difficultyColors = {
-                      简单: 'text-green-500',
-                      普通: 'text-blue-500',
-                      困难: 'text-orange-500',
-                      极难: 'text-red-500',
+                      Easy: 'text-green-500',
+                      Normal: 'text-blue-500',
+                      Hard: 'text-orange-500',
+                      Extreme: 'text-red-500',
                     };
 
                     // Check rank requirement
@@ -609,9 +609,9 @@ const SectModal: React.FC<Props> = ({
                     return (
                       <div
                         key={task.id}
-                        className={`bg-stone-900/40 p-4 rounded-none border relative overflow-hidden flex flex-col group ${task.quality === '仙品'
+                        className={`bg-stone-900/40 p-4 rounded-none border relative overflow-hidden flex flex-col group ${task.quality === 'Mythic'
                           ? 'border-yellow-600/30'
-                          : task.quality === '传说'
+                          : task.quality === 'Legendary'
                             ? 'border-purple-600/30'
                             : 'border-stone-800'
                           }`}
@@ -628,7 +628,7 @@ const SectModal: React.FC<Props> = ({
                           </h4>
                           {task.quality && (
                             <span className={`text-[9px] px-1.5 py-0.5 border rounded-none uppercase tracking-widest font-bold ${qualityColors[task.quality]}`}>
-                              {task.quality === '仙品' ? 'LEGENDARY' : task.quality === '传说' ? 'EPIC' : task.quality === '稀有' ? 'RARE' : 'COMMON'}
+                              {task.quality === 'Mythic' ? 'LEGENDARY' : task.quality === 'Legendary' ? 'EPIC' : task.quality === 'Rare' ? 'RARE' : 'COMMON'}
                             </span>
                           )}
                         </div>
@@ -639,7 +639,7 @@ const SectModal: React.FC<Props> = ({
                         {/* 任务标签 */}
                         <div className="flex flex-wrap gap-2 mb-4 relative z-10">
                           <span className={`text-[9px] px-1.5 py-0.5 border border-stone-800 bg-stone-950/50 uppercase tracking-widest ${difficultyColors[task.difficulty]}`}>
-                            DIFF: {task.difficulty === '简单' ? 'EASY' : task.difficulty === '普通' ? 'NORMAL' : task.difficulty === '困难' ? 'HARD' : 'EXTREME'}
+                            DIFF: {task.difficulty === 'Easy' ? 'EASY' : task.difficulty === 'Normal' ? 'NORMAL' : task.difficulty === 'Hard' ? 'HARD' : 'EXTREME'}
                           </span>
                           {task.minRealm && (
                             <span className={`text-[9px] px-1.5 py-0.5 border uppercase tracking-widest ${meetsRealmRequirement

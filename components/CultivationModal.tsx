@@ -174,7 +174,7 @@ const CultivationModal: React.FC<Props> = ({
         <div className="crt-vignette"></div>
 
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 rounded-none relative z-10">
-          <h3 className="text-lg md:text-xl font-mono text-mystic-gold flex items-center gap-2 uppercase tracking-widest">
+          <h3 className="text-lg md:text-xl font-mono text-amber-400 flex items-center gap-2 uppercase tracking-widest">
             <BookOpen size={18} className="md:w-5 md:h-5" /> Library of Evolution
           </h3>
           <button
@@ -217,21 +217,21 @@ const CultivationModal: React.FC<Props> = ({
           <div className="mb-4 space-y-3">
             <div className="flex flex-wrap gap-2">
               <span className="text-[10px] text-stone-600 self-center uppercase tracking-widest min-w-[60px]">Tier:</span>
-              {(['all', '天', '地', '玄', '黄'] as const).map((grade) => (
+              {(['all', 'S', 'A', 'B', 'C'] as const).map((grade) => (
                 <button
                   key={grade}
                   onClick={() => setGradeFilter(grade === 'all' ? 'all' : grade)}
                   className={`px-3 py-1 rounded-none text-[10px] transition-all uppercase tracking-tighter border font-mono ${
                     gradeFilter === grade
-                      ? grade === '天'
+                      ? grade === 'S'
                         ? 'bg-yellow-950/40 border-yellow-700/50 text-yellow-500'
-                        : grade === '地'
+                        : grade === 'A'
                         ? 'bg-purple-950/40 border-purple-700/50 text-purple-500'
-                        : grade === '玄'
+                        : grade === 'B'
                         ? 'bg-blue-950/40 border-blue-700/50 text-blue-500'
-                        : grade === '黄'
+                        : grade === 'C'
                         ? 'bg-stone-900/40 border-stone-700/50 text-stone-400'
-                        : 'bg-mystic-gold/20 text-mystic-gold border-mystic-gold'
+                        : 'bg-amber-500/20 text-amber-400 border-amber-500'
                       : 'bg-ink-950 text-stone-500 border-stone-800 hover:border-stone-600 hover:text-stone-400'
                   }`}
                 >
@@ -251,7 +251,7 @@ const CultivationModal: React.FC<Props> = ({
                         ? 'bg-blue-950/40 border-blue-700/50 text-blue-500'
                         : type === 'body'
                         ? 'bg-red-950/40 border-red-700/50 text-red-500'
-                        : 'bg-mystic-gold/20 text-mystic-gold border-mystic-gold'
+                        : 'bg-amber-500/20 text-amber-400 border-amber-500'
                       : 'bg-ink-950 text-stone-500 border-stone-800 hover:border-stone-600 hover:text-stone-400'
                   }`}
                 >
@@ -273,7 +273,7 @@ const CultivationModal: React.FC<Props> = ({
                         ? 'bg-yellow-950/40 border-yellow-700/50 text-yellow-500'
                         : status === 'unobtained'
                         ? 'bg-stone-900/40 border-stone-700/50 text-stone-500'
-                        : 'bg-mystic-gold/20 text-mystic-gold border-mystic-gold'
+                        : 'bg-amber-500/20 text-amber-400 border-amber-500'
                       : 'bg-ink-950 text-stone-500 border-stone-800 hover:border-stone-600 hover:text-stone-400'
                   }`}
                 >
@@ -310,7 +310,7 @@ const CultivationModal: React.FC<Props> = ({
                   key={art.id}
                   className={`
                     relative p-4 rounded-none border transition-all flex flex-col sm:flex-row justify-between gap-4 group overflow-hidden
-                    ${isActive ? 'bg-ink-950 border-mystic-gold/30 shadow-lg' : 'bg-stone-900/30 border-stone-800 hover:border-stone-700'}
+                    ${isActive ? 'bg-ink-950 border-amber-500/30 shadow-lg' : 'bg-stone-900/30 border-stone-800 hover:border-stone-700'}
                     ${locked ? 'opacity-60 grayscale' : ''}
                   `}
                 >
@@ -318,7 +318,7 @@ const CultivationModal: React.FC<Props> = ({
                   <div className="relative z-10 flex-1">
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <h4
-                        className={`text-base md:text-lg font-mono uppercase tracking-widest ${isActive ? 'text-mystic-gold' : 'text-stone-200'}`}
+                        className={`text-base md:text-lg font-mono uppercase tracking-widest ${isActive ? 'text-amber-400' : 'text-stone-200'}`}
                       >
                         {art.name}
                       </h4>
@@ -341,7 +341,7 @@ const CultivationModal: React.FC<Props> = ({
                         {art.type === 'mental' ? 'MENTAL' : 'BODY'}
                       </span>
                       {isActive && (
-                        <span className="text-[9px] md:text-[10px] text-mystic-gold flex items-center uppercase tracking-widest animate-pulse">
+                        <span className="text-[9px] md:text-[10px] text-amber-400 flex items-center uppercase tracking-widest animate-pulse">
                           <Check size={10} className="md:w-3 md:h-3 mr-1" />{' '}
                           ACTIVE
                         </span>
@@ -437,14 +437,14 @@ const CultivationModal: React.FC<Props> = ({
                         isActive ? (
                           <button
                             disabled
-                            className="px-4 py-2 bg-mystic-gold/10 border border-mystic-gold text-mystic-gold rounded-none text-xs md:text-sm font-mono uppercase tracking-widest cursor-default min-h-[44px] md:min-h-0 w-full"
+                            className="px-4 py-2 bg-amber-500/10 border border-amber-500 text-amber-400 rounded-none text-xs md:text-sm font-mono uppercase tracking-widest cursor-default min-h-[44px] md:min-h-0 w-full"
                           >
                             ACTIVE
                           </button>
                         ) : (
                           <button
                             onClick={() => onActivateArt(art)}
-                            className="px-4 py-2 bg-ink-950 hover:bg-stone-900 text-stone-300 rounded-none text-xs md:text-sm font-mono uppercase tracking-widest transition-all border border-stone-700 hover:border-mystic-gold min-h-[44px] md:min-h-0 w-full touch-manipulation"
+                            className="px-4 py-2 bg-ink-950 hover:bg-stone-900 text-stone-300 rounded-none text-xs md:text-sm font-mono uppercase tracking-widest transition-all border border-stone-700 hover:border-amber-500 min-h-[44px] md:min-h-0 w-full touch-manipulation"
                           >
                             INITIALIZE
                           </button>

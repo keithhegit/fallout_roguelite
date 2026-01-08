@@ -9,6 +9,10 @@ export const RARITY_MULTIPLIERS: Record<ItemRarity, number> = {
   Rare: 1.5,
   Legendary: 2.5,
   Mythic: 6.0,
+  普通: 1,
+  稀有: 1.5,
+  传说: 2.5,
+  仙品: 6.0,
 };
 
 // Initial survival kit

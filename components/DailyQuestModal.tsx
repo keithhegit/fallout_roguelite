@@ -61,6 +61,10 @@ const DailyQuestModal: React.FC<Props> = ({
           Rare: 2,
           Legendary: 3,
           Mythic: 4,
+          普通: 1,
+          稀有: 2,
+          传说: 3,
+          仙品: 4,
         };
         return rarityOrder[b.rarity] - rarityOrder[a.rarity];
       }
@@ -103,8 +107,8 @@ const DailyQuestModal: React.FC<Props> = ({
         {/* Header */}
         <div className="bg-stone-950 p-4 border-b border-stone-800 flex items-center justify-between flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
-            <Calendar className="text-mystic-gold w-6 h-6" />
-            <h2 className="text-xl font-serif font-bold text-mystic-gold">
+            <Calendar className="text-amber-400 w-6 h-6" />
+            <h2 className="text-xl font-serif font-bold text-amber-400">
               Daily Bounties
             </h2>
             <span className="text-sm text-stone-400">
@@ -124,7 +128,7 @@ const DailyQuestModal: React.FC<Props> = ({
           <div className="flex items-center justify-between mb-2">
             <span className="text-stone-300 text-sm">Today's Progress</span>
             <div className="flex items-center gap-3">
-              <span className="text-mystic-gold font-bold">
+              <span className="text-amber-400 font-bold">
                 {completedCount} / {totalCount}
               </span>
               {claimableQuests.length > 0 && (
@@ -140,7 +144,7 @@ const DailyQuestModal: React.FC<Props> = ({
           </div>
           <div className="h-3 bg-stone-950 rounded-full overflow-hidden border border-stone-800">
             <div
-              className="h-full bg-gradient-to-r from-mystic-jade to-mystic-gold transition-all duration-500"
+              className="h-full bg-gradient-to-r from-mystic-jade to-amber-500 transition-all duration-500"
               style={{ width: `${completionRate}%` }}
             />
           </div>
@@ -156,7 +160,7 @@ const DailyQuestModal: React.FC<Props> = ({
               onChange={(e) =>
                 setFilterRarity(e.target.value as ItemRarity | 'all')
               }
-              className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-stone-200 text-sm outline-none focus:border-mystic-gold"
+              className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-stone-200 text-sm outline-none focus:border-amber-500"
             >
               <option value="all">All Rarities</option>
               <option value="Common">Common</option>
@@ -171,7 +175,7 @@ const DailyQuestModal: React.FC<Props> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-stone-200 text-sm outline-none focus:border-mystic-gold"
+              className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-stone-200 text-sm outline-none focus:border-amber-500"
             >
               <option value="default">Default</option>
               <option value="progress">Progress</option>
@@ -272,7 +276,7 @@ const QuestItem: React.FC<QuestItemProps> = ({
           <div
             className={`h-full transition-all duration-300 ${quest.completed
               ? 'bg-mystic-jade'
-              : 'bg-gradient-to-r from-mystic-jade to-mystic-gold'
+              : 'bg-gradient-to-r from-mystic-jade to-amber-500'
               }`}
             style={{ width: `${progressPercentage}%` }}
           />
@@ -289,7 +293,7 @@ const QuestItem: React.FC<QuestItemProps> = ({
             </div>
           )}
           {!!quest.reward.spiritStones && (
-            <div className="flex items-center gap-1 text-mystic-gold">
+            <div className="flex items-center gap-1 text-amber-400">
               <Sparkles size={14} />
               <span>{quest.reward.spiritStones} Caps</span>
             </div>
