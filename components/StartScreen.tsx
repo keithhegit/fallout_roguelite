@@ -180,7 +180,7 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-stone-950 flex items-center justify-center z-50 p-4 overflow-y-auto touch-manipulation crt-screen">
+    <div className="fixed inset-0 bg-stone-950 flex justify-center z-50 p-4 overflow-y-auto touch-manipulation crt-screen">
       {/* 背景纹理层 */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
