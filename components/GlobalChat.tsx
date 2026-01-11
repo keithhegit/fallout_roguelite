@@ -70,11 +70,13 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
 
   // Auto-scroll to bottom
   useEffect(() => {
-    if (scrollRef.current) {
-      setTimeout(() => {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }, 0);
-    }
+    const timeoutId = setTimeout(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      el.scrollTop = el.scrollHeight;
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [displayMessages, isOpen]);
 
   // Add emoji to input

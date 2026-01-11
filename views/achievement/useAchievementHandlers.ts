@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { PlayerStats, RealmType } from '../../types';
+import { PlayerStats, RealmType, SectRank } from '../../types';
 import { REALM_ORDER, ACHIEVEMENTS, TITLES } from '../../constants/index';
 import { uid } from '../../utils/gameUtils';
 import { calculateTitleEffects } from '../../utils/titleUtils';
