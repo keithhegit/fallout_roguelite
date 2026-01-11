@@ -180,19 +180,24 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-stone-950 flex justify-center z-50 p-4 overflow-y-auto touch-manipulation crt-screen">
-      {/* 背景纹理层 */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
-        style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
-      />
+    <div className="fixed inset-0 bg-stone-950 z-50">
+      {/* Background & CRT Effects Layer - Fixed and Non-interactive */}
+      <div className="absolute inset-0 pointer-events-none crt-screen overflow-hidden">
+        {/* Background Texture */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] z-0"
+          style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
+        />
+        {/* CRT Visual Layers */}
+        <div className="crt-noise opacity-[0.02]"></div>
+        <div className="crt-vignette"></div>
+        <div className="scanline-overlay opacity-[0.04]"></div>
+      </div>
 
-      {/* CRT Visual Layers */}
-      <div className="crt-noise opacity-[0.02]"></div>
-      <div className="crt-vignette"></div>
-      <div className="scanline-overlay opacity-[0.04]"></div>
-
-      <div className="bg-stone-950/90 border-2 border-stone-700 rounded-none p-6 md:p-10 max-w-2xl w-full shadow-[0_0_30px_rgba(0,0,0,0.5)] my-auto relative z-30 backdrop-blur-md overflow-hidden">
+      {/* Scrollable Content Layer */}
+      <div className="absolute inset-0 overflow-y-auto z-50 custom-scrollbar">
+        <div className="min-h-full flex flex-col items-center justify-center p-4 md:p-8">
+          <div className="bg-stone-950/90 border-2 border-stone-700 rounded-none p-6 md:p-10 max-w-2xl w-full shadow-[0_0_30px_rgba(0,0,0,0.5)] relative z-30 backdrop-blur-md overflow-hidden flex-shrink-0">
         {/* 内置背景纹理 */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.02] z-0"
@@ -428,6 +433,7 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 
