@@ -58,11 +58,6 @@ export default {
           800: '#27272a',
           900: '#18181b',
         },
-        mystic: {
-          gold: '#f59e0b',
-          jade: '#22c55e',
-          blood: '#dc2626',
-        },
         // Pip-Boy specific colors
         pip: {
           green: '#1aff1a',

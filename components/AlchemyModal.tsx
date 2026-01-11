@@ -21,7 +21,7 @@ const AlchemyModal: React.FC<Props> = ({
     return item ? item.quantity : 0;
   };
 
-  // 合并基础配方和已解锁的配方
+  // Merge base recipes and unlocked recipes
   const availableRecipes = useMemo(() => {
     const unlockedRecipes = player.unlockedRecipes || [];
     const unlocked = DISCOVERABLE_RECIPES.filter((recipe) =>
@@ -41,7 +41,7 @@ const AlchemyModal: React.FC<Props> = ({
         className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-3xl rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[85vh] overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* CRT 效果层 */}
+        {/* CRT Effect Layer */}
         <div className="absolute inset-0 pointer-events-none z-50">
           <div className="absolute inset-0 crt-noise opacity-[0.03]"></div>
           <div className="absolute inset-0 scanline-overlay opacity-[0.05]"></div>

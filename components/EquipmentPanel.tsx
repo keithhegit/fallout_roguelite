@@ -32,16 +32,16 @@ const EquipmentPanel: React.FC<Props> = ({
     return inventory.find((item) => item.id === id) || null;
   };
 
-  // 使用统一的工具函数获取槽位配置
+  // Use unified utility function to get slot configuration
   const slotConfig = getEquipmentSlotConfig();
 
   return (
-    <div className="bg-stone-950/20 rounded-none border border-stone-800 p-5 relative overflow-hidden font-mono">
+    <div className="bg-stone-950 rounded-none border border-amber-500/30 p-5 relative overflow-hidden font-mono">
       {/* CRT Visual Layers */}
       <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
 
       <h3 className="text-xs font-bold mb-5 flex items-center gap-2 text-stone-300 uppercase tracking-[0.3em] relative z-10">
-        <ShieldCheck size={16} className="text-yellow-500/80 animate-pulse" />
+        <ShieldCheck size={16} className="text-amber-500 animate-pulse" />
         NEURAL_LINK_INTERFACE
       </h3>
 
@@ -80,8 +80,8 @@ const EquipmentPanel: React.FC<Props> = ({
               key={slot}
               className={`group relative border rounded-none p-3 h-[180px] flex flex-col transition-all duration-300 ${
                 item 
-                  ? `bg-stone-950/50 ${getRarityBorder(rarity)} ${getRarityGlow(rarity)}` 
-                  : 'border-stone-800/40 bg-stone-900/5 opacity-60 border-dashed'
+                  ? `bg-stone-950 ${getRarityBorder(rarity)} ${getRarityGlow(rarity)}` 
+                  : 'border-amber-900/20 bg-stone-950/50 opacity-60 border-dashed'
               }`}
             >
               <div className="text-[9px] text-stone-500 mb-2 uppercase font-bold tracking-widest shrink-0">{label}</div>
@@ -131,13 +131,15 @@ const EquipmentPanel: React.FC<Props> = ({
                     )}
                   </div>
                   
-                  <button
-                    onClick={() => onUnequip(slot)}
-                    className="mt-3 w-full py-1.5 bg-stone-950 hover:bg-red-950/20 hover:text-red-500 hover:border-red-900/50 border border-stone-800 text-stone-600 text-[9px] rounded-none transition-all duration-300 flex items-center justify-center gap-1.5 shrink-0 uppercase font-bold tracking-widest group-hover:border-stone-700"
-                  >
-                    <X size={10} />
-                    DISCONNECT
-                  </button>
+                  {!isNatal && (
+                    <button
+                      onClick={() => onUnequip(slot)}
+                      className="mt-3 w-full py-1.5 bg-stone-950 hover:bg-red-950/20 hover:text-red-500 hover:border-red-900/50 border border-stone-800 text-stone-600 text-[9px] rounded-none transition-all duration-300 flex items-center justify-center gap-1.5 shrink-0 uppercase font-bold tracking-widest group-hover:border-stone-700"
+                    >
+                      <X size={10} />
+                      DISCONNECT
+                    </button>
+                  )}
                 </>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-stone-700 gap-2 opacity-30">

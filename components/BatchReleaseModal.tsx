@@ -11,7 +11,7 @@ interface Props {
 }
 
 type RarityFilter = 'all' | ItemRarity;
-type EvolutionFilter = 'all' | '0' | '1' | '2'; // 0=幼年期, 1=成熟期, 2=完全体
+type EvolutionFilter = 'all' | '0' | '1' | '2'; // 0=Juvenile, 1=Mature, 2=Apex
 type ActiveFilter = 'all' | 'active' | 'inactive';
 
 const BatchReleaseModal: React.FC<Props> = ({
@@ -23,7 +23,7 @@ const BatchReleaseModal: React.FC<Props> = ({
   const [selectedPets, setSelectedPets] = useState<Set<string>>(new Set());
   const [confirmRelease, setConfirmRelease] = useState(false);
 
-  // 筛选状态
+  // Filter state
   const [selectedRarity, setSelectedRarity] = useState<RarityFilter>('all');
   const [selectedSpecies, setSelectedSpecies] = useState<string>('all');
   const [selectedEvolution, setSelectedEvolution] = useState<EvolutionFilter>('all');
@@ -31,7 +31,7 @@ const BatchReleaseModal: React.FC<Props> = ({
   const [minLevel, setMinLevel] = useState<number>(0);
   const [maxLevel, setMaxLevel] = useState<number>(100);
 
-  // 获取所有灵宠种类
+  // Get all pet species
   const allSpecies = useMemo(() => {
     const speciesSet = new Set<string>();
     player.pets.forEach((pet) => {
@@ -40,20 +40,20 @@ const BatchReleaseModal: React.FC<Props> = ({
     return Array.from(speciesSet).sort();
   }, [player.pets]);
 
-  // 筛选后的灵宠列表
+  // Filtered pet list
   const filteredPets = useMemo(() => {
     return player.pets.filter((pet) => {
-      // 稀有度筛选
+      // Rarity filter
       if (selectedRarity !== 'all' && pet.rarity !== selectedRarity) {
         return false;
       }
 
-      // 种类筛选
+      // Species filter
       if (selectedSpecies !== 'all' && pet.species !== selectedSpecies) {
         return false;
       }
 
-      // 进化阶段筛选
+      // Evolution stage filter
       if (selectedEvolution !== 'all') {
         const stage = pet.evolutionStage.toString();
         if (stage !== selectedEvolution) {
@@ -61,7 +61,7 @@ const BatchReleaseModal: React.FC<Props> = ({
         }
       }
 
-      // 激活状态筛选
+      // Active status filter
       if (selectedActive !== 'all') {
         const isActive = pet.id === player.activePetId;
         if (selectedActive === 'active' && !isActive) {
@@ -72,7 +72,7 @@ const BatchReleaseModal: React.FC<Props> = ({
         }
       }
 
-      // 等级范围筛选
+      // Level range filter
       if (pet.level < minLevel || pet.level > maxLevel) {
         return false;
       }
@@ -81,7 +81,7 @@ const BatchReleaseModal: React.FC<Props> = ({
     });
   }, [player.pets, selectedRarity, selectedSpecies, selectedEvolution, selectedActive, minLevel, maxLevel, player.activePetId]);
 
-  // 必须在所有 hooks 之后才能提前返回
+  // Must return early after all hooks
   if (!isOpen) return null;
 
   const handleTogglePet = (petId: string) => {
@@ -118,7 +118,7 @@ const BatchReleaseModal: React.FC<Props> = ({
     onClose();
   };
 
-  // 使用统一的工具函数获取稀有度颜色（BatchReleaseModal 需要特殊的灰色处理）
+  // Use unified utility for rarity color (BatchReleaseModal needs special gray handling)
   const getRarityColor = (rarity: string) => {
     if (rarity === 'common') {
       return 'text-gray-400';
@@ -126,7 +126,7 @@ const BatchReleaseModal: React.FC<Props> = ({
     return getRarityTextColor(rarity as ItemRarity);
   };
 
-  // 计算总补偿
+  // Calculate total compensation
   const totalCompensation = Array.from(selectedPets).reduce((total: number, petId) => {
     const pet = player.pets.find((p) => p.id === petId);
     if (!pet) return total;
@@ -141,7 +141,7 @@ const BatchReleaseModal: React.FC<Props> = ({
     return total + Math.floor(baseCompensation * levelMultiplier * rarityMultiplier);
   }, 0);
 
-  // 检查是否包含激活的灵宠
+  // Check if active pet is included
   const includesActivePet = selectedPets.has(player.activePetId || '');
 
   return (
@@ -265,14 +265,14 @@ const BatchReleaseModal: React.FC<Props> = ({
                   </button>
                 </div>
 
-                {/* 筛选器 */}
+                {/* Filters */}
                 <div className="bg-stone-900 rounded p-3 border border-stone-700 space-y-3">
                   <div className="flex items-center gap-2 text-stone-400 text-sm">
                     <Filter size={16} />
                     <span>Filter Criteria:</span>
                   </div>
 
-                  {/* 稀有度筛选 */}
+                  {/* Rarity Filter */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-stone-500">Rarity:</span>
                     {(['all', 'common', 'uncommon', 'rare', 'legendary'] as RarityFilter[]).map((rarity) => (
@@ -292,7 +292,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                     ))}
                   </div>
 
-                  {/* 种类筛选 */}
+                  {/* Species Filter */}
                   {allSpecies.length > 0 && (
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs text-stone-500">Species:</span>
@@ -326,7 +326,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                     </div>
                   )}
 
-                  {/* 进化阶段筛选 */}
+                  {/* Evolution Stage Filter */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-stone-500">Evolution Stage:</span>
                     {(['all', '0', '1', '2'] as EvolutionFilter[]).map((stage) => (
@@ -346,7 +346,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                     ))}
                   </div>
 
-                  {/* 激活状态筛选 */}
+                  {/* Active Status Filter */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-stone-500">Active Status:</span>
                     {(['all', 'active', 'inactive'] as ActiveFilter[]).map((active) => (
@@ -366,7 +366,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                     ))}
                   </div>
 
-                  {/* 等级范围筛选 */}
+                  {/* Level Range Filter */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-stone-500">Level Range:</span>
                     <div className="flex items-center gap-2">
@@ -400,7 +400,7 @@ const BatchReleaseModal: React.FC<Props> = ({
                     </div>
                   </div>
 
-                  {/* 清除筛选 */}
+                  {/* Clear Filters */}
                   {(selectedRarity !== 'all' || selectedSpecies !== 'all' || selectedEvolution !== 'all' || selectedActive !== 'all' || minLevel > 0 || maxLevel < 100) && (
                     <button
                       onClick={() => {

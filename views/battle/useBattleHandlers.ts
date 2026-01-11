@@ -14,15 +14,15 @@ interface UseBattleHandlersProps {
 }
 
 /**
- * 战斗处理函数
- * 包含打开战斗模态框、跳过战斗日志、关闭战斗模态框
- * @param battleReplay 战斗回放
- * @param setBattleReplay 设置战斗回放
- * @param setIsBattleModalOpen 设置战斗模态框是否打开
- * @param setRevealedBattleRounds 设置战斗回放已揭露的回合数
- * @returns openBattleModal 打开战斗模态框
- * @returns handleSkipBattleLogs 跳过战斗日志
- * @returns handleCloseBattleModal 关闭战斗模态框
+ * Battle Handlers
+ * Includes opening battle modal, skipping battle logs, closing battle modal
+ * @param battleReplay Battle replay
+ * @param setBattleReplay Set battle replay
+ * @param setIsBattleModalOpen Set is battle modal open
+ * @param setRevealedBattleRounds Set revealed battle rounds
+ * @returns openBattleModal Open battle modal
+ * @returns handleSkipBattleLogs Skip battle logs
+ * @returns handleCloseBattleModal Close battle modal
  */
 export function useBattleHandlers({
   battleReplay,

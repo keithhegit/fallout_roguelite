@@ -20,7 +20,7 @@ import { getPlayerTotalStats } from '../utils/statUtils';
 import { PlayerStats } from '../types';
 
 /**
- * 事件模板接口
+ * Event Template Interface
  */
 interface AdventureEventTemplate {
   story: string;
@@ -30,7 +30,7 @@ interface AdventureEventTemplate {
   eventColor: 'normal' | 'gain' | 'danger' | 'special';
   adventureType: AdventureType;
   riskLevel?: RiskLevel;
-  // 可选字段
+  // Optional fields
   itemObtained?: AdventureResult['itemObtained'];
   itemsObtained?: AdventureResult['itemsObtained'];
   petObtained?: string;
@@ -44,33 +44,33 @@ interface AdventureEventTemplate {
   spiritualRootsChange?: AdventureResult['spiritualRootsChange'];
   lifespanChange?: number;
   lotteryTicketsChange?: number;
-  longevityRuleObtained?: string; // 获得的规则之力ID
-  heavenEarthSoulEncounter?: string; // 遇到的天地之魄BOSS ID
+  longevityRuleObtained?: string; // Obtained longevity rule ID
+  heavenEarthSoulEncounter?: string; // Encountered Heaven Earth Soul BOSS ID
 }
 
 /**
- * 事件模板库
+ * Event Template Library
  */
 let eventTemplateLibrary: AdventureEventTemplate[] = [];
 
 /**
- * 事件模板库是否已初始化
+ * Whether the event template library has been initialized
  */
 let isInitialized = false;
 
 /**
- * 事件模板数量配置
+ * Event Template Count Configuration
  */
 const TEMPLATE_COUNTS = {
-  NORMAL: 1500,        // 普通历练事件 (60%)
-  LUCKY: 500,         // 大机缘事件 (10%)
-  SECRET_REALM: 700,  // 秘境探索事件 (25%)
-  SECT_CHALLENGE: 300, // 宗门挑战事件 (5%)
+  NORMAL: 1500,        // Normal adventure events (60%)
+  LUCKY: 500,         // Lucky events (10%)
+  SECRET_REALM: 700,  // Secret realm exploration events (25%)
+  SECT_CHALLENGE: 300, // Sect challenge events (5%)
 } as const;
 
 /**
- * 确定性随机数生成器（基于种子）
- * 确保相同种子生成相同序列的随机数
+ * Deterministic Random Number Generator (Seed-based)
+ * Ensures the same seed generates the same sequence of random numbers
  */
 function seededRandom(seed: number): number {
   const x = Math.sin(seed) * 10000;
@@ -78,27 +78,27 @@ function seededRandom(seed: number): number {
 }
 
 /**
- * 基于索引的确定性随机数生成器
+ * Index-based deterministic random number generator
  */
 function deterministicRandom(index: number, offset: number = 0): number {
   return seededRandom(index * 1000 + offset);
 }
 
 /**
- * 从数组中确定性选择一个元素（增加随机性）
+ * Select an element deterministically from an array (with added randomness)
  */
 function selectFromArray<T>(array: T[], index: number): T {
   if (array.length === 0) {
     throw new Error('Cannot select from empty array');
   }
-  // 使用确定性随机数而不是简单的取模，增加随机性
+  // Use deterministic random number instead of simple modulo for more randomness
   const randomValue = deterministicRandom(index, 600);
   const selectedIndex = Math.floor(randomValue * array.length);
   return array[selectedIndex];
 }
 
 /**
- * 生成确定性随机整数（范围：[min, max)）
+ * Generate deterministic random integer (Range: [min, max))
  */
 function randomInt(index: number, min: number, max: number, offset: number = 0): number {
   const range = max - min;
@@ -106,7 +106,7 @@ function randomInt(index: number, min: number, max: number, offset: number = 0):
 }
 
 /**
- * 生成确定性随机浮点数（范围：[min, max)）
+ * Generate deterministic random float (Range: [min, max))
  */
 function randomFloat(index: number, min: number, max: number, offset: number = 0): number {
   const range = max - min;
@@ -114,34 +114,34 @@ function randomFloat(index: number, min: number, max: number, offset: number = 0
 }
 
 /**
- * 基于概率的确定性判断
+ * Probability-based deterministic check
  */
 function randomChance(index: number, probability: number, offset: number = 0): boolean {
   return deterministicRandom(index, offset) < probability;
 }
 
 /**
- * 生成事件模板库（3000个事件）
+ * Generate Event Template Library (3000 events)
  */
 export function generateEventTemplateLibrary(): AdventureEventTemplate[] {
   const templates: AdventureEventTemplate[] = [];
 
-  // 普通历练事件 (600个，60%)
+  // Normal adventure events (1500, 60%)
   for (let i = 0; i < TEMPLATE_COUNTS.NORMAL; i++) {
     templates.push(generateNormalEventTemplate(i));
   }
 
-  // Lucky events (100 events, 10%)
+  // Lucky events (500, 10%)
   for (let i = 0; i < TEMPLATE_COUNTS.LUCKY; i++) {
     templates.push(generateLuckyEventTemplate(i));
   }
 
-  // Secret Realm events (250 events, 25%)
+  // Secret Realm events (700, 25%)
   for (let i = 0; i < TEMPLATE_COUNTS.SECRET_REALM; i++) {
     templates.push(generateSecretRealmEventTemplate(i));
   }
 
-  // Sect Challenge events (50 events, 5%)
+  // Sect Challenge events (300, 5%)
   for (let i = 0; i < TEMPLATE_COUNTS.SECT_CHALLENGE; i++) {
     templates.push(generateSectChallengeEventTemplate(i));
   }
@@ -150,10 +150,10 @@ export function generateEventTemplateLibrary(): AdventureEventTemplate[] {
 }
 
 /**
- * 生成普通历练事件模板
+ * Generate Normal Event Template
  */
 function generateNormalEventTemplate(index: number): AdventureEventTemplate {
-  // 增加功法和灵宠的出现频率，提高获得概率
+  // Increase frequency of cultivation arts and pets
   const eventTypes = [
     'battle', // Combat
     'herb', // Found herbs/chems
@@ -222,10 +222,10 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'herb': {
-      // 从常量池中获取草药
+      // Get herbs from constant pool
       const allItems = getAllItemsFromConstants();
       const herbs = allItems.filter(item => item.type === ItemType.Herb);
-      // 使用确定性随机数选择草药，增加随机性
+      // Use deterministic random number to select herb, increasing randomness
       const selectedHerb = herbs.length > 0
         ? (() => {
           const herbRandom = deterministicRandom(index, 500);
@@ -256,7 +256,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
         eventColor: 'gain',
         itemObtained: {
           name: selectedHerb.name,
-          type: selectedHerb.type, // 常量池中的类型应该是正确的
+          type: selectedHerb.type, // Type in constant pool should be correct
           description: selectedHerb.description || 'A mysterious wasteland herb.',
           rarity: selectedHerb.rarity || 'Common',
           effect: selectedHerb.effect,
@@ -322,7 +322,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'cultivationArt': {
-      // 从常量池中获取功法（虽然系统会自动解锁，但事件描述要匹配）
+      // Get Art from constant pool (System auto-unlocks, but event description needs to match)
       const stories = [
         `In deep ${['Vault Ruins', 'Remnants', 'Bunkers', 'Secret Labs', 'Forbidden Zones'][index % 5]}, you found a ${['fragmented', 'ancient', 'mysterious', 'valuable', 'rare'][index % 5]} Combat Protocol data-chip. Though the chip was slightly degraded, the data remained accessible. You carefully downloaded and decrypted it, finding survival techniques and combat maneuvers far beyond what you had previously known. You became absorbed in the data, absorbing its essence.`,
         `You encountered a ${['Hermit Sage', 'Veteran Ranger', 'Mysterious Elder', 'Sect Overseer', 'Legendary Scavenger'][index % 5]} who seemed impressed by your aptitude. Sitting in a quiet corner of the wasteland, they began transmitting a specialized Protocol to you. Their explanation was clear and precise, and you quickly grasped the intricate maneuvers. Before leaving, they urged you to practice diligently.`,
@@ -413,7 +413,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'pet': {
-      // 从常量池中获取灵宠模板
+      // Get pet template from constant pool
       const availablePets = PET_TEMPLATES.map(pet => pet.id);
       const petId = selectFromArray(availablePets, index);
       const stories = [
@@ -547,7 +547,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'foundationTreasure': {
-      // 从筑基奇物中随机选择一个
+      // Randomly select a Foundation Treasure
       const allTreasures = Object.values(FOUNDATION_TREASURES);
       const selectedTreasure = selectFromArray(allTreasures, index);
 
@@ -558,7 +558,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
         `You inadvertently discovered a ${['shielded', 'mysterious', 'ancient', 'dense', 'rare'][index % 5]} research area. In a ${['locked locker', 'reinforced crate', 'maintenance hatch', 'data terminal', 'shielded container'][index % 5]}, you found a ${selectedTreasure.name}. Its sophisticated design spoke of a lost era of technology.`,
         `In an ${['ancient bunker', 'ruined factory', 'hidden research station', 'vault', 'monolith'][index % 5]}, you accidentally triggered a ${['primitive', 'sophisticated', 'defensive', 'automated', 'hidden'][index % 5]} mechanism. A secure compartment opened, revealing a ${selectedTreasure.name}! You secured the valuable item with trembling hands.`,
       ];
-      // 将筑基奇物转换为Item格式
+      // Convert Foundation Treasure to Item format
       const permanentEffect: any = {};
       if (selectedTreasure.effects.hpBonus) permanentEffect.maxHp = selectedTreasure.effects.hpBonus;
       if (selectedTreasure.effects.attackBonus) permanentEffect.attack = selectedTreasure.effects.attackBonus;
@@ -586,7 +586,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'heavenEarthEssence': {
-      // 从天地精华中随机选择一个
+      // Randomly select one Heaven Earth Essence
       const allEssences = Object.values(HEAVEN_EARTH_ESSENCES);
       const selectedEssence = selectFromArray(allEssences, index);
 
@@ -597,7 +597,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
         `While searching ${['an old bunker', 'ruins', 'a monolith site', 'a dead city', 'a hazardous plain'][index % 5]}, you felt a localized atmospheric disturbance. Investigating, you uncovered a ${['shielded', 'mysterious', 'ancient', 'dense', 'rare'][index % 5]} storage area for ${selectedEssence.name}. You secured the material, knowing its immense value.`,
         `In ${['a pre-war burial site', 'a research facility', 'a bunker', 'a vault', 'a forbidden zone'][index % 5]}, you found a ${['sophisticated', 'ancient', 'sharded', 'locked', 'shielded'][index % 5]} containment unit. Inside was a stable sample of ${selectedEssence.name}. You retrieved the sample, your hands glowing from the background energy it radiated.`,
       ];
-      // 将天地精华转换为Item格式
+      // Convert Heaven Earth Essence to Item format
       const permanentEffect: any = {};
       if (selectedEssence.effects.hpBonus) permanentEffect.maxHp = selectedEssence.effects.hpBonus;
       if (selectedEssence.effects.attackBonus) permanentEffect.attack = selectedEssence.effects.attackBonus;
@@ -625,7 +625,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'heavenEarthMarrow': {
-      // 从天地之髓中随机选择一个
+      // Randomly select a Heaven Earth Marrow
       const allMarrows = Object.values(HEAVEN_EARTH_MARROWS);
       const selectedMarrow = selectFromArray(allMarrows, index);
 
@@ -636,7 +636,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
         `While searching ${['an old experimental bunker', 'ruins', 'the Forbidden City', 'a dead city', 'a hazardous crater'][index % 5]}, you felt a localized reality distortion. Investigating, you uncovered a ${['shielded', 'mysterious', 'ancient', 'dense', 'rare'][index % 5]} storage area for ${selectedMarrow.name}. You secured the material, each gram humming with immense power.`,
         `In ${['a high-security burial site', 'a research facility', 'an ancient bunker', 'a secure vault', 'a forbidden zone'][index % 5]}, you found a ${['high-tech', 'pre-war', 'encoded', 'shielded', 'advanced'][index % 5]} containment unit. Inside was a pure sample of ${selectedMarrow.name}. You retrieved it, its glow illuminating the dark corridor with a sickly green light.`,
       ];
-      // 将天地之髓转换为Item格式
+      // Convert Heaven Earth Marrow to Item format
       const permanentEffect: any = {};
       if (selectedMarrow.effects.hpBonus) permanentEffect.maxHp = selectedMarrow.effects.hpBonus;
       if (selectedMarrow.effects.attackBonus) permanentEffect.attack = selectedMarrow.effects.attackBonus;
@@ -664,7 +664,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
     }
 
     case 'heavenEarthSoul': {
-      // 从天地之魄BOSS中随机选择一个
+      // Randomly select one Heaven Earth Soul BOSS
       const allBosses = Object.values(HEAVEN_EARTH_SOUL_BOSSES);
       const selectedBoss = selectFromArray(allBosses, index);
 
@@ -683,13 +683,13 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
         expChange: 0,
         spiritStonesChange: 0,
         eventColor: 'danger',
-        adventureType: 'dao_combining_challenge', // 标记为合道挑战类型
-        heavenEarthSoulEncounter: selectedBoss.id, // 标记遇到的BOSS ID
+        adventureType: 'dao_combining_challenge', // Mark as Dao Combining Challenge type
+        heavenEarthSoulEncounter: selectedBoss.id, // Mark encountered BOSS ID
       };
     }
 
     case 'longevityRule': {
-      // 从规则之力中随机选择一个
+      // Randomly select one Longevity Rule
       const allRules = Object.values(LONGEVITY_RULES);
       const selectedRule = selectFromArray(allRules, index);
 
@@ -708,7 +708,7 @@ function generateNormalEventTemplate(index: number): AdventureEventTemplate {
         expChange: randomInt(index, 200, 400, 530),
         spiritStonesChange: randomInt(index, 500, 1000, 540),
         eventColor: 'special',
-        longevityRuleObtained: selectedRule.id, // 标记获得的规则之力ID
+        longevityRuleObtained: selectedRule.id, // Mark obtained Longevity Rule ID
       };
     }
 
@@ -780,7 +780,7 @@ function generateLuckyEventTemplate(index: number, forcedRarity?: ItemRarity): A
 }
 
 /**
- * 生成秘境探索事件模板
+ * Generate Secret Realm Event Template
  */
 function generateSecretRealmEventTemplate(index: number): AdventureEventTemplate {
   const riskLevels: Array<RiskLevel> = ['Low', 'Medium', 'High', 'Extreme'];
@@ -794,9 +794,9 @@ function generateSecretRealmEventTemplate(index: number): AdventureEventTemplate
 
   const stories = [
     `As you explore the secret realm, rich spiritual energy permeates the surroundings, and the air itself seems to carry a mysterious aura. You proceed cautiously, suddenly discovering a ${encounter}. A powerful aura emanates from it, clearly indicating it's no ordinary object. You observe carefully, finding many precious treasures and inheritances, but also immense danger.`,
-    `Deep within the secret realm, the scenery becomes increasingly bizarre, and the air is filled with a powerful Dao韵. You proceed cautiously, suddenly discovering a ${location}. A rich glow emanates from it, clearly indicating it's no ordinary place. You observe carefully, finding many precious treasures and inheritances, but also immense danger.`,
-    `While exploring the secret realm, you suddenly feel a strong sense of danger. You quickly circulate your cultivation technique, vigilantly observing your surroundings, and realize you've encountered a ${encounter}. You dare not be careless, immediately activating your cultivation technique, preparing to face the impending danger.`,
-    `Deep within the secret realm, the scenery becomes increasingly bizarre, and the air is filled with a powerful Dao韵. You proceed cautiously, discovering many precious treasures and inheritances, but also immense danger.`,
+    `Deep within the secret realm, the scenery becomes increasingly bizarre, and the air is filled with a powerful mysterious resonance. You proceed cautiously, suddenly discovering a ${location}. A rich glow emanates from it, clearly indicating it's no ordinary place. You observe carefully, finding many precious treasures and inheritances, but also immense danger.`,
+    `While exploring the secret realm, you suddenly feel a strong sense of danger. You quickly prepare your combat protocols, vigilantly observing your surroundings, and realize you've encountered a ${encounter}. You dare not be careless, immediately activating your combat protocols, preparing to face the impending danger.`,
+    `Deep within the secret realm, the scenery becomes increasingly bizarre, and the air is filled with a powerful mysterious resonance. You proceed cautiously, discovering many precious treasures and inheritances, but also immense danger.`,
     `As you explore the secret realm, rich spiritual energy permeates the surroundings, and the air itself seems to carry a mysterious aura. You proceed cautiously, suddenly discovering a ${encounter}. A powerful aura emanates from it, clearly indicating it's no ordinary object. You observe carefully, finding many precious treasures and inheritances, but also immense danger.`,
   ];
 
@@ -830,7 +830,7 @@ function generateSecretRealmEventTemplate(index: number): AdventureEventTemplate
 }
 
 /**
- * 生成宗门挑战事件模板
+ * Generate Faction Challenge Event Template
  */
 function generateSectChallengeEventTemplate(index: number): AdventureEventTemplate {
   const missions = ['mission', 'challenge', 'trial', 'test', 'commission'];
@@ -862,10 +862,10 @@ function generateSectChallengeEventTemplate(index: number): AdventureEventTempla
 }
 
 /**
- * 生成随机物品
+ * Generate random item
  */
 /**
- * 从常量池中获取所有可用物品（缓存）
+ * Get all available items from constant pool (cached)
  */
 let cachedItems: Array<{
   name: string;
@@ -892,7 +892,7 @@ function getAllItemsFromConstants(): Array<{
   advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule';
   advancedItemId?: string;
 }> {
-  // 使用缓存
+  // Use cache
   if (cachedItems) {
     return cachedItems;
   }
@@ -911,7 +911,7 @@ function getAllItemsFromConstants(): Array<{
   }> = [];
   const itemNames = new Set<string>();
 
-  // 从INITIAL_ITEMS中提取物品
+  // Extract items from INITIAL_ITEMS
   INITIAL_ITEMS.forEach(item => {
     if (itemNames.has(item.name)) return;
     itemNames.add(item.name);
@@ -927,7 +927,7 @@ function getAllItemsFromConstants(): Array<{
     });
   });
 
-  // 从ITEM_TEMPLATES中提取生成的物品
+  // Extract generated items from ITEM_TEMPLATES
   ITEM_TEMPLATES.forEach(item => {
     if (itemNames.has(item.name)) return;
     itemNames.add(item.name);
@@ -943,7 +943,7 @@ function getAllItemsFromConstants(): Array<{
     });
   });
 
-  // 从所有丹方中提取丹药（避免重复）
+  // Extract Chems from all recipes (avoid duplicates)
   [...PILL_RECIPES, ...DISCOVERABLE_RECIPES].forEach(recipe => {
     if (recipe.result && !itemNames.has(recipe.result.name)) {
       itemNames.add(recipe.result.name);
@@ -958,15 +958,15 @@ function getAllItemsFromConstants(): Array<{
     }
   });
 
-  // 从抽奖奖品中提取物品
+  // Extract items from lottery prizes
   LOTTERY_PRIZES.forEach(prize => {
     if (prize.type === 'item' && prize.value.item) {
       const item = prize.value.item;
-      // 避免重复
+      // Avoid duplicates
       if (itemNames.has(item.name)) return;
       itemNames.add(item.name);
 
-      // 如果是丹药，优先从常量中获取完整定义
+      // If it is a Chem, prioritize getting the full definition from constants
       if (item.type === ItemType.Pill) {
         const pillDef = getPillDefinition(item.name);
         if (pillDef) {
@@ -981,7 +981,7 @@ function getAllItemsFromConstants(): Array<{
           return;
         }
       }
-      // 非丹药或常量中没有定义的物品，使用原始定义
+      // Use original definition for non-Chem items or items without constant definition
       items.push({
         name: item.name,
         type: item.type,
@@ -995,13 +995,13 @@ function getAllItemsFromConstants(): Array<{
     }
   });
 
-  // 从宗门商店物品中提取
+  // Extract items from Faction shop
   SECT_SHOP_ITEMS.forEach(shopItem => {
     const item = shopItem.item;
     if (itemNames.has(item.name)) return;
     itemNames.add(item.name);
 
-    // 如果是丹药，优先从常量中获取完整定义
+    // If it is a Chem, prioritize getting the full definition from constants
     if (item.type === ItemType.Pill) {
       const pillDef = getPillDefinition(item.name);
       if (pillDef) {
@@ -1029,12 +1029,12 @@ function getAllItemsFromConstants(): Array<{
     });
   });
 
-  // 从筑基奇物中提取物品
+  // Extract items from Foundation Treasures
   Object.values(FOUNDATION_TREASURES).forEach(treasure => {
     if (itemNames.has(treasure.name)) return;
     itemNames.add(treasure.name);
 
-    // 将effects转换为Item格式的permanentEffect
+    // Convert effects to permanentEffect in Item format
     const permanentEffect: any = {};
     if (treasure.effects.hpBonus) permanentEffect.maxHp = treasure.effects.hpBonus;
     if (treasure.effects.attackBonus) permanentEffect.attack = treasure.effects.attackBonus;
@@ -1054,12 +1054,12 @@ function getAllItemsFromConstants(): Array<{
     });
   });
 
-  // 从天地精华中提取物品
+  // Extract items from Heaven Earth Essences
   Object.values(HEAVEN_EARTH_ESSENCES).forEach(essence => {
     if (itemNames.has(essence.name)) return;
     itemNames.add(essence.name);
 
-    // 将effects转换为Item格式的permanentEffect
+    // Convert effects to permanentEffect in Item format
     const permanentEffect: any = {};
     if (essence.effects.hpBonus) permanentEffect.maxHp = essence.effects.hpBonus;
     if (essence.effects.attackBonus) permanentEffect.attack = essence.effects.attackBonus;
@@ -1079,12 +1079,12 @@ function getAllItemsFromConstants(): Array<{
     });
   });
 
-  // 从天地之髓中提取物品
+  // Extract items from Heaven Earth Marrows
   Object.values(HEAVEN_EARTH_MARROWS).forEach(marrow => {
     if (itemNames.has(marrow.name)) return;
     itemNames.add(marrow.name);
 
-    // 将effects转换为Item格式的permanentEffect
+    // Convert effects to permanentEffect in Item format
     const permanentEffect: any = {};
     if (marrow.effects.hpBonus) permanentEffect.maxHp = marrow.effects.hpBonus;
     if (marrow.effects.attackBonus) permanentEffect.attack = marrow.effects.attackBonus;
@@ -1109,9 +1109,9 @@ function getAllItemsFromConstants(): Array<{
 }
 
 /**
- * 从常量池中根据名称获取物品
- * @param itemName 物品名称
- * @returns 物品数据，如果未找到则返回 null
+ * Get item from constant pool by name
+ * @param itemName Item name
+ * @returns Item data, or null if not found
  */
 export function getItemFromConstants(itemName: string): {
   name: string;
@@ -1130,7 +1130,7 @@ export function getItemFromConstants(itemName: string): {
     return null;
   }
 
-  // 验证物品类型是否为有效的 ItemType
+  // Validate if item type is a valid ItemType
   const itemType = Object.values(ItemType).includes(item.type as ItemType)
     ? (item.type as ItemType)
     : ItemType.Material;
@@ -1148,17 +1148,17 @@ export function getItemFromConstants(itemName: string): {
 }
 
 /**
- * 从常量池中获取随机物品
+ * Get random item from constant pool
  */
 function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult['itemObtained'] {
   const allItems = getAllItemsFromConstants();
 
-  // 根据稀有度筛选物品
+  // Filter items by rarity
   let filteredItems = allItems.filter(item => item.rarity === rarity);
 
-  // 如果该稀有度的物品太少，放宽条件
+  // If too few items of this rarity, relax conditions
   if (filteredItems.length < 3) {
-    // 允许使用相邻稀有度的物品
+    // Allow using items of adjacent rarities
     const rarityOrder: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
     const currentIndex = rarityOrder.indexOf(rarity);
     const allowedRarities: ItemRarity[] = [rarity];
@@ -1167,28 +1167,28 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     filteredItems = allItems.filter(item => allowedRarities.includes(item.rarity));
   }
 
-  // 如果还是没有，使用所有物品
+  // If still no items, use all items
   if (filteredItems.length === 0) {
     filteredItems = allItems;
   }
 
-  // 使用确定性随机数生成器选择物品，增加随机性
-  // 使用多个偏移量组合，避免固定模式
+  // Use deterministic random number generator to select item, increasing randomness
+  // Use multiple offsets combination to avoid fixed patterns
   const randomOffset1 = deterministicRandom(index, 100);
   const randomOffset2 = deterministicRandom(index, 200);
   const randomOffset3 = deterministicRandom(index, 300);
-  // 组合多个随机数，增加随机性
+  // Combine multiple random numbers to increase randomness
   let combinedRandom = (randomOffset1 + randomOffset2 + randomOffset3) / 3;
 
-  // 如果物品池较大，进行二次随机化
+  // If item pool is large, perform secondary randomization
   if (filteredItems.length > 10) {
-    // 使用额外的随机偏移，增加随机性
+    // Use additional random offset to increase randomness
     const additionalRandom = deterministicRandom(index, 400);
     combinedRandom = (combinedRandom + additionalRandom) / 2;
   }
 
-  // 使用 Fisher-Yates 风格的随机选择，增加随机性
-  // 先打乱数组顺序（基于确定性随机数）
+  // Use Fisher-Yates style random selection to increase randomness
+  // Shuffle array first (based on deterministic random number)
   const shuffleSeed = deterministicRandom(index, 500);
   const shuffledItems = [...filteredItems];
   for (let i = shuffledItems.length - 1; i > 0; i--) {
@@ -1209,12 +1209,12 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     };
   }
 
-  // 验证物品类型是否为有效的 ItemType（常量池中的类型应该是正确的）
+  // Validate if item type is a valid ItemType (types in constant pool should be correct)
   const itemType = Object.values(ItemType).includes(selectedItem.type as ItemType)
     ? (selectedItem.type as ItemType)
-    : ItemType.Material; // 如果类型无效，默认为材料
+    : ItemType.Material; // If type is invalid, default to Material
 
-  // 构建返回的物品对象（直接使用常量池中的数据，不需要推断）
+  // Build returned item object (use data from constant pool directly, no inference needed)
   const result: AdventureResult['itemObtained'] = {
     name: selectedItem.name,
     type: itemType,
@@ -1222,7 +1222,7 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     rarity: selectedItem.rarity || 'Common',
   };
 
-  // 添加效果（常量池中的效果已经是正确的）
+  // Add effect (effects in constant pool should be correct)
   if (selectedItem.effect && typeof selectedItem.effect === 'object') {
     result.effect = selectedItem.effect;
   }
@@ -1231,7 +1231,7 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     result.permanentEffect = selectedItem.permanentEffect;
   }
 
-  // 如果草药或丹药没有效果，尝试从丹药定义中获取
+  // If Herb or Chem has no effect, try to get from Chem definition
   if ((itemType === ItemType.Herb || itemType === ItemType.Pill) &&
     !result.effect && !result.permanentEffect) {
     const pillDef = getPillDefinition(selectedItem.name);
@@ -1245,11 +1245,11 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     }
   }
 
-  // 添加装备相关属性（常量池中的装备信息应该是正确的）
+  // Add equipment related attributes (equipment info in constant pool should be correct)
   if (selectedItem.isEquippable) {
     result.isEquippable = true;
     if (selectedItem.equipmentSlot) {
-      // 验证 equipmentSlot 是否为有效的 EquipmentSlot
+      // Validate if equipmentSlot is a valid EquipmentSlot
       const validSlots = Object.values(EquipmentSlot);
       if (validSlots.includes(selectedItem.equipmentSlot as EquipmentSlot)) {
         result.equipmentSlot = selectedItem.equipmentSlot as EquipmentSlot;
@@ -1257,7 +1257,7 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     }
   }
 
-  // 添加进阶物品相关属性（如果物品是进阶物品）
+  // Add advanced item related attributes (if item is an advanced item)
   if (itemType === ItemType.AdvancedItem) {
     if ((selectedItem as any).advancedItemType) {
       result.advancedItemType = (selectedItem as any).advancedItemType;
@@ -1267,9 +1267,9 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
     }
   }
 
-  // 测试环境验证物品数据
+  // Validate item data in dev environment
   if (import.meta.env.DEV) {
-    // 验证物品类型和稀有度的匹配
+    // Validate match between item type and rarity
     const typeRarityValid = result.type && result.rarity;
     if (!typeRarityValid) {
       logger.warn('【Item Validation Warning】Missing item type or rarity:', {
@@ -1279,7 +1279,7 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
       });
     }
 
-    // 验证装备物品必须有槽位
+    // Validate equippable item must have a slot
     if (result.isEquippable && !result.equipmentSlot) {
       logger.warn('【Item Validation Warning】Equippable item missing slot:', {
         name: result.name,
@@ -1287,11 +1287,11 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
       });
     }
 
-    // 验证草药和丹药必须有 effect 或 permanentEffect
-    // 如果仍然没有效果，提供默认效果（避免警告，但记录日志）
+    // Validate Herb and Chem must have effect or permanentEffect
+    // If still no effect, provide default effect (avoid warning, but log)
     if ((result.type === ItemType.Herb || result.type === ItemType.Pill) &&
       !result.effect && !result.permanentEffect) {
-      // 为草药和丹药提供默认效果，避免游戏逻辑错误
+      // Provide default effect for Herb and Chem to avoid game logic errors
       if (result.type === ItemType.Herb) {
         result.effect = { hp: 50, exp: 10 };
         result.permanentEffect = { spirit: 1 };
@@ -1314,7 +1314,7 @@ function generateRandomItem(rarity: ItemRarity, index: number): AdventureResult[
 }
 
 /**
- * 初始化事件模板库（同步版本，用于直接生成）
+ * Initialize event template library (sync version, for direct generation)
  */
 export function initializeEventTemplateLibrary(): void {
   if (eventTemplateLibrary.length === 0 && !isInitialized) {
@@ -1324,7 +1324,7 @@ export function initializeEventTemplateLibrary(): void {
 }
 
 /**
- * 从外部设置事件模板库（用于从 IndexedDB 加载）
+ * Set event template library from external source (for loading from IndexedDB)
  */
 export function setEventTemplateLibrary(templates: AdventureEventTemplate[]): void {
   eventTemplateLibrary = templates;
@@ -1332,22 +1332,22 @@ export function setEventTemplateLibrary(templates: AdventureEventTemplate[]): vo
 }
 
 /**
- * 获取当前事件模板库
+ * Get current event template library
  */
 export function getEventTemplateLibrary(): AdventureEventTemplate[] {
   return eventTemplateLibrary;
 }
 
 /**
- * 检查事件模板库是否已初始化
+ * Check if event template library is initialized
  */
 export function isEventTemplateLibraryInitialized(): boolean {
   return isInitialized && eventTemplateLibrary.length > 0;
 }
 
 /**
- * 从模板库中随机获取一个事件模板
- * 根据玩家境界调整事件类型和风险等级的分布
+ * Get a random event template from the library
+ * Adjust event type and risk level distribution based on player realm
  */
 export function getRandomEventTemplate(
   adventureType: AdventureType = 'normal',
@@ -1359,19 +1359,19 @@ export function getRandomEventTemplate(
     initializeEventTemplateLibrary();
   }
 
-  // 计算玩家境界指数（0-6，对应7个境界）
+  // Calculate player realm index (0-6, corresponding to 7 realms)
   const realmIndex = playerRealm ? REALM_ORDER.indexOf(playerRealm) : 0;
   const validRealmIndex = realmIndex >= 0 ? realmIndex : 0;
   const realmLevel = playerRealmLevel || 1;
 
-  // 境界进度：0.0（最低）到 1.0（最高）
-  // 考虑境界和境界等级，最高境界9层时接近1.0
+  // Realm progress: 0.0 (lowest) to 1.0 (highest)
+  // Consider realm and realm level, highest realm level 9 is close to 1.0
   const realmProgress = (validRealmIndex + (realmLevel - 1) / 9) / REALM_ORDER.length;
 
-  // 根据类型和风险等级筛选
+  // Filter by type and risk level
   let filtered = eventTemplateLibrary.filter(t => t.adventureType === adventureType);
 
-  // 根据玩家境界过滤特殊事件
+  // Filter special events based on player realm
   if (playerRealm) {
     const spiritSeveringIndex = REALM_ORDER.indexOf(RealmType.SpiritSevering);
     const longevityRealmIndex = REALM_ORDER.indexOf(RealmType.LongevityRealm);
@@ -1524,66 +1524,66 @@ function adjustRarityByRealm(
     return baseRarity;
   }
 
-  // 根据境界进度计算稀有度提升概率
-  // 基础概率：低境界5%，高境界40%
+  // Calculate rarity upgrade chance based on realm progress
+  // Base chance: 5% at low realm, 40% at high realm
   const baseUpgradeChance = 0.05 + realmProgress * 0.35;
 
-  // 使用确定性随机数（基于境界、等级和物品种子）
+  // Use deterministic random number (based on realm, level and item seed)
   const randomSeed = validRealmIndex * 1000 + realmLevel * 100 + itemSeed;
   const randomValue = seededRandom(randomSeed);
 
-  // 计算升级概率（考虑当前稀有度）
-  // 普通->稀有：基础概率
-  // 稀有->传说：基础概率 * 0.8
-  // 传说->仙品：基础概率 * 0.5
+  // Calculate upgrade chance (considering current rarity)
+  // Common->Rare: Base chance
+  // Rare->Legendary: Base chance * 0.8
+  // Legendary->Mythic: Base chance * 0.5
   const rarityMultipliers = [1.0, 0.8, 0.5];
   const upgradeChance = baseUpgradeChance * (rarityMultipliers[currentRarityIndex] || 0.3);
 
   if (randomValue < upgradeChance) {
-    // 升级到下一个稀有度
+    // Upgrade to next rarity
     return rarityOrder[currentRarityIndex + 1];
   } else if (randomValue < upgradeChance * 0.2 && currentRarityIndex < rarityOrder.length - 2) {
-    // 小概率（20%的升级概率）直接升级两级（仅对普通和稀有）
+    // Small chance (20% of upgrade chance) to upgrade two levels (only for Common and Rare)
     return rarityOrder[currentRarityIndex + 2];
   }
 
-  // 保持原稀有度
+  // Keep original rarity
   return baseRarity;
 }
 
 /**
- * 将模板转换为AdventureResult（根据玩家境界调整数值）
+ * Convert template to AdventureResult (adjust values based on player realm)
  */
 export function templateToAdventureResult(
   template: AdventureEventTemplate,
   player: { realm: RealmType; realmLevel: number; maxHp: number }
 ): AdventureResult {
-  // 计算境界倍数
+  // Calculate realm multiplier
   const realmIndex = REALM_ORDER.indexOf(player.realm);
   const realmBaseMultipliers = [1, 2, 4, 8, 16, 32, 64];
   const realmBaseMultiplier = realmBaseMultipliers[realmIndex] || 1;
   const levelMultiplier = 1 + (player.realmLevel - 1) * 0.3;
   const realmMultiplier = realmBaseMultiplier * levelMultiplier;
 
-  // 调整数值
+  // Adjust values
   const result: AdventureResult = {
     story: template.story,
     hpChange: Math.floor(template.hpChange * realmMultiplier),
     expChange: Math.floor(template.expChange * realmMultiplier),
     spiritStonesChange: Math.floor(template.spiritStonesChange * realmMultiplier),
     eventColor: template.eventColor,
-    adventureType: template.adventureType, // 传递adventureType，用于判断是否需要触发战斗
+    adventureType: template.adventureType, // Pass adventureType, used to check if battle needs to be triggered
   };
 
-  // 确保hpChange不超过maxHp的50%
+  // Ensure hpChange does not exceed 50% of maxHp
   const maxHpChange = Math.floor(player.maxHp * 0.5);
   if (Math.abs(result.hpChange) > maxHpChange) {
     result.hpChange = result.hpChange > 0 ? maxHpChange : -maxHpChange;
   }
 
-  // 根据境界调整物品稀有度
+  // Adjust item rarity based on realm
   if (template.itemObtained !== undefined) {
-    // 使用物品名称和类型作为种子，确保相同物品的稀有度调整是确定的
+    // Use item name and type as seed to ensure deterministic rarity adjustment for the same item
     const itemSeed = template.itemObtained.name.length * 100 + template.itemObtained.type.length;
     const adjustedRarity = adjustRarityByRealm(
       template.itemObtained.rarity as ItemRarity,
@@ -1592,17 +1592,17 @@ export function templateToAdventureResult(
       itemSeed
     );
 
-    // 如果稀有度提升了，尝试找到相同类型但更高稀有度的物品
-    // 如果找不到，保持原物品但提升稀有度（属性会在后续处理中调整）
+    // If rarity upgraded, try to find item of same type but higher rarity
+    // If not found, keep original item but upgrade rarity (attributes will be adjusted later)
     if (adjustedRarity !== template.itemObtained.rarity) {
-      // 尝试从常量池中找到相同类型但更高稀有度的物品
+      // Try to find item of same type but higher rarity from constant pool
       const allItems = getAllItemsFromConstants();
       const sameTypeItems = allItems.filter(
         item => item.type === template.itemObtained!.type && item.rarity === adjustedRarity
       );
 
       if (sameTypeItems.length > 0) {
-        // 找到相同类型的高稀有度物品，使用它
+        // Found item of same type and higher rarity, use it
         const selectedItem = selectFromArray(sameTypeItems, itemSeed);
         result.itemObtained = {
           name: selectedItem.name,
@@ -1613,12 +1613,12 @@ export function templateToAdventureResult(
           permanentEffect: selectedItem.permanentEffect,
           isEquippable: selectedItem.isEquippable,
           equipmentSlot: selectedItem.equipmentSlot as EquipmentSlot | undefined,
-          // 保留进阶物品相关字段
+          // Preserve advanced item related fields
           advancedItemType: template.itemObtained.advancedItemType,
           advancedItemId: template.itemObtained.advancedItemId,
         };
       } else {
-        // 找不到相同类型的高稀有度物品，保持原物品但提升稀有度
+        // Cannot find item of same type and higher rarity, keep original item but upgrade rarity
         result.itemObtained = {
           ...template.itemObtained,
           rarity: adjustedRarity,
@@ -1628,14 +1628,14 @@ export function templateToAdventureResult(
       result.itemObtained = template.itemObtained;
     }
 
-    // 对丹药和草药的效果根据境界倍数进行调整（提高属性值）
+    // Adjust Herb and Chem effects based on realm multiplier (increase attribute values)
     if (result.itemObtained && (result.itemObtained.type === ItemType.Pill || result.itemObtained.type === ItemType.Herb)) {
       const adjustedEffect = result.itemObtained.effect ? { ...result.itemObtained.effect } : undefined;
       const adjustedPermanentEffect = result.itemObtained.permanentEffect ? { ...result.itemObtained.permanentEffect } : undefined;
 
-      // 调整临时效果（effect）
+      // Adjust temporary effect (effect)
       if (adjustedEffect) {
-        // 使用较大的倍数调整（境界倍数 * 2，使丹药效果更明显）
+        // Use larger multiplier (realm multiplier * 2, make Chem effects more significant)
         const pillEffectMultiplier = realmMultiplier * 2;
         if (adjustedEffect.exp !== undefined) adjustedEffect.exp = Math.floor(adjustedEffect.exp * pillEffectMultiplier);
         if (adjustedEffect.hp !== undefined) adjustedEffect.hp = Math.floor(adjustedEffect.hp * pillEffectMultiplier);
@@ -1646,9 +1646,9 @@ export function templateToAdventureResult(
         if (adjustedEffect.speed !== undefined) adjustedEffect.speed = Math.floor(adjustedEffect.speed * pillEffectMultiplier);
       }
 
-      // 调整永久效果（permanentEffect）
+      // Adjust permanent effect (permanentEffect)
       if (adjustedPermanentEffect) {
-        // 使用较大的倍数调整（境界倍数 * 1.5，永久效果略小一些）
+        // Use larger multiplier (realm multiplier * 1.5, permanent effects slightly smaller)
         const pillPermanentMultiplier = realmMultiplier * 1.5;
         if (adjustedPermanentEffect.maxHp !== undefined) adjustedPermanentEffect.maxHp = Math.floor(adjustedPermanentEffect.maxHp * pillPermanentMultiplier);
         if (adjustedPermanentEffect.attack !== undefined) adjustedPermanentEffect.attack = Math.floor(adjustedPermanentEffect.attack * pillPermanentMultiplier);
@@ -1665,7 +1665,7 @@ export function templateToAdventureResult(
   }
 
   if (template.itemsObtained !== undefined) {
-    // 对多个物品也应用稀有度调整
+    // Apply rarity adjustment to multiple items as well
     result.itemsObtained = template.itemsObtained.map((item, index) => {
       const itemSeed = item.name.length * 100 + item.type.length + index * 10;
       const adjustedRarity = adjustRarityByRealm(
@@ -1676,7 +1676,7 @@ export function templateToAdventureResult(
       );
 
       if (adjustedRarity !== item.rarity) {
-        // 尝试找到相同类型但更高稀有度的物品
+        // Try to find item of same type but higher rarity
         const allItems = getAllItemsFromConstants();
         const sameTypeItems = allItems.filter(
           i => i.type === item.type && i.rarity === adjustedRarity
@@ -1695,7 +1695,7 @@ export function templateToAdventureResult(
             equipmentSlot: selectedItem.equipmentSlot as EquipmentSlot | undefined,
           };
 
-          // 对丹药和草药的效果根据境界倍数进行调整
+          // Adjust Herb and Chem effects based on realm multiplier
           if (adjustedItem.type === ItemType.Pill || adjustedItem.type === ItemType.Herb) {
             const adjustedEffect = adjustedItem.effect ? { ...adjustedItem.effect } : undefined;
             const adjustedPermanentEffect = adjustedItem.permanentEffect ? { ...adjustedItem.permanentEffect } : undefined;
@@ -1728,13 +1728,13 @@ export function templateToAdventureResult(
 
           return adjustedItem;
         } else {
-          // 保持原物品但提升稀有度
+          // Keep original item but upgrade rarity
           const adjustedItem = {
             ...item,
             rarity: adjustedRarity,
           };
 
-          // 对丹药和草药的效果根据境界倍数进行调整
+          // Adjust Herb and Chem effects based on realm multiplier
           if (adjustedItem.type === ItemType.Pill || adjustedItem.type === ItemType.Herb) {
             const adjustedEffect = adjustedItem.effect ? { ...adjustedItem.effect } : undefined;
             const adjustedPermanentEffect = adjustedItem.permanentEffect ? { ...adjustedItem.permanentEffect } : undefined;
@@ -1769,7 +1769,7 @@ export function templateToAdventureResult(
         }
       }
 
-      // 对原始物品也应用倍数调整（如果是丹药或草药）
+      // Apply multiplier adjustment to original item as well (if it is Chem or Herb)
       if (item.type === ItemType.Pill || item.type === ItemType.Herb) {
         const adjustedEffect = item.effect ? { ...item.effect } : undefined;
         const adjustedPermanentEffect = item.permanentEffect ? { ...item.permanentEffect } : undefined;
@@ -1820,72 +1820,72 @@ export function templateToAdventureResult(
   if (template.heavenEarthSoulEncounter !== undefined) result.heavenEarthSoulEncounter = template.heavenEarthSoulEncounter;
   if (template.adventureType !== undefined) result.adventureType = template.adventureType;
 
-  // 测试环境打印事件模板返回结果
+  // Log event template result in dev environment
   if (import.meta.env.DEV) {
-    logger.log('=== 事件模板返回结果 ===');
-    logger.log('【模板信息】');
-    logger.log('  事件类型:', template.adventureType);
-    logger.log('  风险等级:', template.riskLevel || '无');
-    logger.log('  事件描述:', template.story);
-    logger.log('  原始数值:', {
+    logger.log('=== Event Template Result ===');
+    logger.log('【Template Info】');
+    logger.log('  Event Type:', template.adventureType);
+    logger.log('  Risk Level:', template.riskLevel || 'None');
+    logger.log('  Event Story:', template.story);
+    logger.log('  Original Values:', {
       hpChange: template.hpChange,
       expChange: template.expChange,
       spiritStonesChange: template.spiritStonesChange,
     });
-    logger.log('【玩家信息】');
-    logger.log('  境界:', player.realm);
-    logger.log('  境界等级:', player.realmLevel);
-    logger.log('  最大气血:', player.maxHp);
-    logger.log('  境界倍数:', realmMultiplier.toFixed(2));
-    logger.log('【转换结果】');
-    logger.log('  事件描述:', result.story);
-    logger.log('  气血变化:', result.hpChange);
-    logger.log('  修为变化:', result.expChange);
-    logger.log('  灵石变化:', result.spiritStonesChange);
-    logger.log('  事件颜色:', result.eventColor);
+    logger.log('【Player Info】');
+    logger.log('  Realm:', player.realm);
+    logger.log('  Realm Level:', player.realmLevel);
+    logger.log('  Max HP:', player.maxHp);
+    logger.log('  Realm Multiplier:', realmMultiplier.toFixed(2));
+    logger.log('【Conversion Result】');
+    logger.log('  Event Story:', result.story);
+    logger.log('  HP Change:', result.hpChange);
+    logger.log('  Exp Change:', result.expChange);
+    logger.log('  Caps Change:', result.spiritStonesChange);
+    logger.log('  Event Color:', result.eventColor);
     if (result.itemObtained) {
-      logger.log('  获得物品:', {
+      logger.log('  Item Obtained:', {
         name: result.itemObtained.name,
         type: result.itemObtained.type,
         rarity: result.itemObtained.rarity,
       });
     }
     if (result.itemsObtained && result.itemsObtained.length > 0) {
-      logger.log('  获得多个物品:', result.itemsObtained.map(item => ({
+      logger.log('  Multiple Items Obtained:', result.itemsObtained.map(item => ({
         name: item.name,
         type: item.type,
         rarity: item.rarity,
       })));
     }
     if (result.petObtained) {
-      logger.log('  获得灵宠:', result.petObtained);
+      logger.log('  Pet Obtained:', result.petObtained);
     }
     if (result.petOpportunity) {
-      logger.log('  灵宠机缘:', result.petOpportunity);
+      logger.log('  Pet Opportunity:', result.petOpportunity);
     }
     if (result.attributeReduction) {
-      logger.log('  属性降低:', result.attributeReduction);
+      logger.log('  Attribute Reduction:', result.attributeReduction);
     }
     if (result.reputationChange) {
-      logger.log('  声望变化:', result.reputationChange);
+      logger.log('  Reputation Change:', result.reputationChange);
     }
     if (result.reputationEvent) {
-      logger.log('  声望事件:', result.reputationEvent);
+      logger.log('  Reputation Event:', result.reputationEvent);
     }
     if (result.inheritanceLevelChange) {
-      logger.log('  传承等级变化:', result.inheritanceLevelChange);
+      logger.log('  Legacy Level Change:', result.inheritanceLevelChange);
     }
     if (result.triggerSecretRealm) {
-      logger.log('  触发秘境:', result.triggerSecretRealm);
+      logger.log('  Trigger Secret Realm:', result.triggerSecretRealm);
     }
     if (result.spiritualRootsChange) {
-      logger.log('  灵根变化:', result.spiritualRootsChange);
+      logger.log('  Spiritual Roots Change:', result.spiritualRootsChange);
     }
     if (result.lifespanChange) {
-      logger.log('  寿命变化:', result.lifespanChange);
+      logger.log('  Lifespan Change:', result.lifespanChange);
     }
     if (result.lotteryTicketsChange) {
-      logger.log('  抽奖券变化:', result.lotteryTicketsChange);
+      logger.log('  Lottery Tickets Change:', result.lotteryTicketsChange);
     }
     logger.log('======================');
   }

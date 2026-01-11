@@ -16,14 +16,14 @@ interface UseCharacterHandlersProps {
 }
 
 /**
- * 角色处理函数
- * 包含选择天赋、选择称号、分配属性
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @returns handleSelectTalent 选择天赋
- * @returns handleSelectTitle 选择称号
- * @returns handleAllocateAttribute 分配属性
+ * Character Handlers
+ * Includes selecting talents, titles, and allocating attributes
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @returns handleSelectTalent Select talent
+ * @returns handleSelectTitle Select title
+ * @returns handleAllocateAttribute Allocate attribute
  */
 export function useCharacterHandlers({
   player,
@@ -32,8 +32,8 @@ export function useCharacterHandlers({
   setItemActionLog,
 }: UseCharacterHandlersProps) {
   const handleSelectTalent = (talentId: string) => {
-    // 天赋在游戏开始时随机生成，之后不可修改
-    addLog('天赋在游戏开始时已确定，无法修改！', 'danger');
+    // Talents are randomly generated at the start of the game and cannot be changed
+    addLog('Talents are determined at the start of the game and cannot be changed!', 'danger');
     return;
   };
 
@@ -41,10 +41,10 @@ export function useCharacterHandlers({
     const title = TITLES.find((t) => t.id === titleId);
     if (!title) return;
 
-    // 检查是否已解锁该称号
+    // Check if unlocked
     const unlockedTitles = player.unlockedTitles || [];
     if (!unlockedTitles.includes(titleId)) {
-      const message = `你尚未解锁称号【${title.name}】！`;
+      const message = `You have not unlocked the title [${title.name}]!`;
       if (setItemActionLog) {
         setItemActionLog({ text: message, type: 'danger' });
       } else {
@@ -54,14 +54,14 @@ export function useCharacterHandlers({
     }
 
     setPlayer((prev) => {
-      // 计算旧称号效果（包括套装效果）
+      // Calculate old title effects (including set effects)
       const prevUnlockedTitles = prev.unlockedTitles || [];
       const oldEffects = calculateTitleEffects(prev.titleId, prevUnlockedTitles);
 
-      // 计算新称号效果（包括套装效果）
+      // Calculate new title effects (including set effects)
       const newEffects = calculateTitleEffects(titleId, prevUnlockedTitles);
 
-      // 应用效果差值
+      // Apply effect difference
       const attackDiff = newEffects.attack - oldEffects.attack;
       const defenseDiff = newEffects.defense - oldEffects.defense;
       const hpDiff = newEffects.hp - oldEffects.hp;
@@ -80,21 +80,21 @@ export function useCharacterHandlers({
       let newSpeed = prev.speed + speedDiff;
       let newLuck = prev.luck + luckDiff;
 
-      // 计算实际最大血量（包含功法加成等）
+      // Calculate actual max HP (including cultivation art bonuses etc.)
       const tempPlayer = { ...prev, maxHp: newMaxHp };
       const totalStats = getPlayerTotalStats(tempPlayer);
       const actualMaxHp = totalStats.maxHp;
 
-      let logMessage = `你装备了称号【${title.name}】！`;
+      let logMessage = `You equipped the title [${title.name}]!`;
 
-      // 检查是否有套装效果
+      // Check for set effects
       if (title.setGroup) {
         const setEffect = TITLE_SET_EFFECTS.find(se =>
           se.titles.includes(titleId) &&
           se.titles.every(tid => prevUnlockedTitles.includes(tid))
         );
         if (setEffect) {
-          logMessage += `\n✨ 激活了套装效果【${setEffect.setName}】！`;
+          logMessage += `\n✨ Activated set effect [${setEffect.setName}]!`;
         }
       }
 
@@ -105,7 +105,7 @@ export function useCharacterHandlers({
         attack: newAttack,
         defense: newDefense,
         maxHp: newMaxHp,
-        hp: Math.min(newHp, actualMaxHp), // 使用实际最大血量作为上限
+        hp: Math.min(newHp, actualMaxHp), // Use actual max HP as limit
         spirit: newSpirit,
         physique: newPhysique,
         speed: newSpeed,
@@ -129,10 +129,10 @@ export function useCharacterHandlers({
       let newPhysique = prev.physique;
       let newSpeed = prev.speed;
 
-      // 根据境界计算属性点加成倍数（线性增长，更平衡）
+      // Calculate attribute point bonus multiplier based on realm (linear growth, more balanced)
       const multiplier = getAttributeMultiplier(prev.realm);
 
-      // 基础属性增加值
+      // Base attribute gain
       const baseAttack = BASE_ATTRIBUTES.attack;
       const baseDefense = BASE_ATTRIBUTES.defense;
       const baseHp = BASE_ATTRIBUTES.hp;
@@ -144,41 +144,41 @@ export function useCharacterHandlers({
       if (type === 'attack') {
         const gain = Math.floor(baseAttack * multiplier);
         newAttack += gain;
-        addLog(`你分配了1点属性点到攻击力 (+${gain})`, 'gain');
+        addLog(`You allocated 1 attribute point to Attack (+${gain})`, 'gain');
       } else if (type === 'defense') {
         const gain = Math.floor(baseDefense * multiplier);
         newDefense += gain;
-        addLog(`你分配了1点属性点到防御力 (+${gain})`, 'gain');
+        addLog(`You allocated 1 attribute point to Defense (+${gain})`, 'gain');
       } else if (type === 'hp') {
         const gain = Math.floor(baseHp * multiplier);
         newMaxHp += gain;
         newHp += gain;
-        // 计算实际最大血量（包含功法加成等）作为上限
+        // Calculate actual max HP (including cultivation art bonuses etc.) as limit
         const tempPlayer = { ...prev, maxHp: newMaxHp };
         const totalStats = getPlayerTotalStats(tempPlayer);
         const actualMaxHp = totalStats.maxHp;
         newHp = Math.min(newHp, actualMaxHp);
-        addLog(`你分配了1点属性点到气血 (+${gain})`, 'gain');
+        addLog(`You allocated 1 attribute point to HP (+${gain})`, 'gain');
       } else if (type === 'spirit') {
         const gain = Math.floor(baseSpirit * multiplier);
         newSpirit += gain;
-        addLog(`你分配了1点属性点到神识 (+${gain})`, 'gain');
+        addLog(`You allocated 1 attribute point to Spirit (+${gain})`, 'gain');
       } else if (type === 'physique') {
         const physiqueGain = Math.floor(basePhysique * multiplier);
         const hpGain = Math.floor(basePhysiqueHp * multiplier);
         newPhysique += physiqueGain;
         newMaxHp += hpGain;
         newHp += hpGain;
-        // 计算实际最大血量（包含功法加成等）作为上限
+        // Calculate actual max HP (including cultivation art bonuses etc.) as limit
         const tempPlayer = { ...prev, maxHp: newMaxHp };
         const totalStats = getPlayerTotalStats(tempPlayer);
         const actualMaxHp = totalStats.maxHp;
         newHp = Math.min(newHp, actualMaxHp);
-        addLog(`你分配了1点属性点到体魄 (+${physiqueGain}体魄, +${hpGain}气血)`, 'gain');
+        addLog(`You allocated 1 attribute point to Physique (+${physiqueGain} Physique, +${hpGain} HP)`, 'gain');
       } else if (type === 'speed') {
         const gain = Math.floor(baseSpeed * multiplier);
         newSpeed += gain;
-        addLog(`你分配了1点属性点到速度 (+${gain})`, 'gain');
+        addLog(`You allocated 1 attribute point to Speed (+${gain})`, 'gain');
       }
 
       return {
@@ -210,10 +210,10 @@ export function useCharacterHandlers({
       let newPhysique = prev.physique;
       let newSpeed = prev.speed;
 
-      // 根据境界计算属性点加成倍数（线性增长，更平衡）
+      // Calculate attribute point bonus multiplier based on realm (linear growth, more balanced)
       const multiplier = getAttributeMultiplier(prev.realm);
 
-      // 基础属性增加值
+      // Base attribute gain
       const baseAttack = BASE_ATTRIBUTES.attack;
       const baseDefense = BASE_ATTRIBUTES.defense;
       const baseHp = BASE_ATTRIBUTES.hp;
@@ -222,7 +222,7 @@ export function useCharacterHandlers({
       const basePhysiqueHp = BASE_ATTRIBUTES.physiqueHp;
       const baseSpeed = BASE_ATTRIBUTES.speed;
 
-      // 计算总增加值
+      // Calculate total gain
       let totalGain = 0;
       let totalPhysiqueGain = 0;
       let totalHpGain = 0;
@@ -230,44 +230,44 @@ export function useCharacterHandlers({
       if (type === 'attack') {
         totalGain = Math.floor(baseAttack * multiplier * pointsToAllocate);
         newAttack += totalGain;
-        addLog(`你一键分配了 ${pointsToAllocate} 点属性点到攻击力 (+${totalGain})`, 'gain');
+        addLog(`You auto-allocated ${pointsToAllocate} attribute points to Attack (+${totalGain})`, 'gain');
       } else if (type === 'defense') {
         totalGain = Math.floor(baseDefense * multiplier * pointsToAllocate);
         newDefense += totalGain;
-        addLog(`你一键分配了 ${pointsToAllocate} 点属性点到防御力 (+${totalGain})`, 'gain');
+        addLog(`You auto-allocated ${pointsToAllocate} attribute points to Defense (+${totalGain})`, 'gain');
       } else if (type === 'hp') {
         totalGain = Math.floor(baseHp * multiplier * pointsToAllocate);
         newMaxHp += totalGain;
         newHp += totalGain;
-        // 计算实际最大血量（包含功法加成等）作为上限
+        // Calculate actual max HP (including cultivation art bonuses etc.) as limit
         const tempPlayer = { ...prev, maxHp: newMaxHp };
         const totalStats = getPlayerTotalStats(tempPlayer);
         const actualMaxHp = totalStats.maxHp;
         newHp = Math.min(newHp, actualMaxHp);
-        addLog(`你一键分配了 ${pointsToAllocate} 点属性点到气血 (+${totalGain})`, 'gain');
+        addLog(`You auto-allocated ${pointsToAllocate} attribute points to HP (+${totalGain})`, 'gain');
       } else if (type === 'spirit') {
         totalGain = Math.floor(baseSpirit * multiplier * pointsToAllocate);
         newSpirit += totalGain;
-        addLog(`你一键分配了 ${pointsToAllocate} 点属性点到神识 (+${totalGain})`, 'gain');
+        addLog(`You auto-allocated ${pointsToAllocate} attribute points to Spirit (+${totalGain})`, 'gain');
       } else if (type === 'physique') {
         totalPhysiqueGain = Math.floor(basePhysique * multiplier * pointsToAllocate);
         totalHpGain = Math.floor(basePhysiqueHp * multiplier * pointsToAllocate);
         newPhysique += totalPhysiqueGain;
         newMaxHp += totalHpGain;
         newHp += totalHpGain;
-        // 计算实际最大血量（包含功法加成等）作为上限
+        // Calculate actual max HP (including cultivation art bonuses etc.) as limit
         const tempPlayer = { ...prev, maxHp: newMaxHp };
         const totalStats = getPlayerTotalStats(tempPlayer);
         const actualMaxHp = totalStats.maxHp;
         newHp = Math.min(newHp, actualMaxHp);
         addLog(
-          `你一键分配了 ${pointsToAllocate} 点属性点到体魄 (+${totalPhysiqueGain}体魄, +${totalHpGain}气血)`,
+          `You auto-allocated ${pointsToAllocate} attribute points to Physique (+${totalPhysiqueGain} Physique, +${totalHpGain} HP)`,
           'gain'
         );
       } else if (type === 'speed') {
         totalGain = Math.floor(baseSpeed * multiplier * pointsToAllocate);
         newSpeed += totalGain;
-        addLog(`你一键分配了 ${pointsToAllocate} 点属性点到速度 (+${totalGain})`, 'gain');
+        addLog(`You auto-allocated ${pointsToAllocate} attribute points to Speed (+${totalGain})`, 'gain');
       }
 
       return {
@@ -287,17 +287,17 @@ export function useCharacterHandlers({
   const handleResetAttributes = () => {
     if (!player) return;
 
-    // 计算重置成本：每点已分配属性点需要100灵石
-    const allocatedPoints = 0; // 这里需要追踪已分配的属性点，暂时设为0
+    // Calculate reset cost: 100 Spirit Stones per allocated point
+    const allocatedPoints = 0; // Need to track allocated points here, temporarily set to 0
     const cost = allocatedPoints * 100;
 
     if (player.spiritStones < cost) {
-      addLog(`重置属性需要 ${cost} 灵石，你的灵石不足！`, 'danger');
+      addLog(`Resetting attributes costs ${cost} Spirit Stones. You don't have enough!`, 'danger');
       return;
     }
 
-    // 暂时提示功能未完全实现
-    addLog('属性重置功能需要追踪已分配属性点，暂时未完全实现。', 'danger');
+    // Temporarily indicate feature not fully implemented
+    addLog('Attribute reset requires tracking allocated points. Not fully implemented yet.', 'danger');
   };
 
   return {

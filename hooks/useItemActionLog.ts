@@ -1,14 +1,14 @@
 /**
- * 物品操作日志 Hook
- * 封装了延迟状态管理逻辑，用于显示临时物品操作消息
+ * Item Action Log Hook
+ * Encapsulates delayed state management logic for displaying temporary item action messages
  *
  * @example
  * const { itemActionLog, setItemActionLog } = useItemActionLog();
  *
- * // 设置日志，3秒后自动清除
- * setItemActionLog({ text: '你装备了武器', type: 'normal' });
+ * // Set log, automatically clears after 3 seconds
+ * setItemActionLog({ text: 'You equipped a weapon', type: 'normal' });
  *
- * // 立即清除
+ * // Clear immediately
  * setItemActionLog(null);
  */
 
@@ -23,68 +23,68 @@ export interface ItemActionLog {
 
 export interface UseItemActionLogOptions {
   /**
-   * 延迟清除时间（毫秒），默认 3000ms
+   * Delay clear time (ms), default 3000ms
    */
   delay?: number;
   /**
-   * 外部状态设置函数（可选）
-   * 如果提供，会将延迟状态同步到外部状态
+   * External state setter (optional)
+   * If provided, syncs delayed state to external state
    */
   externalSetter?: (value: ItemActionLog | null) => void;
 }
 
 export interface UseItemActionLogReturn {
   /**
-   * 当前日志值
+   * Current log value
    */
   itemActionLog: ItemActionLog | null;
   /**
-   * 设置日志函数
-   * @param log 日志对象或 null（用于清除）
+   * Set log function
+   * @param log Log object or null (to clear)
    */
   setItemActionLog: (log: ItemActionLog | null) => void;
 }
 
 /**
- * 物品操作日志 Hook
- * 封装了延迟状态管理逻辑，用于显示临时物品操作消息
+ * Item Action Log Hook
+ * Encapsulates delayed state management logic for displaying temporary item action messages
  *
- * @param options 配置选项
- * @returns 返回日志值和设置函数
+ * @param options Configuration options
+ * @returns Returns log value and setter function
  */
 export function useItemActionLog(
   options: UseItemActionLogOptions = {}
 ): UseItemActionLogReturn {
   const { delay = 3000, externalSetter } = options;
 
-  // 使用延迟状态管理
+  // Use delayed state management
   const [delayedItemActionLog, setDelayedItemActionLog] = useDelayedState<ItemActionLog>(delay);
 
-  // 同步延迟状态到外部状态（如果提供了外部设置函数）
+  // Sync delayed state to external state (if external setter provided)
   useEffect(() => {
     if (externalSetter) {
       externalSetter(delayedItemActionLog);
     }
   }, [delayedItemActionLog, externalSetter]);
 
-  // 包装设置函数，支持立即清除
+  // Wrap setter function to support immediate clear
   const setItemActionLog = useCallback(
     (log: ItemActionLog | null) => {
       if (log) {
-        // 设置日志，自动添加时间戳
+        // Set log, automatically add timestamp
         const logWithTimestamp = {
           ...log,
           timestamp: log.timestamp || Date.now(),
         };
-        // 设置日志，延迟状态会自动管理清除
+        // Set log, delayed state will automatically manage clearing
         setDelayedItemActionLog(logWithTimestamp);
       } else {
-        // 立即清除外部状态
+        // Immediately clear external state
         if (externalSetter) {
           externalSetter(null);
         }
-        // 注意：延迟状态会在延迟时间后自动清除
-        // 如果需要立即清除延迟状态，可以考虑扩展 useDelayedState 来支持直接清除
+        // Note: Delayed state will automatically clear after delay time
+        // If immediate clear of delayed state is needed, consider extending useDelayedState to support direct clearing
       }
     },
     [setDelayedItemActionLog, externalSetter]

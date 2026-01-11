@@ -19,12 +19,11 @@ interface UseAlchemyHandlersProps {
 }
 
 /**
- * 炼丹处理函数
- * 包含炼丹
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @returns handleCraft 炼丹
+ * Chem Lab processing functions
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @returns handleCraft Crafting function
  */
 export function useAlchemyHandlers({
   setPlayer,
@@ -32,12 +31,12 @@ export function useAlchemyHandlers({
   triggerVisual,
 }: UseAlchemyHandlersProps) {
   const handleCraft = async (recipe: Recipe) => {
-    // 先触发炼丹开始动画
+    // Trigger synthesis animation
     if (triggerVisual) {
-      triggerVisual('alchemy', '🔥 炼丹中...', 'text-amber-400');
+      triggerVisual('alchemy', '🔥 SYNTHESIZING...', 'text-amber-400');
     }
 
-    // 延迟一下，让用户看到炼丹过程
+    // Delay for visual effect
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     setPlayer((prev) => {
@@ -59,17 +58,17 @@ export function useAlchemyHandlers({
         name: recipe.result.name || 'Unknown',
         type: recipe.result.type || ItemType.Pill,
         description: recipe.result.description || '',
-        rarity: (recipe.result.rarity as ItemRarity) || '普通',
+        rarity: (recipe.result.rarity as ItemRarity) || 'Common',
         effect: recipe.result.effect,
         permanentEffect: recipe.result.permanentEffect,
       });
 
-      addLog(`丹炉火起，药香四溢。你炼制出了 ${recipe.result.name}。`, 'gain');
-      // 显示全局成功提示
-      showSuccess(`炼制成功！获得 ${recipe.result.name}`);
-      // 触发炼丹成功动画（更明显的效果）
+      addLog(`Synthesis complete. Produced: ${recipe.result.name}.`, 'gain');
+      // Show global success notification
+      showSuccess(`SYNTHESIS SUCCESSFUL: ${recipe.result.name}`);
+      // Trigger success animation
       if (triggerVisual) {
-        // 延迟触发成功动画，让用户看到完整的炼丹过程
+        // Delay for visual clarity
         setTimeout(() => {
           triggerVisual('alchemy', `✨ ${recipe.result.name}`, 'text-amber-400');
         }, 200);

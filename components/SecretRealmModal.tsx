@@ -82,25 +82,32 @@ const SecretRealmModal: React.FC<Props> = ({
                   }
                 `}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h4
-                    className={`text-xl font-serif font-bold ${locked ? 'text-stone-500' : 'text-purple-200 group-hover:text-purple-100'}`}
-                  >
-                    {realm.name}
-                  </h4>
-                  <span
-                    className={`
-                    text-xs px-2 py-0.5 rounded border
-                    ${realm.riskLevel === 'Extreme'
-                        ? 'text-red-500 border-red-900 bg-red-900/20'
-                        : realm.riskLevel === 'High'
-                          ? 'text-orange-400 border-orange-900 bg-orange-900/20'
-                          : 'text-yellow-400 border-yellow-900 bg-yellow-900/20'
-                      }
-                  `}
-                  >
-                    {realm.riskLevel} Risk
-                  </span>
+                <div className="flex justify-between items-start mb-2 relative">
+                  <div className="flex-1">
+                    <h4
+                      className={`text-xl font-serif font-bold ${locked ? 'text-stone-500' : 'text-purple-200 group-hover:text-purple-100'}`}
+                    >
+                      {realm.name}
+                    </h4>
+                    <span
+                      className={`
+                      inline-block mt-1 text-xs px-2 py-0.5 rounded border
+                      ${realm.riskLevel === 'Extreme'
+                          ? 'text-red-500 border-red-900 bg-red-900/20'
+                          : realm.riskLevel === 'High'
+                            ? 'text-orange-400 border-orange-900 bg-orange-900/20'
+                            : 'text-yellow-400 border-yellow-900 bg-yellow-900/20'
+                        }
+                    `}
+                    >
+                      {realm.riskLevel} Risk
+                    </span>
+                  </div>
+                  {realm.thumbnail && (
+                    <div className="ml-3 w-16 h-16 rounded border border-purple-900/50 overflow-hidden flex-shrink-0 bg-black/40">
+                      <img src={realm.thumbnail} alt={realm.name} className={`w-full h-full object-cover ${locked ? 'grayscale opacity-50' : ''}`} />
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-sm text-stone-500 mb-4 h-12">

@@ -21,12 +21,12 @@ const SectTreasureVaultModal: React.FC<Props> = ({
   onTakeItem,
   onUpdateVault,
 }) => {
-  // 生成宝库物品的辅助函数（使用 useCallback 避免不必要的重新创建）
+  // Helper function to generate vault items (use useCallback to avoid unnecessary recreation)
   const generateVaultItems = useCallback((realm: string): Item[] => {
     const items: Item[] = [];
-    const itemCount = 5 + Math.floor(Math.random() * 4); // 5-8个物品
+    const itemCount = 5 + Math.floor(Math.random() * 4); // 5-8 items
 
-    // 根据玩家境界决定稀有度分布
+    // Determine rarity distribution based on player realm
     const realmIndex = realm === RealmType.QiRefining ? 0 :
       realm === RealmType.Foundation ? 1 :
         realm === RealmType.GoldenCore ? 2 :
@@ -55,7 +55,7 @@ const SectTreasureVaultModal: React.FC<Props> = ({
 
     for (let i = 0; i < itemCount; i++) {
       const roll = Math.random();
-      let targetRarity: ItemRarity = '普通';
+      let targetRarity: ItemRarity = 'Common';
 
       if (roll < rarityChances['Mythic']) {
         targetRarity = 'Mythic';
@@ -66,20 +66,20 @@ const SectTreasureVaultModal: React.FC<Props> = ({
       } else {
         targetRarity = 'Common';
       }
-
-      // 筛选对应稀有度的物品
+      
+      // Filter items of the corresponding rarity
       let availableItems = allItems.filter(
         item => (item.rarity as any) === targetRarity && !selectedNames.has(item.name)
       );
 
-      // 如果该稀有度没有可用物品，降级查找（但保持稀有度标签）
+      // If no items available for this rarity, downgrade search (but keep rarity label)
       if (availableItems.length === 0 && targetRarity !== 'Common') {
         availableItems = allItems.filter(
           item => (item.rarity === 'Common' || item.rarity === 'Rare') && !selectedNames.has(item.name)
         );
       }
 
-      // 如果还是没有，允许重复（但保持稀有度标签）
+      // If still none, allow duplicates (but keep rarity label)
       if (availableItems.length === 0) {
         availableItems = allItems.filter(
           item => (item.rarity as any) === targetRarity || targetRarity === 'Common'
@@ -90,7 +90,7 @@ const SectTreasureVaultModal: React.FC<Props> = ({
         const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
         selectedNames.add(randomItem.name);
 
-        // 创建物品对象
+        // Create item object
         const item: Item = {
           id: uid(),
           name: randomItem.name,
@@ -111,21 +111,21 @@ const SectTreasureVaultModal: React.FC<Props> = ({
     return items;
   }, []);
 
-  // 初始化或获取宗门宝库物品（根据玩家境界生成高质量物品）
+  // Initialize or get sect vault items (generate high-quality items based on player realm)
   const vaultItems = useMemo(() => {
-    // 如果宝库已存在且有物品，使用现有物品并过滤已拿取的
+    // If vault exists and has items, use existing items and filter out taken ones
     if (player.sectTreasureVault && player.sectTreasureVault.items.length > 0) {
       const takenIds = new Set(player.sectTreasureVault.takenItemIds || []);
       return player.sectTreasureVault.items.filter(item => !takenIds.has(item.id));
     }
 
-    // 否则返回空数组（由 useEffect 处理初始化）
+    // Otherwise return empty array (initialization handled by useEffect)
     return [];
   }, [player.sectTreasureVault]);
 
-  // 使用 useEffect 处理宝库初始化，避免在 useMemo 中使用副作用
+  // Use useEffect for vault initialization to avoid side effects in useMemo
   useEffect(() => {
-    // 如果宝库为空且弹窗打开，生成新宝库
+    // If vault is empty and modal is open, generate new vault
     if (isOpen && onUpdateVault && (!player.sectTreasureVault || player.sectTreasureVault.items.length === 0)) {
       const items = generateVaultItems(player.realm);
       if (items.length > 0) {
@@ -137,7 +137,7 @@ const SectTreasureVaultModal: React.FC<Props> = ({
     }
   }, [isOpen, player.realm, player.sectTreasureVault, onUpdateVault, generateVaultItems]);
 
-  // 计算宝库统计信息
+  // Calculate vault statistics
   const vaultStats = useMemo(() => {
     if (!player.sectTreasureVault) {
       return { total: 0, taken: 0, remaining: 0 };
@@ -154,7 +154,7 @@ const SectTreasureVaultModal: React.FC<Props> = ({
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[70] p-4 backdrop-blur-sm">
       <div className="bg-ink-950 w-full max-w-4xl md:rounded-none border border-stone-800 shadow-2xl relative flex flex-col max-h-[85vh] overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 扫描线效果 */}
+        {/* CRT scanline effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
 
         <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 z-10">

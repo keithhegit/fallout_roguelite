@@ -46,7 +46,7 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
   const [upgradeStones, setUpgradeStones] = useState(0);
   const [isUpgrading, setIsUpgrading] = useState(false);
 
-  // 当 Modal 打开时重置状态
+  // Reset state when Modal opens
   useEffect(() => {
     if (isOpen && item) {
       setUpgradeStones(0);
@@ -56,25 +56,25 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
 
   if (!isOpen || !item) return null;
 
-  // 从玩家库存中获取最新的物品信息（确保显示的是最新数据）
+  // Get latest item info from player inventory (ensure showing latest data)
   const currentItem = player.inventory.find((i) => i.id === item.id) || item;
 
   const currentLevel = currentItem.level || 0;
   const nextLevel = currentLevel + 1;
-  const rarity = currentItem.rarity || '普通';
+  const rarity = currentItem.rarity || 'Common';
   const rarityMult = RARITY_MULTIPLIERS[rarity];
 
-  // Cost Calculation - 每次强化后炼器石需求增加
-  // 灵石消耗：基础消耗 * (等级+1) * 品质倍率 * (1 + 等级 * 0.25) - 高等级增长更快
+  // Cost Calculation - Upgrade stone requirement increases after each upgrade
+  // Spirit Stone Cost: Base * (Level+1) * Rarity Multiplier * (1 + Level * 0.25) - Grows faster at high levels
   const costStones = Math.floor(
     BASE_UPGRADE_COST_STONES * (currentLevel + 1) * rarityMult * (1 + currentLevel * 0.25)
   );
-  // 材料消耗：基础消耗 * 品质倍率 * (等级+1) * (1 + 等级 * 0.5) - 高等级和品质消耗大幅增加
+  // Material Cost: Base * Rarity Multiplier * (Level+1) * (1 + Level * 0.5) - Increases significantly at high levels and rarities
   const costMats = Math.floor(
     BASE_UPGRADE_COST_MATS * rarityMult * (currentLevel + 1) * (1 + currentLevel * 0.5)
   );
 
-  // 计算基础成功率（根据稀有度和等级）
+  // Calculate base success rate (based on rarity and level)
   const baseSuccessRate = Math.max(
     0.1,
     1 - currentLevel * 0.1 - (rarityMult - 1) * 0.15
@@ -119,14 +119,14 @@ const ArtifactUpgradeModal: React.FC<Props> = ({
         className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-md rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* CRT 效果层 */}
+        {/* CRT Effect Layer */}
         <div className="absolute inset-0 pointer-events-none z-50">
           <div className="absolute inset-0 crt-noise opacity-[0.03]"></div>
           <div className="absolute inset-0 scanline-overlay opacity-[0.05]"></div>
           <div className="absolute inset-0 crt-vignette"></div>
         </div>
 
-        {/* 强化动画覆盖层 */}
+        {/* Upgrade Animation Overlay */}
         {isUpgrading && (
           <div className="absolute inset-0 bg-ink-950/90 z-[60] flex items-center justify-center">
             <div className="text-center p-8 border border-amber-500/30 bg-ink-900 relative">

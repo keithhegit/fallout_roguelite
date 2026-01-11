@@ -16,18 +16,18 @@ interface UseRealmHandlersProps {
 }
 
 /**
- * 秘境处理函数
- * 包含进入秘境
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @param setLoading 设置加载状态
- * @param setCooldown 设置冷却时间
- * @param loading 加载状态
- * @param cooldown 冷却时间
- * @param setIsRealmOpen 设置秘境是否打开
- * @param executeAdventure 执行历练
- * @returns handleEnterRealm 进入秘境
+ * Realm Handler
+ * Includes entering secret realm
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @param setLoading Set loading state
+ * @param setCooldown Set cooldown
+ * @param loading Loading state
+ * @param cooldown Cooldown time
+ * @param setIsRealmOpen Set realm modal open state
+ * @param executeAdventure Execute adventure
+ * @returns handleEnterRealm Enter secret realm
  */
 
 export function useRealmHandlers({
@@ -43,10 +43,10 @@ export function useRealmHandlers({
   const handleEnterRealm = async (realm: SecretRealm) => {
     if (loading || cooldown > 0 || !player) return;
 
-    // 使用实际最大血量（包含金丹法数加成等）来判断气血不足
+    // Use actual max HP (including Golden Core bonuses etc.) to judge if HP is sufficient
     const totalStats = getPlayerTotalStats(player);
     if (player.hp < totalStats.maxHp * 0.3) {
-      const message = '你气血不足，此时进入秘境无异于自寻死路！';
+      const message = 'Your HP is too low! Entering the Secret Realm now is suicide!';
       addLog(message, 'danger');
       if (setItemActionLog) {
         setItemActionLog({ text: message, type: 'danger' });
@@ -55,7 +55,7 @@ export function useRealmHandlers({
     }
 
     if (player.spiritStones < realm.cost) {
-      addLog('囊中羞涩，无法支付开启秘境的灵石。', 'danger');
+      addLog('Insufficient Spirit Stones to open the Secret Realm.', 'danger');
       return;
     }
 
@@ -65,7 +65,7 @@ export function useRealmHandlers({
     }));
     setIsRealmOpen(false); // Close modal
 
-    // Secret Realm Adventure - 传递秘境的完整信息
+    // Secret Realm Adventure - Pass full realm info
     await executeAdventure('secret_realm', realm.name, realm.riskLevel, realm.minRealm, realm.description);
   };
 

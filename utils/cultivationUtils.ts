@@ -2,7 +2,7 @@ import { PlayerStats } from '../types';
 import { FOUNDATION_TREASURES, HEAVEN_EARTH_ESSENCES, HEAVEN_EARTH_MARROWS, LONGEVITY_RULES, GOLDEN_CORE_METHOD_CONFIG, CULTIVATION_ARTS } from '../constants/index';
 
 /**
- * 获取筑基奇物效果
+ * Get Foundation Treasure Effects
  */
 export function getFoundationTreasureEffects(treasureId?: string) {
   if (!treasureId) return {};
@@ -11,7 +11,7 @@ export function getFoundationTreasureEffects(treasureId?: string) {
 }
 
 /**
- * 获取天地精华效果
+ * Get Heaven Earth Essence Effects
  */
 export function getHeavenEarthEssenceEffects(essenceId?: string) {
   if (!essenceId) return {};
@@ -20,7 +20,7 @@ export function getHeavenEarthEssenceEffects(essenceId?: string) {
 }
 
 /**
- * 获取天地之髓效果
+ * Get Heaven Earth Marrow Effects
  */
 export function getHeavenEarthMarrowEffects(marrowId?: string) {
   if (!marrowId) return {};
@@ -29,7 +29,7 @@ export function getHeavenEarthMarrowEffects(marrowId?: string) {
 }
 
 /**
- * 获取规则之力效果
+ * Get Longevity Rule Effects
  */
 export function getLongevityRuleEffects(ruleIds: string[] = []) {
   const effects = {
@@ -49,11 +49,11 @@ export function getLongevityRuleEffects(ruleIds: string[] = []) {
         if (key === 'specialEffect') {
           effects.specialEffect += rule.effects.specialEffect + '; ';
         } else if (key in effects && key in rule.effects) {
-          // 使用类型安全的键访问，明确处理数字类型
+          // Use type-safe key access, handle number types explicitly
           const effectKey = key as keyof typeof effects;
           const ruleEffectKey = key as keyof typeof rule.effects;
 
-          // 确保只处理数字类型的属性
+          // Ensure only number types are processed
           if (effectKey !== 'specialEffect') {
             const effectValue = effects[effectKey] as number;
             const ruleValue = (rule.effects[ruleEffectKey] || 0) as number;
@@ -70,11 +70,11 @@ export function getLongevityRuleEffects(ruleIds: string[] = []) {
 // Removed numberToChinese as we now use simple Arabic numerals for mutant paths.
 
 /**
- * 计算金丹法数（只统计玄级及以上功法）
+ * Calculate Golden Core Method Count (Only count Grade B and above)
  */
 export function calculateGoldenCoreMethodCount(player: PlayerStats): number {
-  // 只统计玄级及以上的功法（玄、地、天）
-  // 兼容旧存档：如果cultivationArts不存在或为空，返回0
+  // Only count Grade B and above (B, A, S)
+  // Compatibility with old saves: if cultivationArts does not exist or is empty, return 0
   if (!player.cultivationArts || player.cultivationArts.length === 0) {
     return 0;
   }
@@ -87,7 +87,7 @@ export function calculateGoldenCoreMethodCount(player: PlayerStats): number {
     }
   });
 
-  return count; // 不设上限
+  return count; // No limit
 }
 
 export function getGoldenCoreMethodTitle(methodCount: number): string {
@@ -96,18 +96,18 @@ export function getGoldenCoreMethodTitle(methodCount: number): string {
 }
 
 /**
- * 计算金丹天劫难度倍数（支持任意法数）
+ * Calculate Golden Core Tribulation Difficulty Multiplier (Supports any method count)
  */
 export function getGoldenCoreTribulationDifficulty(methodCount: number): number {
   if (methodCount <= 0) return 1.0;
 
-  // 如果配置中有，直接使用
+  // If config exists, use it directly
   if (methodCount <= 9 && GOLDEN_CORE_METHOD_CONFIG.methodDifficultyMultiplier[methodCount]) {
     return GOLDEN_CORE_METHOD_CONFIG.methodDifficultyMultiplier[methodCount];
   }
 
-  // 大于9法金丹，使用公式计算：基础难度 + (法数-1) * 0.5
-  // 9法金丹是5.0，10法开始是 5.0 + (10-9) * 0.5 = 5.5，以此类推
+  // For >9 methods, use formula: Base Difficulty + (Count - 9) * 0.5
+  // 9 methods is 5.0, 10 methods starts at 5.0 + (10-9) * 0.5 = 5.5, and so on
   if (methodCount > 9) {
     const base9Difficulty = GOLDEN_CORE_METHOD_CONFIG.methodDifficultyMultiplier[9] || 5.0;
     return base9Difficulty + (methodCount - 9) * 0.5;
@@ -117,25 +117,25 @@ export function getGoldenCoreTribulationDifficulty(methodCount: number): number 
 }
 
 /**
- * 计算金丹属性加成倍数（支持任意法数）
+ * Calculate Golden Core Attribute Bonus Multiplier (Supports any method count)
  */
 export function getGoldenCoreBonusMultiplier(methodCount: number): number {
   if (methodCount <= 0) return 1.0;
 
-  // 如果配置中有，直接使用
+  // If config exists, use it directly
   if (methodCount <= 9 && GOLDEN_CORE_METHOD_CONFIG.methodBonusMultiplier[methodCount]) {
     return GOLDEN_CORE_METHOD_CONFIG.methodBonusMultiplier[methodCount];
   }
 
-  // 大于9法金丹，使用公式计算：9法金丹是4.6，10法开始是 4.6 + (10-9) * 0.1 = 4.7，但增长速度递减
-  // 使用对数增长模式，让加成增长速度逐渐放缓
+  // For >9 methods, use formula: 9 methods is 4.6, 10 methods starts at 4.6 + (10-9) * 0.1 = 4.7, but growth rate decreases
+  // Use logarithmic growth pattern to slow down bonus growth
   if (methodCount > 9) {
     const base9Multiplier = GOLDEN_CORE_METHOD_CONFIG.methodBonusMultiplier[9] || 4.6;
-    // 超过9法后，每增加1法，加成增加量递减：第10法+0.1，第11法+0.09，第12法+0.08...
+    // After 9 methods, increment decreases for each additional method: 10th +0.1, 11th +0.09, 12th +0.08...
     const extraMethods = methodCount - 9;
     let additionalBonus = 0;
     for (let i = 1; i <= extraMethods; i++) {
-      additionalBonus += Math.max(0.05, 0.1 - (i - 1) * 0.01); // 最小增长0.05
+      additionalBonus += Math.max(0.05, 0.1 - (i - 1) * 0.01); // Minimum increment 0.05
     }
     return base9Multiplier + additionalBonus;
   }
@@ -144,7 +144,7 @@ export function getGoldenCoreBonusMultiplier(methodCount: number): number {
 }
 
 /**
- * 检查晋升条件
+ * Check Breakthrough Conditions
  */
 export function checkBreakthroughConditions(player: PlayerStats, targetRealm: string): {
   canBreakthrough: boolean;
@@ -225,133 +225,133 @@ export function checkBreakthroughConditions(player: PlayerStats, targetRealm: st
 }
 
 /**
- * 生成金丹天劫解密游戏（数字序列找规律）
+ * Generate Golden Core Tribulation Puzzle (Numeric Sequence Pattern)
  */
 export function generateGoldenCorePuzzle(methodCount: number): {
-  puzzleType: '数字序列';
+  puzzleType: 'Numeric Sequence';
   difficulty: number;
   description: string;
-  sequence: number[]; // 显示的序列（最后一个用?表示）
-  solution: number; // 正确答案
-  pattern: string; // 规律描述
+  sequence: number[]; // Sequence to display (last one is ?)
+  solution: number; // Correct answer
+  pattern: string; // Pattern description
   maxAttempts: number;
 } {
   const difficulty = getGoldenCoreTribulationDifficulty(methodCount);
 
-  // 根据难度生成不同复杂度的序列
+  // Generate sequences of varying complexity based on difficulty
   let sequence: number[] = [];
   let solution: number;
   let pattern: string;
 
-  // 难度分级调整：1简单，2-3中等，4+困难（略微提升难度）
+  // Difficulty tiers: 1 Simple, 2-3 Medium, 4+ Hard (Slightly increased)
   const difficultyLevel = Math.min(Math.floor(difficulty), 6);
 
   if (difficultyLevel <= 1) {
-    // 简单：等差数列（增加序列长度到5个，让规律更明显但需要更多观察）
+    // Simple: Arithmetic progression (Increase length to 5, make pattern obvious but requires observation)
     const start = Math.floor(Math.random() * 15) + 1;
-    const step = Math.floor(Math.random() * 6) + 2; // 步长2-7（略微增加范围）
+    const step = Math.floor(Math.random() * 6) + 2; // Step 2-7
     sequence = [start, start + step, start + step * 2, start + step * 3, start + step * 4];
     solution = start + step * 5;
-    pattern = `等差数列，每次增加 ${step}`;
+    pattern = `Arithmetic sequence, add ${step} each time`;
   } else if (difficultyLevel <= 3) {
-    // 中等：等比数列、递增步长或混合规律
+    // Medium: Geometric, Incremental Step, or Mixed
     const type = Math.floor(Math.random() * 3);
     if (type === 0) {
-      // 等比数列（增加序列长度）
+      // Geometric progression
       const start = Math.floor(Math.random() * 5) + 2;
-      const ratio = Math.floor(Math.random() * 3) + 2; // 倍数2-4
+      const ratio = Math.floor(Math.random() * 3) + 2; // Ratio 2-4
       sequence = [start, start * ratio, start * ratio * ratio, start * ratio * ratio * ratio, start * ratio * ratio * ratio * ratio];
       solution = start * ratio * ratio * ratio * ratio * ratio;
-      pattern = `等比数列，每次乘以 ${ratio}`;
+      pattern = `Geometric sequence, multiply by ${ratio} each time`;
     } else if (type === 1) {
-      // 递增步长（增加序列长度）
+      // Incremental Step
       const start = Math.floor(Math.random() * 10) + 1;
       sequence = [start, start + 2, start + 5, start + 9, start + 14]; // +2, +3, +4, +5
       solution = start + 20; // +6
-      pattern = `递增步长：+2, +3, +4, +5, +6...`;
+      pattern = `Incremental step: +2, +3, +4, +5, +6...`;
     } else {
-      // 递减步长（新类型）
+      // Decreasing then Increasing (New type)
       const start = Math.floor(Math.random() * 30) + 20;
       sequence = [start, start - 3, start - 5, start - 6, start - 6]; // -3, -2, -1, 0
-      solution = start - 5; // +1（开始递增）
-      pattern = `先递减后递增的规律`;
+      solution = start - 5; // +1 (Start increasing)
+      pattern = `Decreasing then increasing pattern`;
     }
   } else {
-    // 困难：复杂规律（增加更多类型）
+    // Hard: Complex patterns
     const type = Math.floor(Math.random() * 5);
     if (type === 0) {
-      // 平方序列
+      // Square sequence
       const base = Math.floor(Math.random() * 5) + 2;
       sequence = [base * base, (base + 1) * (base + 1), (base + 2) * (base + 2), (base + 3) * (base + 3), (base + 4) * (base + 4)];
       solution = (base + 5) * (base + 5);
-      pattern = `平方序列：${base}², ${base + 1}², ${base + 2}²...`;
+      pattern = `Square sequence: ${base}², ${base + 1}², ${base + 2}²...`;
     } else if (type === 1) {
-      // 斐波那契变种（改进）
+      // Fibonacci Variant
       const a = Math.floor(Math.random() * 5) + 1;
       const b = Math.floor(Math.random() * 5) + 1;
       sequence = [a, b, a + b, a + b * 2, a * 2 + b * 3];
       solution = a * 3 + b * 5;
-      pattern = `斐波那契变种：每个数是前两个数的组合`;
+      pattern = `Fibonacci variant: Each number is sum of previous two`;
     } else if (type === 2) {
-      // 交替规律（改进）
+      // Alternating Pattern
       const start = Math.floor(Math.random() * 10) + 1;
       sequence = [start, start * 2, start * 2 + 3, (start * 2 + 3) * 2, (start * 2 + 3) * 2 + 3];
       solution = ((start * 2 + 3) * 2 + 3) * 2;
-      pattern = `交替规律：×2 和 +3 交替`;
+      pattern = `Alternating: *2 then +3`;
     } else if (type === 3) {
-      // 质数序列（新类型）
+      // Prime Sequence
       const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
       const startIdx = Math.floor(Math.random() * 4);
       sequence = primes.slice(startIdx, startIdx + 5);
       solution = primes[startIdx + 5];
-      pattern = `质数序列`;
+      pattern = `Prime number sequence`;
     } else {
-      // 立方序列（新类型）
+      // Cube Sequence
       const base = Math.floor(Math.random() * 4) + 2;
       sequence = [base * base * base, (base + 1) ** 3, (base + 2) ** 3, (base + 3) ** 3, (base + 4) ** 3];
       solution = (base + 5) ** 3;
-      pattern = `立方序列：${base}³, ${base + 1}³, ${base + 2}³...`;
+      pattern = `Cube sequence: ${base}³, ${base + 1}³, ${base + 2}³...`;
     }
   }
 
   return {
-    puzzleType: '数字序列',
+    puzzleType: 'Numeric Sequence',
     difficulty,
-    description: `请仔细观察数字序列的规律，找出下一个数字。`,
+    description: `Observe the sequence pattern and find the next number.`,
     sequence,
     solution,
     pattern,
-    maxAttempts: Math.max(3, 9 - Math.floor(difficulty)) // 略微减少尝试次数
+    maxAttempts: Math.max(3, 9 - Math.floor(difficulty)) // Slightly reduce attempts
   };
 }
 
 /**
- * 生成元婴天劫解密游戏（2048）
+ * Generate Nascent Soul Tribulation Puzzle (2048)
  */
 export function generateNascentSoulPuzzle(essenceQuality: number): {
-  puzzleType: '天地棋局';
+  puzzleType: 'Celestial Grid';
   difficulty: number;
   description: string;
   targetScore: number;
 } {
   const difficulty = essenceQuality / 100;
 
-  // 固定目标分数为1000（元婴天劫）
+  // Fixed target score 1000 (Nascent Soul Tribulation)
   const targetScore = 1000;
 
   return {
-    puzzleType: '天地棋局',
+    puzzleType: 'Celestial Grid',
     difficulty,
-    description: `通过移动方块合成更大的数字，达到目标分数 ${targetScore} 即可通过天劫。使用方向键或点击按钮移动。`,
+    description: `Merge blocks to reach the target score ${targetScore} to bypass the firewall. Use arrow keys or buttons.`,
     targetScore
   };
 }
 
 /**
- * 生成化神天劫解密游戏（符文序列）
+ * Generate Spirit Severing Tribulation Puzzle (Rune Sequence)
  */
 export function generateSpiritSeveringPuzzle(marrowQuality: number): {
-  puzzleType: '符文序列';
+  puzzleType: 'Rune Sequence';
   difficulty: number;
   description: string;
   sequence: string[];
@@ -361,15 +361,15 @@ export function generateSpiritSeveringPuzzle(marrowQuality: number): {
   const difficulty = marrowQuality / 100;
   const sequenceLength = Math.min(4 + Math.floor(difficulty * 2), 8);
 
-  // 生成符文序列
-  const symbols = ['天', '地', '玄', '黄', '宇', '宙', '洪', '荒'];
+  // Generate rune sequence
+  const symbols = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta'];
   const targetSequence = Array.from({ length: sequenceLength }, () =>
     symbols[Math.floor(Math.random() * symbols.length)]
   );
 
-  // 生成初始序列（与目标序列稍有不同）
+  // Generate initial sequence (slightly shuffled)
   const initialSequence = [...targetSequence];
-  // 随机打乱几个位置
+  // Shuffle a few positions
   for (let i = 0; i < Math.floor(difficulty); i++) {
     const pos1 = Math.floor(Math.random() * sequenceLength);
     const pos2 = Math.floor(Math.random() * sequenceLength);
@@ -377,9 +377,9 @@ export function generateSpiritSeveringPuzzle(marrowQuality: number): {
   }
 
   return {
-    puzzleType: '符文序列',
+    puzzleType: 'Rune Sequence',
     difficulty,
-    description: '请将符文按照正确的顺序排列。每个操作可以交换相邻的两个符文。',
+    description: 'Arrange the runes in the correct order. Click to swap adjacent runes.',
     sequence: initialSequence,
     targetSequence,
     maxSteps: Math.max(5, 15 - Math.floor(difficulty * 3))
@@ -387,69 +387,69 @@ export function generateSpiritSeveringPuzzle(marrowQuality: number): {
 }
 
 /**
- * 生成长生天劫解密游戏（五重考验）
+ * Generate Longevity Tribulation Puzzle (Five Trials)
  */
 export function generateLongevityPuzzle(ruleCount: number): {
-  puzzleType: '五重考验';
+  puzzleType: 'Five Trials';
   description: string;
   challenges: Array<{
-    type: '八卦阵' | '天地棋局' | '符文序列' | '心魔考验' | '天道问答';
+    type: 'Octagram Array' | 'Celestial Grid' | 'Rune Sequence' | 'Inner Demon Trial' | 'System Inquiry';
     difficulty: number;
     data: any;
   }>;
 } {
   const challenges: Array<{
-    type: '八卦阵' | '天地棋局' | '符文序列' | '心魔考验' | '天道问答';
+    type: 'Octagram Array' | 'Celestial Grid' | 'Rune Sequence' | 'Inner Demon Trial' | 'System Inquiry';
     difficulty: number;
     data: any;
   }> = [
       {
-        type: '八卦阵' as const,
+        type: 'Octagram Array' as const,
         difficulty: 0.8 + ruleCount * 0.1,
         data: generateGoldenCorePuzzle(Math.min(ruleCount + 3, 9))
       },
       {
-        type: '天地棋局' as const,
+        type: 'Celestial Grid' as const,
         difficulty: 0.9 + ruleCount * 0.1,
         data: {
           ...generateNascentSoulPuzzle(80 + ruleCount * 10),
-          targetScore: 2000  // 长生天劫2048游戏目标分数为2000
+          targetScore: 2000  // Target score for Longevity Tribulation
         }
       },
       {
-        type: '符文序列' as const,
+        type: 'Rune Sequence' as const,
         difficulty: 1.0 + ruleCount * 0.1,
         data: generateSpiritSeveringPuzzle(90 + ruleCount * 10)
       },
       {
-        type: '心魔考验' as const,
+        type: 'Inner Demon Trial' as const,
         difficulty: 1.2 + ruleCount * 0.1,
         data: {
-          description: '面对内心最深处的恐惧和欲望，保持道心坚定。',
+          description: 'Face your deepest fears and desires. Maintain your resolve.',
           questions: [
-            '长生之道，何为真？',
-            '若得永生，愿付出何代价？',
-            '天道无情，人道何存？'
+            'What is the truth of Immortality?',
+            'What price will you pay for eternity?',
+            'The Wasteland is cruel. Where does humanity lie?'
           ]
         }
       },
       {
-        type: '天道问答' as const,
+        type: 'System Inquiry' as const,
         difficulty: 1.5 + ruleCount * 0.1,
         data: {
-          description: '回答天道提出的终极问题，证明你有资格逆天而行。',
+          description: 'Answer the ultimate questions of the System. Prove you can defy the protocol.',
           questions: [
-            '天地为何而生？',
-            '长生为何而求？',
-            '规则为何而逆？'
+            'Why does the world exist?',
+            'Why do you seek survival?',
+            'Why do you break the rules?'
           ]
         }
       }
     ];
 
   return {
-    puzzleType: '五重考验',
-    description: '长生天劫共有五重考验，需全部通过方可证道长生。',
+    puzzleType: 'Five Trials',
+    description: 'The Longevity Tribulation consists of five trials. Pass all to prove your worth.',
     challenges
   };
 }

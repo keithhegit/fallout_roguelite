@@ -128,7 +128,7 @@ function GameHeader({
   }, []);
 
   return (
-    <header className="bg-ink-950 p-2 md:p-4 border-b border-stone-800 flex justify-between items-center shadow-lg z-10 sticky top-0 safe-area-header">
+    <header className="bg-stone-950 p-2 md:p-4 border-b border-amber-500/30 flex justify-between items-center shadow-lg z-[100] sticky top-0 safe-area-header">
       <div className="flex items-center gap-3">
         <h1
           onClick={handleTitleClick}
@@ -160,7 +160,7 @@ function GameHeader({
       {/* Mobile Menu Button */}
       <button
         onClick={onOpenMenu}
-        className="md:hidden flex items-center justify-center w-12 h-12 bg-ink-800 active:bg-stone-700 rounded-none border border-stone-800 touch-manipulation"
+        className="md:hidden flex items-center justify-center w-12 h-12 bg-stone-900 active:bg-stone-800 rounded-none border border-stone-700 touch-manipulation"
       >
         <img
           src={ASSETS.TOP_TAB.MENU}
@@ -172,7 +172,7 @@ function GameHeader({
       <div className="hidden md:flex gap-2 flex-wrap">
         <button
           onClick={onOpenCultivation}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.ICONS.CRAFTING}
@@ -183,7 +183,7 @@ function GameHeader({
         </button>
         <button
           onClick={onOpenInventory}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.ICONS.BACKPACK}
@@ -194,7 +194,7 @@ function GameHeader({
         </button>
         <button
           onClick={onOpenCharacter}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.BOTTOM_TAB.STATUS}
@@ -205,7 +205,7 @@ function GameHeader({
         </button>
         <button
           onClick={onOpenAchievement}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.ICONS.ACHIEVEMENTS}
@@ -221,7 +221,7 @@ function GameHeader({
         </button>
         <button
           onClick={onOpenPet}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.ICONS.COMPANIONS}
@@ -237,7 +237,7 @@ function GameHeader({
         </button>
         <button
           onClick={onOpenLottery}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.ICONS.GACHA}
@@ -246,7 +246,7 @@ function GameHeader({
           />
           <span>Gacha</span>
           {lotteryTickets > 0 && (
-            <span className="absolute -top-1 -right-1 bg-yellow-500 text-ink-950 text-[10px] font-bold rounded-none px-1 h-5 flex items-center justify-center min-w-[20px]">
+            <span className="absolute -top-1 -right-1 bg-yellow-500 text-stone-950 text-[10px] font-bold rounded-none px-1 h-5 flex items-center justify-center min-w-[20px]">
               {lotteryTickets}
             </span>
           )}
@@ -254,7 +254,7 @@ function GameHeader({
         {onOpenDailyQuest && (
           <button
             onClick={onOpenDailyQuest}
-            className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm relative min-w-[44px] min-h-[44px] justify-center"
           >
             <img
               src={ASSETS.ICONS.QUESTS}
@@ -273,7 +273,7 @@ function GameHeader({
         {onOpenGrotto && (
           <button
             onClick={onOpenGrotto}
-            className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
             title="Base"
           >
             <Home size={18} />
@@ -287,7 +287,7 @@ function GameHeader({
         )}
         <button
           onClick={onOpenSettings}
-          className="flex items-center gap-2 px-3 py-2 bg-ink-800 hover:bg-stone-700 rounded-none border border-stone-800 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
+          className="flex items-center gap-2 px-3 py-2 bg-stone-900 hover:bg-stone-800 rounded-none border border-stone-700 transition-colors text-sm min-w-[44px] min-h-[44px] justify-center"
         >
           <img
             src={ASSETS.TOP_TAB.SETTINGS}

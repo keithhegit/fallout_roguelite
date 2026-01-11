@@ -1,12 +1,12 @@
 /**
- * 类型守卫工具函数
- * 用于运行时类型检查和类型安全转换
+ * Type Guard Utility Functions
+ * Used for runtime type checking and type-safe casting
  */
 
 import { DailyQuestType } from '../types';
 
 /**
- * 类型守卫：检查字符串是否为有效的 DailyQuestType
+ * Type Guard: Check if string is valid DailyQuestType
  */
 export function isValidDailyQuestType(type: string): type is DailyQuestType {
   const validTypes: DailyQuestType[] = [

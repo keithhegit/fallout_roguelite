@@ -26,29 +26,29 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
 }) => {
   const [selectedBossId, setSelectedBossId] = useState<string | null>(null);
   const [bossAttempts, setBossAttempts] = useState<Record<string, number>>({});
-  // 处理战斗的函数
+  // Battle handling function
   const handleBattle = async (battleState: any) => {
-    // 使用回合制战斗系统处理战斗
+    // Use turn-based battle system to handle battle
     let currentState = battleState;
 
-    // 战斗循环
+    // Battle loop
     while (!checkBattleEnd(currentState)) {
       if (currentState.isPlayerTurn) {
-        // 玩家回合 - 这里需要处理玩家行动
-        // 简化处理：玩家自动普通攻击
+        // Player turn - Handle player action
+        // Simplified: Player auto attacks
         const playerAction = { type: 'attack' as const };
         currentState = executePlayerAction(currentState, playerAction);
       } else {
-        // 敌人回合
+        // Enemy turn
         currentState = executeEnemyTurn(currentState);
       }
     }
 
-    // 计算战斗结果
+    // Calculate battle result
     const victory = currentState.enemy.hp <= 0;
     const hpLoss = Math.max(0, battleState.player.hp - currentState.player.hp);
 
-    // 计算奖励
+    // Calculate rewards
     const rewards = calculateBattleRewards(currentState, player);
 
     return {
@@ -57,12 +57,12 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
       expChange: rewards.expChange,
       spiritChange: rewards.spiritChange,
       summary: victory ?
-        `Success! You defeated 【${currentState.enemy.name}】! Recovered ${rewards.expChange} XP and ${rewards.spiritChange} Caps!` :
-        `Challenge 【${currentState.enemy.name}】 failed! Lost ${hpLoss} HP.`
+        `Success! You defeated [${currentState.enemy.name}]! Recovered ${rewards.expChange} XP and ${rewards.spiritChange} Caps!` :
+        `Challenge [${currentState.enemy.name}] failed! Lost ${hpLoss} HP.`
     };
   };
 
-  // 检查解锁条件
+  // Check unlock conditions
   const canChallengeDaoCombining = () => {
     if (player.realm !== DAO_COMBINING_CHALLENGE_CONFIG.requiredRealm || player.realmLevel < DAO_COMBINING_CHALLENGE_CONFIG.requiredRealmLevel) {
       return false;
@@ -72,32 +72,32 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
       return false;
     }
 
-    // 检查属性是否足够
+    // Check if stats are sufficient
     const totalStats = player.attack + player.defense + player.spirit + player.physique + player.speed;
     return totalStats > 100000;
   };
 
-  // 选择BOSS
+  // Select BOSS
   const handleSelectBoss = (bossId: string) => {
     const boss = HEAVEN_EARTH_SOUL_BOSSES[bossId];
     const attempts = bossAttempts[bossId] || 0;
 
     if (attempts >= DAO_COMBINING_CHALLENGE_CONFIG.maxBossAttempts) {
-      addLog(`该BOSS的挑战次数已达上限（${DAO_COMBINING_CHALLENGE_CONFIG.maxBossAttempts}次）！`, 'danger');
+      addLog(`Challenge limit for this BOSS reached (${DAO_COMBINING_CHALLENGE_CONFIG.maxBossAttempts} times)!`, 'danger');
       return;
     }
 
     setSelectedBossId(bossId);
-    addLog(`Engagement selected: 【${boss.name}】! Prepare for high-intensity combat!`, 'special');
+    addLog(`Engagement selected: [${boss.name}]! Prepare for high-intensity combat!`, 'special');
   };
 
-  // 开始挑战
+  // Start challenge
   const handleStartChallenge = async () => {
     if (!selectedBossId) return;
 
     const boss = HEAVEN_EARTH_SOUL_BOSSES[selectedBossId];
 
-    // 生成随机强度倍数
+    // Generate random strength multiplier
     const [min, max] = DAO_COMBINING_CHALLENGE_CONFIG.bossStrengthMultiplierRange;
     const strengthMultiplier = Math.random() * (max - min) + min;
 
@@ -108,7 +108,7 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
       battleResult: null
     });
 
-    // 创建战斗状态
+    // Create battle state
     const battleState = {
       id: `dao_combining_${Date.now()}`,
       round: 0,
@@ -162,7 +162,7 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
       riskLevel: 'Extreme' as const
     };
 
-    // 进行战斗
+    // Execute battle
     const result = await handleBattle(battleState);
 
     setChallengeState(prev => ({
@@ -174,14 +174,14 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
       }
     }));
 
-    // 更新挑战次数
+    // Update attempts
     setBossAttempts(prev => ({
       ...prev,
       [selectedBossId]: (prev[selectedBossId] || 0) + 1
     }));
 
     if (result.victory) {
-      // 胜利奖励
+      // Victory rewards
       setPlayer(prev => ({
         ...prev,
         exp: prev.exp + boss.rewards.exp,
@@ -189,14 +189,14 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
         daoCombiningChallenged: true
       }));
 
-      addLog(`Success! You defeated 【${boss.name}】! Recovered ${boss.rewards.exp.toLocaleString()} XP and ${boss.rewards.spiritStones.toLocaleString()} Caps!`, 'gain');
+      addLog(`Success! You defeated [${boss.name}]! Recovered ${boss.rewards.exp.toLocaleString()} XP and ${boss.rewards.spiritStones.toLocaleString()} Caps!`, 'gain');
       addLog('Engagement Clearance Granted! You may now attempt to ascend to the high-rank realm!', 'special');
     } else {
-      addLog(`Failure! Engagement with 【${boss.name}】 failed. Improve your survival parameters.`, 'danger');
+      addLog(`Failure! Engagement with [${boss.name}] failed. Improve your survival parameters.`, 'danger');
     }
   };
 
-  // 获取BOSS难度颜色
+  // Get BOSS difficulty color
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy': return 'text-green-500';
@@ -213,7 +213,7 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
       <div className="bg-ink-950 rounded-none max-w-4xl w-full max-h-[90vh] overflow-hidden border border-stone-800 shadow-2xl relative flex flex-col group">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 扫描线效果 */}
+        {/* CRT Scanline Effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
         
         <div className="flex items-center justify-between p-6 border-b border-stone-800 bg-stone-950 relative z-10">
@@ -274,7 +274,7 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
             </div>
           )}
 
-          {/* BOSS选择 */}
+          {/* BOSS Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {Object.entries(HEAVEN_EARTH_SOUL_BOSSES).map(([bossId, boss]) => {
               const attempts = bossAttempts[bossId] || 0;
@@ -355,7 +355,7 @@ const DaoCombiningChallengeModal: React.FC<Props> = ({
             </div>
           )}
 
-          {/* 行动按钮 */}
+          {/* Action Buttons */}
           <div className="flex justify-end gap-4 mt-2">
             <button
               onClick={onClose}

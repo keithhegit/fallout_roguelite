@@ -49,18 +49,18 @@ const SectModal: React.FC<Props> = ({
   const [sectShopItems, setSectShopItems] = useState<Array<{ name: string; cost: number; item: Omit<Item, 'id'> }>>(() => generateSectShopItems(1));
   const [sectShopItemsFloor2, setSectShopItemsFloor2] = useState<Array<{ name: string; cost: number; item: Omit<Item, 'id'> }>>(() => generateSectShopItems(2));
   const [shopFloor, setShopFloor] = useState<1 | 2>(1);
-  const [shopRefreshTime, setShopRefreshTime] = useState<number>(() => Date.now() + 5 * 60 * 1000); // 5分钟后可刷新
+  const [shopRefreshTime, setShopRefreshTime] = useState<number>(() => Date.now() + 5 * 60 * 1000); // Refreshable after 5 minutes
   const [shopRefreshCooldown, setShopRefreshCooldown] = useState<number>(() => {
-    // 初始化时计算剩余倒计时
+    // Calculate remaining countdown on initialization
     const now = Date.now();
     const refreshTime = Date.now() + 5 * 60 * 1000;
     return Math.max(0, Math.floor((refreshTime - now) / 1000));
-  }); // 倒计时（秒）
+  }); // Countdown (seconds)
 
   // Generate random faction list (when not in a faction)
   const availableSects = useMemo(() => {
     if (player.sectId) return SECTS;
-    // 生成更多宗门以确保能选出6个唯一的
+    // Generate more factions to ensure 6 unique ones can be selected
     const allSects = generateRandomSects(player.realm, 12);
     const uniqueSects: typeof SECTS = [];
     const seenNames = new Set<string>();
@@ -74,7 +74,7 @@ const SectModal: React.FC<Props> = ({
       }
     }
 
-    return uniqueSects.slice(0, 6); // 确保最多返回6个
+    return uniqueSects.slice(0, 6); // Ensure max 6 returned
   }, [player.realm, player.sectId, refreshKey]);
 
   // Generate random ops list (when in a faction)
@@ -108,10 +108,10 @@ const SectModal: React.FC<Props> = ({
       if (player.sectContribution >= 5000) {
         setSectShopItemsFloor2(generateSectShopItems(2));
       }
-      const newRefreshTime = now + 5 * 60 * 1000; // 设置下次刷新时间
+      const newRefreshTime = now + 5 * 60 * 1000; // Set next refresh time
       setShopRefreshTime(newRefreshTime);
-      setShopRefreshCooldown(5 * 60); // 重置倒计时
-      setBuyQuantities({}); // 清空购买数量
+      setShopRefreshCooldown(5 * 60); // Reset cooldown
+      setBuyQuantities({}); // Clear buy quantities
     }
   }, [shopRefreshTime, player.sectContribution]);
 
@@ -135,7 +135,7 @@ const SectModal: React.FC<Props> = ({
       }
     };
 
-    // 立即更新一次
+    // Update immediately
     updateCooldown();
 
     const interval = setInterval(updateCooldown, 1000);
@@ -151,7 +151,7 @@ const SectModal: React.FC<Props> = ({
       name: player.currentSectInfo.name,
       description: '',
       reqRealm: RealmType.QiRefining,
-      grade: '黄',
+      grade: 'C',
       exitCost: player.currentSectInfo.exitCost,
     } : null) ||
     availableSects.find((s) => s.id === player.sectId) ||
@@ -163,10 +163,10 @@ const SectModal: React.FC<Props> = ({
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm font-mono">
         <div className="bg-ink-950 w-full max-w-4xl rounded-none border border-stone-800 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden relative">
-          {/* 背景纹理 */}
+          {/* Background Texture */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
           
-          {/* CRT 效果层 */}
+          {/* CRT Effect Layer */}
           <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
           <div className="crt-noise"></div>
           <div className="crt-vignette"></div>
@@ -563,7 +563,7 @@ const SectModal: React.FC<Props> = ({
                       // Check daily op limit (per individual op)
                       const today = new Date().toISOString().split('T')[0];
                       const lastReset = player.lastTaskResetDate || today;
-                      const TASK_DAILY_LIMIT = 3; // 每个任务每天最多3次
+                      const TASK_DAILY_LIMIT = 3; // Max 3 times per task daily
 
                       if (lastReset === today) {
                         const dailyTaskCount = player.dailyTaskCount || {};
@@ -636,7 +636,7 @@ const SectModal: React.FC<Props> = ({
                           {task.description}
                         </p>
 
-                        {/* 任务标签 */}
+                        {/* Task Tags */}
                         <div className="flex flex-wrap gap-2 mb-4 relative z-10">
                           <span className={`text-[9px] px-1.5 py-0.5 border border-stone-800 bg-stone-950/50 uppercase tracking-widest ${difficultyColors[task.difficulty]}`}>
                             DIFF: {task.difficulty === 'Easy' ? 'EASY' : task.difficulty === 'Normal' ? 'NORMAL' : task.difficulty === 'Hard' ? 'HARD' : 'EXTREME'}

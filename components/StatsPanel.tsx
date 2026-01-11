@@ -52,11 +52,11 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
   // Use unified utility function to get rarity color
 
   return (
-    <div className="bg-ink-950 border-r-2 border-b-2 md:border-b-0 border-stone-800 p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full md:w-80 shrink-0 h-auto md:h-full overflow-y-auto font-mono">
+    <div className="bg-stone-950 border-r-2 border-b-2 md:border-b-0 border-amber-500/30 p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full md:w-80 shrink-0 h-auto md:h-full overflow-y-auto font-mono">
       {/* Mobile Collapse Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="md:hidden flex items-center justify-between w-full p-2 bg-ink-900 rounded-none border border-stone-700 mb-2 touch-manipulation"
+        className="md:hidden flex items-center justify-between w-full p-2 bg-stone-900 rounded-none border border-stone-700 mb-2 touch-manipulation"
       >
         <div className="text-center flex-1">
           <h2 className="text-lg font-mono font-bold text-amber-400 tracking-[0.2em] uppercase">
@@ -77,7 +77,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
       </button>
 
       {/* Desktop Header */}
-      <div className="hidden md:block text-center mb-4 border-b-2 border-stone-800 pb-4">
+      <div className="hidden md:block text-center mb-4 border-b-2 border-amber-500/30 pb-4">
         <h2 className="text-2xl font-mono font-bold text-amber-400 tracking-[0.2em] uppercase">
           {player.name}
         </h2>
@@ -108,7 +108,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
             </div>
             <div className="h-2 bg-stone-900 rounded-none overflow-hidden border border-stone-700">
               <div
-                className="h-full bg-mystic-blood transition-all duration-500 ease-out"
+                className="h-full bg-red-600 transition-all duration-500 ease-out"
                 style={{ width: `${hpPercentage}%` }}
               />
             </div>
@@ -123,7 +123,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
             </div>
             <div className="h-2 bg-stone-900 rounded-none overflow-hidden border border-stone-700">
               <div
-                className="h-full bg-mystic-jade transition-all duration-500 ease-out"
+                className="h-full bg-emerald-500 transition-all duration-500 ease-out"
                 style={{ width: `${expPercentage}%` }}
               />
             </div>
@@ -147,7 +147,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
         </div>
 
         {/* Active Art */}
-        <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
+        <div className="bg-stone-900 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
           <BookOpen
             size={16}
             className="md:w-[18px] md:h-[18px] text-blue-400"
@@ -163,7 +163,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
         </div>
 
         {/* Natal Artifact */}
-        <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
+        <div className="bg-stone-900 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
           <Sword
             size={16}
             className="md:w-[18px] md:h-[18px] text-purple-400"
@@ -182,7 +182,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
 
         {/* Attributes */}
         <div className="grid grid-cols-2 gap-2 md:gap-3 mt-1">
-          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-stone-900 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Sword size={14} className="md:w-[18px] md:h-[18px] text-red-400" />
             <div>
               <div className="text-[10px] md:text-xs text-stone-500 uppercase">Firepower (FP)</div>
@@ -191,7 +191,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
               </div>
             </div>
           </div>
-          <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
+          <div className="bg-stone-900 p-2 md:p-3 rounded-none border border-stone-700 flex items-center gap-2 md:gap-3">
             <Shield
               size={14}
               className="md:w-[18px] md:h-[18px] text-blue-400"
@@ -250,7 +250,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
           </div>
         </div>
 
-        {/* 其他信息 */}
+        {/* Other Info */}
         {player.lotteryTickets > 0 && (
           <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-yellow-500/50 flex items-center gap-2 md:gap-3">
             <Zap
@@ -284,7 +284,7 @@ const StatsPanel: React.FC<Props> = ({ player }) => {
           </div>
         )}
 
-        {/* 灵根显示 */}
+        {/* Spiritual Roots Display */}
         <div className="bg-ink-800 p-2 md:p-3 rounded-none border border-stone-700">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles

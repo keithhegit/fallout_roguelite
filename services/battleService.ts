@@ -175,45 +175,41 @@ const ENEMY_TITLES = [
   'Abomination',
 ];
 
-// 根据风险等级计算战斗难度
+// Calculate battle difficulty based on risk level
 const getBattleDifficulty = (
   adventureType: AdventureType,
   riskLevel?: RiskLevel
 ): number => {
   if (adventureType === 'secret_realm' && riskLevel) {
-    // 秘境根据风险等级调整难度（扩大差异使风险等级名称与实际难度匹配）
+    // Adjust difficulty based on risk level for Secret Realms
     const riskMultipliers: Record<string, number> = {
       Low: 0.6,      // Lower difficulty, good for farming
       Medium: 1.0,       // Standard difficulty
       High: 1.5,       // Increased difficulty, more challenging
-      'Extreme': 2.2, // Significantly increased difficulty, truly "Extremely Dangerous"
-      '低': 0.6,
-      '中': 1.0,
-      '高': 1.5,
-      '极度危险': 2.2,
+      Extreme: 2.2, // Significantly increased difficulty, truly "Extremely Dangerous"
     };
     return riskMultipliers[riskLevel] || 1.0;
   }
-  // 非秘境使用固定难度
+  // Use fixed difficulty for non-secret realm
   const baseDifficulty: Record<AdventureType, number> = {
     normal: 1,
     lucky: 0.85,
     secret_realm: 1.25,
-    sect_challenge: 1.5, // 宗主挑战难度稍微下调，从2.0降至1.8
-    dao_combining_challenge: 2.0, // 天地之魄挑战难度
+    sect_challenge: 1.5, // Sect Master challenge difficulty slightly reduced from 2.0 to 1.8
+    dao_combining_challenge: 2.0, // Heaven Earth Soul challenge difficulty
   };
   return baseDifficulty[adventureType];
 };
 
 const baseBattleChance: Record<AdventureType, number> = {
-  normal: 0.25, // 历练基础概率降低到25%
-  lucky: 0.12, // 机缘历练基础概率降低到12%
-  secret_realm: 0.45, // 秘境基础概率降低到45%
-  sect_challenge: 1.0, // 挑战必然触发
-  dao_combining_challenge: 1.0, // 天地之魄挑战必然触发
+  normal: 0.25, // Normal adventure base chance reduced to 25%
+  lucky: 0.12, // Lucky adventure base chance reduced to 12%
+  secret_realm: 0.45, // Secret realm base chance reduced to 45%
+  sect_challenge: 1.0, // Challenge always triggers
+  dao_combining_challenge: 1.0, // Heaven Earth Soul challenge always triggers
 };
 
-// Fisher-Yates 洗牌算法，用于打乱数组顺序
+// Fisher-Yates shuffle algorithm, used to shuffle array order
 const shuffle = <T>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -223,42 +219,42 @@ const shuffle = <T>(array: T[]): T[] => {
   return shuffled;
 };
 
-// 改进的随机选择函数，先打乱数组再选择，增加随机性
+// Improved random selection function, shuffle array first then select, increasing randomness
 const pickOne = <T>(list: T[]): T => {
   if (list.length === 0) throw new Error('Cannot pick from empty list');
-  // 对于小数组，直接随机选择；对于大数组，先打乱再选择
+  // For small arrays, select randomly directly; for large arrays, shuffle first then select
   if (list.length <= 10) {
     return list[Math.floor(Math.random() * list.length)];
   }
-  // 对于大数组，打乱后选择，增加随机性
+  // For large arrays, shuffle first then pick to increase randomness
   const shuffled = shuffle(list);
   return shuffled[Math.floor(Math.random() * shuffled.length)];
 };
 
-// 搜刮奖励物品名称库（全部从常量池获取，确保数据一致性）
+// Loot item name pool (fetched from constants for consistency)
 export const LOOT_ITEMS = {
-  // 草药类
+  // Herbs
   herbs: (() => getItemsByType(ItemType.Herb))(),
-  // 丹药类
+  // Chems
   pills: (() => getItemsByType(ItemType.Pill))(),
-  // 材料类
+  // Materials
   materials: (() => getItemsByType(ItemType.Material))(),
-  // 装备类（武器）
+  // Weapons
   weapons: (() => getItemsByType(ItemType.Weapon))(),
-  // 装备类（护甲）
+  // Armors
   armors: (() => getItemsByType(ItemType.Armor))(),
-  // 首饰类
+  // Accessories
   accessories: (() => getItemsByType(ItemType.Accessory))(),
-  // 戒指类
+  // Rings
   rings: (() => getItemsByType(ItemType.Ring))(),
-  // 法宝类
+  // Artifacts
   artifacts: (() => getItemsByType(ItemType.Artifact))(),
 };
 
 // Rarity Order (Cached to avoid repeated creation)
 const RARITY_ORDER: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
 
-// 根据敌人强度和类型生成搜刮奖励
+// Generate loot based on enemy strength and type
 const generateLoot = (
   enemyStrength: number,
   adventureType: AdventureType,
@@ -266,55 +262,55 @@ const generateLoot = (
   riskLevel?: RiskLevel
 ): AdventureResult['itemObtained'][] => {
   const lootItems: AdventureResult['itemObtained'][] = [];
-  // 用于追踪已选择的物品，避免重复（装备类物品按名称+稀有度去重）
+  // Track selected items to avoid duplicates (equipment deduped by name + rarity)
   const selectedItems = new Set<string>();
-  // 用于追踪已选择的物品类型，避免连续获得相同类型
+  // Track selected item types to avoid consecutive same types
   const selectedTypes: string[] = [];
 
-  // 根据敌人强度决定奖励数量（1-4个物品）
+  // Determine item count based on enemy strength (1-4 items)
   const numItems =
     enemyStrength < 0.7
-      ? 1 // 弱敌：1个物品
+      ? 1 // Weak enemy: 1 item
       : enemyStrength < 1.0
-        ? 1 + Math.floor(Math.random() * 2) // 普通：1-2个物品
-        : 2 + Math.floor(Math.random() * 3); // 强敌：2-4个物品
+        ? 1 + Math.floor(Math.random() * 2) // Normal: 1-2 items
+        : 2 + Math.floor(Math.random() * 3); // Strong enemy: 2-4 items
 
-  // 根据玩家境界调整稀有度概率（高境界更容易获得高级物品）
+  // Adjust rarity chance based on player realm (higher realm = better items)
   const realmIndex = REALM_ORDER.indexOf(playerRealm);
-  // 境界加成：每个境界增加稀有度概率，降低加成上限防止物品通胀
-  // 基础加成：每个境界增加1%仙品、1.5%传说、2.5%稀有概率
-  // 高境界（第4个境界及以上）额外获得50%加成
-  const isHighRealm = realmIndex >= 3; // 元婴期及以上
+  // Realm bonus: each realm increases rarity chance, capped to prevent inflation
+  // Base bonus: +1% Mythic, +1.5% Legendary, +2.5% Rare per realm
+  // High realm (4th realm and above) gets 50% extra bonus
+  const isHighRealm = realmIndex >= 3; // Nascent Soul and above
   const realmMultiplier = isHighRealm ? 1.5 : 1.0;
-  const realmBonusImmortal = Math.min(0.05, realmIndex * 0.01 * realmMultiplier); // 仙品加成，最高5%
-  const realmBonusLegend = Math.min(0.10, realmIndex * 0.015 * realmMultiplier); // 传说加成，最高10%
-  const realmBonusRare = Math.min(0.20, realmIndex * 0.025 * realmMultiplier); // 稀有加成，最高20%
+  const realmBonusImmortal = Math.min(0.05, realmIndex * 0.01 * realmMultiplier); // Mythic bonus, max 5%
+  const realmBonusLegend = Math.min(0.10, realmIndex * 0.015 * realmMultiplier); // Legendary bonus, max 10%
+  const realmBonusRare = Math.min(0.20, realmIndex * 0.025 * realmMultiplier); // Rare bonus, max 20%
 
-  // 根据敌人强度和类型决定稀有度分布
+  // Determine rarity distribution based on enemy strength and type
   const getRarityChance = (): ItemRarity => {
     const roll = Math.random();
     if (adventureType === 'secret_realm') {
-      // 秘境：根据风险等级调整稀有度概率
-      if (riskLevel === 'Extreme' || riskLevel === '极度危险') {
-        // Extremely Dangerous: Higher chance for top-tier items (lower base chance to prevent inflation)
-        if (roll < 0.05 + realmBonusImmortal) return 'Mythic'; // 10% reduction
-        if (roll < 0.20 + realmBonusLegend) return 'Legendary'; // 30% reduction
-        if (roll < 0.70 + realmBonusRare) return 'Rare'; // 15% reduction
+      // Adjust rarity based on risk level
+      if (riskLevel === 'Extreme') {
+        // Extremely Dangerous: Higher chance for top-tier items
+        if (roll < 0.05 + realmBonusImmortal) return 'Mythic';
+        if (roll < 0.20 + realmBonusLegend) return 'Legendary';
+        if (roll < 0.70 + realmBonusRare) return 'Rare';
         return 'Common';
-      } else if (riskLevel === 'High' || riskLevel === '高') {
+      } else if (riskLevel === 'High') {
         // High Risk: Higher probability
         if (roll < 0.12 + realmBonusImmortal) return 'Mythic';
         if (roll < 0.4 + realmBonusLegend) return 'Legendary';
         if (roll < 0.75 + realmBonusRare) return 'Rare';
         return 'Common';
-      } else if (riskLevel === 'Medium' || riskLevel === '中') {
+      } else if (riskLevel === 'Medium') {
         // Medium Risk: Medium probability
         if (roll < 0.08 + realmBonusImmortal) return 'Mythic';
         if (roll < 0.3 + realmBonusLegend) return 'Legendary';
         if (roll < 0.65 + realmBonusRare) return 'Rare';
         return 'Common';
       } else {
-        // Low Risk: Lower probability (but higher than normal adventure)
+        // Low Risk: Lower probability
         if (roll < 0.05 + realmBonusImmortal) return 'Mythic';
         if (roll < 0.2 + realmBonusLegend) return 'Legendary';
         if (roll < 0.55 + realmBonusRare) return 'Rare';
@@ -335,7 +331,7 @@ const generateLoot = (
     }
   };
 
-  // 最大尝试次数，避免无限循环
+  // Max attempts to avoid infinite loop
   let maxAttempts = numItems * 10;
   let attempts = 0;
 
@@ -375,11 +371,11 @@ const generateLoot = (
       });
     }
 
-    // 计算总权重
+    // Calculate total weight
     const totalWeight = typeWeights.reduce((sum, w) => sum + w.weight, 0);
     let randomWeight = Math.random() * totalWeight;
 
-    // 根据权重选择类型（完全随机）
+    // Select type based on weight (random)
     let selectedType = typeWeights[0];
     for (const type of typeWeights) {
       randomWeight -= type.weight;
@@ -391,11 +387,11 @@ const generateLoot = (
 
     itemType = selectedType.name;
 
-    // 根据选择的类型设置物品池，多次打乱增加随机性
+    // Set item pool based on selected type, shuffle multiple times
     if (selectedType.type === 'herbs') {
       let pool = [...LOOT_ITEMS.herbs];
       pool = shuffle(pool);
-      pool = shuffle(pool); // 二次打乱
+      pool = shuffle(pool); // Second shuffle
       itemPool = pool as any;
     } else if (selectedType.type === 'pills') {
       let pool = [...LOOT_ITEMS.pills];
@@ -413,10 +409,10 @@ const generateLoot = (
       pool = shuffle(pool);
       itemPool = pool as any;
     } else if (selectedType.type === 'armors') {
-      // 护甲：先打乱所有护甲，然后随机选择部位
+      // Armor: shuffle all armors first, then randomly select slot
       let allArmors = [...LOOT_ITEMS.armors];
       allArmors = shuffle(allArmors);
-      allArmors = shuffle(allArmors); // 二次打乱
+      allArmors = shuffle(allArmors); // Second shuffle
       const armorSlots = [
         EquipmentSlot.Head,
         EquipmentSlot.Shoulder,
@@ -425,7 +421,7 @@ const generateLoot = (
         EquipmentSlot.Legs,
         EquipmentSlot.Boots,
       ];
-      // 打乱槽位顺序，增加随机性
+      // Shuffle slot order
       const shuffledSlots = shuffle(armorSlots);
       const selectedSlot = shuffledSlots[Math.floor(Math.random() * shuffledSlots.length)];
       const slotFilteredArmors = allArmors.filter((item: any) => item.equipmentSlot === selectedSlot);
@@ -451,22 +447,22 @@ const generateLoot = (
       itemPool = []; // Recipes don't use standard item pool
     }
 
-    // 特殊处理：丹方
-    if (itemType === '丹方') {
-      // 根据稀有度筛选可获得的丹方，排除已选择的
+    // Special Handling: Recipe
+    if (itemType === ItemType.Recipe) {
+      // Filter available recipes based on rarity, exclude already selected
       const availableRecipes = DISCOVERABLE_RECIPES.filter((recipe) => {
         const targetIndex = RARITY_ORDER.indexOf(targetRarity);
         const recipeIndex = RARITY_ORDER.indexOf(recipe.result.rarity);
-        const recipeKey = `${recipe.name}丹方-${recipe.result.rarity}`;
+        const recipeKey = `${recipe.name} Recipe-${recipe.result.rarity}`;
         return recipeIndex <= targetIndex && !selectedItems.has(recipeKey);
       });
 
       if (availableRecipes.length > 0) {
-        // 多次打乱可用丹方列表，增加随机性
+        // Shuffle available recipes multiple times for increased randomness
         let shuffledRecipes = shuffle(availableRecipes);
-        shuffledRecipes = shuffle(shuffledRecipes); // 二次打乱
-        shuffledRecipes = shuffle(shuffledRecipes); // 三次打乱，确保完全随机
-        // 使用完全随机选择，确保每个丹方被选中的概率相等
+        shuffledRecipes = shuffle(shuffledRecipes); // Second shuffle
+        shuffledRecipes = shuffle(shuffledRecipes); // Third shuffle, ensure complete randomness
+        // Use completely random selection to ensure equal probability for each recipe
         const randomIndex = Math.floor(Math.random() * shuffledRecipes.length);
         const selectedRecipe = shuffledRecipes[randomIndex];
         const recipeKey = `${selectedRecipe.name} Recipe-${selectedRecipe.result.rarity}`;
@@ -588,8 +584,8 @@ export interface BattleRoundLog {
 
 export interface BattleReplay {
   id: string;
-  adventureType?: AdventureType; // 历练类型
-  bossId?: string | null; // 挑战的BOSS ID（用于天地之魄等特殊战斗）
+  adventureType?: AdventureType; // Adventure Type
+  bossId?: string | null; // Challenge BOSS ID (for Heaven Earth Soul etc.)
   enemy: {
     name: string;
     title: string;
@@ -598,8 +594,8 @@ export interface BattleReplay {
     attack: number;
     defense: number;
     speed: number;
-    spirit: number; // 敌人神识属性
-    strengthMultiplier?: number; // 敌人强度倍数
+    spirit: number; // Enemy Spirit Attribute
+    strengthMultiplier?: number; // Enemy Strength Multiplier
   };
   rounds: BattleRoundLog[];
   victory: boolean;
@@ -614,18 +610,18 @@ export interface BattleReplay {
 export interface BattleResolution {
   adventureResult: AdventureResult;
   replay: BattleReplay;
-  petSkillCooldowns?: Record<string, number>; // 战斗结束后的灵宠技能冷却状态
+  petSkillCooldowns?: Record<string, number>; // Pet skill cooldowns after battle
 }
 
 const clampMin = (value: number, min: number) => (value < min ? min : value);
 
 /**
- * 计算行动次数（基于速度差和神识差）
- * @param fasterSpeed 更快单位的速度
- * @param slowerSpeed 更慢单位的速度
- * @param fasterSpirit 更快单位的神识
- * @param slowerSpirit 更慢单位的神识
- * @returns 行动次数（1-5）
+ * Calculate action count (based on speed difference and spirit difference)
+ * @param fasterSpeed Faster unit speed
+ * @param slowerSpeed Slower unit speed
+ * @param fasterSpirit Faster unit spirit
+ * @param slowerSpirit Slower unit spirit
+ * @returns Action count (1-5)
  */
 const calculateActionCount = (
   fasterSpeed: number,
@@ -633,30 +629,30 @@ const calculateActionCount = (
   fasterSpirit: number,
   slowerSpirit: number
 ): number => {
-  // 确保速度值是有效数字，防止NaN
+  // Ensure speed is valid number, prevent NaN
   const validFasterSpeed = Number(fasterSpeed) || 0;
-  const validSlowerSpeed = Number(slowerSpeed) || 1; // 避免除零，默认至少为1
+  const validSlowerSpeed = Number(slowerSpeed) || 1; // Avoid divide by zero, default at least 1
   const validFasterSpirit = Number(fasterSpirit) || 0;
-  const validSlowerSpirit = Number(slowerSpirit) || 1; // 避免除零，默认至少为1
+  const validSlowerSpirit = Number(slowerSpirit) || 1; // Avoid divide by zero, default at least 1
 
-  // 计算速度和神识的综合行动力
-  // 速度权重0.6，神识权重0.4
+  // Calculate combined action power of speed and spirit
+  // Speed weight 0.6, Spirit weight 0.4
   const fasterActionPower = validFasterSpeed * 0.6 + validFasterSpirit * 0.4;
   const slowerActionPower = validSlowerSpeed * 0.6 + validSlowerSpirit * 0.4;
 
-  if (fasterActionPower <= slowerActionPower) return 1; // 行动力不占优，只有1次行动
+  if (fasterActionPower <= slowerActionPower) return 1; // No advantage, only 1 action
 
   const powerDiff = fasterActionPower - slowerActionPower;
-  // 确保slowerActionPower至少为1，避免除零
+  // Ensure slowerActionPower is at least 1, avoid divide by zero
   const safeSlowerPower = Math.max(1, slowerActionPower);
-  const powerRatio = powerDiff / safeSlowerPower; // 行动力差比例
+  const powerRatio = powerDiff / safeSlowerPower; // Power difference ratio
 
-  // 基础1次 + 每50%行动力优势额外1次行动
-  // 例如：行动力是敌人的1.5倍 = 2次行动，2倍 = 3次行动，3倍 = 4次行动
+  // Base 1 action + 1 extra action per 50% power advantage
+  // e.g. Power 1.5x = 2 actions, 2x = 3 actions, 3x = 4 actions
   const extraActions = Math.floor(powerRatio / 0.5);
   const totalActions = 1 + extraActions;
 
-  // 最多5次行动（避免过于不平衡）
+  // Max 5 actions (avoid being too unbalanced)
   return Math.min(5, Math.max(1, totalActions));
 };
 
@@ -668,7 +664,7 @@ const createEnemy = async (
   sectMasterId?: string | null,
   huntSectId?: string | null,
   huntLevel?: number,
-  bossId?: string // 指定的天地之魄BOSS ID（用于事件模板）
+  bossId?: string // Specified Heaven Earth Soul BOSS ID (for event templates)
 ): Promise<{
   name: string;
   title: string;
@@ -682,10 +678,10 @@ const createEnemy = async (
 }> => {
   const currentRealmIndex = REALM_ORDER.indexOf(player.realm);
 
-  // 保存选中的BOSS用于后续属性计算（天地之魄挑战）
+  // Save selected BOSS for subsequent stat calculation (Heaven Earth Soul challenge)
   let selectedBossForStats: typeof HEAVEN_EARTH_SOUL_BOSSES[string] | null = null;
   if (adventureType === 'dao_combining_challenge') {
-    // 天地之魄挑战：如果指定了BOSS ID，使用指定的；否则随机选择一个
+    // Heaven Earth Soul challenge: use specified BOSS ID if available, otherwise pick random
     if (bossId && HEAVEN_EARTH_SOUL_BOSSES[bossId]) {
       selectedBossForStats = HEAVEN_EARTH_SOUL_BOSSES[bossId];
     } else {
@@ -695,52 +691,52 @@ const createEnemy = async (
     }
   }
 
-  // 如果进入秘境且有秘境的最低境界要求，基于秘境境界计算敌人强度
+  // If entering Secret Realm with minimum realm requirement, calculate enemy strength based on it
   let targetRealmIndex: number;
-  let realmLevelReduction = 1.0; // 境界压制倍率（玩家境界高于秘境要求时降低难度）
+  let realmLevelReduction = 1.0; // Realm suppression multiplier (reduce difficulty if player realm > secret realm requirement)
 
   if (adventureType === 'secret_realm' && realmMinRealm) {
     const realmMinIndex = REALM_ORDER.indexOf(realmMinRealm);
-    // 敌人境界基于秘境最低境界，而不是玩家境界
-    const realmOffset = 0; // 秘境中敌人与秘境要求相同境界（从+1改为0，降低难度）
+    // Enemy realm based on secret realm minimum, not player realm
+    const realmOffset = 0; // Enemy matches secret realm requirement (changed from +1 to 0 to lower difficulty)
     targetRealmIndex = clampMin(
       Math.min(REALM_ORDER.length - 1, realmMinIndex + realmOffset),
       0
     );
 
-    // 如果玩家境界高于秘境要求，降低敌人强度（境界压制）
+    // If player realm > secret realm requirement, reduce enemy strength (Realm Suppression)
     if (currentRealmIndex > realmMinIndex) {
       const realmDiff = currentRealmIndex - realmMinIndex;
-      // 每高1个境界，降低15%难度，最多降低60%
+      // Reduce difficulty by 15% per realm difference, max 60% reduction
       realmLevelReduction = Math.max(0.4, 1.0 - realmDiff * 0.15);
     }
   } else if (adventureType === 'sect_challenge') {
-    // 如果是追杀战斗，根据追杀强度生成敌人
+    // If Hunt battle, generate enemy based on hunt intensity
     if (huntSectId && huntLevel !== undefined) {
-      // 追杀强度：0=普通弟子，1=精英弟子，2=长老，3=宗主
+      // Hunt Intensity: 0=Member, 1=Elite, 2=Elder, 3=Leader
       if (huntLevel >= 3) {
-        // 宗主：高出玩家 1-2 个境界
+        // Leader: 1-2 realms higher than player
         const realmOffset = Math.random() < 0.85 ? 1 : 2;
         targetRealmIndex = clampMin(
           Math.min(REALM_ORDER.length - 1, currentRealmIndex + realmOffset),
-          3 // 至少元婴期
+          3 // Minimum Nascent Soul
         );
       } else if (huntLevel >= 2) {
-        // 长老：与玩家相同或高出 1 个境界
+        // Elder: Same or 1 realm higher
         const realmOffset = Math.random() < 0.7 ? 0 : 1;
         targetRealmIndex = clampMin(
           Math.min(REALM_ORDER.length - 1, currentRealmIndex + realmOffset),
           currentRealmIndex
         );
       } else if (huntLevel >= 1) {
-        // 精英弟子：与玩家相同或低 1 个境界
+        // Elite: Same or 1 realm lower
         const realmOffset = Math.random() < 0.6 ? 0 : -1;
         targetRealmIndex = clampMin(
           Math.min(REALM_ORDER.length - 1, currentRealmIndex + realmOffset),
           0
         );
       } else {
-        // 普通弟子：低 1-2 个境界
+        // Member: 1-2 realms lower
         const realmOffset = Math.random() < 0.7 ? -1 : -2;
         targetRealmIndex = clampMin(
           Math.min(REALM_ORDER.length - 1, currentRealmIndex + realmOffset),
@@ -748,18 +744,18 @@ const createEnemy = async (
         );
       }
     } else {
-      // 宗主挑战特殊逻辑：宗主境界通常高出玩家 1 个境界，少数高出 2 个
-      const realmOffset = Math.random() < 0.85 ? 1 : 2; // 85% 概率高出 1 个境界，15% 概率高出 2 个
+      // Sect Master Challenge special logic: usually 1 realm higher, rarely 2
+      const realmOffset = Math.random() < 0.85 ? 1 : 2; // 85% chance +1 realm, 15% chance +2
       targetRealmIndex = clampMin(
         Math.min(REALM_ORDER.length - 1, currentRealmIndex + realmOffset),
-        3 // 至少元婴期
+        3 // Minimum Nascent Soul
       );
     }
   } else if (adventureType === 'dao_combining_challenge') {
-    // 天地之魄挑战：固定为化神期
+    // Heaven Earth Soul challenge: fixed at Spirit Severing
     targetRealmIndex = REALM_ORDER.indexOf(RealmType.SpiritSevering);
   } else {
-    // 普通历练和机缘历练，按原逻辑
+    // Normal/Lucky adventure, standard logic
     const realmOffset =
       adventureType === 'lucky' ? -1 : 0;
     targetRealmIndex = clampMin(
@@ -768,18 +764,18 @@ const createEnemy = async (
     );
   }
 
-  // 确保targetRealmIndex有效，防止访问undefined
+  // Ensure targetRealmIndex is valid to prevent undefined access
   const validTargetRealmIndex = Math.max(0, Math.min(targetRealmIndex, REALM_ORDER.length - 1));
   const realm = REALM_ORDER[validTargetRealmIndex];
   if (!realm) {
-    // 如果仍然获取不到，使用第一个境界作为默认值
+    // Fallback to first realm if still invalid
     const fallbackRealm = REALM_ORDER[0];
     if (!fallbackRealm) {
       throw new Error('REALM_ORDER is empty or invalid');
     }
     return {
-      name: '未知敌人',
-      title: '神秘的',
+      name: 'Unknown Enemy',
+      title: 'Mysterious',
       realm: fallbackRealm,
       attack: 10,
       defense: 8,
@@ -791,63 +787,63 @@ const createEnemy = async (
   }
   const baseDifficulty = getBattleDifficulty(adventureType, riskLevel);
 
-  // 引入强度等级系统：弱敌、普通、强敌
-  // 普通历练：40%弱敌，50%普通，10%强敌
-  // 机缘历练：60%弱敌，35%普通，5%强敌
-  // 秘境历练：20%弱敌，50%普通，30%强敌
+  // Introduce strength tier system: Weak, Normal, Tough
+  // Normal Adventure: 40% Weak, 50% Normal, 10% Tough
+  // Lucky Adventure: 60% Weak, 35% Normal, 5% Tough
+  // Secret Realm: 20% Weak, 50% Normal, 30% Tough
   const strengthRoll = Math.random();
   let strengthMultiplier = 1;
   let strengthVariance = { min: 0.85, max: 1.2 };
 
   if (adventureType === 'sect_challenge') {
-    // 宗主属性平衡：收窄波动范围，确保既有挑战性又不至于绝望
+    // Sect Master balance: narrow variance, challenging but not impossible
     strengthMultiplier = 1.0;
     if (strengthRoll < 0.3) {
-      // 30% 概率：由于长期闭关或旧疾复发，实力处于低谷
+      // 30% chance: Weakened state (old injury/meditation)
       strengthVariance = { min: 0.9, max: 1.1 };
     } else if (strengthRoll < 0.8) {
-      // 50% 概率：平稳期，正常发挥
+      // 50% chance: Normal state
       strengthVariance = { min: 1.1, max: 1.3 };
     } else {
-      // 20% 概率：境界突破或感悟提升，实力处于顶峰
+      // 20% chance: Peak state (breakthrough/enlightenment)
       strengthVariance = { min: 1.3, max: 1.6 };
     }
   } else if (adventureType === 'dao_combining_challenge') {
-    // 天地之魄挑战：倍数将在后续根据玩家战斗力计算（0.9~3.0倍）
-    // 这里先设置一个默认值，实际倍数会在属性计算时动态生成
-    strengthMultiplier = 1.0; // 临时值，会在后面重新计算
-    strengthVariance = { min: 1.0, max: 1.0 }; // 天地之魄倍数由随机数决定，不需要额外波动
+    // Heaven Earth Soul challenge: multiplier calculated later based on player stats (0.9-3.0x)
+    // Set default here, actual multiplier generated dynamically during stat calculation
+    strengthMultiplier = 1.0; // Temporary value
+    strengthVariance = { min: 1.0, max: 1.0 }; // Determined by RNG, no extra variance
   } else if (adventureType === 'normal') {
     if (strengthRoll < 0.4) {
-      // 弱敌 40%
+      // Weak 40%
       strengthMultiplier = 0.6 + Math.random() * 0.2; // 0.6 - 0.8
       strengthVariance = { min: 0.6, max: 0.9 };
     } else if (strengthRoll < 0.9) {
-      // 普通 50%
+      // Normal 50%
       strengthMultiplier = 0.8 + Math.random() * 0.2; // 0.8 - 1.0
       strengthVariance = { min: 0.75, max: 1.1 };
     } else {
-      // 强敌 10%
+      // Tough 10%
       strengthMultiplier = 1.0 + Math.random() * 0.2; // 1.0 - 1.2
       strengthVariance = { min: 0.9, max: 1.3 };
     }
   } else if (adventureType === 'lucky') {
     if (strengthRoll < 0.6) {
-      // 弱敌 60%
+      // Weak 60%
       strengthMultiplier = 0.5 + Math.random() * 0.2; // 0.5 - 0.7
       strengthVariance = { min: 0.5, max: 0.85 };
     } else if (strengthRoll < 0.95) {
-      // 普通 35%
+      // Normal 35%
       strengthMultiplier = 0.7 + Math.random() * 0.2; // 0.7 - 0.9
       strengthVariance = { min: 0.65, max: 1.0 };
     } else {
-      // 强敌 5%
+      // Tough 5%
       strengthMultiplier = 0.9 + Math.random() * 0.2; // 0.9 - 1.1
       strengthVariance = { min: 0.8, max: 1.2 };
     }
   } else if (adventureType === 'secret_realm') {
     // Secret Realm Adventure: adjust enemy strength distribution based on risk level
-    if (riskLevel === 'Extreme' || riskLevel === '极度危险') {
+    if (riskLevel === 'Extreme') {
       // Extremely Dangerous: 15% Weak, 45% Normal, 40% Tough
       if (strengthRoll < 0.15) {
         strengthMultiplier = 0.85 + Math.random() * 0.15; // 0.85 - 1.0
@@ -859,7 +855,7 @@ const createEnemy = async (
         strengthMultiplier = 1.2 + Math.random() * 0.3; // 1.2 - 1.5
         strengthVariance = { min: 1.1, max: 1.6 }; // Reduced from 1.2-1.8
       }
-    } else if (riskLevel === 'High' || riskLevel === '高') {
+    } else if (riskLevel === 'High') {
       // High Risk: 20% Weak, 50% Normal, 30% Tough
       if (strengthRoll < 0.2) {
         strengthMultiplier = 0.75 + Math.random() * 0.15; // 0.75 - 0.9
@@ -871,7 +867,7 @@ const createEnemy = async (
         strengthMultiplier = 1.1 + Math.random() * 0.25; // 1.1 - 1.35
         strengthVariance = { min: 1.0, max: 1.5 };
       }
-    } else if (riskLevel === 'Medium' || riskLevel === '中') {
+    } else if (riskLevel === 'Medium') {
       // Medium Risk: 30% Weak, 55% Normal, 15% Tough
       if (strengthRoll < 0.3) {
         strengthMultiplier = 0.65 + Math.random() * 0.2; // 0.65 - 0.85
@@ -901,17 +897,17 @@ const createEnemy = async (
   const variance = () =>
     strengthVariance.min +
     Math.random() * (strengthVariance.max - strengthVariance.min);
-  // 应用境界压制倍率到最终难度
+  // Apply realm suppression multiplier to final difficulty
   const finalDifficulty =
     baseDifficulty * strengthMultiplier * realmLevelReduction;
 
-  // 15%概率使用AI生成敌人名字，失败则使用预设列表
+  // 15% chance to use AI-generated enemy name; fallback to presets on failure
   let name = pickOne(ENEMY_NAMES);
   let title = pickOne(ENEMY_TITLES);
 
   if (adventureType === 'sect_challenge') {
     if (huntSectId && huntLevel !== undefined) {
-      // 根据追杀强度设置敌人名称和称号
+      // Set enemy name and title based on hunt intensity
       if (huntLevel >= 3) {
         name = 'Overseer';
         title = 'Legendary';
@@ -930,7 +926,7 @@ const createEnemy = async (
       title = 'Legendary';
     }
   } else if (adventureType === 'dao_combining_challenge') {
-    // 天地之魄挑战：使用已选中的BOSS
+    // Heaven-Earth Soul challenge: use selected boss
     if (selectedBossForStats) {
       name = selectedBossForStats.name;
       title = 'Anomaly ';
@@ -939,19 +935,19 @@ const createEnemy = async (
 
   if (Math.random() < 0.15 && adventureType !== 'sect_challenge' && adventureType !== 'dao_combining_challenge') {
     try {
-      // 使用模板库生成敌人名称
+      // Use template library to generate enemy name
       const generated = getRandomEnemyName(realm, adventureType);
       if (generated.name && generated.title) {
         name = generated.name;
         title = generated.title;
       }
     } catch (e) {
-      // 模板生成失败，使用预设列表
-      logger.warn('模板生成敌人名字失败，使用预设列表:', e);
+      // Failed to generate from template, use fallback list
+      logger.warn('Failed to generate enemy name from template, using preset list:', e);
     }
   }
 
-  // 如果玩家境界高于秘境要求，使用秘境境界的属性基准，而不是玩家属性
+  // If player realm > secret realm requirement, use secret realm stats as baseline, not player stats
   let basePlayerAttack: number;
   let basePlayerDefense: number;
   let basePlayerMaxHp: number;
@@ -962,9 +958,9 @@ const createEnemy = async (
   if (adventureType === 'secret_realm' && realmMinRealm) {
     const realmMinIndex = REALM_ORDER.indexOf(realmMinRealm);
     if (currentRealmIndex > realmMinIndex) {
-      // 使用秘境境界的属性作为基准（模拟秘境中敌人的合理强度）
-      // 使用秘境最低境界的属性，但会根据风险等级调整
-      // 确保REALM_ORDER.length不为0，防止除零
+      // Use secret realm stats as baseline (simulate reasonable enemy strength in secret realm)
+      // Use minimum secret realm stats, adjusted by risk level
+      // Ensure REALM_ORDER.length is not 0 to prevent division by zero
       const realmOrderLength = REALM_ORDER.length || 1;
       const realmRatio = realmMinIndex / realmOrderLength;
       basePlayerAttack =
@@ -982,7 +978,7 @@ const createEnemy = async (
         player.realmLevel - (currentRealmIndex - realmMinIndex)
       );
     } else {
-      // 玩家境界等于或低于秘境要求，使用玩家属性
+      // Player realm <= secret realm requirement, use player stats
       basePlayerAttack = player.attack;
       basePlayerDefense = player.defense;
       basePlayerMaxHp = player.maxHp;
@@ -991,7 +987,7 @@ const createEnemy = async (
       basePlayerRealmLevel = player.realmLevel;
     }
   } else {
-    // 非秘境历练，使用玩家属性
+    // Non-secret realm adventure, use player stats
     basePlayerAttack = player.attack;
     basePlayerDefense = player.defense;
     basePlayerMaxHp = player.maxHp;
@@ -1000,8 +996,8 @@ const createEnemy = async (
     basePlayerRealmLevel = player.realmLevel;
   }
 
-  // 平衡敌人的基础属性
-  // 天地之魄挑战：直接使用BOSS的基础属性
+  // Balance enemy base stats
+  // Heaven Earth Soul challenge: use BOSS base stats directly
   let baseAttack: number;
   let baseDefense: number;
   let baseMaxHp: number;
@@ -1009,43 +1005,43 @@ const createEnemy = async (
   let baseSpirit: number;
 
   if (adventureType === 'dao_combining_challenge' && selectedBossForStats) {
-    // 使用BOSS的基础属性
+    // Use BOSS base stats
     baseAttack = selectedBossForStats.baseStats.attack;
     baseDefense = selectedBossForStats.baseStats.defense;
     baseMaxHp = selectedBossForStats.baseStats.hp;
     baseSpeed = selectedBossForStats.baseStats.speed;
     baseSpirit = selectedBossForStats.baseStats.spirit;
   } else {
-    // 普通敌人：基于玩家属性计算（优化：降低系数，确保敌人不会过强）
-    // 攻击和防御系数从0.75降低到0.7，境界加成从2.5降低到2，使敌人更平衡
+    // Normal enemy: calculated based on player stats (Optimization: reduce coefficient to ensure enemy is not too strong)
+    // Attack and defense coefficients reduced from 0.75 to 0.7, realm bonus reduced from 2.5 to 2
     baseAttack = basePlayerAttack * 0.7 + basePlayerRealmLevel * 2;
     baseDefense = basePlayerDefense * 0.7 + basePlayerRealmLevel * 2;
-    // 计算敌人神识：基于玩家神识和境界基础神识
+    // Calculate enemy spirit: based on player spirit and realm base spirit
     const realmBaseSpirit = REALM_DATA[realm]?.baseSpirit || 0;
     baseSpirit = basePlayerSpirit * 0.3 + realmBaseSpirit * 0.5 + basePlayerRealmLevel * 1;
-    // 敌人血量从与玩家相同改为70%-90%，确保战斗回合数合理
+    // Enemy HP changed from same as player to 70%-90%, ensuring reasonable battle rounds
     baseMaxHp = basePlayerMaxHp * (0.7 + Math.random() * 0.2);
     baseSpeed = basePlayerSpeed;
   }
 
-  // 天地之魄挑战：根据玩家战斗力动态调整BOSS属性（0.9~3.0倍）
+  // Heaven Earth Soul Challenge: Dynamically adjust BOSS stats based on player combat power (0.9~3.0x)
   if (adventureType === 'dao_combining_challenge' && selectedBossForStats) {
-    // 计算玩家战斗力（综合攻击、防御、血量等属性）
+    // Calculate player combat power (comprehensive attack, defense, HP, etc.)
     const playerCombatPower = basePlayerAttack * 0.4 + basePlayerDefense * 0.3 + basePlayerMaxHp * 0.002 + basePlayerSpeed * 0.15 + basePlayerSpirit * 0.15;
 
-    // 计算BOSS基准战斗力（使用BOSS基础属性）
+    // Calculate BOSS base combat power (using BOSS base stats)
     const bossBaseCombatPower = baseAttack * 0.4 + baseDefense * 0.3 + baseMaxHp * 0.002 + baseSpeed * 0.15 + baseSpirit * 0.15;
 
-    // 随机倍数：0.9~1.8倍玩家战斗力（缩小范围避免难度极端）
+    // Random multiplier: 0.9~1.8x player combat power (narrow range to avoid extreme difficulty)
     const randomMultiplier = 0.9 + Math.random() * 0.9; // 0.9 ~ 1.8
 
-    // 计算目标战斗力
+    // Calculate target combat power
     const targetCombatPower = playerCombatPower * randomMultiplier;
 
-    // 计算比例系数
+    // Calculate ratio coefficient
     const powerRatio = bossBaseCombatPower > 0 ? targetCombatPower / bossBaseCombatPower : randomMultiplier;
 
-    // 按比例调整BOSS属性
+    // Adjust BOSS stats proportionally
     const adjustedAttack = Math.round(baseAttack * powerRatio);
     const adjustedDefense = Math.round(baseDefense * powerRatio);
     const adjustedMaxHp = Math.round(baseMaxHp * powerRatio);
@@ -1061,24 +1057,24 @@ const createEnemy = async (
       maxHp: adjustedMaxHp,
       speed: adjustedSpeed,
       spirit: adjustedSpirit,
-      strengthMultiplier: randomMultiplier, // 保存实际倍数用于生成奖励
+      strengthMultiplier: randomMultiplier, // Save actual multiplier for reward generation
     };
   }
 
-  // 普通敌人：动态调整敌人血量，根据攻击力和防御力计算，确保战斗有足够的回合数（至少3-5回合）
-  // 注意：如果敌人是普通敌人（非天地之魄），baseMaxHp已经在createEnemy中设置为70%-90%玩家血量
-  // 这里只需要根据难度和攻击力比例进行微调
-  const baseHpMultiplier = 1.0; // 基础倍数（因为baseMaxHp已经调整过）
+  // Normal enemy: Dynamically adjust enemy HP based on attack and defense, ensuring enough rounds (at least 3-5)
+  // Note: If enemy is normal (not Heaven Earth Soul), baseMaxHp is already set to 70%-90% of player HP
+  // Here we only fine-tune based on difficulty and attack ratio
+  const baseHpMultiplier = 1.0; // Base multiplier (since baseMaxHp is already adjusted)
   let calculatedHp = Math.round(baseMaxHp * baseHpMultiplier * finalDifficulty);
 
-  // 根据敌人攻击力动态调整：如果敌人攻击力高，血量适当降低；如果攻击力低，血量适当提高
-  // 目标：确保战斗回合数在3-8回合之间
+  // Adjust dynamically based on enemy attack: lower HP if attack is high, higher HP if attack is low
+  // Goal: Ensure battle lasts 3-8 rounds
   const attackRatio = baseAttack / Math.max(1, basePlayerAttack);
   if (attackRatio > 1.2) {
-    // 敌人攻击力很强，血量降低10%，避免战斗过长
+    // Enemy attack is strong, reduce HP by 10% to avoid overly long battle
     calculatedHp = Math.round(calculatedHp * 0.9);
   } else if (attackRatio < 0.8) {
-    // 敌人攻击力较弱，血量提高10%，确保有挑战性
+    // Enemy attack is weak, increase HP by 10% to ensure challenge
     calculatedHp = Math.round(calculatedHp * 1.1);
   }
   return {
@@ -1104,59 +1100,59 @@ const createEnemy = async (
       5,
       Math.round(baseSpirit * variance() * finalDifficulty)
     ),
-    strengthMultiplier, // 保存强度倍数用于生成奖励
+    strengthMultiplier, // Save strength multiplier for reward generation
   };
 };
 
 const calcDamage = (attack: number, defense: number) => {
-  // 确保输入是有效数字，防止NaN
+  // Ensure input is valid number, prevent NaN
   const validAttack = Number(attack) || 0;
   const validDefense = Number(defense) || 0;
 
-  // 优化后的伤害计算：使用双曲线公式，确保防御收益递减但不会完全无效
-  // 公式: damage = attack * (1 - defense / (defense + attack * k))
-  // 这个公式的特点：
-  // 1. 防御力越高，减伤效果越明显，但不会完全无效
-  // 2. 当防御=0时，伤害=攻击力
-  // 3. 当防御=攻击时，伤害约为攻击力的33%（k=0.5时）
-  // 4. 当防御远大于攻击时，伤害会趋近于0，但不会完全为0
-  const k = 0.5; // 调整系数，控制防御收益曲线
+  // Optimized damage calculation: Use hyperbolic formula, ensure defense returns diminishing but not completely invalid
+  // Formula: damage = attack * (1 - defense / (defense + attack * k))
+  // Features of this formula:
+  // 1. The higher the defense, the more obvious the damage reduction effect, but it will not be completely invalid
+  // 2. When defense = 0, damage = attack
+  // 3. When defense = attack, damage is about 33% of attack (when k=0.5)
+  // 4. When defense is far greater than attack, damage will approach 0, but will not be completely 0
+  const k = 0.5; // Adjustment coefficient, control defense return curve
   const denominator = validDefense + validAttack * k;
 
-  // 避免除零
+  // Avoid division by zero
   if (denominator <= 0) {
     return Math.max(1, Math.round(validAttack * (0.9 + Math.random() * 0.2)));
   }
 
-  // 计算基础伤害
+  // Calculate base damage
   const baseDamage = validAttack * (1 - validDefense / denominator);
 
-  // 优化：提高最小伤害到攻击力的15%，确保高防御时仍能造成有效伤害
+  // Optimization: Increase minimum damage to 15% of attack, ensure effective damage even with high defense
   const minDamage = validAttack > 0 ? Math.max(1, Math.floor(validAttack * 0.15)) : 0;
 
-  // 随机波动范围（伤害在一定范围内浮动）
-  const baseRandomRange = 0.2; // 基础±10%波动（即0.9~1.1倍）
-  const randomFactor = 0.9 + Math.random() * baseRandomRange; // 0.9~1.1倍
+  // Random fluctuation range (damage fluctuates within a certain range)
+  const baseRandomRange = 0.2; // Base ±10% fluctuation (i.e. 0.9~1.1 times)
+  const randomFactor = 0.9 + Math.random() * baseRandomRange; // 0.9~1.1 times
   return Math.round(Math.max(minDamage, baseDamage * randomFactor));
 };
 
-// 战斗触发
+// Battle Trigger
 export const shouldTriggerBattle = (
   player: PlayerStats,
   adventureType: AdventureType
 ): boolean => {
-  // 挑战类型（宗主挑战、天地之魄挑战）总是触发战斗
+  // Challenge type (Sect Master Challenge, Heaven Earth Soul Challenge) always triggers battle
   if (adventureType === 'sect_challenge' || adventureType === 'dao_combining_challenge') {
     return true;
   }
 
-  const base = baseBattleChance[adventureType] ?? 0.2; // 基础战斗概率
-  const realmBonus = REALM_ORDER.indexOf(player.realm) * 0.02; // 境界加成（从0.015提高到0.02）
-  const speedBonus = (player.speed || 0) * 0.0005; // 速度加成（从0.0004提高到0.0005）
-  const luckMitigation = (player.luck || 0) * 0.00015; // 幸运减成（从0.0002降低到0.00015，减少影响）
-  const chance = Math.min(0.6, base + realmBonus + speedBonus - luckMitigation); // 保持上限适中
-  return Math.random() < Math.max(0.1, chance); // 确保不会过低也不过高
-  // return true; // 调试战斗打开
+  const base = baseBattleChance[adventureType] ?? 0.2; // Base battle chance
+  const realmBonus = REALM_ORDER.indexOf(player.realm) * 0.02; // Realm bonus (increased from 0.015 to 0.02)
+  const speedBonus = (player.speed || 0) * 0.0005; // Speed bonus (increased from 0.0004 to 0.0005)
+  const luckMitigation = (player.luck || 0) * 0.00015; // Luck mitigation (reduced from 0.0002 to 0.00015, reduce impact)
+  const chance = Math.min(0.6, base + realmBonus + speedBonus - luckMitigation); // Keep upper limit moderate
+  return Math.random() < Math.max(0.1, chance); // Ensure not too low or too high
+  // return true; // Debug battle open
 };
 
 export const resolveBattleEncounter = async (
@@ -1167,7 +1163,7 @@ export const resolveBattleEncounter = async (
   realmName?: string,
   huntSectId?: string | null,
   huntLevel?: number,
-  bossId?: string, // 指定的天地之魄BOSS ID（用于事件模板）
+  bossId?: string, // Specified Heaven Earth Soul BOSS ID (for event template)
 ): Promise<BattleResolution> => {
   const enemy = await createEnemy(
     player,
@@ -1180,15 +1176,15 @@ export const resolveBattleEncounter = async (
     bossId
   );
   const difficulty = getBattleDifficulty(adventureType, riskLevel);
-  // 使用getPlayerTotalStats计算实际最大血量（包含金丹法数、心法等加成）
+  // Use getPlayerTotalStats to calculate actual max HP (including Golden Core Method, Heart Method bonuses)
   const totalStats = getPlayerTotalStats(player);
   const actualMaxHp = totalStats.maxHp;
-  // 确保初始值为有效数字，防止NaN
-  // 按比例调整血量：如果功法增加了最大血量，当前血量也应该按比例增加
-  const baseMaxHp = Number(player.maxHp) || 1; // 避免除零
+  // Ensure initial value is valid number, prevent NaN
+  // Adjust HP proportionally: If Art increased max HP, current HP should also increase proportionally
+  const baseMaxHp = Number(player.maxHp) || 1; // Avoid division by zero
   const currentHp = Number(player.hp) || 0;
-  const hpRatio = baseMaxHp > 0 ? currentHp / baseMaxHp : 0; // 计算血量比例
-  const initialPlayerHp = Math.floor(actualMaxHp * hpRatio); // 按比例应用到新的最大血量
+  const hpRatio = baseMaxHp > 0 ? currentHp / baseMaxHp : 0; // Calculate HP ratio
+  const initialPlayerHp = Math.floor(actualMaxHp * hpRatio); // Apply proportionally to new max HP
   const initialMaxHp = actualMaxHp;
   let playerHp = Math.max(0, Math.min(initialPlayerHp, initialMaxHp));
   let enemyHp = Number(enemy.maxHp) || 0;
@@ -1196,12 +1192,12 @@ export const resolveBattleEncounter = async (
   let attacker: 'player' | 'enemy' =
     (player.speed || 0) >= enemy.speed ? 'player' : 'enemy';
 
-  // 获取激活的灵宠
+  // Get active pet
   const activePet = player.activePetId
     ? player.pets.find((p) => p.id === player.activePetId)
     : null;
 
-  // 初始化灵宠技能冷却（如果还没有）
+  // Initialize pet skill cooldowns (if not yet)
   let petSkillCooldowns: Record<string, number> = {};
   if (activePet && !activePet.skillCooldowns) {
     petSkillCooldowns = {};
@@ -1215,15 +1211,15 @@ export const resolveBattleEncounter = async (
       isPlayerTurn ? player.attack : enemy.attack,
       isPlayerTurn ? enemy.defense : player.defense
     );
-    // 确保速度值是有效数字，防止NaN
+    // Ensure speed value is valid number, prevent NaN
     const playerSpeed = Number(player.speed) || 0;
     const enemySpeed = Number(enemy.speed) || 0;
-    const speedSum = Math.max(1, playerSpeed + enemySpeed); // 确保至少为1，避免除零
+    const speedSum = Math.max(1, playerSpeed + enemySpeed); // Ensure at least 1, avoid division by zero
     const critSpeed = isPlayerTurn ? playerSpeed : enemySpeed;
-    // 优化暴击率计算：降低速度对暴击率的影响，设置上限为20%
-    // 基础10% + 速度加成最高10% = 最高20%暴击率（修复：基础暴击率改为10%）
+    // Optimized crit rate calculation: Reduce speed impact on crit rate, cap at 20%
+    // Base 10% + Speed bonus max 10% = Max 20% crit rate (Fix: Base crit rate changed to 10%)
     const critChanceBase = 0.10 + (critSpeed / speedSum) * 0.10;
-    // 确保暴击率在合理范围内（最高20%）
+    // Ensure crit rate is within reasonable range (max 20%)
     const validCritChance = Math.max(0, Math.min(0.2, critChanceBase));
     const crit = Math.random() < validCritChance;
     const finalDamage = crit ? Math.round(damage * 1.5) : damage;
@@ -1245,29 +1241,29 @@ export const resolveBattleEncounter = async (
       enemyHpAfter: enemyHp,
     });
 
-    // 玩家回合后，灵宠可以行动（附加攻击或释放技能）
+    // After player turn, pet can act (extra attack or cast skill)
     if (isPlayerTurn && activePet && enemyHp > 0) {
-      // 更新技能冷却
+      // Update skill cooldowns
       Object.keys(petSkillCooldowns).forEach((skillId) => {
         if (petSkillCooldowns[skillId] > 0) {
           petSkillCooldowns[skillId]--;
         }
       });
 
-      // 决定灵宠行动：根据亲密度和等级动态调整技能释放概率
-      // 基础概率30%，亲密度每10点增加2%，等级每10级增加1%，最高70%
+      // Decide pet action: dynamically adjust skill probability based on affection and level
+      // Base probability 30%, +2% per 10 affection, +1% per 10 levels, max 70%
       const baseProbability = 0.3;
-      const petAffection = Number(activePet.affection) || 0; // 确保是有效数字
-      const petLevel = Number(activePet.level) || 0; // 确保是有效数字
-      const affectionBonus = (petAffection / 100) * 0.2; // 亲密度加成，最高20%
-      const levelBonus = (petLevel / 100) * 0.1; // 等级加成，最高10%
+      const petAffection = Number(activePet.affection) || 0; // Ensure valid number
+      const petLevel = Number(activePet.level) || 0; // Ensure valid number
+      const affectionBonus = (petAffection / 100) * 0.2; // Affection bonus, max 20%
+      const levelBonus = (petLevel / 100) * 0.1; // Level bonus, max 10%
       const skillProbability = Math.min(0.7, baseProbability + affectionBonus + levelBonus);
       const useSkill = Math.random() < skillProbability;
       let petAction: 'attack' | 'skill' | null = null;
       let usedSkill: PetSkill | null = null;
 
       if (useSkill && activePet.skills.length > 0) {
-        // 查找可用的技能（冷却时间为0或未设置冷却）
+        // Find available skills (cooldown is 0 or not set)
         const availableSkills = activePet.skills.filter(
           (skill) => !petSkillCooldowns[skill.id] || petSkillCooldowns[skill.id] <= 0
         );
@@ -1283,37 +1279,37 @@ export const resolveBattleEncounter = async (
       }
 
       if (petAction === 'skill' && usedSkill) {
-        // 释放技能
+        // Cast skill
         let petDamage = 0;
         let petHeal = 0;
         let petBuff: { attack?: number; defense?: number; hp?: number } | undefined;
 
         if (usedSkill.effect.damage) {
-          // 技能伤害：基础伤害值 + 灵宠攻击力加成 + 等级加成
+          // Skill damage: Base damage + Pet attack bonus + Level bonus
           const baseSkillDamage = Number(usedSkill.effect.damage) || 0;
-          // 根据进化阶段增加攻击力倍率
+          // Increase attack multiplier based on evolution stage
           const evolutionMultiplier = 1.0 + (Number(activePet.evolutionStage) || 0) * 0.5;
-          const attackMultiplier = 1.0 + ((Number(activePet.level) || 0) / 50); // 每50级增加100%攻击力
-          // 攻击力加成从30%提升到100%，并应用进化倍率
+          const attackMultiplier = 1.0 + ((Number(activePet.level) || 0) / 50); // +100% attack per 50 levels
+          // Attack bonus increased from 30% to 100%, and apply evolution multiplier
           const baseAttack = Number(activePet.stats?.attack) || 0;
-          const attackBonus = Math.floor(baseAttack * evolutionMultiplier * attackMultiplier * 1.0); // 100%攻击力加成
-          const levelBonus = Math.floor((Number(activePet.level) || 0) * 5); // 每级+5伤害（从2提升到5）
-          const affectionBonus = Math.floor((Number(activePet.affection) || 0) * 0.8); // 亲密度对技能伤害也有加成
+          const attackBonus = Math.floor(baseAttack * evolutionMultiplier * attackMultiplier * 1.0); // 100% attack bonus
+          const levelBonus = Math.floor((Number(activePet.level) || 0) * 5); // +5 damage per level (increased from 2)
+          const affectionBonus = Math.floor((Number(activePet.affection) || 0) * 0.8); // Affection also boosts skill damage
           const skillDamage = baseSkillDamage + attackBonus + levelBonus + affectionBonus;
           petDamage = calcDamage(skillDamage, enemy.defense);
           enemyHp = Math.max(0, (Number(enemyHp) || 0) - petDamage);
         }
 
         if (usedSkill.effect.heal) {
-          // 治疗玩家
+          // Heal player
           const baseHeal = Number(usedSkill.effect.heal) || 0;
           const petLevel = Number(activePet.level) || 0;
           const petAffection = Number(activePet.affection) || 0;
           petHeal = Math.floor(
             baseHeal * (1 + petLevel * 0.05) * (1 + petAffection / 200)
           );
-          // 使用getPlayerTotalStats计算实际最大血量（包含金丹法数、心法等加成）
-          const totalStats = getPlayerTotalStats(player);
+          // Calculate actual max HP using getPlayerTotalStats (includes Golden Core method, Mental Arts bonuses, etc.)
+  const totalStats = getPlayerTotalStats(player);
           const actualMaxHp = totalStats.maxHp;
           playerHp = Math.max(0, Math.min(actualMaxHp, Math.floor((Number(playerHp) || 0) + petHeal)));
         }
@@ -1322,7 +1318,7 @@ export const resolveBattleEncounter = async (
           petBuff = usedSkill.effect.buff;
         }
 
-        // 设置技能冷却
+        // Set skill cooldown
         if (usedSkill.cooldown) {
           petSkillCooldowns[usedSkill.id] = usedSkill.cooldown;
         }
@@ -1337,9 +1333,9 @@ export const resolveBattleEncounter = async (
         }
         if (petBuff) {
           const buffParts: string[] = [];
-          if (petBuff.attack) buffParts.push(`攻击+${petBuff.attack}`);
-          if (petBuff.defense) buffParts.push(`防御+${petBuff.defense}`);
-          if (petBuff.hp) buffParts.push(`气血+${petBuff.hp}`);
+          if (petBuff.attack) buffParts.push(`ATK+${petBuff.attack}`);
+          if (petBuff.defense) buffParts.push(`DEF+${petBuff.defense}`);
+          if (petBuff.hp) buffParts.push(`HP+${petBuff.hp}`);
           if (buffParts.length > 0) {
             skillDesc += ` You gained buff: ${buffParts.join(', ')}.`;
           }
@@ -1355,14 +1351,14 @@ export const resolveBattleEncounter = async (
           enemyHpAfter: enemyHp,
         });
       } else {
-        // 普通攻击：基础攻击力 + 攻击力百分比加成 + 等级加成 + 亲密度加成
+        // Normal attack: Base attack + Attack % bonus + Level bonus + Affection bonus
         const baseAttack = Number(activePet.stats?.attack) || 0;
-        // 根据进化阶段增加攻击力倍率（幼年期1.0，成熟期1.5，完全体2.0）
+        // Evolution multiplier (Juvenile 1.0, Mature 1.5, Complete 2.0)
         const evolutionMultiplier = 1.0 + (Number(activePet.evolutionStage) || 0) * 0.5;
-        const attackMultiplier = 1.0 + ((Number(activePet.level) || 0) / 50); // 每50级增加100%攻击力
-        const levelBonus = Math.floor((Number(activePet.level) || 0) * 8); // 每级+8攻击（从3提升到8）
-        const affectionBonus = Math.floor((Number(activePet.affection) || 0) * 1.5); // 亲密度加成（从0.5提升到1.5）
-        // 最终攻击力 = (基础攻击力 * 进化倍率 * 等级倍率) + 等级加成 + 亲密度加成
+        const attackMultiplier = 1.0 + ((Number(activePet.level) || 0) / 50); // +100% attack per 50 levels
+        const levelBonus = Math.floor((Number(activePet.level) || 0) * 8); // +8 attack per level
+        const affectionBonus = Math.floor((Number(activePet.affection) || 0) * 1.5); // Affection bonus
+        // Final attack = (Base * Evo * LevelMultiplier) + LevelBonus + AffectionBonus
         const petAttackDamage = Math.floor(baseAttack * evolutionMultiplier * attackMultiplier) + levelBonus + affectionBonus;
         const petDamage = calcDamage(petAttackDamage, enemy.defense);
         enemyHp = Math.max(0, (Number(enemyHp) || 0) - petDamage);
@@ -1388,7 +1384,7 @@ export const resolveBattleEncounter = async (
 
   const victory = enemyHp <= 0 && playerHp > 0;
 
-  // 确保hpLoss是有效数字，防止NaN
+  // Ensure hpLoss is valid number
   const playerHpBefore = Number(player.hp) || 0;
   const playerHpAfter = Number(playerHp) || 0;
   const hpLoss = Math.max(0, Math.floor(playerHpBefore - playerHpAfter));
@@ -1403,31 +1399,27 @@ export const resolveBattleEncounter = async (
       Medium: 1.3,
       High: 1.6,
       'Extreme': 2.2,
-      '低': 1.0,
-      '中': 1.3,
-      '高': 1.6,
-      '极度危险': 2.2,
     };
-    return multipliers[riskLevel];
+    return multipliers[riskLevel] || 1.0;
   };
 
   const rewardMultiplier =
     adventureType === 'secret_realm' ? getRewardMultiplier(riskLevel) : 1.0;
 
-  // 根据境界计算基础奖励（高境界获得更多奖励）
+  // Calculate base reward based on Realm (Higher realm = more rewards)
   const realmIndex = REALM_ORDER.indexOf(player.realm);
-  // 优化后的境界基础倍数：与装备倍数保持一致，防止数值膨胀
-  // 从 [1, 2, 4, 8, 16, 32, 64] 改为 [1, 1.5, 2.5, 4, 6, 10, 16]
-  // 这样最高倍数从64倍降低到16倍，与境界属性增长（5倍）更匹配
+  // Optimized Realm Multipliers: Consistent with equipment multipliers to prevent stat inflation
+  // From [1, 2, 4, 8, 16, 32, 64] to [1, 1.5, 2.5, 4, 6, 10, 16]
+  // Max multiplier reduced from 64x to 16x, matching realm stat growth (5x)
   const realmBaseMultipliers = [1, 1.5, 2.5, 4, 6, 10, 16];
   const realmBaseMultiplier = realmBaseMultipliers[realmIndex] || 1;
 
-  // 基础修为 = 境界基础倍数 * (基础值 + 境界等级 * 系数) * 境界等级加成
-  const levelMultiplier = 1 + (player.realmLevel - 1) * 0.15; // 每级增加15%（从20%降低）
+  // Base Exp = Realm Multiplier * (Base + Level * Factor) * Level Bonus
+  const levelMultiplier = 1 + (player.realmLevel - 1) * 0.15; // +15% per level
   const baseExp = Math.round(realmBaseMultiplier * (50 + player.realmLevel * 25) * levelMultiplier);
   const rewardExp = Math.round(baseExp * difficulty * rewardMultiplier);
 
-  // 基础灵石 = 境界基础倍数 * (基础值 + 境界等级 * 系数) * 境界等级加成
+  // Base Spirit Stones = Realm Multiplier * (Base + Level * Factor) * Level Bonus
   const baseStones = Math.round(realmBaseMultiplier * (15 + player.realmLevel * 5) * levelMultiplier);
   const rewardStones = Math.max(
     10,
@@ -1441,7 +1433,7 @@ export const resolveBattleEncounter = async (
     ? rewardStones
     : -Math.max(2, Math.round(rewardStones * 0.6));
 
-  // 如果胜利，生成搜刮奖励
+  // If victory, generate loot
   const lootItems: AdventureResult['itemObtained'][] = [];
   if (victory) {
     const loot = generateLoot(
@@ -1453,7 +1445,7 @@ export const resolveBattleEncounter = async (
     lootItems.push(...loot);
   }
 
-  // 生成更丰富的战斗描述（如果有秘境信息，会结合秘境特点）
+  // Generate richer battle descriptions (combine with Secret Realm features if available)
   const generateBattleSummary = (
     victory: boolean,
     enemy: { name: string; title: string },
@@ -1461,41 +1453,41 @@ export const resolveBattleEncounter = async (
     hasLoot: boolean,
     realmName?: string
   ): string => {
-    // 如果有秘境名称，生成与秘境相关的描述
+    // If secret realm name exists, generate secret realm related description
     if (realmName && adventureType === 'secret_realm') {
-      const realmContext = `在${realmName}中，`;
+      const realmContext = `In [${realmName}], `;
       const victoryScenarios = [
-        `${realmContext}你与${enemy.title}${enemy.name}展开激战。最终，你将其斩于剑下，但也耗费了 ${hpLoss} 点气血。${hasLoot ? '你仔细搜刮了敌人的遗物。' : ''}`,
-        `${realmContext}你遭遇了${enemy.title}${enemy.name}的袭击。经过一番殊死搏斗，你成功将其击败，消耗了 ${hpLoss} 点气血。${hasLoot ? '你从敌人身上找到了战利品。' : ''}`,
-        `${realmContext}你与${enemy.title}${enemy.name}在秘境中展开对决。最终，你凭借更强的实力将其斩杀，损失了 ${hpLoss} 点气血。${hasLoot ? '你检查了敌人的遗物，收获颇丰。' : ''}`,
+        `${realmContext}you fought fiercely against ${enemy.title} ${enemy.name}. Finally, you slew it, but lost ${hpLoss} HP. ${hasLoot ? 'You carefully searched its remains.' : ''}`,
+        `${realmContext}you were ambushed by ${enemy.title} ${enemy.name}. After a desperate struggle, you defeated it, consuming ${hpLoss} HP. ${hasLoot ? 'You found loot on the enemy.' : ''}`,
+        `${realmContext}you confronted ${enemy.title} ${enemy.name}. You killed it with superior strength, losing ${hpLoss} HP. ${hasLoot ? 'You checked the remains and found a bountiful harvest.' : ''}`,
       ];
       const defeatScenarios = [
-        `${realmContext}你与${enemy.title}${enemy.name}的战斗异常艰难。对方实力强大，你拼尽全力仍不敌，只得重伤撤离，损失了 ${hpLoss} 点气血。`,
-        `${realmContext}你遭遇了强大的${enemy.title}${enemy.name}。面对其猛烈的攻击，你渐渐落入下风，只能带着伤势逃离，损失了 ${hpLoss} 点气血。`,
+        `${realmContext}the battle with ${enemy.title} ${enemy.name} was extremely difficult. The enemy was too strong, and you had to retreat with heavy injuries, losing ${hpLoss} HP.`,
+        `${realmContext}you encountered a powerful ${enemy.title} ${enemy.name}. Facing its fierce attacks, you fell into a disadvantage and had to flee, losing ${hpLoss} HP.`,
       ];
       const scenarios = victory ? victoryScenarios : defeatScenarios;
       return scenarios[Math.floor(Math.random() * scenarios.length)];
     }
 
-    // 默认描述（非秘境）
+    // Default description (Non-secret realm)
     const battleScenarios = victory
       ? [
-        `经过一番激烈的战斗，你最终将${enemy.title}${enemy.name}斩于剑下。虽然耗费了 ${hpLoss} 点气血，但你成功获得了胜利。${hasLoot ? '你仔细搜刮了敌人的遗物，发现了一些有用的物品。' : ''}`,
-        `你与${enemy.title}${enemy.name}展开了殊死搏斗，剑光与妖气交织。最终，你凭借精湛的剑法将其击败，但也消耗了 ${hpLoss} 点气血。${hasLoot ? '你从敌人身上搜刮到了一些战利品。' : ''}`,
-        `面对${enemy.title}${enemy.name}的疯狂攻击，你沉着应对，运转功法防御。经过一番苦战，你终于找到破绽，将其一击必杀。虽然损失了 ${hpLoss} 点气血，但胜利的喜悦让你忘记了疼痛。${hasLoot ? '你检查了敌人的遗物，收获颇丰。' : ''}`,
-        `你与${enemy.title}${enemy.name}的战斗异常激烈，双方都拼尽全力。最终，你凭借更强的实力将其斩杀，但也被其临死反击，损失了 ${hpLoss} 点气血。${hasLoot ? '战斗结束后，你搜刮了战利品。' : ''}`,
-        `你祭出法宝，与${enemy.title}${enemy.name}展开对决。战斗持续了数个回合，法宝的光芒与妖气不断碰撞。最终，你技高一筹，成功将其击杀，但气血也损耗了 ${hpLoss} 点。${hasLoot ? '你在敌人身上找到了一些有价值的物品。' : ''}`,
-        `你施展神通，与${enemy.title}${enemy.name}展开激战。双方你来我往，招式层出不穷。最终，你抓住机会，一剑将其斩杀。虽然耗费了 ${hpLoss} 点气血，但你的实力也在这场战斗中得到了提升。${hasLoot ? '你仔细搜刮了敌人的遗物。' : ''}`,
+        `After a fierce battle, you finally slew ${enemy.title} ${enemy.name}. Although you lost ${hpLoss} HP, you emerged victorious. ${hasLoot ? 'You searched the remains and found useful items.' : ''}`,
+        `You engaged in a life-and-death struggle with ${enemy.title} ${enemy.name}. You defeated it with your skills, but consumed ${hpLoss} HP. ${hasLoot ? 'You looted some spoils from the enemy.' : ''}`,
+        `Facing the crazy attacks of ${enemy.title} ${enemy.name}, you defended calmly. After a bitter fight, you found a flaw and killed it in one blow. Although you lost ${hpLoss} HP, the joy of victory made you forget the pain. ${hasLoot ? 'You checked the remains and found a bountiful harvest.' : ''}`,
+        `Your battle with ${enemy.title} ${enemy.name} was intense. You killed it with superior strength, but also took damage from its dying counterattack, losing ${hpLoss} HP. ${hasLoot ? 'After the battle, you looted the spoils.' : ''}`,
+        `You used your artifact to fight ${enemy.title} ${enemy.name}. After several rounds, you won by a narrow margin, killing it but losing ${hpLoss} HP. ${hasLoot ? 'You found some valuable items on the enemy.' : ''}`,
+        `You unleashed your divine powers against ${enemy.title} ${enemy.name}. After trading blows, you seized the opportunity to kill it. Although you lost ${hpLoss} HP, your strength improved in this battle. ${hasLoot ? 'You carefully searched the remains.' : ''}`,
       ]
       : [
-        `你与${enemy.title}${enemy.name}展开了激烈的战斗，但对方的实力远超你的想象。你拼尽全力抵抗，却依然不敌，只得重伤撤离，损失了 ${hpLoss} 点气血。`,
-        `面对强大的${enemy.title}${enemy.name}，你奋力迎战。然而，对方的攻击太过猛烈，你渐渐落入下风。最终，你不得不放弃战斗，带着伤势逃离，损失了 ${hpLoss} 点气血。`,
-        `你与${enemy.title}${enemy.name}的战斗异常艰难。对方的速度和力量都远超你的预期，你虽然拼尽全力，却依然无法战胜。为了保全性命，你只能重伤撤离，损失了 ${hpLoss} 点气血。`,
-        `你祭出法宝与${enemy.title}${enemy.name}交战，但对方的防御力极强，你的攻击无法造成有效伤害。眼看局势不妙，你只得放弃战斗，带着伤势撤离，损失了 ${hpLoss} 点气血。`,
-        `你施展神通与${enemy.title}${enemy.name}对决，但对方的实力深不可测。经过一番苦战，你意识到无法取胜，只得选择撤退，损失了 ${hpLoss} 点气血。`,
+        `You fought fiercely with ${enemy.title} ${enemy.name}, but its strength far exceeded your imagination. You resisted with all your might but were still defeated, retreating with heavy injuries and losing ${hpLoss} HP.`,
+        `Facing the powerful ${enemy.title} ${enemy.name}, you fought bravely. However, the enemy's attacks were too fierce, and you gradually fell into a disadvantage. Finally, you had to abandon the battle and flee, losing ${hpLoss} HP.`,
+        `The battle with ${enemy.title} ${enemy.name} was extremely difficult. Its speed and power exceeded your expectations. You fought hard but could not win. To save your life, you retreated with heavy injuries, losing ${hpLoss} HP.`,
+        `You used your artifact to fight ${enemy.title} ${enemy.name}, but its defense was extremely strong. Seeing the situation was bad, you had to abandon the battle and retreat, losing ${hpLoss} HP.`,
+        `You used your divine powers against ${enemy.title} ${enemy.name}, but its strength was unfathomable. After a bitter fight, you realized you could not win and chose to retreat, losing ${hpLoss} HP.`,
       ];
 
-    // 随机选择一个场景描述
+    // Randomly select a scenario description
     return battleScenarios[Math.floor(Math.random() * battleScenarios.length)];
   };
 
@@ -1507,7 +1499,7 @@ export const resolveBattleEncounter = async (
     realmName
   );
 
-  // 确保hpChange是有效数字，防止NaN
+  // Ensure hpChange is valid number, prevent NaN
   const hpChange = Math.floor(playerHpAfter - playerHpBefore);
 
   const adventureResult: AdventureResult = {
@@ -1519,7 +1511,7 @@ export const resolveBattleEncounter = async (
     itemsObtained: lootItems.length > 0 ? lootItems : undefined,
   };
 
-  // 清理冷却时间为0的技能冷却（节省存储空间）
+  // Clear skill cooldowns with 0 cooldown (save storage space)
   const finalPetSkillCooldowns: Record<string, number> = {};
   if (activePet) {
     Object.keys(petSkillCooldowns).forEach((skillId) => {
@@ -1549,10 +1541,10 @@ export const resolveBattleEncounter = async (
   };
 };
 
-// ==================== 回合制战斗系统 ====================
+// ==================== Turn-Based Battle System ====================
 
 /**
- * 计算战斗奖励
+ * Calculate Battle Rewards
  */
 export const calculateBattleRewards = (
   battleState: BattleState,
@@ -1569,11 +1561,11 @@ export const calculateBattleRewards = (
   const actualRiskLevel = riskLevel || battleState.riskLevel;
   const difficulty = getBattleDifficulty(actualAdventureType, actualRiskLevel);
 
-  // 根据敌人强度计算奖励倍数（敌人越强，奖励越多）
+  // Calculate reward multiplier based on enemy strength (stronger enemy, more rewards)
   const enemyStrength = battleState.enemyStrengthMultiplier || 1.0;
-  const strengthRewardMultiplier = 0.8 + enemyStrength * 0.4; // 0.8-1.2倍（弱敌）到 1.2-2.0倍（强敌）
+  const strengthRewardMultiplier = 0.8 + enemyStrength * 0.4; // 0.8-1.2x (Weak) to 1.2-2.0x (Strong)
 
-  // 根据风险等级调整奖励倍数
+  // Adjust reward multiplier based on risk level
   const getRewardMultiplier = (
     riskLevel?: RiskLevel
   ): number => {
@@ -1583,10 +1575,10 @@ export const calculateBattleRewards = (
       Medium: 1.3,
       High: 1.6,
       'Extreme': 2.2,
-      '低': 1.0,
-      '中': 1.3,
-      '高': 1.6,
-      '极度危险': 2.2,
+      'Low': 1.0,
+      'Medium': 1.3,
+      'High': 1.6,
+      'Extreme Danger': 2.2,
     };
     return multipliers[riskLevel] || 1.0;
   };
@@ -1594,32 +1586,32 @@ export const calculateBattleRewards = (
   const riskRewardMultiplier =
     actualAdventureType === 'secret_realm' ? getRewardMultiplier(actualRiskLevel) : 1.0;
 
-  // 综合奖励倍数
+  // Comprehensive reward multiplier
   const totalRewardMultiplier = difficulty * riskRewardMultiplier * strengthRewardMultiplier;
 
-  // 根据境界计算基础奖励（高境界获得更多奖励）
+  // Calculate base reward based on Realm (Higher realm = more rewards)
   const realmIndex = REALM_ORDER.indexOf(player.realm);
-  // 境界基础倍数：每个境界大幅增加奖励倍数（指数增长）
+  // Realm Base Multiplier: Each realm significantly increases reward multiplier (exponential growth)
   const realmBaseMultipliers = [1, 2, 4, 8, 16, 32, 64];
   const realmBaseMultiplier = realmBaseMultipliers[realmIndex] || 1;
 
-  // 基础修为 = 境界基础倍数 * (基础值 + 境界等级 * 系数) * 境界等级加成
-  const levelMultiplier = 1 + (player.realmLevel - 1) * 0.2; // 每级增加20%
+  // Base Cultivation = Realm Base Multiplier * (Base Value + Realm Level * Coefficient) * Realm Level Bonus
+  const levelMultiplier = 1 + (player.realmLevel - 1) * 0.2; // Increase 20% per level
   const baseExp = Math.round(realmBaseMultiplier * (50 + player.realmLevel * 25) * levelMultiplier);
   const rewardExp = Math.round(baseExp * totalRewardMultiplier);
 
-  // 基础灵石 = 境界基础倍数 * (基础值 + 境界等级 * 系数) * 境界等级加成
-  const baseStones = Math.round(realmBaseMultiplier * (15 + player.realmLevel * 5) * levelMultiplier);
+  // Base Spirit Stones = Realm Base Multiplier * (Base Value + Realm Level * Coefficient) * Realm Level Bonus
+  const baseSpiritStones = Math.round(realmBaseMultiplier * (15 + player.realmLevel * 5) * levelMultiplier);
   const rewardStones = Math.max(
     10,
     Math.round(baseStones * totalRewardMultiplier)
   );
 
-  // 宗门挑战特殊奖励（只有战胜宗主才给特殊奖励）
+  // Sect Challenge Special Reward (Only for defeating Sect Master)
   if (actualAdventureType === 'sect_challenge') {
-    // 判断是否是宗主战斗：
-    // 1. 追杀战斗且 huntLevel >= 3（战胜宗主）
-    // 2. 正常挑战且是长老挑战宗主
+    // Check if Sect Master Battle:
+    // 1. Hunt battle and huntLevel >= 3 (Defeated Sect Master)
+    // 2. Normal challenge and Elder challenges Sect Master
     const isHuntMasterBattle = player.sectId === null &&
       player.sectHuntSectId &&
       player.sectHuntLevel !== undefined &&
@@ -1629,33 +1621,33 @@ export const calculateBattleRewards = (
     const isMasterBattle = isHuntMasterBattle || isNormalMasterBattle;
 
     if (victory && isMasterBattle) {
-      // 战胜宗主，给予特殊奖励
+      // Defeated Sect Master, give special reward
       return {
         expChange: SECT_MASTER_CHALLENGE_REQUIREMENTS.victoryReward.exp,
         spiritChange: SECT_MASTER_CHALLENGE_REQUIREMENTS.victoryReward.spiritStones,
         items: [
           {
-            name: '宗主信物',
+            name: 'Sect Master Token',
             type: ItemType.Material,
             rarity: 'Mythic',
-            description: '宗门之主的象征，持此信物可号令宗门上下。'
+            description: 'Symbol of the Sect Master. With this token, you can command the entire sect.'
           },
           {
-            name: '宗门宝库钥匙',
+            name: 'Sect Vault Key',
             type: ItemType.Material,
             rarity: 'Mythic',
-            description: '用于开启宗门宝库的钥匙，藏有历代宗主的积累。'
+            description: 'Key to open the Sect Vault, containing the accumulation of past Sect Masters.'
           }
         ]
       };
     } else if (!victory && isMasterBattle) {
-      // 挑战宗主失败，根据常量扣除修为
+      // Failed to challenge Sect Master, deduct cultivation base based on constant
       return {
         expChange: -SECT_MASTER_CHALLENGE_REQUIREMENTS.defeatPenalty.expLoss,
         spiritChange: 0,
       };
     }
-    // 如果不是宗主战斗，继续使用普通奖励计算逻辑
+    // If not Sect Master battle, continue with normal reward calculation logic
   }
 
   const expChange = victory
@@ -1665,7 +1657,7 @@ export const calculateBattleRewards = (
     ? rewardStones
     : -Math.max(2, Math.round(rewardStones * 0.6));
 
-  // 如果胜利，生成物品奖励
+  // If victory, generate item rewards
   let items: AdventureResult['itemObtained'][] | undefined = undefined;
   if (victory) {
     items = generateLoot(
@@ -1680,7 +1672,7 @@ export const calculateBattleRewards = (
 };
 
 /**
- * 初始化回合制战斗
+ * Initialize Turn-Based Battle
  */
 export const initializeTurnBasedBattle = async (
   player: PlayerStats,
@@ -1688,17 +1680,17 @@ export const initializeTurnBasedBattle = async (
   riskLevel?: RiskLevel,
   realmMinRealm?: RealmType,
   sectMasterId?: string | null,
-  bossId?: string // 指定的天地之魄BOSS ID（用于事件模板）
+  bossId?: string // Specified Heaven Earth Soul BOSS ID (for event template)
 ): Promise<BattleState> => {
-  // 创建敌人（如果是追杀战斗，从 player 对象中获取追杀参数）
+  // Create enemy (if hunt battle, get hunt params from player object)
   const huntSectId = adventureType === 'sect_challenge' && player.sectId === null ? player.sectHuntSectId : undefined;
   const huntLevel = adventureType === 'sect_challenge' && player.sectId === null ? player.sectHuntLevel : undefined;
   const enemyData = await createEnemy(player, adventureType, riskLevel, realmMinRealm, sectMasterId, huntSectId, huntLevel, bossId);
 
-  // 创建玩家战斗单位
+  // Create player battle unit
   const playerUnit = createBattleUnitFromPlayer(player);
 
-  // 创建敌人战斗单位
+  // Create enemy battle unit
   const enemyUnit: BattleUnit = {
     id: 'enemy',
     name: enemyData.name,
@@ -1708,23 +1700,23 @@ export const initializeTurnBasedBattle = async (
     attack: enemyData.attack,
     defense: enemyData.defense,
     speed: enemyData.speed,
-    spirit: enemyData.spirit, // 使用敌人数据中的神识属性
+    spirit: enemyData.spirit, // Use spirit attribute from enemy data
     buffs: [],
     debuffs: [],
-    skills: [], // 敌人技能（可以后续添加）
+    skills: [], // Enemy skills (can be added later)
     cooldowns: {},
-    // 敌人MP也根据属性计算
+    // Enemy MP also calculated based on attributes
     mana: Math.floor(enemyData.attack * 0.3 + enemyData.maxHp * 0.05),
     maxMana: Math.floor(enemyData.attack * 0.3 + enemyData.maxHp * 0.05),
     isDefending: false,
   };
 
-  // 获取激活的灵宠
+  // Get active pet
   const activePet = player.activePetId
     ? player.pets.find((p) => p.id === player.activePetId)
     : null;
 
-  // 初始化灵宠技能冷却
+  // Initialize pet skill cooldowns
   let petSkillCooldowns: Record<string, number> = {};
   if (activePet) {
     if (activePet.skillCooldowns) {
@@ -1734,7 +1726,7 @@ export const initializeTurnBasedBattle = async (
     }
   }
 
-  // 确定先手
+  // Determine turn order
   const playerFirst = (playerUnit.speed || 0) >= enemyUnit.speed;
 
   const playerMaxActions = calculateActionCount(
@@ -1750,14 +1742,14 @@ export const initializeTurnBasedBattle = async (
     playerUnit.spirit
   );
 
-  // 初始化战斗历史
+  // Initialize battle history
   const initialHistory: BattleAction[] = [];
 
-  // 如果玩家神识比对手高，添加震慑提示
+  // If player spirit is higher than opponent, add intimidate hint
   if (playerUnit.spirit > enemyUnit.spirit) {
     const spiritDiff = playerUnit.spirit - enemyUnit.spirit;
     const spiritRatio = spiritDiff / enemyUnit.spirit;
-    // 如果神识优势超过20%，添加震慑日志
+    // If spirit advantage exceeds 20%, add intimidate log
     if (spiritRatio >= 0.2) {
       const intimidateAction: BattleAction = {
         id: randomId(),
@@ -1766,7 +1758,7 @@ export const initializeTurnBasedBattle = async (
         actor: 'player',
         actionType: 'attack',
         result: {},
-        description: `✨ 你的神识远超对手，对手被你震慑了！`,
+        description: `✨ Your perception far exceeds the opponent! They are intimidated!`,
       };
       initialHistory.push(intimidateAction);
     }
@@ -1781,42 +1773,42 @@ export const initializeTurnBasedBattle = async (
     history: initialHistory,
     isPlayerTurn: playerFirst,
     waitingForPlayerAction: playerFirst,
-    playerInventory: player.inventory, // 保存玩家背包
+    playerInventory: player.inventory, // Save player inventory
     playerActionsRemaining: playerFirst ? playerMaxActions : 0,
     enemyActionsRemaining: playerFirst ? 0 : enemyMaxActions,
     playerMaxActions,
     enemyMaxActions,
-    enemyStrengthMultiplier: enemyData.strengthMultiplier, // 保存敌人强度倍数
-    adventureType, // 保存历练类型
-    riskLevel, // 保存风险等级
-    activePet, // 保存激活的灵宠
-    petSkillCooldowns, // 保存灵宠技能冷却
+    enemyStrengthMultiplier: enemyData.strengthMultiplier, // Save enemy strength multiplier
+    adventureType, // Save adventure type
+    riskLevel, // Save risk level
+    activePet, // Save active pet
+    petSkillCooldowns, // Save pet skill cooldowns
   };
 };
 
 /**
- * 为没有配置技能的功法生成默认技能
+ * Generate default skill for Arts without configured skills
  */
 function generateDefaultSkillForArt(art: { id: string; name: string; type: string; grade: string; effects: any }): BattleSkill | null {
-  // 根据功法类型和品级生成不同的技能
+  // Generate different skills based on Art type and grade
   const gradeMultipliers: Record<string, number> = {
-    '黄': 1.0,
-    '玄': 1.5,
-    '地': 2.5,
-    '天': 4.0,
+    'C': 1.0,
+    'B': 1.5,
+    'A': 2.5,
+    'S': 4.0,
   };
   const multiplier = gradeMultipliers[art.grade] || 1.0;
 
-  // 根据功法类型决定技能类型
+  // Determine skill type based on Art type
   if (art.type === 'body') {
-    // 体术类功法 -> 攻击技能
+    // Body Art -> Attack Skill
     const baseDamage = Math.round(30 * multiplier);
     const damageMultiplier = 0.8 + (multiplier - 1) * 0.3;
 
     return {
       id: `skill-${art.id}`,
       name: art.name,
-      description: `施展${art.name}，对敌人造成伤害。`,
+      description: `Unleash ${art.name}, dealing damage to the enemy.`,
       type: 'attack',
       source: 'cultivation_art',
       sourceId: art.id,
@@ -1834,13 +1826,13 @@ function generateDefaultSkillForArt(art: { id: string; name: string; type: strin
       },
     };
   } else if (art.type === 'mental') {
-    // 心法类功法 -> 根据效果决定技能类型
+    // Mental Art -> Skill type determined by effect
     if (art.effects?.expRate) {
-      // 如果有修炼速度加成，生成Buff技能（提升属性）
+      // If has exp rate bonus, generate Buff skill (boost attributes)
       return {
         id: `skill-${art.id}`,
         name: art.name,
-        description: `运转${art.name}，提升自身属性。`,
+        description: `Activate ${art.name}, boosting own attributes.`,
         type: 'buff',
         source: 'cultivation_art',
         sourceId: art.id,
@@ -1852,10 +1844,10 @@ function generateDefaultSkillForArt(art: { id: string; name: string; type: strin
               id: `${art.id}-buff`,
               name: art.name,
               type: 'attack',
-              value: 0.1 * multiplier, // 10% * 品级倍数
+              value: 0.1 * multiplier, // 10% * grade multiplier
               duration: 3,
               source: art.id,
-              description: `攻击力提升${Math.round(10 * multiplier)}%`,
+              description: `Attack increased by ${Math.round(10 * multiplier)}%`,
             },
           },
         ],
@@ -1865,14 +1857,14 @@ function generateDefaultSkillForArt(art: { id: string; name: string; type: strin
         target: 'self',
       };
     } else {
-      // 其他心法 -> 法术攻击
+      // Other Mental Arts -> Magical Attack
       const baseDamage = Math.round(40 * multiplier);
       const damageMultiplier = 1.0 + (multiplier - 1) * 0.4;
 
       return {
         id: `skill-${art.id}`,
         name: art.name,
-        description: `施展${art.name}，对敌人造成法术伤害。`,
+        description: `Cast ${art.name}, dealing magical damage to the enemy.`,
         type: 'attack',
         source: 'cultivation_art',
         sourceId: art.id,
@@ -1896,10 +1888,10 @@ function generateDefaultSkillForArt(art: { id: string; name: string; type: strin
 }
 
 /**
- * 从玩家数据创建战斗单位
+ * Create battle unit from player data
  */
-function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
-  // 获取包含心法加成的总属性
+export function createPlayerUnit(player: PlayerStats): BattleUnit {
+  // Get total stats including Mental Art bonuses
   const totalStats = getPlayerTotalStats(player);
 
   const equippedItems = getEquippedItems(player);
@@ -1908,26 +1900,26 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
   let totalSpirit = totalStats.spirit;
   let totalSpeed = totalStats.speed;
 
-  // 注意：player.attack 等字段已经包含了装备加成
-  // getPlayerTotalStats 也包含了心法加成
-  // 所以这里不再需要遍历 equippedItems 累加属性，否则会重复计算
+  // Note: player.attack etc. already include equipment bonuses
+  // getPlayerTotalStats also includes Mental Art bonuses
+  // So no need to iterate equippedItems to add stats here, otherwise it will double count
 
-  // 收集所有可用技能
+  // Collect all available skills
   const skills: BattleSkill[] = [];
 
-  // 优化：预先建立功法映射，避免在循环中重复查找
+  // Optimization: Pre-build Art map to avoid repeated lookups in loop
   const artsMap = new Map(
     CULTIVATION_ARTS.map(art => [art.id, art])
   );
 
-  // 1. 功法技能
+  // 1. Cultivation Art Skills
   player.cultivationArts.forEach((artId) => {
     const artSkills = CULTIVATION_ART_BATTLE_SKILLS[artId];
     if (artSkills) {
-      // 如果功法有配置的技能，使用配置的技能
+      // If Art has configured skills, use them
       skills.push(...artSkills.map((s) => ({ ...s, cooldown: 0 })));
     } else {
-      // 如果功法没有配置技能，自动生成默认技能
+      // If Art has no configured skills, auto-generate default skill
       const art = artsMap.get(artId);
       if (art) {
         const defaultSkill = generateDefaultSkillForArt(art);
@@ -1938,16 +1930,16 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
     }
   });
 
-  // 2. 法宝/武器技能
-  // 优化：预先建立技能查找映射，避免在循环中重复调用 Object.values()
+  // 2. Artifact/Weapon Skills
+  // Optimization: Pre-build skill lookup map to avoid repeated Object.values() calls
   const artifactSkillsBySourceId = new Map<string, BattleSkill[]>();
   const weaponSkillsBySourceId = new Map<string, BattleSkill[]>();
 
-  // 建立 sourceId 到技能的映射（用于 fallback 查找）
+  // Build sourceId to skills map (for fallback lookup)
   Object.entries(ARTIFACT_BATTLE_SKILLS).forEach(([key, skillArray]) => {
-    // 支持直接通过 key 查找
+    // Support direct lookup by key
     artifactSkillsBySourceId.set(key, skillArray);
-    // 建立 sourceId 到技能的映射
+    // Build sourceId to skills map
     skillArray.forEach((skill) => {
       if (skill.sourceId && !artifactSkillsBySourceId.has(skill.sourceId)) {
         artifactSkillsBySourceId.set(skill.sourceId, skillArray);
@@ -1956,9 +1948,9 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
   });
 
   Object.entries(WEAPON_BATTLE_SKILLS).forEach(([key, skillArray]) => {
-    // 支持直接通过 key 查找
+    // Support direct lookup by key
     weaponSkillsBySourceId.set(key, skillArray);
-    // 建立 sourceId 到技能的映射
+    // Build sourceId to skills map
     skillArray.forEach((skill) => {
       if (skill.sourceId && !weaponSkillsBySourceId.has(skill.sourceId)) {
         weaponSkillsBySourceId.set(skill.sourceId, skillArray);
@@ -1967,13 +1959,13 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
   });
 
   equippedItems.forEach((item) => {
-    // 优先使用物品自带的battleSkills
+    // Prioritize item's own battleSkills
     if (item.battleSkills && item.battleSkills.length > 0) {
       skills.push(...item.battleSkills.map((s) => ({ ...s, cooldown: 0 })));
     } else {
-      // 如果没有，尝试从配置中获取
+      // If not, try to get from config
       if (item.type === ItemType.Artifact) {
-        // 优化：先尝试直接通过 item.id 查找，再通过 sourceId 查找
+        // Optimization: Try direct lookup by item.id first, then by sourceId
         const artifactSkills = ARTIFACT_BATTLE_SKILLS[item.id] ||
           artifactSkillsBySourceId.get(item.id);
         if (artifactSkills) {
@@ -1989,7 +1981,7 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
     }
   });
 
-  // 应用被动效果（心法）
+  // Apply passive effects (Mental Arts)
   const buffs: Buff[] = [];
   if (player.activeArtId) {
     const activeArt = artsMap.get(player.activeArtId);
@@ -2009,27 +2001,27 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
     }
   }
 
-  // 根据境界计算MP（灵力值）
-  // MP = 基础值 + 境界加成 + 神识加成
+  // Calculate Mana based on Realm
+  // Mana = Base + Realm Bonus + Spirit Bonus
   const realmIndex = REALM_ORDER.indexOf(player.realm);
-  const baseMana = 50; // 基础灵力值
-  const realmManaBonus = realmIndex * 50 + (player.realmLevel - 1) * 10; // 境界加成
-  const spiritManaBonus = Math.floor(totalSpirit * 0.5); // 神识加成（神识的50%）
+  const baseMana = 50; // Base Mana
+  const realmManaBonus = realmIndex * 50 + (player.realmLevel - 1) * 10; // Realm Bonus
+  const spiritManaBonus = Math.floor(totalSpirit * 0.5); // Spirit Bonus (50% of Spirit)
   const maxMana = baseMana + realmManaBonus + spiritManaBonus;
-  const currentMana = maxMana; // 战斗开始时MP满值
+  const currentMana = maxMana; // Full Mana at start
 
-  // 按比例调整血量：如果功法增加了最大血量，当前血量也应该按比例增加
-  const baseMaxHp = Number(player.maxHp) || 1; // 避免除零
+  // Adjust HP proportionally: if max HP increased, current HP should increase proportionally
+  const baseMaxHp = Number(player.maxHp) || 1; // Avoid divide by zero
   const currentHp = Number(player.hp) || 0;
-  const hpRatio = baseMaxHp > 0 ? currentHp / baseMaxHp : 0; // 计算血量比例
-  const adjustedHp = Math.floor(totalStats.maxHp * hpRatio); // 按比例应用到新的最大血量
+  const hpRatio = baseMaxHp > 0 ? currentHp / baseMaxHp : 0; // Calculate HP ratio
+  const adjustedHp = Math.floor(totalStats.maxHp * hpRatio); // Apply ratio to new max HP
 
   return {
     id: 'player',
     name: player.name,
     realm: player.realm,
-    hp: Math.min(adjustedHp, totalStats.maxHp), // 使用按比例调整后的血量
-    maxHp: totalStats.maxHp, // 使用实际最大血量（包含金丹法数加成等）
+    hp: Math.min(adjustedHp, totalStats.maxHp), // Use adjusted HP
+    maxHp: totalStats.maxHp, // Use actual max HP (including bonuses)
     attack: totalAttack,
     defense: totalDefense,
     speed: totalSpeed,
@@ -2045,7 +2037,7 @@ function createBattleUnitFromPlayer(player: PlayerStats): BattleUnit {
 }
 
 /**
- * 获取玩家装备的物品列表
+ * Get list of equipped items
  */
 function getEquippedItems(player: PlayerStats): Item[] {
   const equipped: Item[] = [];
@@ -2061,7 +2053,7 @@ function getEquippedItems(player: PlayerStats): Item[] {
 }
 
 /**
- * 执行玩家行动
+ * Execute Player Action
  */
 export function executePlayerAction(
   battleState: BattleState,
@@ -2092,8 +2084,8 @@ export function executePlayerAction(
       break;
     case 'flee':
       actionResult = executeFlee(newState);
-      // 逃跑成功则直接结束
-      if (actionResult.description.includes('成功')) {
+      // If flee success, end battle immediately
+      if (actionResult.description.includes('Success') || actionResult.description.includes('success')) {
         return newState;
       }
       break;
@@ -2104,12 +2096,12 @@ export function executePlayerAction(
     newState = updateBattleStateAfterAction(newState, actionResult);
   }
 
-  // 减少剩余行动次数
+  // Decrease remaining actions
   newState.playerActionsRemaining -= 1;
 
-  // 玩家行动后，灵宠可以行动（如果敌人还没死）
+  // After player action, Pet can act (if enemy still alive)
   if (newState.activePet && newState.enemy.hp > 0) {
-    // 更新灵宠技能冷却
+    // Update Pet skill cooldowns
     const petSkillCooldowns = newState.petSkillCooldowns || {};
     const newPetSkillCooldowns: Record<string, number> = {};
     Object.keys(petSkillCooldowns).forEach((skillId) => {
@@ -2126,13 +2118,13 @@ export function executePlayerAction(
     }
   }
 
-  // 如果还有剩余行动次数，继续玩家回合；否则切换到敌人回合
+  // If actions remaining, continue player turn; otherwise switch to enemy turn
   if (newState.playerActionsRemaining > 0) {
-    // 继续玩家回合，可以再次行动
+    // Continue player turn
     newState.waitingForPlayerAction = true;
     newState.turn = 'player';
   } else {
-    // 玩家回合结束，切换到敌人回合
+    // Player turn end, switch to enemy turn
     newState.waitingForPlayerAction = false;
     newState.turn = 'enemy';
     newState.enemyActionsRemaining = newState.enemyMaxActions;
@@ -2142,7 +2134,7 @@ export function executePlayerAction(
 }
 
 /**
- * 执行敌人回合（AI）
+ * Execute Enemy Turn (AI)
  */
 export function executeEnemyTurn(battleState: BattleState): BattleState {
   if (battleState.waitingForPlayerAction || battleState.enemyActionsRemaining <= 0) {
@@ -2153,15 +2145,15 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
   const enemy = newState.enemy;
   const player = newState.player;
 
-  // 简单的AI：70%普通攻击，20%技能（如果有），10%防御
+  // Simple AI: 70% Normal Attack, 20% Skill (if available), 10% Defend
   const actionRoll = Math.random();
   let actionResult: BattleAction | null = null;
 
   if (actionRoll < 0.7) {
-    // 普通攻击
+    // Normal Attack
     actionResult = executeNormalAttack(newState, 'enemy', 'player');
   } else if (actionRoll < 0.9 && enemy.skills.length > 0) {
-    // 使用技能（随机选择一个可用技能）
+    // Use Skill (Randomly select an available skill)
     const availableSkills = enemy.skills.filter(
       (s) => (enemy.cooldowns[s.id] || 0) === 0 && (!s.cost.mana || (enemy.mana || 0) >= s.cost.mana)
     );
@@ -2172,7 +2164,7 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
       actionResult = executeNormalAttack(newState, 'enemy', 'player');
     }
   } else {
-    // 防御
+    // Defend
     actionResult = executeDefend(newState, 'enemy');
   }
 
@@ -2181,10 +2173,10 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
     newState = updateBattleStateAfterAction(newState, actionResult);
   }
 
-  // 减少剩余行动次数
+  // Decrease remaining actions
   newState.enemyActionsRemaining -= 1;
 
-  // 敌人回合结束后，更新灵宠技能冷却（如果存在）
+  // After enemy turn, update Pet skill cooldowns (if exists)
   if (newState.activePet && newState.petSkillCooldowns) {
     const petSkillCooldowns = newState.petSkillCooldowns;
     const updatedCooldowns: Record<string, number> = {};
@@ -2196,19 +2188,19 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
     newState.petSkillCooldowns = updatedCooldowns;
   }
 
-  // 如果还有剩余行动次数，继续敌人回合；否则切换到玩家回合
+  // If actions remaining, continue enemy turn; otherwise switch to player turn
   if (newState.enemyActionsRemaining > 0) {
-    // 继续敌人回合，可以再次行动
+    // Continue enemy turn, can act again
     newState.waitingForPlayerAction = false;
     newState.turn = 'enemy';
-    // 递归执行下一次敌人行动
+    // Recursively execute next enemy action
     return executeEnemyTurn(newState);
   } else {
-    // 敌人回合结束，切换到玩家回合
+    // Enemy turn end, switch to player turn
     newState.waitingForPlayerAction = true;
     newState.turn = 'player';
     newState.round += 1;
-    // 重新计算并重置玩家行动次数（速度和神识可能因为Buff/Debuff改变）
+    // Recalculate and reset player action count (Speed and Spirit may change due to Buff/Debuff)
     newState.playerMaxActions = calculateActionCount(
       newState.player.speed,
       newState.enemy.speed,
@@ -2223,12 +2215,12 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
     );
     newState.playerActionsRemaining = newState.playerMaxActions;
 
-    // 如果玩家行动次数为0（速度太慢），立即切换回敌人回合
+    // If player action count is 0 (too slow), switch back to enemy turn immediately
     if (newState.playerActionsRemaining <= 0) {
       newState.waitingForPlayerAction = false;
       newState.turn = 'enemy';
       newState.enemyActionsRemaining = newState.enemyMaxActions;
-      // 递归执行敌人回合
+      // Recursively execute enemy turn
       return executeEnemyTurn(newState);
     }
   }
@@ -2237,7 +2229,7 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
 }
 
 /**
- * 执行普通攻击
+ * Execute Normal Attack
  */
 function executeNormalAttack(
   battleState: BattleState,
@@ -2247,27 +2239,27 @@ function executeNormalAttack(
   const attacker = attackerId === 'player' ? battleState.player : battleState.enemy;
   const target = targetId === 'player' ? battleState.player : battleState.enemy;
 
-  // 计算基础伤害
+  // Calculate base damage
   const baseDamage = calcDamage(attacker.attack, target.defense);
 
-  // 计算暴击（优化：统一暴击率计算，设置上限）
-  let critChance = 0.10; // 基础暴击率10%（修复：从8%改为10%）
-  // 根据速度差计算速度加成（与自动战斗保持一致）
+  // Calculate Crit (Optimization: Unified crit calculation, set cap)
+  let critChance = 0.10; // Base crit chance 10%
+  // Calculate speed bonus based on speed diff (consistent with auto battle)
   const attackerSpeed = Number(attacker.speed) || 0;
   const targetSpeed = Number(target.speed) || 0;
   const speedSum = Math.max(1, attackerSpeed + targetSpeed);
-  const speedBonus = (attackerSpeed / speedSum) * 0.10; // 速度加成最高10%（从12%调整为10%）
+  const speedBonus = (attackerSpeed / speedSum) * 0.10; // Max speed bonus 10%
   critChance += speedBonus;
-  // 应用Buff/Debuff
+  // Apply Buff/Debuff
   attacker.buffs.forEach((buff) => {
     if (buff.type === 'crit') {
       critChance += buff.value;
     }
   });
-  // 设置暴击率上限为20%（除非Buff超过）
+  // Cap crit chance at 20% (unless exceeded by Buff)
   critChance = Math.min(0.2, Math.max(0, critChance));
   const isCrit = Math.random() < critChance;
-  // 计算暴击伤害倍率（基础1.5倍，加上buff加成）
+  // Calculate crit multiplier (Base 1.5x + buff)
   let critMultiplier = 1.5;
   attacker.buffs.forEach((buff) => {
     if (buff.critDamage && buff.critDamage > 0) {
@@ -2276,7 +2268,7 @@ function executeNormalAttack(
   });
   const finalDamage = isCrit ? Math.round(baseDamage * critMultiplier) : baseDamage;
 
-  // 检查闪避
+  // Check Dodge
   let isDodged = false;
   if (target.buffs.some(buff => buff.dodge && buff.dodge > 0)) {
     const maxDodge = Math.max(...target.buffs
@@ -2298,42 +2290,42 @@ function executeNormalAttack(
       },
       description:
         attackerId === 'player'
-          ? `你发动攻击，但被${target.name}闪避了！`
-          : `${attacker.name}攻击，但被你闪避了！`,
+          ? `You attacked, but ${target.name} dodged!`
+          : `${attacker.name} attacked, but you dodged!`,
     };
   }
 
-  // 应用防御状态（优化：根据攻击力和防御力比例动态调整减伤效果）
+  // Apply Defense (Optimization: Dynamic damage reduction based on attack/defense ratio)
   let actualDamage = finalDamage;
 
-  // 检查攻击者是否有无视防御buff
+  // Check if attacker has Ignore Defense buff
   const hasIgnoreDefense = attacker.buffs.some(buff => buff.ignoreDefense);
 
   if (target.isDefending && !hasIgnoreDefense) {
-    // 基础减伤50%，如果攻击力远高于防御力，减伤效果降低
+    // Base reduction 50%. If attack >> defense, reduction decreases
     const attackDefenseRatio = attacker.attack / Math.max(1, target.defense);
-    let defenseReduction = 0.5; // 基础减伤50%
+    let defenseReduction = 0.5; // Base reduction 50%
 
-    // 如果攻击力是防御力的2倍以上，减伤效果降低到40%
+    // If Attack > 2x Defense, reduction -> 40%
     if (attackDefenseRatio > 2.0) {
       defenseReduction = 0.4;
     }
-    // 如果攻击力是防御力的3倍以上，减伤效果降低到35%
+    // If Attack > 3x Defense, reduction -> 35%
     else if (attackDefenseRatio > 3.0) {
       defenseReduction = 0.35;
     }
-    // 如果防御力高于攻击力，减伤效果提高到60%
+    // If Defense > Attack, reduction -> 60%
     else if (attackDefenseRatio < 1.0) {
       defenseReduction = 0.6;
     }
 
     actualDamage = Math.round(actualDamage * (1 - defenseReduction));
   } else if (hasIgnoreDefense) {
-    // 无视防御，直接造成伤害
+    // Ignore Defense, deal full damage
     actualDamage = finalDamage;
   }
 
-  // 应用伤害减免buff
+  // Apply Damage Reduction Buff
   if (target.buffs.some(buff => buff.damageReduction && buff.damageReduction > 0)) {
     const maxReduction = Math.max(...target.buffs
       .filter(buff => buff.damageReduction && buff.damageReduction > 0)
@@ -2341,13 +2333,13 @@ function executeNormalAttack(
     actualDamage = Math.round(actualDamage * (1 - maxReduction));
   }
 
-  // 更新目标血量（确保是整数）
+  // Update target HP (ensure integer)
   target.hp = Math.max(0, Math.floor(target.hp - actualDamage));
 
-  // 处理反弹伤害（如果目标有 reflectDamage buff）
+  // Handle Reflect Damage (if target has reflectDamage buff)
   let reflectedDamage = 0;
   if (actualDamage > 0 && target.buffs.some(buff => buff.reflectDamage && buff.reflectDamage > 0)) {
-    // 找到最高的反弹伤害比例
+    // Find max reflect ratio
     const maxReflectRatio = Math.max(...target.buffs
       .filter(buff => buff.reflectDamage && buff.reflectDamage > 0)
       .map(buff => buff.reflectDamage!));
@@ -2358,17 +2350,17 @@ function executeNormalAttack(
     }
   }
 
-  // 构建描述
+  // Build description
   let description = '';
   if (attackerId === 'player') {
-    description = `你发动攻击，造成 ${actualDamage}${isCrit ? '（暴击）' : ''} 点伤害。`;
+    description = `You attacked, dealing ${actualDamage}${isCrit ? ' (CRIT)' : ''} damage.`;
     if (reflectedDamage > 0) {
-      description += ` ${target.name}的反弹效果对你造成了 ${reflectedDamage} 点伤害！`;
+      description += ` ${target.name}'s reflection dealt ${reflectedDamage} damage to you!`;
     }
   } else {
-    description = `${attacker.name}攻击，造成 ${actualDamage}${isCrit ? '（暴击）' : ''} 点伤害。`;
+    description = `${attacker.name} attacked, dealing ${actualDamage}${isCrit ? ' (CRIT)' : ''} damage.`;
     if (reflectedDamage > 0) {
-      description += ` 你的反弹效果对${attacker.name}造成了 ${reflectedDamage} 点伤害！`;
+      description += ` Your reflection dealt ${reflectedDamage} damage to ${attacker.name}!`;
     }
   }
 
@@ -2389,7 +2381,7 @@ function executeNormalAttack(
 }
 
 /**
- * 执行技能
+ * Execute Skill
  */
 function executeSkill(
   battleState: BattleState,
@@ -2405,46 +2397,46 @@ function executeSkill(
     throw new Error(`Skill ${skillId} not found`);
   }
 
-  // 检查冷却
+  // Check Cooldown
   if ((caster.cooldowns[skillId] || 0) > 0) {
     throw new Error(`Skill ${skillId} is on cooldown`);
   }
 
-  // 检查消耗
+  // Check Cost
   if (skill.cost.mana && (caster.mana || 0) < skill.cost.mana) {
-    throw new Error(`灵力不足！需要 ${skill.cost.mana} 点灵力，当前只有 ${caster.mana || 0} 点。`);
+    throw new Error(`Insufficient Mana! Need ${skill.cost.mana} Mana, currently have ${caster.mana || 0}.`);
   }
 
-  // 消耗资源
+  // Consume Resources
   if (skill.cost.mana) {
     caster.mana = (caster.mana || 0) - skill.cost.mana;
   }
 
-  // 执行技能效果
+  // Execute Skill Effects
   let damage = 0;
   let heal = 0;
   let reflectedDamage = 0;
   const buffs: Buff[] = [];
   const debuffs: Debuff[] = [];
 
-  // 伤害计算（统一使用calcDamage函数，确保与普通攻击一致）
+  // Damage Calculation (Use unified calcDamage function to ensure consistency with normal attack)
   if (skill.damage) {
     const base = skill.damage.base;
     const multiplier = skill.damage.multiplier;
     const statValue =
       skill.damage.type === 'magical' ? caster.spirit : caster.attack;
-    // 计算技能的基础攻击力（用于伤害计算）
+    // Calculate skill base attack (for damage calculation)
     const skillAttack = base + statValue * multiplier;
 
-    // 根据伤害类型选择对应的防御属性
+    // Select defense attribute based on damage type
     const targetDefense = skill.damage.type === 'magical' ? target.spirit : target.defense;
 
-    // 使用统一的伤害计算函数
+    // Use unified damage calculation function
     let baseDamage = calcDamage(skillAttack, targetDefense);
 
-    // 计算暴击
+    // Calculate Crit
     let critChance = skill.damage.critChance || 0;
-    // 应用Buff
+    // Apply Buffs
     caster.buffs.forEach((buff) => {
       if (buff.type === 'crit') {
         critChance += buff.value;
@@ -2452,7 +2444,7 @@ function executeSkill(
     });
     const isCrit = Math.random() < critChance;
 
-    // 计算暴击伤害倍率（基础1.5倍或技能指定倍率，加上buff加成）
+    // Calculate Crit Damage Multiplier (Base 1.5x or skill specified, plus buff bonus)
     let critMultiplier = skill.damage.critMultiplier || 1.5;
     caster.buffs.forEach((buff) => {
       if (buff.critDamage && buff.critDamage > 0) {
@@ -2460,27 +2452,27 @@ function executeSkill(
       }
     });
 
-    // 计算基础伤害（包括暴击）
+    // Calculate Base Damage (including Crit)
     damage = isCrit
       ? Math.round(baseDamage * critMultiplier)
       : Math.round(baseDamage);
 
-    // 添加随机伤害浮动（0.9-1.1倍）
-    const randomMultiplier = 0.9 + Math.random() * 0.2; // 0.9-1.1之间的随机数
+    // Add random damage variance (0.9-1.1x)
+    const randomMultiplier = 0.9 + Math.random() * 0.2; // Random between 0.9-1.1
     damage = Math.round(damage * randomMultiplier);
 
-    // 应用防御（保留技能伤害的特殊处理逻辑）
+    // Apply Defense (Preserve special handling logic for skill damage)
     if (skill.damage.type === 'physical') {
-      // 物理伤害：如果伤害值大于目标防御，造成伤害；否则造成很少的穿透伤害
+      // Physical Damage: If damage > target defense, deal damage; otherwise deal small penetration damage
       if (damage > target.defense) {
-        damage = damage - target.defense * 0.5; // 正常减伤
+        damage = damage - target.defense * 0.5; // Normal reduction
       } else {
-        // 伤害小于防御，造成少量穿透伤害
+        // Damage < Defense, deal small penetration damage
         damage = Math.max(1, Math.round(damage * 0.1));
       }
     } else {
-      // 法术伤害：如果伤害值大于目标神识，造成伤害；否则造成很少的穿透伤害
-      // 应用法术防御buff
+      // Magical Damage: If damage > target spirit, deal damage; otherwise deal small penetration damage
+      // Apply Magic Defense Buff
       let effectiveSpirit = target.spirit;
       if (target.buffs.some(buff => buff.magicDefense && buff.magicDefense > 0)) {
         const maxMagicDefense = Math.max(...target.buffs
@@ -2490,17 +2482,17 @@ function executeSkill(
       }
 
       if (damage > effectiveSpirit) {
-        damage = damage - effectiveSpirit * 0.3; // 正常减伤
+        damage = damage - effectiveSpirit * 0.3; // Normal reduction
       } else {
-        // 伤害小于神识，造成少量穿透伤害
+        // Damage < Spirit, deal small penetration damage
         damage = Math.max(1, Math.round(damage * 0.1));
       }
     }
 
-    // 确保伤害至少为1（除非完全免疫）
+    // Ensure damage at least 1 (unless fully immune)
     damage = Math.max(1, Math.round(damage));
 
-    // 检查闪避
+    // Check Dodge
     let isDodged = false;
     if (target.buffs.some(buff => buff.dodge && buff.dodge > 0)) {
       const maxDodge = Math.max(...target.buffs
@@ -2522,41 +2514,41 @@ function executeSkill(
           miss: true,
           manaCost: skill.cost.mana,
         },
-        description: generateSkillDescription(skill, caster, target, 0, 0) + ` 但被${target.name}闪避了！`,
+        description: generateSkillDescription(skill, caster, target, 0, 0) + ` but was dodged by ${target.name}!`,
       };
     }
 
-    // 检查攻击者是否有无视防御buff
+    // Check if attacker has Ignore Defense buff
     const hasIgnoreDefense = caster.buffs.some(buff => buff.ignoreDefense);
 
-    // 应用防御状态减伤（优化：与普通攻击保持一致，动态调整减伤效果）
+    // Apply Defense State Reduction (Optimization: Consistent with normal attack, dynamic reduction)
     if (target.isDefending && !hasIgnoreDefense) {
-      // 基础减伤50%，如果攻击力远高于防御力，减伤效果降低
+      // Base reduction 50%, if attack >> defense, reduction decreases
       const skillAttackValue = skill.damage.type === 'magical' ? caster.spirit : caster.attack;
       const targetDefenseValue = skill.damage.type === 'magical' ? target.spirit : target.defense;
       const attackDefenseRatio = skillAttackValue / Math.max(1, targetDefenseValue);
-      let defenseReduction = 0.5; // 基础减伤50%
+      let defenseReduction = 0.5; // Base reduction 50%
 
-      // 如果攻击力是防御力的2倍以上，减伤效果降低到40%
+      // If Attack > 2x Defense, reduction -> 40%
       if (attackDefenseRatio > 2.0) {
         defenseReduction = 0.4;
       }
-      // 如果攻击力是防御力的3倍以上，减伤效果降低到35%
+      // If Attack > 3x Defense, reduction -> 35%
       else if (attackDefenseRatio > 3.0) {
         defenseReduction = 0.35;
       }
-      // 如果防御力高于攻击力，减伤效果提高到60%
+      // If Defense > Attack, reduction -> 60%
       else if (attackDefenseRatio < 1.0) {
         defenseReduction = 0.6;
       }
 
       damage = Math.round(damage * (1 - defenseReduction));
     } else if (hasIgnoreDefense) {
-      // 无视防御，直接造成伤害
+      // Ignore Defense, deal full damage
       damage = damage;
     }
 
-    // 应用伤害减免buff
+    // Apply Damage Reduction Buff
     if (target.buffs.some(buff => buff.damageReduction && buff.damageReduction > 0)) {
       const maxReduction = Math.max(...target.buffs
         .filter(buff => buff.damageReduction && buff.damageReduction > 0)
@@ -2566,9 +2558,9 @@ function executeSkill(
 
     target.hp = Math.max(0, Math.floor(target.hp - damage));
 
-    // 处理反弹伤害（如果目标有 reflectDamage buff）
+    // Handle Reflect Damage (if target has reflectDamage buff)
     if (damage > 0 && target.buffs.some(buff => buff.reflectDamage && buff.reflectDamage > 0)) {
-      // 找到最高的反弹伤害比例
+      // Find max reflect ratio
       const maxReflectRatio = Math.max(...target.buffs
         .filter(buff => buff.reflectDamage && buff.reflectDamage > 0)
         .map(buff => buff.reflectDamage!));
@@ -2580,7 +2572,7 @@ function executeSkill(
     }
   }
 
-  // 治疗计算
+  // Heal Calculation
   if (skill.heal) {
     const base = skill.heal.base;
     const multiplier = skill.heal.multiplier;
@@ -2588,7 +2580,7 @@ function executeSkill(
     caster.hp = Math.min(caster.maxHp, Math.floor(caster.hp + heal));
   }
 
-  // 应用技能效果
+  // Apply Skill Effects
   skill.effects.forEach((effect) => {
     if (effect.type === 'buff' && effect.buff) {
       const targetUnit = effect.target === 'self' ? caster : target;
@@ -2596,7 +2588,7 @@ function executeSkill(
     }
     if (effect.type === 'debuff' && effect.debuff) {
       const targetUnit = effect.target === 'enemy' ? target : caster;
-      // 检查免疫
+      // Check Immunity
       const hasImmunity = targetUnit.buffs.some(buff => buff.immunity);
       if (!hasImmunity) {
         targetUnit.debuffs.push({ ...effect.debuff });
@@ -2604,16 +2596,16 @@ function executeSkill(
     }
   });
 
-  // 设置冷却
+  // Set Cooldown
   caster.cooldowns[skillId] = skill.maxCooldown;
 
-  // 生成描述（包含反弹伤害信息）
+  // Generate Description (with reflect info)
   let description = generateSkillDescription(skill, caster, target, damage, heal);
   if (reflectedDamage > 0) {
     if (casterId === 'enemy') {
-      description += ` 你的反弹效果对${caster.name}造成了 ${reflectedDamage} 点伤害！`;
+      description += ` Your reflection dealt ${reflectedDamage} damage to ${caster.name}!`;
     } else {
-      description += ` ${target.name}的反弹效果对你造成了 ${reflectedDamage} 点伤害！`;
+      description += ` ${target.name}'s reflection dealt ${reflectedDamage} damage to you!`;
     }
   }
 
@@ -2638,7 +2630,7 @@ function executeSkill(
 }
 
 /**
- * 执行使用进阶物品
+ * Execute Use Advanced Item
  */
 function executeAdvancedItem(
   battleState: BattleState,
@@ -2648,7 +2640,7 @@ function executeAdvancedItem(
   const player = battleState.player;
   const enemy = battleState.enemy;
 
-  // 根据类型获取进阶物品
+  // Get Advanced Item by Type
   let advancedItem: any = null;
   switch (itemType) {
     case 'foundationTreasure':
@@ -2676,23 +2668,23 @@ function executeAdvancedItem(
   const debuffs: Debuff[] = [];
   let description = '';
 
-  // 检查冷却（使用battleState中的冷却记录）
+  // Check Cooldown (Use cooldown record in battleState)
   const cooldownKey = `advanced_${itemType}_${itemId}`;
   if ((battleState.player.cooldowns[cooldownKey] || 0) > 0) {
-    throw new Error(`${advancedItem.name}还在冷却中`);
+    throw new Error(`${advancedItem.name} is on cooldown`);
   }
 
-  // 检查消耗
+  // Check Cost
   if (effect.cost.lifespan) {
-    // 寿命消耗在战斗结束后处理，这里只记录
-    // 实际应该在战斗结束后从playerStats中扣除
+    // Lifespan cost handled after battle, only recorded here
+    // Should be deducted from playerStats after battle
   }
   if (effect.cost.maxHp) {
     const maxHpCost = typeof effect.cost.maxHp === 'number' && effect.cost.maxHp < 1
       ? Math.floor(player.maxHp * effect.cost.maxHp)
       : (effect.cost.maxHp || 0);
     player.maxHp = Math.max(1, player.maxHp - maxHpCost);
-    player.hp = Math.min(player.hp, player.maxHp); // 调整当前HP不超过最大HP
+    player.hp = Math.min(player.hp, player.maxHp); // Adjust current HP not to exceed Max HP
   }
   if (effect.cost.hp) {
     player.hp = Math.max(1, player.hp - effect.cost.hp);
@@ -2701,7 +2693,7 @@ function executeAdvancedItem(
     player.mana = Math.max(0, (player.mana || 0) - effect.cost.spirit);
   }
 
-  // 应用效果
+  // Apply Effects
   if (effect.type === 'damage' && effect.effect.damage) {
     const dmg = effect.effect.damage;
     let baseDamage = 0;
@@ -2716,20 +2708,22 @@ function executeAdvancedItem(
       baseDamage += player.maxHp * dmg.percentOfMaxHp;
     }
     if (dmg.percentOfLifespan) {
-      // 寿命百分比伤害（需要从playerStats获取，这里简化处理）
-      baseDamage += player.maxHp * dmg.percentOfLifespan * 0.1; // 简化：用最大HP的10%代表寿命
+      // Lifespan % Damage (Need from playerStats, simplified here)
+      baseDamage += player.maxHp * dmg.percentOfLifespan * 0.1; // Simplified: Use 10% of Max HP to represent Lifespan
     }
 
-    // 应用对邪魔的伤害倍率（如果敌人是邪魔类型）
-    const isDemon = enemy.name.includes('魔') || enemy.name.includes('邪') || enemy.name.includes('鬼') ||
-      enemy.name.includes('妖') || enemy.name.includes('怨') || enemy.name.includes('恶');
+    // Apply Demon Damage Multiplier (If enemy is Demon type)
+    const isDemon = enemy.name.includes('Demon') || enemy.name.includes('Evil') || enemy.name.includes('Ghost') ||
+      enemy.name.includes('Monster') || enemy.name.includes('Wraith') || enemy.name.includes('Vile') ||
+      enemy.name.includes('Ghoul') || enemy.name.includes('Mutant') || enemy.name.includes('Glowing') ||
+      enemy.name.includes('Abomination') || enemy.name.includes('Cursed');
     if (dmg.demonMultiplier && isDemon) {
       baseDamage = Math.floor(baseDamage * dmg.demonMultiplier);
     }
 
-    // 计算最终伤害
+    // Calculate Final Damage
     if (dmg.ignoreDefense) {
-      // 支持百分比无视防御（0-1之间的数字）或完全无视（true）
+      // Support % Ignore Defense (0-1 number) or Full Ignore (true)
       const ignoreRatio = typeof dmg.ignoreDefense === 'number' ? dmg.ignoreDefense : 1;
       const effectiveDefense = enemy.defense * (1 - ignoreRatio);
       damage = Math.floor(Math.max(1, baseDamage - effectiveDefense * 0.5));
@@ -2737,15 +2731,15 @@ function executeAdvancedItem(
       damage = Math.floor(Math.max(1, baseDamage - enemy.defense * 0.5));
     }
 
-    // 应用必定暴击
+    // Apply Guaranteed Crit
     let isCrit = false;
     if (dmg.guaranteedCrit) {
       isCrit = true;
-      damage = Math.floor(damage * 1.5); // 基础暴击倍率1.5
+      damage = Math.floor(damage * 1.5); // Base Crit Multiplier 1.5
     }
 
     enemy.hp = Math.max(0, enemy.hp - damage);
-    description = `${effect.name}！对${enemy.name}造成了 ${damage}${isCrit ? '（暴击）' : ''} 点伤害！`;
+    description = `${effect.name}! Dealt ${damage}${isCrit ? ' (Crit)' : ''} damage to ${enemy.name}!`;
   }
 
   if (effect.type === 'heal' && effect.effect.heal) {
@@ -2757,7 +2751,7 @@ function executeAdvancedItem(
       heal += Math.floor(player.maxHp * healEffect.percentOfMaxHp);
     }
     player.hp = Math.min(player.maxHp, player.hp + heal);
-    description = `${effect.name}！恢复了 ${heal} 点气血！`;
+    description = `${effect.name}! Restored ${heal} HP!`;
   }
 
   if (effect.type === 'buff' && effect.effect.buff) {
@@ -2782,72 +2776,72 @@ function executeAdvancedItem(
       player.speed = Math.floor(player.speed * (1 + buffEffect.speed));
     }
     if (buffEffect.critChance) {
-      // 暴击率加成通过buff记录
+      // Crit Chance Bonus recorded via buff
       buff.type = 'crit';
       buff.value = buffEffect.critChance;
     }
     if (buffEffect.critDamage) {
-      // 暴击伤害加成
+      // Crit Damage Bonus
       buff.critDamage = buffEffect.critDamage;
     }
     if (buffEffect.reflectDamage) {
-      // 反弹伤害比例
+      // Reflect Damage Ratio
       buff.reflectDamage = buffEffect.reflectDamage;
     }
     if (buffEffect.spirit) {
-      // 神识加成
+      // Spirit Bonus
       player.spirit = Math.floor(player.spirit * (1 + buffEffect.spirit));
     }
     if (buffEffect.physique) {
-      // 体魄加成（体魄影响防御和生命）
+      // Physique Bonus (Physique affects Defense and HP)
       player.defense = Math.floor(player.defense * (1 + buffEffect.physique * 0.5));
       player.maxHp = Math.floor(player.maxHp * (1 + buffEffect.physique * 0.3));
       player.hp = Math.min(player.maxHp, Math.floor(player.hp * (1 + buffEffect.physique * 0.3)));
     }
     if (buffEffect.maxHp) {
-      // 最大气血加成
+      // Max HP Bonus
       const oldMaxHp = player.maxHp;
       player.maxHp = Math.floor(player.maxHp * (1 + buffEffect.maxHp));
-      // 按比例增加当前HP
+      // Increase Current HP proportionally
       const hpRatio = player.hp / oldMaxHp;
       player.hp = Math.floor(player.maxHp * hpRatio);
     }
     if (buffEffect.revive) {
-      // 复活标记
+      // Revive Mark
       buff.revive = buffEffect.revive;
     }
     if (buffEffect.dodge !== undefined) {
-      // 闪避率加成
+      // Dodge Rate Bonus
       buff.dodge = buffEffect.dodge;
     }
     if (buffEffect.ignoreDefense) {
-      // 攻击无视防御
+      // Attack Ignore Defense
       buff.ignoreDefense = buffEffect.ignoreDefense;
     }
     if (buffEffect.regen) {
-      // 每回合恢复
+      // Regen per turn
       buff.regen = buffEffect.regen;
     }
     if (buffEffect.damageReduction) {
-      // 伤害减免
+      // Damage Reduction
       buff.damageReduction = buffEffect.damageReduction;
     }
     if (buffEffect.immunity) {
-      // 免疫所有负面状态
+      // Immunity to all Debuffs
       buff.immunity = buffEffect.immunity;
     }
     if (buffEffect.cleanse) {
-      // 清除所有负面状态
+      // Cleanse all Debuffs
       player.debuffs = [];
     }
     if (buffEffect.magicDefense) {
-      // 法术防御加成（影响神识防御）
+      // Magic Defense Bonus (Affects Spirit Defense)
       buff.magicDefense = buffEffect.magicDefense;
     }
 
     player.buffs.push(buff);
     buffs.push(buff);
-    description = `${effect.name}！获得了强大的增益效果！`;
+    description = `${effect.name}! Gained powerful buff effects!`;
   }
 
   if (effect.type === 'debuff' && effect.effect.debuff) {
@@ -2869,29 +2863,29 @@ function executeAdvancedItem(
       enemy.defense = Math.floor(enemy.defense * (1 - debuffEffect.defense));
     }
     if (debuffEffect.speed) {
-      enemy.speed = Math.floor(enemy.speed * (1 + debuffEffect.speed)); // speed是负数，所以用加法
+      enemy.speed = Math.floor(enemy.speed * (1 + debuffEffect.speed)); // speed is negative (reduction), so use addition (to reduce)
     }
     if (debuffEffect.spirit) {
-      enemy.spirit = Math.floor(enemy.spirit * (1 + debuffEffect.spirit)); // spirit是负数，所以用加法
+      enemy.spirit = Math.floor(enemy.spirit * (1 + debuffEffect.spirit)); // spirit is negative (reduction), so use addition
     }
     if (debuffEffect.hp) {
-      // 持续掉血（负数表示损失）
-      debuff.type = 'poison'; // 使用poison类型表示持续掉血
-      debuff.value = debuffEffect.hp; // 存储百分比值
+      // DoT (Negative value means loss)
+      debuff.type = 'poison'; // Use poison type for DoT
+      debuff.value = debuffEffect.hp; // Store percentage value
     }
 
-    // 检查免疫
+    // Check Immunity
     const hasImmunity = enemy.buffs.some(buff => buff.immunity);
     if (!hasImmunity) {
       enemy.debuffs.push(debuff);
       debuffs.push(debuff);
-      description = `${effect.name}！${enemy.name}受到了削弱效果！`;
+      description = `${effect.name}! ${enemy.name} was weakened!`;
     } else {
-      description = `${effect.name}！但${enemy.name}免疫了负面效果！`;
+      description = `${effect.name}! But ${enemy.name} is immune to debuffs!`;
     }
   }
 
-  // 设置冷却
+  // Set Cooldown
   if (effect.cooldown) {
     battleState.player.cooldowns[cooldownKey] = effect.cooldown;
   }
@@ -2901,7 +2895,7 @@ function executeAdvancedItem(
     round: battleState.round,
     turn: 'player',
     actor: 'player',
-    actionType: 'skill', // 使用skill类型，因为进阶物品效果类似技能
+    actionType: 'skill', // Use skill type, as advanced item effect is similar to skill
     result: {
       damage,
       heal,
@@ -2913,18 +2907,18 @@ function executeAdvancedItem(
 }
 
 /**
- * 执行使用物品
+ * Execute Use Item
  */
 function executeItem(battleState: BattleState, itemId: string): BattleAction {
   const player = battleState.player;
 
-  // 从玩家背包中查找物品
+  // Find item in player inventory
   const item = battleState.playerInventory.find((i) => i.id === itemId);
   if (!item) {
     throw new Error(`Item ${itemId} not found in inventory`);
   }
 
-  // 查找丹药配置（通过物品名称匹配）
+  // Find potion config (match by item name)
   const potionConfig = Object.values(BATTLE_POTIONS).find(
     (p) => p.name === item.name
   );
@@ -2946,7 +2940,7 @@ function executeItem(battleState: BattleState, itemId: string): BattleAction {
     });
   }
 
-  // 消耗物品（减少数量）
+  // Consume item (decrease quantity)
   const itemIndex = battleState.playerInventory.findIndex((i) => i.id === itemId);
   if (itemIndex >= 0) {
     battleState.playerInventory[itemIndex] = {
@@ -2966,12 +2960,12 @@ function executeItem(battleState: BattleState, itemId: string): BattleAction {
       heal,
       buffs: potionConfig.effect.buffs || [],
     },
-    description: `你使用了${potionConfig.name}，${heal > 0 ? `恢复了 ${heal} 点气血。` : '获得了增益效果。'}`,
+    description: `You used ${potionConfig.name}, ${heal > 0 ? `recovered ${heal} HP.` : 'gained buffs.'}`,
   };
 }
 
 /**
- * 执行防御
+ * Execute Defend
  */
 function executeDefend(
   battleState: BattleState,
@@ -2989,21 +2983,21 @@ function executeDefend(
     result: {},
     description:
       unitId === 'player'
-        ? '你进入防御状态，下回合受到的伤害减少50%。'
-        : `${unit.name}进入防御状态。`,
+        ? 'You entered defensive stance, taking 50% less damage next turn.'
+        : `${unit.name} entered defensive stance.`,
   };
 }
 
 /**
- * 执行逃跑
+ * Execute Flee
  */
 function executeFlee(battleState: BattleState): BattleAction {
-  // 逃跑成功率基于速度差
+  // Flee success rate based on speed difference
   const playerSpeed = Number(battleState.player.speed) || 0;
   const enemySpeed = Number(battleState.enemy.speed) || 0;
   const speedDiff = playerSpeed - enemySpeed;
   const fleeChance = 0.3 + Math.min(0.5, speedDiff / 100);
-  const success = Math.random() < Math.max(0, Math.min(1, fleeChance)); // 确保概率在0-1之间
+  const success = Math.random() < Math.max(0, Math.min(1, fleeChance)); // Ensure probability is between 0-1
 
   return {
     id: randomId(),
@@ -3013,19 +3007,19 @@ function executeFlee(battleState: BattleState): BattleAction {
     actionType: 'flee',
     result: {},
     description: success
-      ? '你成功逃离了战斗。'
-      : '你试图逃跑，但被敌人拦截。',
+      ? 'You successfully fled the battle.'
+      : 'You tried to flee, but were intercepted by the enemy.',
   };
 }
 
 /**
- * 更新战斗状态（处理持续效果、冷却等）
+ * Update Battle State (Handle ongoing effects, cooldowns, etc.)
  */
 function updateBattleStateAfterAction(
   battleState: BattleState,
   action: BattleAction
 ): BattleState {
-  // 深拷贝玩家和敌人状态，确保不可变性
+  // Deep copy player and enemy state to ensure immutability
   const newState: BattleState = {
     ...battleState,
     player: {
@@ -3042,18 +3036,18 @@ function updateBattleStateAfterAction(
     },
   };
 
-  // 处理持续效果
+  // Handle Ongoing Effects
   [newState.player, newState.enemy].forEach((unit) => {
-    // 处理Debuff（持续伤害）
+    // Handle Debuffs (DoT)
     unit.debuffs = unit.debuffs
       .map((debuff) => {
         if (debuff.type === 'poison' || debuff.type === 'burn') {
-          // 如果是百分比掉血（value是负数百分比）
+          // If % HP loss (value is negative percentage)
           if (debuff.value < 0 && debuff.value > -1) {
             const hpLoss = Math.floor(unit.maxHp * Math.abs(debuff.value));
             unit.hp = Math.max(0, Math.floor(unit.hp - hpLoss));
           } else {
-            // 固定数值掉血
+            // Fixed value HP loss
             const debuffValue = Math.floor(debuff.value);
             unit.hp = Math.max(0, Math.floor(unit.hp - debuffValue));
           }
@@ -3062,14 +3056,14 @@ function updateBattleStateAfterAction(
       })
       .filter((debuff) => debuff.duration > 0);
 
-    // 处理Buff（持续治疗等）
+    // Handle Buffs (HoT, etc.)
     unit.buffs = unit.buffs
       .map((buff) => {
         if (buff.type === 'heal' && buff.duration > 0) {
           const healValue = Math.floor(buff.value);
           unit.hp = Math.min(unit.maxHp, Math.floor(unit.hp + healValue));
         }
-        // 处理持续恢复（regen）
+        // Handle Regen
         if (buff.regen && buff.regen > 0 && buff.duration > 0) {
           const regenValue = Math.floor(unit.maxHp * buff.regen);
           unit.hp = Math.min(unit.maxHp, Math.floor(unit.hp + regenValue));
@@ -3078,14 +3072,14 @@ function updateBattleStateAfterAction(
       })
       .filter((buff) => buff.duration === -1 || buff.duration > 0);
 
-    // 更新冷却时间
+    // Update Cooldowns
     Object.keys(unit.cooldowns).forEach((skillId) => {
       if (unit.cooldowns[skillId] > 0) {
         unit.cooldowns[skillId] -= 1;
       }
     });
 
-    // 重置防御状态
+    // Reset Defense State
     unit.isDefending = false;
   });
 
@@ -3093,14 +3087,14 @@ function updateBattleStateAfterAction(
 }
 
 /**
- * 检查战斗是否结束
+ * Check Battle End
  */
 export function checkBattleEnd(battleState: BattleState): boolean {
   return battleState.player.hp <= 0 || battleState.enemy.hp <= 0;
 }
 
 /**
- * 生成技能描述
+ * Generate Skill Description
  */
 function generateSkillDescription(
   skill: BattleSkill,
@@ -3110,16 +3104,16 @@ function generateSkillDescription(
   heal: number
 ): string {
   if (damage > 0) {
-    return `你使用【${skill.name}】，对${target.name}造成 ${damage} 点伤害。`;
+    return `You used [${skill.name}], dealing ${damage} damage to ${target.name}.`;
   }
   if (heal > 0) {
-    return `你使用【${skill.name}】，恢复了 ${heal} 点气血。`;
+    return `You used [${skill.name}], restoring ${heal} HP.`;
   }
-  return `你使用【${skill.name}】。`;
+  return `You used [${skill.name}].`;
 }
 
 /**
- * 执行灵宠行动
+ * Execute Pet Action
  */
 function executePetAction(battleState: BattleState): BattleAction | null {
   if (!battleState.activePet || battleState.enemy.hp <= 0) {
@@ -3129,20 +3123,20 @@ function executePetAction(battleState: BattleState): BattleAction | null {
   const activePet = battleState.activePet;
   const petSkillCooldowns = battleState.petSkillCooldowns || {};
 
-  // 决定灵宠行动：根据亲密度和等级动态调整技能释放概率
-  // 基础概率30%，亲密度每10点增加2%，等级每10级增加1%，最高70%
+  // Determine Pet Action: Dynamically adjust skill chance based on affection and level
+  // Base chance 30%, +2% per 10 affection, +1% per 10 levels, max 70%
   const baseProbability = 0.3;
-  const petAffection = Number(activePet.affection) || 0; // 确保是有效数字
-  const petLevel = Number(activePet.level) || 0; // 确保是有效数字
-  const affectionBonus = (petAffection / 100) * 0.2; // 亲密度加成，最高20%
-  const levelBonus = (petLevel / 100) * 0.1; // 等级加成，最高10%
+  const petAffection = Number(activePet.affection) || 0; // Ensure valid number
+  const petLevel = Number(activePet.level) || 0; // Ensure valid number
+  const affectionBonus = (petAffection / 100) * 0.2; // Affection bonus, max 20%
+  const levelBonus = (petLevel / 100) * 0.1; // Level bonus, max 10%
   const skillProbability = Math.min(0.7, baseProbability + affectionBonus + levelBonus);
   const useSkill = Math.random() < skillProbability;
   let petAction: 'attack' | 'skill' | null = null;
   let usedSkill: PetSkill | null = null;
 
   if (useSkill && activePet.skills.length > 0) {
-    // 查找可用的技能（冷却时间为0或未设置冷却）
+    // Find available skills (cooldown is 0 or unset)
     const availableSkills = activePet.skills.filter(
       (skill) => !petSkillCooldowns[skill.id] || petSkillCooldowns[skill.id] <= 0
     );
@@ -3158,32 +3152,32 @@ function executePetAction(battleState: BattleState): BattleAction | null {
   }
 
   if (petAction === 'skill' && usedSkill) {
-    // 释放技能
+    // Cast Skill
     let petDamage = 0;
     let petHeal = 0;
     let petBuff: { attack?: number; defense?: number; hp?: number } | undefined;
 
     if (usedSkill.effect.damage) {
-      // 技能伤害：基础伤害值 + 灵宠攻击力加成 + 等级加成
+      // Skill Damage: Base Damage + Pet Attack Bonus + Level Bonus
       const baseSkillDamage = Number(usedSkill.effect.damage) || 0;
-      // 根据进化阶段增加攻击力倍率
+      // Increase attack multiplier based on evolution stage
       const evolutionStage = Number(activePet.evolutionStage) || 0;
       const petLevel = Number(activePet.level) || 0;
       const petAffection = Number(activePet.affection) || 0;
       const petAttack = Number(activePet.stats?.attack) || 0;
       const evolutionMultiplier = 1.0 + evolutionStage * 0.5;
-      const attackMultiplier = 1.0 + (petLevel / 50); // 每50级增加100%攻击力
-      // 攻击力加成从30%提升到100%，并应用进化倍率
-      const attackBonus = Math.floor(petAttack * evolutionMultiplier * attackMultiplier * 1.0); // 100%攻击力加成
-      const levelBonus = Math.floor(petLevel * 5); // 每级+5伤害（从2提升到5）
-      const affectionBonus = Math.floor(petAffection * 0.8); // 亲密度对技能伤害也有加成
+      const attackMultiplier = 1.0 + (petLevel / 50); // +100% Attack per 50 levels
+      // Attack bonus increased from 30% to 100%, applying evolution multiplier
+      const attackBonus = Math.floor(petAttack * evolutionMultiplier * attackMultiplier * 1.0); // 100% Attack Bonus
+      const levelBonus = Math.floor(petLevel * 5); // +5 Damage per level (increased from 2)
+      const affectionBonus = Math.floor(petAffection * 0.8); // Affection also boosts skill damage
       const skillDamage = baseSkillDamage + attackBonus + levelBonus + affectionBonus;
       petDamage = calcDamage(skillDamage, battleState.enemy.defense);
       battleState.enemy.hp = Math.max(0, Math.floor((Number(battleState.enemy.hp) || 0) - petDamage));
     }
 
     if (usedSkill.effect.heal) {
-      // 治疗玩家
+      // Heal Player
       const baseHeal = Number(usedSkill.effect.heal) || 0;
       const petLevel = Number(activePet.level) || 0;
       const petAffection = Number(activePet.affection) || 0;
@@ -3197,21 +3191,21 @@ function executePetAction(battleState: BattleState): BattleAction | null {
 
     if (usedSkill.effect.buff) {
       petBuff = usedSkill.effect.buff;
-      // 应用Buff到玩家
+      // Apply Buff to Player
       if (petBuff.attack) {
         battleState.player.buffs.push({
           id: randomId(),
-          name: `${activePet.name}的攻击增益`,
+          name: `${activePet.name}'s Attack Buff`,
           type: 'attack',
           value: petBuff.attack,
-          duration: 3, // 默认3回合
+          duration: 3, // Default 3 turns
           source: `pet_${activePet.id}`,
         });
       }
       if (petBuff.defense) {
         battleState.player.buffs.push({
           id: randomId(),
-          name: `${activePet.name}的防御增益`,
+          name: `${activePet.name}'s Defense Buff`,
           type: 'defense',
           value: petBuff.defense,
           duration: 3,
@@ -3225,28 +3219,28 @@ function executePetAction(battleState: BattleState): BattleAction | null {
       }
     }
 
-    // 设置技能冷却
+    // Set Skill Cooldown
     if (usedSkill.cooldown) {
       const updatedCooldowns = { ...petSkillCooldowns };
       updatedCooldowns[usedSkill.id] = usedSkill.cooldown;
       battleState.petSkillCooldowns = updatedCooldowns;
     }
 
-    // 构建技能描述
-    let skillDesc = `【${activePet.name}】释放了【${usedSkill.name}】！`;
+    // Build Skill Description
+    let skillDesc = `[${activePet.name}] cast [${usedSkill.name}]!`;
     if (petDamage > 0) {
-      skillDesc += `对敌人造成 ${petDamage} 点伤害。`;
+      skillDesc += ` dealing ${petDamage} damage to enemy.`;
     }
     if (petHeal > 0) {
-      skillDesc += `为你恢复了 ${petHeal} 点气血。`;
+      skillDesc += ` restoring ${petHeal} HP to you.`;
     }
     if (petBuff) {
       const buffParts: string[] = [];
-      if (petBuff.attack) buffParts.push(`攻击+${petBuff.attack}`);
-      if (petBuff.defense) buffParts.push(`防御+${petBuff.defense}`);
-      if (petBuff.hp) buffParts.push(`气血+${petBuff.hp}`);
+      if (petBuff.attack) buffParts.push(`Attack +${petBuff.attack}`);
+      if (petBuff.defense) buffParts.push(`Defense +${petBuff.defense}`);
+      if (petBuff.hp) buffParts.push(`HP +${petBuff.hp}`);
       if (buffParts.length > 0) {
-        skillDesc += `你获得了${buffParts.join('、')}的增益。`;
+        skillDesc += ` You gained buffs: ${buffParts.join(', ')}.`;
       }
     }
 
@@ -3264,7 +3258,7 @@ function executePetAction(battleState: BattleState): BattleAction | null {
         buffs: petBuff ? [
           ...(petBuff.attack ? [{
             id: randomId(),
-            name: `${activePet.name}的攻击增益`,
+            name: `${activePet.name}'s Attack Buff`,
             type: 'attack' as const,
             value: petBuff.attack,
             duration: 3,
@@ -3272,7 +3266,7 @@ function executePetAction(battleState: BattleState): BattleAction | null {
           }] : []),
           ...(petBuff.defense ? [{
             id: randomId(),
-            name: `${activePet.name}的防御增益`,
+            name: `${activePet.name}'s Defense Buff`,
             type: 'defense' as const,
             value: petBuff.defense,
             duration: 3,
@@ -3283,18 +3277,17 @@ function executePetAction(battleState: BattleState): BattleAction | null {
       description: skillDesc,
     };
   } else {
-    // 普通攻击：基础攻击力 + 等级加成 + 亲密度加成
-    // 普通攻击：基础攻击力 + 攻击力百分比加成 + 等级加成 + 亲密度加成
+    // Normal Attack: Base Attack + Attack % Bonus + Level Bonus + Affection Bonus
     const baseAttack = Number(activePet.stats?.attack) || 0;
-    // 根据进化阶段增加攻击力倍率（幼年期1.0，成熟期1.5，完全体2.0）
+    // Increase attack multiplier based on evolution stage (Infant 1.0, Mature 1.5, Perfect 2.0)
     const evolutionStage = Number(activePet.evolutionStage) || 0;
     const petLevel = Number(activePet.level) || 0;
     const petAffection = Number(activePet.affection) || 0;
     const evolutionMultiplier = 1.0 + evolutionStage * 0.5;
-    const attackMultiplier = 1.0 + (petLevel / 50); // 每50级增加100%攻击力
-    const levelBonus = Math.floor(petLevel * 8); // 每级+8攻击（从3提升到8）
-    const affectionBonus = Math.floor(petAffection * 1.5); // 亲密度加成（从0.5提升到1.5）
-    // 最终攻击力 = (基础攻击力 * 进化倍率 * 等级倍率) + 等级加成 + 亲密度加成
+    const attackMultiplier = 1.0 + (petLevel / 50); // +100% Attack per 50 levels
+    const levelBonus = Math.floor(petLevel * 8); // +8 Damage per level (increased from 3)
+    const affectionBonus = Math.floor(petAffection * 1.5); // Affection bonus (increased from 0.5 to 1.5)
+    // Final Attack = (Base * Evo * Level Multi) + Level Bonus + Affection Bonus
     const petAttackDamage = Math.floor(baseAttack * evolutionMultiplier * attackMultiplier) + levelBonus + affectionBonus;
     const petDamage = calcDamage(petAttackDamage, battleState.enemy.defense);
     battleState.enemy.hp = Math.max(0, Math.floor((Number(battleState.enemy.hp) || 0) - petDamage));
@@ -3309,7 +3302,7 @@ function executePetAction(battleState: BattleState): BattleAction | null {
       result: {
         damage: petDamage,
       },
-      description: `【${activePet.name}】紧随其后发动攻击，造成 ${petDamage} 点伤害。`,
+      description: `[${activePet.name}] followed up with an attack, dealing ${petDamage} damage.`,
     };
   }
 }

@@ -4,8 +4,8 @@ import { getGoldenCoreBonusMultiplier } from './cultivationUtils';
 import { getItemStats } from './itemUtils';
 
 /**
- * 计算玩家所有的固定数值加成（功法、装备、天赋、称号）
- * 这些加成通常直接反映在 player.attack 等字段的基础值中
+ * Calculate all fixed value bonuses for player (Arts, Equipment, Talents, Titles)
+ * These bonuses are usually reflected directly in base values like player.attack
  */
 export function calculatePlayerBonuses(player: PlayerStats): {
   attack: number;
@@ -22,7 +22,7 @@ export function calculatePlayerBonuses(player: PlayerStats): {
   let bonusPhysique = 0;
   let bonusSpeed = 0;
 
-  // 1. 功法加成（所有已习得功法的固定加成）
+  // 1. Art Bonuses (Fixed bonuses from all learned arts)
   const spiritualRoots = player.spiritualRoots || {
     metal: 0, wood: 0, water: 0, fire: 0, earth: 0,
   };
@@ -40,7 +40,7 @@ export function calculatePlayerBonuses(player: PlayerStats): {
     }
   });
 
-  // 2. 装备加成
+  // 2. Equipment Bonuses
   Object.values(player.equippedItems).forEach((itemId) => {
     const equippedItem = player.inventory.find((i) => i.id === itemId);
     if (equippedItem && equippedItem.effect) {
@@ -55,7 +55,7 @@ export function calculatePlayerBonuses(player: PlayerStats): {
     }
   });
 
-  // 3. 天赋加成
+  // 3. Talent Bonuses
   const talent = TALENTS.find((t) => t.id === player.talentId);
   if (talent) {
     bonusAttack += talent.effects.attack || 0;
@@ -66,7 +66,7 @@ export function calculatePlayerBonuses(player: PlayerStats): {
     bonusSpeed += talent.effects.speed || 0;
   }
 
-  // 4. 称号加成
+  // 4. Title Bonuses
   const title = TITLES.find((t) => t.id === player.titleId);
   if (title) {
     bonusAttack += title.effects.attack || 0;
@@ -88,20 +88,20 @@ export function calculatePlayerBonuses(player: PlayerStats): {
 }
 
 /**
- * 获取玩家激活的心法
+ * Get active mental art of player
  */
 export function getActiveMentalArt(player: PlayerStats): CultivationArt | null {
   if (!player.activeArtId) return null;
 
-  // 在功法中查找
+  // Find in cultivation arts
   const art = CULTIVATION_ARTS.find((a) => a.id === player.activeArtId);
   return art || null;
 }
 
 /**
- * 计算玩家的总属性（基础属性 + 装备 + 功法 + 称号 + 天赋）
- * 注意：目前的实现中，装备、称号、天赋、体术功法已经永久加到了 player.attack 等字段中
- * 这里主要负责加上【激活的心法】带来的属性加成
+ * Calculate player total stats (Base + Equipment + Arts + Titles + Talents)
+ * Note: In current implementation, Equipment, Titles, Talents, and Physical Arts are permanently added to player.attack etc.
+ * This mainly adds bonuses from [Active Mental Art]
  */
 export const getPlayerTotalStats = (player: PlayerStats): {
   attack: number;
@@ -120,13 +120,13 @@ export const getPlayerTotalStats = (player: PlayerStats): {
     speed: player.speed,
   };
 
-  // 1. 获取激活的心法
+  // 1. Get active mental art
   const activeArt = getActiveMentalArt(player);
 
   if (activeArt && activeArt.type === 'mental') {
     const effects = activeArt.effects;
 
-    // 计算灵根对心法的加成
+    // Calculate spiritual root bonus for art
     const spiritualRoots = player.spiritualRoots || {
       metal: 0,
       wood: 0,
@@ -136,7 +136,7 @@ export const getPlayerTotalStats = (player: PlayerStats): {
     };
     const spiritualRootBonus = calculateSpiritualRootArtBonus(activeArt, spiritualRoots);
 
-    // 加上固定数值加成（应用灵根加成）
+    // Add fixed value bonuses (apply spiritual root bonus)
     stats.attack += Math.floor((effects.attack || 0) * spiritualRootBonus);
     stats.defense += Math.floor((effects.defense || 0) * spiritualRootBonus);
     stats.maxHp += Math.floor((effects.hp || 0) * spiritualRootBonus);
@@ -144,8 +144,8 @@ export const getPlayerTotalStats = (player: PlayerStats): {
     stats.physique += Math.floor((effects.physique || 0) * spiritualRootBonus);
     stats.speed += Math.floor((effects.speed || 0) * spiritualRootBonus);
 
-    // 加上百分比加成（如果有）
-    // 注意：百分比加成通常基于当前已有的属性（基础+装备等）
+    // Add percentage bonuses (if any)
+    // Note: Percentage bonuses are usually based on current stats (Base + Equipment etc.)
     if (effects.attackPercent) stats.attack = Math.floor(stats.attack * (1 + effects.attackPercent));
     if (effects.defensePercent) stats.defense = Math.floor(stats.defense * (1 + effects.defensePercent));
     if (effects.hpPercent) stats.maxHp = Math.floor(stats.maxHp * (1 + effects.hpPercent));
@@ -154,10 +154,10 @@ export const getPlayerTotalStats = (player: PlayerStats): {
     if (effects.speedPercent) stats.speed = Math.floor(stats.speed * (1 + effects.speedPercent));
   }
 
-  // 2. 应用金丹法数属性加成（如果玩家是金丹期及以上且有金丹法数）
+  // 2. Apply Golden Core Method bonuses (if player is Golden Core or above and has method)
   if (player.goldenCoreMethodCount && player.goldenCoreMethodCount > 0) {
     const bonusMultiplier = getGoldenCoreBonusMultiplier(player.goldenCoreMethodCount);
-    // 应用属性加成倍数（例如：3.6x 表示属性提升到原来的3.6倍，即+260%）
+    // Apply stat bonus multiplier (e.g. 3.6x means stats increase to 3.6 times original, i.e. +260%)
     stats.attack = Math.floor(stats.attack * bonusMultiplier);
     stats.defense = Math.floor(stats.defense * bonusMultiplier);
     stats.maxHp = Math.floor(stats.maxHp * bonusMultiplier);

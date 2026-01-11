@@ -11,7 +11,7 @@ import { TRIBULATION_STAGES, HEAVEN_EARTH_ESSENCES, HEAVEN_EARTH_MARROWS } from 
 interface TribulationModalProps {
   tribulationState: TribulationState;
   onTribulationComplete: (result: TribulationResult) => void;
-  player: any; // PlayerStats - 为了避免导入循环，使用any
+  player: any; // PlayerStats - Use any to avoid circular imports
 }
 
 const TribulationModal: React.FC<TribulationModalProps> = ({
@@ -25,37 +25,37 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
   const hasStartedRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 解密游戏状态
+  // Puzzle Game State
   const [puzzle, setPuzzle] = useState<any>(null);
-  const [userInput, setUserInput] = useState<number[]>([]); // 用于数字序列
-  const [currentSequence, setCurrentSequence] = useState<string[]>([]); // 用于符文序列
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null); // 用于符文序列选择
+  const [userInput, setUserInput] = useState<number[]>([]); // For numeric sequences
+  const [currentSequence, setCurrentSequence] = useState<string[]>([]); // For rune sequences
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null); // For rune sequence selection
   const [attempts, setAttempts] = useState(0);
   const [showPuzzle, setShowPuzzle] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [revealedPositions, setRevealedPositions] = useState<number[]>([]);
 
-  // 长生天劫五重考验状态
+  // Longevity Tribulation Five Trials State
   const [longevityChallenges, setLongevityChallenges] = useState<any>(null);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
-  // 2048游戏状态
+  // 2048 Game State
   const [game2048Grid, setGame2048Grid] = useState<number[][]>([]);
   const [game2048Score, setGame2048Score] = useState<number>(0);
   const [gameOverTriggered, setGameOverTriggered] = useState(false);
 
-  // 初始化2048游戏
+  // Init 2048 Game
   const init2048Game = useCallback(() => {
-    setGameOverTriggered(false); // 重置游戏结束标志
+    setGameOverTriggered(false); // Reset game over flag
     const grid: number[][] = Array(4).fill(null).map(() => Array(4).fill(0));
-    // 随机添加两个初始方块（2或4）
+    // Randomly add two initial tiles (2 or 4)
     const emptyCells: [number, number][] = [];
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
         emptyCells.push([i, j]);
       }
     }
-    // 随机选择两个位置
+    // Randomly select two positions
     const pos1 = emptyCells[Math.floor(Math.random() * emptyCells.length)];
     emptyCells.splice(emptyCells.indexOf(pos1), 1);
     const pos2 = emptyCells[Math.floor(Math.random() * emptyCells.length)];
@@ -65,7 +65,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     setGame2048Score(0);
   }, []);
 
-  // 2048游戏：添加新的随机方块
+  // 2048 Game: Add new random tile
   const addRandomTile = useCallback((grid: number[][]): number[][] => {
     const emptyCells: [number, number][] = [];
     for (let i = 0; i < 4; i++) {
@@ -82,32 +82,32 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     return grid.map(row => [...row]);
   }, []);
 
-  // 2048游戏：检查是否游戏结束（无法移动）
+  // 2048 Game: Check if game over (no moves possible)
   const check2048GameOver = useCallback((grid: number[][]): boolean => {
-    // 检查是否有空格
+    // Check for empty cells
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
         if (grid[i][j] === 0) return false;
       }
     }
 
-    // 检查是否有可合并的相邻方块
+    // Check for mergeable adjacent tiles
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
         const current = grid[i][j];
-        // 检查右侧
+        // Check right
         if (j < 3 && grid[i][j + 1] === current) return false;
-        // 检查下方
+        // Check down
         if (i < 3 && grid[i + 1][j] === current) return false;
       }
     }
 
-    return true; // 游戏结束
+    return true; // Game Over
   }, []);
 
-  // 2048游戏：处理游戏结束
+  // 2048 Game: Handle Game Over
   const handle2048GameOver = useCallback(() => {
-    // 防止重复触发
+    // Prevent duplicate triggers
     if (gameOverTriggered) return;
     setGameOverTriggered(true);
 
@@ -116,7 +116,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     const isMet = game2048Score >= targetScore;
 
     if (!isMet) {
-      // 未达到目标分数，判定失败
+      // Target not met, failure
       const failMessage = tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges
         ? `Phase ${currentChallengeIndex + 1} Failure! The Celestial Grid collapsed. Structural integrity lost...`
         : 'Celestial Grid Failure! System can no longer process moves. Radiation overload imminent...';
@@ -133,14 +133,14 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     }
   }, [puzzle, game2048Score, tribulationState.tribulationLevel, longevityChallenges, currentChallengeIndex]);
 
-  // 2048游戏：移动逻辑
+  // 2048 Game: Move Logic
   const move2048 = useCallback((direction: 'up' | 'down' | 'left' | 'right'): boolean => {
     setGame2048Grid(prevGrid => {
       const grid = prevGrid.map(row => [...row]);
       let moved = false;
       let newScore = 0;
 
-      // 移动和合并逻辑
+      // Move and merge logic
       const moveRow = (row: number[]): { row: number[], score: number } => {
         const filtered = row.filter(val => val !== 0);
         const merged: number[] = [];
@@ -150,7 +150,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
           if (i < filtered.length - 1 && filtered[i] === filtered[i + 1]) {
             merged.push(filtered[i] * 2);
             score += filtered[i] * 2;
-            i++; // 跳过下一个
+            i++; // Skip next
           } else {
             merged.push(filtered[i]);
           }
@@ -215,7 +215,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       if (moved) {
         setGame2048Score(prevScore => prevScore + newScore);
         const newGrid = addRandomTile(grid);
-        // 检查是否游戏结束（无法移动）
+        // Check if game over (no moves possible)
         setTimeout(() => {
           if (check2048GameOver(newGrid)) {
             handle2048GameOver();
@@ -228,75 +228,75 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     return true;
   }, [addRandomTile, check2048GameOver, handle2048GameOver]);
 
-  // 初始化解密游戏（金丹期、元婴期、化神期）
+  // Init Puzzle Game (Golden Core, Nascent Soul, Spirit Severing)
   const initializePuzzle = useCallback(() => {
     if (tribulationState.tribulationLevel === 'Elite Storm') {
-      // 金丹期：数字序列找规律
-      // 使用所有功法数量来决定游戏难度（随法门数上升）
+      // Golden Core: Numeric sequence deduction
+      // Difficulty based on art count
       const artCount = player.cultivationArts?.length || 0;
 
       const puzzleData = generateGoldenCorePuzzle(artCount);
       setPuzzle(puzzleData);
-      setUserInput([0]); // 数字序列只需要一个答案
+      setUserInput([0]); // Numeric sequence requires one answer
       setAttempts(0);
       setShowPuzzle(true);
       setShowHint(false);
       setHintUsed(false);
       setRevealedPositions([]);
     } else if (tribulationState.tribulationLevel === 'Master Storm') {
-      // 元婴期：2048游戏（使用天地精华品质和整体实力决定难度）
+      // Nascent Soul: 2048 Game (Difficulty based on Heaven Earth Essence quality and overall strength)
       const essenceQuality = player.heavenEarthEssence
         ? (HEAVEN_EARTH_ESSENCES[player.heavenEarthEssence]?.quality || 50)
         : 50;
 
-      // 计算玩家整体实力（结合功法和精华品质）
+      // Calculate player overall strength (combine art and essence quality)
       const artCount = player.cultivationArts?.length || 0;
-      // 综合实力计算：精华品质占70%，功法数量占30%
+      // Combined strength: Essence quality 70%, Art count 30%
       const combinedStrength = essenceQuality * 0.7 + artCount * 10 * 0.3;
 
-      // 使用2048游戏，难度基于综合实力
+      // Use 2048 game, difficulty based on combined strength
       const puzzleData = generateNascentSoulPuzzle(combinedStrength);
       setPuzzle(puzzleData);
       setUserInput([]);
-      init2048Game(); // 初始化2048游戏
+      init2048Game(); // Init 2048 game
       setAttempts(0);
       setShowPuzzle(true);
       setShowHint(false);
       setHintUsed(false);
       setRevealedPositions([]);
     } else if (tribulationState.tribulationLevel === 'Grandmaster Storm') {
-      // 化神期：符文序列（使用天地之髓品质决定难度）
+      // Spirit Severing: Rune Sequence (Difficulty based on Heaven Earth Marrow quality)
       const marrowQuality = player.heavenEarthMarrow
         ? (HEAVEN_EARTH_MARROWS[player.heavenEarthMarrow]?.quality || 50)
         : 50;
 
       const puzzleData = generateSpiritSeveringPuzzle(marrowQuality);
       setPuzzle(puzzleData);
-      setCurrentSequence([...puzzleData.sequence]); // 初始化当前序列
-      setSelectedIndex(null); // 重置选择
+      setCurrentSequence([...puzzleData.sequence]); // Init current sequence
+      setSelectedIndex(null); // Reset selection
       setAttempts(0);
       setShowPuzzle(true);
       setShowHint(false);
       setHintUsed(false);
       setRevealedPositions([]);
     } else if (tribulationState.tribulationLevel === 'Eternal Storm') {
-      // 长生天劫：五重考验
+      // Longevity: Five Trials
       const ruleCount = player.longevityRules?.length || 0;
       const puzzleData = generateLongevityPuzzle(ruleCount);
       setLongevityChallenges(puzzleData);
       setCurrentChallengeIndex(0);
       const firstChallenge = puzzleData.challenges[0];
-      // 设置第一个考验，根据类型初始化状态
+      // Set first trial, initialize state by type
       setPuzzle({ type: firstChallenge.type, data: firstChallenge.data });
       setUserInput([]);
-      // 如果是符文序列，从data中初始化序列
-      if (firstChallenge.type === '符文序列' && firstChallenge.data?.sequence) {
+      // If Rune Sequence, init from data
+      if (firstChallenge.type === 'Rune Sequence' && firstChallenge.data?.sequence) {
         setCurrentSequence([...firstChallenge.data.sequence]);
       } else {
         setCurrentSequence([]);
       }
-      // 如果是2048游戏或天地棋局，初始化游戏
-      if (firstChallenge.type === '天地棋局') {
+      // If 2048 or Celestial Grid, init game
+      if (firstChallenge.type === 'Celestial Grid') {
         init2048Game();
       }
       setAttempts(0);
@@ -311,13 +311,13 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     let stageIndex = 0;
 
     const playStage = () => {
-      if (stageIndex < TRIBULATION_STAGES.length - 2) { // -2 排除成功和失败状态
+      if (stageIndex < TRIBULATION_STAGES.length - 2) { // -2 to exclude success and failure states
         setCurrentStage(stageIndex);
         stageIndex++;
         const delay = TRIBULATION_STAGES[stageIndex - 1].delay;
         timeoutRef.current = setTimeout(playStage, delay);
       } else {
-        // 所有阶段完成，计算结果
+        // All stages complete, calculate result
         const tribulationResult: TribulationResult = {
           success: Math.random() > tribulationState.deathProbability,
           deathProbability: tribulationState.deathProbability,
@@ -368,80 +368,80 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
 
     let isCorrect = false;
 
-    // 根据游戏类型判断答案
-    if (puzzle.puzzleType === '数字序列') {
-      // 数字序列游戏：只需要比较一个答案
+    // Check answer based on game type
+    if (puzzle.puzzleType === 'Numeric Sequence') {
+      // Numeric Sequence: Check one answer
       isCorrect = userInput[0] === puzzle.solution;
-    } else if (puzzle.puzzleType === '符文序列') {
-      // 符文序列游戏：比较当前序列是否等于目标序列
+    } else if (puzzle.puzzleType === 'Rune Sequence') {
+      // Rune Sequence: Compare sequences
       isCorrect = currentSequence.length === puzzle.targetSequence.length &&
         currentSequence.every((val, idx) => val === puzzle.targetSequence[idx]);
-    } else if (puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局' || puzzle.type === '2048' || puzzle.type === '天地棋局') {
-      // 2048游戏/天地棋局：检查分数是否达到目标
+    } else if (puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid' || puzzle.type === '2048' || puzzle.type === 'Celestial Grid') {
+      // 2048/Celestial Grid: Check target score
       const puzzleData = puzzle.data || puzzle;
       const targetScore = puzzleData.targetScore || 2048;
       isCorrect = game2048Score >= targetScore;
     } else if (tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges) {
-      // 长生天劫：检查当前考验的答案
+      // Longevity: Check trial answer
       const challenge = longevityChallenges.challenges[currentChallengeIndex];
-      if (challenge.type === '八卦阵') {
-        // 八卦阵使用数字序列逻辑
+      if (challenge.type === 'Octagram Array') {
+        // Octagram Array uses Numeric Sequence logic
         isCorrect = userInput[0] === challenge.data.solution;
-      } else if (challenge.type === '2048' || challenge.type === '天地棋局') {
-        // 2048游戏/天地棋局（在长生天劫中）
+      } else if (challenge.type === '2048' || challenge.type === 'Celestial Grid') {
+        // 2048/Celestial Grid (Longevity)
         const targetScore = challenge.data.targetScore || 2048;
         isCorrect = game2048Score >= targetScore;
-      } else if (challenge.type === '符文序列') {
-        // 符文序列
+      } else if (challenge.type === 'Rune Sequence') {
+        // Rune Sequence
         isCorrect = currentSequence.length === challenge.data.targetSequence.length &&
           currentSequence.every((val, idx) => val === challenge.data.targetSequence[idx]);
-      } else if (challenge.type === '心魔考验' || challenge.type === '天道问答') {
-        // 心魔考验和天道问答：总是正确（简化处理，实际可以添加问答逻辑）
+      } else if (challenge.type === 'Inner Demon Trial' || challenge.type === 'System Inquiry') {
+        // Inner Demon / System Inquiry: Always correct
         isCorrect = true;
       }
     }
 
     if (isCorrect) {
-      // 如果是长生天劫，检查是否还有下一个考验
+      // If Longevity Tribulation, check if there are more trials
       if (tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges) {
         if (currentChallengeIndex < longevityChallenges.challenges.length - 1) {
-          // 进入下一个考验
+          // Enter next trial
           const nextIndex = currentChallengeIndex + 1;
           setCurrentChallengeIndex(nextIndex);
           const nextChallenge = longevityChallenges.challenges[nextIndex];
           setPuzzle({ type: nextChallenge.type, data: nextChallenge.data });
           setUserInput([]);
-          // 如果是符文序列，从data中初始化序列
-          if (nextChallenge.type === '符文序列' && nextChallenge.data?.sequence) {
+          // If Rune Sequence, init from data
+          if (nextChallenge.type === 'Rune Sequence' && nextChallenge.data?.sequence) {
             setCurrentSequence([...nextChallenge.data.sequence]);
           } else {
             setCurrentSequence([]);
           }
-          // 如果是2048游戏或天地棋局，初始化游戏
-          if (nextChallenge.type === '2048' || nextChallenge.type === '天地棋局') {
+          // If 2048 or Celestial Grid, init game
+          if (nextChallenge.type === '2048' || nextChallenge.type === 'Celestial Grid') {
             init2048Game();
           }
           setAttempts(0);
           setShowHint(false);
           setHintUsed(false);
         } else {
-          // 所有考验完成，继续天劫
+          // All trials complete, continue tribulation
           setShowPuzzle(false);
           continueTribulation();
         }
       } else {
-        // 其他天劫：解密成功，继续天劫
+        // Other tribulations: Puzzle solved, continue tribulation
         setShowPuzzle(false);
         continueTribulation();
       }
     } else if (attempts >= (puzzle.maxAttempts || puzzle.maxMoves || puzzle.maxSteps || 3) - 1) {
       // Failure
       let failMessage = 'Decryption Failed! The energy surge consumes you...';
-      if (puzzle.puzzleType === '数字序列') {
+      if (puzzle.puzzleType === 'Numeric Sequence') {
         failMessage = 'Sequence Deduction Failed! A sudden radiation spike bypasses your shields...';
-      } else if (puzzle.puzzleType === '符文序列') {
+      } else if (puzzle.puzzleType === 'Rune Sequence') {
         failMessage = 'Rune Deduction Failed! The energy surge consumes you...';
-      } else if (puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局') {
+      } else if (puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid') {
         failMessage = 'Celestial Grid Failed! Energy targets unmet. System meltdown initiated...';
       } else if (tribulationState.tribulationLevel === 'Eternal Storm') {
         failMessage = `Phase ${currentChallengeIndex + 1} Failure! Your journey ends here...`;
@@ -461,7 +461,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
   const startTribulation = useCallback(() => {
     if (!tribulationState.isOpen || isProcessing) return;
 
-    // 金丹期、元婴期、化神期、长生天劫特殊处理：先进行解密游戏
+    // Special handling for Golden Core, Nascent Soul, Spirit Severing, Longevity: Play puzzle first
     if (tribulationState.tribulationLevel === 'Elite Storm' ||
       tribulationState.tribulationLevel === 'Master Storm' ||
       tribulationState.tribulationLevel === 'Grandmaster Storm' ||
@@ -470,19 +470,19 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       return;
     }
 
-    // 其他境界正常流程
+    // Normal flow for other realms
     continueTribulation();
   }, [tribulationState, isProcessing, initializePuzzle, continueTribulation]);
 
   useEffect(() => {
-    // 当弹窗打开时，自动开始渡劫动画
-    // 只有当没有在处理且没有结果且之前没开始过时才触发
+    // When modal opens, auto-start tribulation animation
+    // Only if not processing, no result, and hasn't started before
     if (tribulationState.isOpen && !isProcessing && !result && !hasStartedRef.current) {
       hasStartedRef.current = true;
       setIsProcessing(true);
       startTribulation();
     }
-    // 当弹窗关闭时，重置状态
+    // When modal closes, reset state
     if (!tribulationState.isOpen) {
       hasStartedRef.current = false;
       setCurrentStage(0);
@@ -498,7 +498,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       setLongevityChallenges(null);
       setCurrentChallengeIndex(0);
       setAttempts(0);
-      // 清除可能存在的定时器
+      // Clear any existing timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -506,10 +506,10 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     }
   }, [tribulationState.isOpen, isProcessing, result, startTribulation]);
 
-  // 处理2048游戏的键盘事件和触摸滑动
+  // Handle 2048 game keyboard events and touch swipes
   useEffect(() => {
     if (!showPuzzle || !puzzle) return;
-    const is2048 = puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局' || puzzle.type === '2048' || puzzle.type === '天地棋局';
+    const is2048 = puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid' || puzzle.type === '2048' || puzzle.type === 'Celestial Grid';
     if (!is2048) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -528,10 +528,10 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       }
     };
 
-    // 触摸滑动处理
+    // Touch swipe handling
     let touchStartX = 0;
     let touchStartY = 0;
-    const minSwipeDistance = 30; // 最小滑动距离
+    const minSwipeDistance = 30; // Minimum swipe distance
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.touches[0].clientX;
@@ -550,19 +550,19 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       const absDeltaX = Math.abs(deltaX);
       const absDeltaY = Math.abs(deltaY);
 
-      // 只有滑动距离超过最小值才触发
+      // Trigger only if swipe distance exceeds minimum
       if (Math.max(absDeltaX, absDeltaY) < minSwipeDistance) return;
 
-      // 判断滑动方向
+      // Determine swipe direction
       if (absDeltaX > absDeltaY) {
-        // 水平滑动
+        // Horizontal swipe
         if (deltaX > 0) {
           move2048('right');
         } else {
           move2048('left');
         }
       } else {
-        // 垂直滑动
+        // Vertical swipe
         if (deltaY > 0) {
           move2048('down');
         } else {
@@ -600,7 +600,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[200] p-2 sm:p-4 md:p-6 backdrop-blur-md">
       <div className="bg-gradient-to-b from-slate-900 to-stone-900 rounded-lg border-2 border-purple-500/50 shadow-2xl w-full max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl">
         <div className="p-4 sm:p-6 md:p-8">
-          {/* 标题 */}
+          {/* Title */}
           <div className="text-center mb-4 sm:mb-6 md:mb-8">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4">
               <Sparkles className="text-purple-400 w-6 h-6 sm:w-8 sm:h-8" />
@@ -614,9 +614,9 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
             </p>
           </div>
 
-          {/* 渡劫动画阶段 */}
+          {/* Tribulation Animation Stage */}
           <div className="mb-4 sm:mb-6 md:mb-8 p-3 sm:p-4 md:p-6 bg-black/30 rounded-lg border border-purple-500/30">
-            {/* 解密游戏 */}
+            {/* Puzzle Game */}
             {showPuzzle && puzzle && (
               <div className="text-center">
                 <Grid3X3 className="text-purple-400 mx-auto mb-4 sm:mb-6 w-8 h-8 sm:w-10 sm:h-10" />
@@ -624,10 +624,10 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   {tribulationState.tribulationLevel === 'Eternal Storm' && longevityChallenges ? (
                     <>Phase {currentChallengeIndex + 1}: {puzzle.type}</>
                   ) : (
-                    puzzle.puzzleType === '数字序列' ? 'Data Sequence Deduction' :
-                      puzzle.puzzleType === '符文序列' ? 'Rune Sequence Deduction' :
+                    puzzle.puzzleType === 'Numeric Sequence' ? 'Data Sequence Deduction' :
+                      puzzle.puzzleType === 'Rune Sequence' ? 'Rune Sequence Deduction' :
                         puzzle.puzzleType === '2048' ? 'Celestial Grid v1.0' :
-                          puzzle.puzzleType === '天地棋局' ? 'Celestial Grid v2.0' :
+                          puzzle.puzzleType === 'Celestial Grid' ? 'Celestial Grid v2.0' :
                             'Encryption Override'
                   )}
                 </h3>
@@ -640,11 +640,11 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   {tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.data?.description ? puzzle.data.description : puzzle.description}
                 </p>
 
-                {/* 数字序列游戏 */}
-                {(puzzle.puzzleType === '数字序列' || (tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '八卦阵')) && (
+                {/* Numeric Sequence Game */}
+                {(puzzle.puzzleType === 'Numeric Sequence' || (tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === 'Octagram Array')) && (
                   <div className="mb-6">
                     <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 flex-wrap">
-                      {(tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '八卦阵' ? puzzle.data?.sequence : puzzle.sequence)?.map((num: number, index: number) => (
+                      {(tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === 'Octagram Array' ? puzzle.data?.sequence : puzzle.sequence)?.map((num: number, index: number) => (
                         <div
                           key={index}
                           className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-900/50 border-2 border-purple-500 rounded-lg flex items-center justify-center text-xl sm:text-2xl font-bold text-purple-200"
@@ -675,12 +675,12 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   </div>
                 )}
 
-                {/* 2048游戏 */}
-                {(puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局' || puzzle.type === '2048' || puzzle.type === '天地棋局') && (() => {
+                {/* 2048 Game */}
+                {(puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid' || puzzle.type === '2048' || puzzle.type === 'Celestial Grid') && (() => {
                   const puzzleData = puzzle.data || puzzle;
                   const targetScore = puzzleData.targetScore || 2048;
 
-                  // 获取数字颜色
+                  // Get tile color
                   const getTileColor = (num: number): string => {
                     if (num === 0) return 'bg-stone-800 text-stone-600';
                     const colors: { [key: number]: string } = {
@@ -757,13 +757,13 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   );
                 })()}
 
-                {/* 符文序列游戏 */}
-                {(puzzle.puzzleType === '符文序列' || (tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '符文序列')) && (
+                {/* Rune Sequence Game */}
+                {(puzzle.puzzleType === 'Rune Sequence' || (tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === 'Rune Sequence')) && (
                   <div className="mb-6">
                     <div className="mb-4">
                       <label className="block text-sm text-stone-400 mb-2">Target Sequence:</label>
                       <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 flex-wrap">
-                        {(tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === '符文序列' ? puzzle.data?.targetSequence : puzzle.targetSequence)?.map((symbol: string, index: number) => (
+                        {(tribulationState.tribulationLevel === 'Eternal Storm' && puzzle.type === 'Rune Sequence' ? puzzle.data?.targetSequence : puzzle.targetSequence)?.map((symbol: string, index: number) => (
                           <div
                             key={index}
                             className="w-12 h-12 sm:w-14 sm:h-14 bg-green-900/50 border-2 border-green-500 rounded-lg flex items-center justify-center text-lg sm:text-xl font-bold text-green-200"
@@ -781,13 +781,13 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                             key={index}
                             onClick={() => {
                               if (selectedIndex === null) {
-                                // 第一次点击：选择第一个符文
+                                // First click: Select first rune
                                 setSelectedIndex(index);
                               } else if (selectedIndex === index) {
-                                // 点击同一个符文：取消选择
+                                // Click same rune: Deselect
                                 setSelectedIndex(null);
                               } else {
-                                // 第二次点击：交换两个符文
+                                // Second click: Swap two runes
                                 const newSequence = [...currentSequence];
                                 [newSequence[selectedIndex], newSequence[index]] = [newSequence[index], newSequence[selectedIndex]];
                                 setCurrentSequence(newSequence);
@@ -812,8 +812,8 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   </div>
                 )}
 
-                {/* 提示按钮和规则说明 */}
-                {puzzle.puzzleType !== '2048' && puzzle.puzzleType !== '天地棋局' && (puzzle.type !== '2048' && puzzle.type !== '天地棋局' && puzzle.type !== '心魔考验' && puzzle.type !== '天道问答') && (
+                {/* Hint Button and Rules */}
+                {puzzle.puzzleType !== '2048' && puzzle.puzzleType !== 'Celestial Grid' && (puzzle.type !== '2048' && puzzle.type !== 'Celestial Grid' && puzzle.type !== 'Inner Demon Trial' && puzzle.type !== 'System Inquiry') && (
                   <div className="mb-4 space-y-2">
                     <button
                       onClick={() => {
@@ -851,8 +851,8 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   </div>
                 )}
 
-                {/* 心魔考验和天道问答的特殊显示 */}
-                {(puzzle.type === '心魔考验' || puzzle.type === '天道问答') && (
+                {/* Special Display for Inner Demon Trial and System Inquiry */}
+                {(puzzle.type === 'Inner Demon Trial' || puzzle.type === 'System Inquiry') && (
                   <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
                     <p className="text-sm text-stone-300 mb-4">{puzzle.data?.description}</p>
                     {puzzle.data?.questions?.map((q: string, idx: number) => (
@@ -868,7 +868,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   {puzzle.maxAttempts && (
                     <>Attempts Remaining: {puzzle.maxAttempts - attempts}</>
                   )}
-                  {(puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局' || puzzle.type === '2048' || puzzle.type === '天地棋局') && (() => {
+                  {(puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid' || puzzle.type === '2048' || puzzle.type === 'Celestial Grid') && (() => {
                     const puzzleData = puzzle.data || puzzle;
                     const targetScore = puzzleData.targetScore || 2048;
                     return (
@@ -887,9 +887,9 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                 <button
                   onClick={handlePuzzleSubmit}
                   disabled={
-                    (puzzle.puzzleType === '数字序列' || puzzle.type === '八卦阵')
+                    (puzzle.puzzleType === 'Numeric Sequence' || puzzle.type === 'Octagram Array')
                       ? (!userInput[0] || userInput[0] === 0)
-                      : (puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局' || puzzle.type === '2048' || puzzle.type === '天地棋局')
+                      : (puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid' || puzzle.type === '2048' || puzzle.type === 'Celestial Grid')
                         ? (() => {
                           const puzzleData = puzzle.data || puzzle;
                           const targetScore = puzzleData.targetScore || 2048;
@@ -899,10 +899,10 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                   }
                   className="px-4 sm:px-6 py-2 sm:py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-stone-700 disabled:text-stone-500 text-white font-bold rounded-lg transition-colors"
                 >
-                  {(puzzle.puzzleType === '数字序列' || puzzle.type === '八卦阵') ? 'SUBMIT ANSWER' :
-                    (puzzle.puzzleType === '符文序列' || puzzle.type === '符文序列') ? 'CONFIRM SEQUENCE' :
-                      (puzzle.puzzleType === '2048' || puzzle.puzzleType === '天地棋局' || puzzle.type === '2048' || puzzle.type === '天地棋局') ? 'CONFIRM COMPLETION' :
-                        (puzzle.type === '心魔考验' || puzzle.type === '天道问答') ? 'MAINTAIN RESOLVE' :
+                  {(puzzle.puzzleType === 'Numeric Sequence' || puzzle.type === 'Octagram Array') ? 'SUBMIT ANSWER' :
+                    (puzzle.puzzleType === 'Rune Sequence' || puzzle.type === 'Rune Sequence') ? 'CONFIRM SEQUENCE' :
+                      (puzzle.puzzleType === '2048' || puzzle.puzzleType === 'Celestial Grid' || puzzle.type === '2048' || puzzle.type === 'Celestial Grid') ? 'CONFIRM COMPLETION' :
+                        (puzzle.type === 'Inner Demon Trial' || puzzle.type === 'System Inquiry') ? 'MAINTAIN RESOLVE' :
                           'CONFIRM'}
                 </button>
               </div>
@@ -935,14 +935,14 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
               <div className="text-center">
                 <XCircle className="text-red-400 mx-auto mb-2 sm:mb-3 w-10 h-10 sm:w-12 sm:h-12" />
                 <p className="text-base sm:text-lg md:text-xl text-red-300 font-medium mb-1 sm:mb-2">
-                  渡劫失败
+                  EVOLUTION FAILURE
                 </p>
                 <p className="text-xs sm:text-sm md:text-base text-stone-300">{result.description}</p>
               </div>
             )}
           </div>
 
-          {/* 天劫详情 */}
+          {/* Tribulation Details */}
           {!result && (
             <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3 md:space-y-4">
               {/* Survival Probability */}
@@ -956,7 +956,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                 </span>
               </div>
 
-              {/* 属性修正 */}
+              {/* Attribute Bonus */}
               <div className="flex items-center justify-between p-2 sm:p-3 md:p-4 bg-black/20 rounded-lg">
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Shield className="text-blue-400 w-4 h-4 sm:w-5 sm:h-5" />
@@ -967,7 +967,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                 </span>
               </div>
 
-              {/* 装备修正 */}
+              {/* Equipment Bonus */}
               <div className="flex items-center justify-between p-2 sm:p-3 md:p-4 bg-black/20 rounded-lg">
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Sparkles className="text-purple-400 w-4 h-4 sm:w-5 sm:h-5" />
@@ -978,7 +978,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
                 </span>
               </div>
 
-              {/* 综合属性 */}
+              {/* Total Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-3 sm:mt-4">
                 <div className="flex items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-black/20 rounded-lg">
                   <Sword className="text-orange-400 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
@@ -1026,7 +1026,7 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
             </div>
           )}
 
-          {/* 按钮 */}
+          {/* Button */}
           {result && (
             <button
               onClick={handleClose}

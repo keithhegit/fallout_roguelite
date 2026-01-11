@@ -2,8 +2,8 @@ import { KeyboardShortcutConfig } from '../types';
 import { KeyboardShortcut } from '../hooks/useKeyboardShortcuts';
 
 /**
- * 默认快捷键配置
- * key 为 actionId，用于标识不同的操作
+ * Default shortcut configuration
+ * key is actionId, used to identify different operations
  */
 export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcutConfig> = {
   meditate: { key: 'm' },
@@ -25,7 +25,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcutConfig> = {
 };
 
 /**
- * 获取快捷键配置（合并默认和自定义配置）
+ * Get shortcut configuration (merge default and custom configuration)
  */
 export function getShortcutConfig(
   actionId: string,
@@ -36,7 +36,7 @@ export function getShortcutConfig(
 }
 
 /**
- * 检查快捷键是否冲突
+ * Check if shortcut conflicts
  */
 export function checkShortcutConflict(
   shortcut: KeyboardShortcutConfig,
@@ -44,7 +44,7 @@ export function checkShortcutConflict(
   allShortcuts: Record<string, KeyboardShortcutConfig>
 ): string | null {
   for (const [id, config] of Object.entries(allShortcuts)) {
-    if (id === actionId) continue; // 跳过自己
+    if (id === actionId) continue; // Skip self
 
     if (
       config.key.toLowerCase() === shortcut.key.toLowerCase() &&
@@ -60,7 +60,7 @@ export function checkShortcutConflict(
 }
 
 /**
- * 将 KeyboardShortcutConfig 转换为 KeyboardShortcut
+ * Convert KeyboardShortcutConfig to KeyboardShortcut
  */
 export function configToShortcut(
   config: KeyboardShortcutConfig,
@@ -81,27 +81,27 @@ export function configToShortcut(
 }
 
 /**
- * 获取所有默认快捷键的显示信息
+ * Get display information for all default shortcuts
  */
 export const SHORTCUT_DESCRIPTIONS: Record<
   string,
   { description: string; category: string }
 > = {
-  meditate: { description: '打坐', category: '基础操作' },
-  adventure: { description: '历练', category: '基础操作' },
-  toggleAutoMeditate: { description: '切换自动打坐', category: '基础操作' },
-  toggleAutoAdventure: { description: '切换自动历练', category: '基础操作' },
-  openInventory: { description: '打开储物袋', category: '打开面板' },
-  openCultivation: { description: '打开功法', category: '打开面板' },
-  openCharacter: { description: '打开角色', category: '打开面板' },
-  openAchievement: { description: '打开成就', category: '打开面板' },
-  openPet: { description: '打开灵宠', category: '打开面板' },
-  openLottery: { description: '打开抽奖', category: '打开面板' },
-  openSettings: { description: '打开设置', category: '打开面板' },
-  openRealm: { description: '打开秘境', category: '打开面板' },
-  openAlchemy: { description: '打开炼丹', category: '打开面板' },
-  openSect: { description: '打开宗门', category: '打开面板' },
-  openDailyQuest: { description: '打开日常任务', category: '打开面板' },
-  closeModal: { description: '关闭当前弹窗', category: '通用操作' },
+  meditate: { description: 'MEDITATE', category: 'BASIC_OPERATIONS' },
+  adventure: { description: 'SCAVENGE', category: 'BASIC_OPERATIONS' },
+  toggleAutoMeditate: { description: 'TOGGLE_AUTO_MEDITATE', category: 'BASIC_OPERATIONS' },
+  toggleAutoAdventure: { description: 'TOGGLE_AUTO_SCAVENGE', category: 'BASIC_OPERATIONS' },
+  openInventory: { description: 'OPEN_INVENTORY', category: 'INTERFACE_ACCESS' },
+  openCultivation: { description: 'OPEN_TRAIN', category: 'INTERFACE_ACCESS' },
+  openCharacter: { description: 'OPEN_CHARACTER', category: 'INTERFACE_ACCESS' },
+  openAchievement: { description: 'OPEN_ACHIEVEMENTS', category: 'INTERFACE_ACCESS' },
+  openPet: { description: 'OPEN_PETS', category: 'INTERFACE_ACCESS' },
+  openLottery: { description: 'OPEN_LOTTERY', category: 'INTERFACE_ACCESS' },
+  openSettings: { description: 'OPEN_SETTINGS', category: 'INTERFACE_ACCESS' },
+  openRealm: { description: 'OPEN_EXPLORE', category: 'INTERFACE_ACCESS' },
+  openAlchemy: { description: 'OPEN_CRAFT', category: 'INTERFACE_ACCESS' },
+  openSect: { description: 'OPEN_FACTION', category: 'INTERFACE_ACCESS' },
+  openDailyQuest: { description: 'OPEN_DAILY_QUESTS', category: 'INTERFACE_ACCESS' },
+  closeModal: { description: 'ABORT_PROTOCOL', category: 'SYSTEM_COMMANDS' },
 };
 

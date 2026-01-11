@@ -60,7 +60,7 @@ import { showSuccess, showError, showInfo, showConfirm } from '../utils/toastUti
 import { getRarityTextColor } from '../utils/rarityUtils';
 import { ASSETS } from '../constants/assets';
 
-// 生成唯一ID
+// Generate unique ID
 const uid = () =>
   Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
 
@@ -69,9 +69,9 @@ interface Props {
   onClose: () => void;
   player: PlayerStats;
   onUpdatePlayer: (updates: Partial<PlayerStats>) => void;
-  onTriggerDeath?: () => void; // 触发死亡测试
-  onTriggerReputationEvent?: (event: AdventureResult['reputationEvent']) => void; // 触发声望事件
-  onChallengeDaoCombining?: () => void; // 挑战天地之魄
+  onTriggerDeath?: () => void; // Trigger death test
+  onTriggerReputationEvent?: (event: AdventureResult['reputationEvent']) => void; // Trigger reputation event
+  onChallengeDaoCombining?: () => void; // Challenge Heaven-Earth Soul
 }
 
 const DebugModal: React.FC<Props> = ({
@@ -100,7 +100,7 @@ const DebugModal: React.FC<Props> = ({
     | 'breakthrough'
   >('equipment');
 
-  // 当 player 更新时同步 localPlayer
+  // Sync localPlayer when player updates
   useEffect(() => {
     setLocalPlayer(player);
   }, [player]);
@@ -115,7 +115,7 @@ const DebugModal: React.FC<Props> = ({
   const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
   const [globalSearchQuery, setGlobalSearchQuery] = useState<string>('');
 
-  // 合并所有装备（包括LOOT_ITEMS中的套装装备）
+  // Merge all equipment (including set items from LOOT_ITEMS)
   const allEquipmentTemplates = useMemo(() => {
     const equipmentFromLoot: Array<{
       name: string;
@@ -126,7 +126,7 @@ const DebugModal: React.FC<Props> = ({
       description?: string;
     }> = [];
 
-    // 从武器池中提取
+    // Extract from weapon pool
     if (LOOT_ITEMS.weapons) {
       LOOT_ITEMS.weapons.forEach((weapon) => {
         equipmentFromLoot.push({
@@ -135,12 +135,12 @@ const DebugModal: React.FC<Props> = ({
           rarity: weapon.rarity,
           slot: weapon.equipmentSlot as EquipmentSlot,
           effect: weapon.effect,
-          description: `${weapon.name}，${weapon.rarity}品质装备`,
+          description: `${weapon.name}, ${weapon.rarity} Quality Equipment`,
         });
       });
     }
 
-    // 从护甲池中提取
+    // Extract from armor pool
     if (LOOT_ITEMS.armors) {
       LOOT_ITEMS.armors.forEach((armor) => {
         equipmentFromLoot.push({
@@ -149,12 +149,12 @@ const DebugModal: React.FC<Props> = ({
           rarity: armor.rarity,
           slot: armor.equipmentSlot as EquipmentSlot,
           effect: armor.effect,
-          description: `${armor.name}，${armor.rarity}品质装备`,
+          description: `${armor.name}, ${armor.rarity} Quality Equipment`,
         });
       });
     }
 
-    // 从首饰池中提取
+    // Extract from accessory pool
     if (LOOT_ITEMS.accessories) {
       LOOT_ITEMS.accessories.forEach((accessory) => {
         equipmentFromLoot.push({
@@ -163,12 +163,12 @@ const DebugModal: React.FC<Props> = ({
           rarity: accessory.rarity,
           slot: accessory.equipmentSlot as EquipmentSlot,
           effect: accessory.effect,
-          description: `${accessory.name}，${accessory.rarity}品质装备`,
+          description: `${accessory.name}, ${accessory.rarity} Quality Equipment`,
         });
       });
     }
 
-    // 从戒指池中提取
+    // Extract from ring pool
     if (LOOT_ITEMS.rings) {
       LOOT_ITEMS.rings.forEach((ring) => {
         equipmentFromLoot.push({
@@ -177,12 +177,12 @@ const DebugModal: React.FC<Props> = ({
           rarity: ring.rarity,
           slot: ring.equipmentSlot as EquipmentSlot,
           effect: ring.effect,
-          description: `${ring.name}，${ring.rarity}品质装备`,
+          description: `${ring.name}, ${ring.rarity} Quality Equipment`,
         });
       });
     }
 
-    // 从法宝池中提取
+    // Extract from artifact pool
     if (LOOT_ITEMS.artifacts) {
       LOOT_ITEMS.artifacts.forEach((artifact) => {
         equipmentFromLoot.push({
@@ -191,12 +191,12 @@ const DebugModal: React.FC<Props> = ({
           rarity: artifact.rarity,
           slot: artifact.equipmentSlot as EquipmentSlot,
           effect: artifact.effect,
-          description: `${artifact.name}，${artifact.rarity}品质装备`,
+          description: `${artifact.name}, ${artifact.rarity} Quality Equipment`,
         });
       });
     }
 
-    // 合并并去重（按名称去重，保留第一个）
+    // Merge and deduplicate (by name, keep first)
     const allEquipment = [
       ...EQUIPMENT_TEMPLATES.map(eq => ({
         name: eq.name,
@@ -218,16 +218,16 @@ const DebugModal: React.FC<Props> = ({
     return Array.from(equipmentMap.values());
   }, []);
 
-  // 过滤装备（按稀有度和搜索关键词）
+  // Filter equipment (by rarity and search keywords)
   const filteredEquipment = useMemo(() => {
     let equipment = allEquipmentTemplates;
 
-    // 先按稀有度过滤
+    // Filter by rarity first
     if (equipmentFilter !== 'all') {
       equipment = equipment.filter((eq) => eq.rarity === equipmentFilter);
     }
 
-    // 再按搜索关键词过滤
+    // Filter by search keywords next
     if (equipmentSearchQuery.trim()) {
       const query = equipmentSearchQuery.trim().toLowerCase();
       equipment = equipment.filter((eq) => {
@@ -242,7 +242,7 @@ const DebugModal: React.FC<Props> = ({
     return equipment;
   }, [equipmentFilter, equipmentSearchQuery, allEquipmentTemplates]);
 
-  // 合并所有物品列表
+  // Merge all item lists
   const allItems = useMemo(() => {
     const items: Array<{
       name: string;
@@ -255,9 +255,9 @@ const DebugModal: React.FC<Props> = ({
       equipmentSlot?: EquipmentSlot;
       level?: number;
     }> = [];
-    const itemNames = new Set<string>(); // 用于去重
+    const itemNames = new Set<string>(); // For deduplication
 
-    // 从初始物品
+    // From initial items
     INITIAL_ITEMS.forEach((item) => {
       if (!itemNames.has(item.name)) {
         itemNames.add(item.name);
@@ -275,7 +275,7 @@ const DebugModal: React.FC<Props> = ({
       }
     });
 
-    // 从丹药配方（优先使用常量中的定义）
+    // From pill recipes (prioritize definition in constants)
     [...PILL_RECIPES, ...DISCOVERABLE_RECIPES].forEach((recipe) => {
       if (!itemNames.has(recipe.result.name)) {
         itemNames.add(recipe.result.name);
@@ -290,11 +290,11 @@ const DebugModal: React.FC<Props> = ({
       }
     });
 
-    // 从抽奖奖品中提取物品（如果是丹药，优先使用常量中的定义）
+    // Extract items from lottery prizes (if pill, prioritize definition in constants)
     LOTTERY_PRIZES.forEach((prize) => {
       if (prize.type === 'item' && prize.value.item) {
         const item = prize.value.item;
-        // 如果是丹药，优先从常量中获取完整定义
+        // If pill, prioritize getting full definition from constants
         if (item.type === ItemType.Pill) {
           const pillDef = getPillDefinition(item.name);
           if (pillDef && !itemNames.has(item.name)) {
@@ -307,15 +307,15 @@ const DebugModal: React.FC<Props> = ({
               effect: pillDef.effect,
               permanentEffect: pillDef.permanentEffect,
             });
-            return; // 已从常量中获取，跳过原始定义
+            return; // Already got from constants, skip original definition
           }
         }
-        // 非丹药或常量中没有定义的物品，使用原始定义
+        // Non-pill or undefined in constants, use original definition
         if (!itemNames.has(item.name)) {
           itemNames.add(item.name);
           items.push({
             name: item.name,
-            type: item.type === '材料' ? ItemType.Material : item.type,
+            type: item.type === 'Material' ? ItemType.Material : item.type,
             description: item.description,
             rarity: item.rarity,
             effect: item.effect,
@@ -328,7 +328,7 @@ const DebugModal: React.FC<Props> = ({
       }
     });
 
-    // 从宗门商店物品
+    // From sect shop items
     SECT_SHOP_ITEMS.forEach((shopItem) => {
       if (!itemNames.has(shopItem.item.name)) {
         itemNames.add(shopItem.item.name);
@@ -346,14 +346,14 @@ const DebugModal: React.FC<Props> = ({
       }
     });
 
-    // 从LOOT_ITEMS中提取草药
+    // Extract herbs from LOOT_ITEMS
     LOOT_ITEMS.herbs.forEach((herb) => {
       if (!itemNames.has(herb.name)) {
         itemNames.add(herb.name);
         items.push({
           name: herb.name,
           type: herb.type,
-          description: `稀有草药：${herb.name}`,
+          description: `Rare Herb: ${herb.name}`,
           rarity: herb.rarity,
           effect: herb.effect,
           permanentEffect: (herb as any).permanentEffect,
@@ -361,40 +361,40 @@ const DebugModal: React.FC<Props> = ({
       }
     });
 
-    // 从LOOT_ITEMS中提取材料
+    // Extract materials from LOOT_ITEMS
     LOOT_ITEMS.materials.forEach((material) => {
       if (!itemNames.has(material.name)) {
         itemNames.add(material.name);
         items.push({
           name: material.name,
           type: material.type,
-          description: `炼器材料：${material.name}`,
+          description: `Crafting Material: ${material.name}`,
           rarity: material.rarity,
           permanentEffect: (material as any).permanentEffect,
         });
       }
     });
 
-    // 从可发现配方中生成丹方物品
+    // Generate recipe items from discoverable recipes
     DISCOVERABLE_RECIPES.forEach((recipe) => {
-      const recipeItemName = `${recipe.name}丹方`;
+      const recipeItemName = `${recipe.name} Recipe`;
       if (!itemNames.has(recipeItemName)) {
         itemNames.add(recipeItemName);
         items.push({
           name: recipeItemName,
           type: ItemType.Recipe,
-          description: `记载了【${recipe.name}】炼制方法的古老丹方。使用后可学会炼制此丹药。`,
+          description: `Ancient recipe recording the method for crafting [${recipe.name}]. Use to learn how to craft this pill.`,
           rarity: recipe.result.rarity,
         });
       }
     });
 
-    // 添加材料包
+    // Add material packs
     const materialPacks = [
-      { name: '仙品丹药材料包', rarity: '传说' as ItemRarity, description: '包含多种仙品丹药材料的礼包。' },
-      { name: '传说丹药材料包', rarity: '传说' as ItemRarity, description: '包含多种传说丹药材料的礼包。' },
-      { name: '稀有丹药材料包', rarity: '稀有' as ItemRarity, description: '包含多种稀有丹药材料的礼包。' },
-      { name: '普通丹药材料包', rarity: '普通' as ItemRarity, description: '包含多种普通丹药材料的礼包。' },
+      { name: 'Mythic Material Pack', rarity: 'Mythic' as ItemRarity, description: 'A pack containing various Mythic quality materials.' },
+      { name: 'Legendary Material Pack', rarity: 'Legendary' as ItemRarity, description: 'A pack containing various Legendary quality materials.' },
+      { name: 'Rare Material Pack', rarity: 'Rare' as ItemRarity, description: 'A pack containing various Rare quality materials.' },
+      { name: 'Common Material Pack', rarity: 'Common' as ItemRarity, description: 'A pack containing various Common quality materials.' },
     ];
     materialPacks.forEach((pack) => {
       if (!itemNames.has(pack.name)) {
@@ -408,30 +408,30 @@ const DebugModal: React.FC<Props> = ({
       }
     });
 
-    // 添加宗门宝库钥匙
-    if (!itemNames.has('宗门宝库钥匙')) {
-      itemNames.add('宗门宝库钥匙');
+    // Add Sect Treasury Key
+    if (!itemNames.has('Sect Treasury Key')) {
+      itemNames.add('Sect Treasury Key');
       items.push({
-        name: '宗门宝库钥匙',
+        name: 'Sect Treasury Key',
         type: ItemType.Material,
-        description: '用于开启宗门宝库的钥匙，藏有历代宗主的积累。',
-        rarity: '仙品' as ItemRarity,
+        description: 'Key to the Sect Treasury, containing accumulations of past leaders.',
+        rarity: 'Mythic' as ItemRarity,
       });
     }
 
     return items;
   }, []);
 
-  // 过滤物品（按类型和搜索关键词）
+  // Filter items (by type and search query)
   const filteredItems = useMemo(() => {
     let items = allItems;
 
-    // 先按类型过滤
+    // Filter by type first
     if (itemFilter !== 'all') {
       items = items.filter((item) => item.type === itemFilter);
     }
 
-    // 再按搜索关键词过滤
+    // Filter by search query next
     if (itemSearchQuery.trim()) {
       const query = itemSearchQuery.trim().toLowerCase();
       items = items.filter((item) => {
@@ -448,12 +448,12 @@ const DebugModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
-  // 检查 player 是否有效，如果无效则不渲染
+  // Check if player is valid, do not render if invalid
   if (!player || !localPlayer) {
     return null;
   }
 
-  // 移除 handleSave，因为所有修改现在都直接生效
+  // Remove handleSave, as all changes take effect immediately
 
   const handleReset = () => {
     setLocalPlayer(player);
@@ -465,7 +465,7 @@ const DebugModal: React.FC<Props> = ({
   ) => {
     const updated = { ...localPlayer, [field]: value };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({ [field]: value });
   };
 
@@ -478,7 +478,7 @@ const DebugModal: React.FC<Props> = ({
     const newValue = Math.max(min, current + delta);
     const updated = { ...localPlayer, [field]: newValue };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({ [field]: newValue });
   };
 
@@ -487,7 +487,7 @@ const DebugModal: React.FC<Props> = ({
     const updated = {
       ...localPlayer,
       realm: newRealm,
-      // 如果境界降低，调整相关属性
+      // If realm decreases, adjust stats
       maxHp: Math.max(localPlayer.maxHp, realmData.baseMaxHp),
       hp: Math.min(localPlayer.hp, Math.max(localPlayer.maxHp, realmData.baseMaxHp)),
       attack: Math.max(localPlayer.attack, realmData.baseAttack),
@@ -497,7 +497,7 @@ const DebugModal: React.FC<Props> = ({
       speed: Math.max(localPlayer.speed, realmData.baseSpeed),
     };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({
       realm: updated.realm,
       maxHp: updated.maxHp,
@@ -514,17 +514,17 @@ const DebugModal: React.FC<Props> = ({
     const clampedLevel = Math.max(1, Math.min(9, newLevel));
     const updated = { ...localPlayer, realmLevel: clampedLevel };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({ realmLevel: clampedLevel });
   };
 
-  // 添加装备到背包
+  // Add equipment to inventory
   const handleAddEquipment = (template: (typeof EQUIPMENT_TEMPLATES)[0]) => {
     const newItem: Item = {
       id: uid(),
       name: template.name,
       type: template.type,
-      description: (template as any).description || `${template.name}的装备`,
+      description: (template as any).description || `${template.name}'s Equipment`,
       quantity: 1,
       rarity: template.rarity,
       level: 0,
@@ -538,19 +538,19 @@ const DebugModal: React.FC<Props> = ({
       inventory: [...localPlayer.inventory, newItem],
     };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({
       inventory: updated.inventory,
     });
-    showSuccess(`已添加装备：${template.name}`);
+    showSuccess(`Added Equipment: ${template.name}`);
   };
 
-  // 选择天赋
+  // Select Talent
   const handleSelectTalent = (talent: Talent) => {
     const oldTalent = TALENTS.find((t) => t.id === localPlayer.talentId);
     const newTalent = talent;
 
-    // 计算属性变化
+    // Calculate stat changes
     let attackChange =
       (newTalent.effects.attack || 0) - (oldTalent?.effects.attack || 0);
     let defenseChange =
@@ -578,7 +578,7 @@ const DebugModal: React.FC<Props> = ({
       luck: localPlayer.luck + luckChange,
     };
     setLocalPlayer(updatedPlayer);
-    // 立即更新到实际玩家状态
+    // Update real player state immediately
     onUpdatePlayer({
       talentId: talent.id,
       attack: updatedPlayer.attack,
@@ -590,49 +590,49 @@ const DebugModal: React.FC<Props> = ({
       speed: updatedPlayer.speed,
       luck: updatedPlayer.luck,
     });
-    showSuccess(`已选择天赋：${talent.name}`);
+    showSuccess(`Selected Talent: ${talent.name}`);
   };
 
-  // 获取稀有度颜色
-  // 使用统一的工具函数获取稀有度颜色（带边框）
+  // Get Rarity Color
+  // Use unified utility to get rarity color (with border)
   const getRarityColor = (rarity: ItemRarity) => {
     const baseColor = getRarityTextColor(rarity);
     switch (rarity) {
-      case '普通':
+      case 'Common':
         return `${baseColor} border-stone-600`;
-      case '稀有':
+      case 'Rare':
         return `${baseColor} border-blue-600`;
-      case '传说':
+      case 'Legendary':
         return `${baseColor} border-purple-600`;
-      case '仙品':
+      case 'Mythic':
         return `${baseColor} border-yellow-600`;
       default:
         return `${baseColor} border-stone-600`;
     }
   };
 
-  // 获取稀有度背景色
+  // Get Rarity Background Color
   const getRarityBgColor = (rarity: ItemRarity) => {
     switch (rarity) {
-      case '普通':
+      case 'Common':
         return 'bg-stone-800/50';
-      case '稀有':
+      case 'Rare':
         return 'bg-blue-900/20';
-      case '传说':
+      case 'Legendary':
         return 'bg-purple-900/20';
-      case '仙品':
+      case 'Mythic':
         return 'bg-yellow-900/20';
       default:
         return 'bg-stone-800/50';
     }
   };
 
-  // 选择称号
+  // Select Title
   const handleSelectTitle = (title: Title) => {
     const oldTitle = TITLES.find((t) => t.id === localPlayer.titleId);
     const newTitle = title;
 
-    // 计算属性变化
+    // Calculate stat changes
     let attackChange =
       (newTitle.effects.attack || 0) - (oldTitle?.effects.attack || 0);
     let defenseChange =
@@ -648,7 +648,7 @@ const DebugModal: React.FC<Props> = ({
       hp: localPlayer.hp + hpChange,
     };
     setLocalPlayer(updatedPlayer);
-    // 立即更新到实际玩家状态
+    // Update real player state immediately
     onUpdatePlayer({
       titleId: title.id,
       attack: updatedPlayer.attack,
@@ -656,13 +656,13 @@ const DebugModal: React.FC<Props> = ({
       maxHp: updatedPlayer.maxHp,
       hp: updatedPlayer.hp,
     });
-    showSuccess(`已选择称号：${title.name}`);
+    showSuccess(`Selected Title: ${title.name}`);
   };
 
-  // 解锁称号
+  // Unlock Title
   const handleUnlockTitle = (title: Title) => {
     if ((localPlayer.unlockedTitles || []).includes(title.id)) {
-      showInfo('该称号已解锁');
+      showInfo('Title already unlocked');
       return;
     }
     const updated = {
@@ -673,29 +673,29 @@ const DebugModal: React.FC<Props> = ({
     onUpdatePlayer({
       unlockedTitles: updated.unlockedTitles,
     });
-    showSuccess(`已解锁称号：${title.name}`);
+    showSuccess(`Unlocked Title: ${title.name}`);
   };
 
 
-  // 学习功法
+  // Learn Cultivation Art
   const handleLearnCultivationArt = (art: CultivationArt) => {
     if (localPlayer.cultivationArts.includes(art.id)) {
-      showError('该功法已学习');
-      return; // 已经学习过了
+      showError('Protocol already learned');
+      return; // Already learned
     }
     const updated = {
       ...localPlayer,
       cultivationArts: [...localPlayer.cultivationArts, art.id],
     };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({
       cultivationArts: updated.cultivationArts,
     });
-    showSuccess(`已学习功法：${art.name}`);
+    showSuccess(`Learned Protocol: ${art.name}`);
   };
 
-  // 加入宗门
+  // Join Faction
   const handleJoinSect = (sectId: string) => {
     const sect = SECTS.find((s) => s.id === sectId);
     setLocalPlayer((prev) => {
@@ -705,7 +705,7 @@ const DebugModal: React.FC<Props> = ({
         sectRank: SectRank.Outer,
         sectContribution: 0,
       };
-      // 立即更新到实际玩家状态
+      // Update real player state immediately
       onUpdatePlayer({
         sectId: sectId,
         sectRank: SectRank.Outer,
@@ -713,14 +713,14 @@ const DebugModal: React.FC<Props> = ({
       });
       return updated;
     });
-    showSuccess(`已加入宗门：${sect?.name || sectId}`);
+    showSuccess(`Joined Faction: ${sect?.name || sectId}`);
   };
 
-  // 完成成就
+  // Complete Achievement
   const handleCompleteAchievement = (achievementId: string) => {
     if (localPlayer.achievements.includes(achievementId)) {
-      showError('该成就已完成');
-      return; // 已经完成了
+      showError('Achievement already completed');
+      return; // Already completed
     }
     const achievement = ACHIEVEMENTS.find((a) => a.id === achievementId);
     const updated = {
@@ -728,14 +728,14 @@ const DebugModal: React.FC<Props> = ({
       achievements: [...localPlayer.achievements, achievementId],
     };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({
       achievements: updated.achievements,
     });
-    showSuccess(`已完成成就：${achievement?.name || achievementId}`);
+    showSuccess(`Completed Achievement: ${achievement?.name || achievementId}`);
   };
 
-  // 添加灵宠
+  // Add Pet
   const handleAddPet = (template: PetTemplate) => {
     const newPet = {
       id: uid(),
@@ -756,18 +756,18 @@ const DebugModal: React.FC<Props> = ({
       pets: [...localPlayer.pets, newPet],
     };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({
       pets: updated.pets,
     });
-    showSuccess(`已添加灵宠：${template.name}`);
+    showSuccess(`Added Pet: ${template.name}`);
   };
 
-  // 添加物品
+  // Add Item
   const handleAddItem = (itemTemplate: Partial<Item> | Recipe['result'], quantity: number = 1) => {
-    // 检查 itemTemplate 是否有效
+    // Check if itemTemplate is valid
     if (!itemTemplate || !itemTemplate.name) {
-      showError('物品模板无效');
+      showError('Invalid Item Template');
       return;
     }
 
@@ -780,24 +780,24 @@ const DebugModal: React.FC<Props> = ({
       let successMessage = '';
 
       if (existingIdx >= 0 && !isEquipment && !isRecipe) {
-        // 非装备类、非丹方类物品可以叠加
+        // Non-equipment, non-recipe items can stack
         newInv[existingIdx] = {
           ...newInv[existingIdx],
           quantity: newInv[existingIdx].quantity + quantity,
         };
-        successMessage = `已添加物品：${itemTemplate.name} x${quantity}（当前数量：${newInv[existingIdx].quantity}）`;
+        successMessage = `Added Item: ${itemTemplate.name} x${quantity} (Current: ${newInv[existingIdx].quantity})`;
       } else {
-        // 装备类物品、丹方或新物品，每个单独占一格
+        // Equipment, recipes, or new items take a separate slot
         const itemsToAdd = isEquipment ? quantity : 1;
         const addQuantity = isEquipment ? 1 : quantity;
 
         for (let i = 0; i < itemsToAdd; i++) {
-          // 处理丹方：需要添加 recipeData
+          // Handle recipe: need to add recipeData
           let recipeData: Recipe | undefined = undefined;
           if (isRecipe) {
-            // 从物品名称中推断配方名称（例如："天元丹丹方" -> "天元丹"）
-            const recipeName = (itemTemplate.name || '').replace(/丹方$/, '');
-            // 在 DISCOVERABLE_RECIPES 中查找对应的配方
+            // Infer recipe name from item name (e.g., "Pill Name Recipe" -> "Pill Name")
+            const recipeName = (itemTemplate.name || '').replace(/ Recipe$/, '');
+            // Find corresponding recipe in DISCOVERABLE_RECIPES
             const matchedRecipe = DISCOVERABLE_RECIPES.find(
               (recipe) => recipe.name === recipeName
             );
@@ -808,11 +808,11 @@ const DebugModal: React.FC<Props> = ({
 
           const newItem: Item = {
             id: uid(),
-            name: itemTemplate.name || '未知物品',
+            name: itemTemplate.name || 'Unknown Item',
             type: itemTemplate.type || ItemType.Material,
             description: itemTemplate.description || '',
             quantity: addQuantity,
-            rarity: itemTemplate.rarity || '普通',
+            rarity: itemTemplate.rarity || 'Common',
             level: (itemTemplate as any).level ?? 0,
             isEquippable: (itemTemplate as any).isEquippable,
             equipmentSlot: (itemTemplate as any).equipmentSlot,
@@ -822,10 +822,10 @@ const DebugModal: React.FC<Props> = ({
           };
           newInv.push(newItem);
         }
-        successMessage = `已添加物品：${itemTemplate.name} x${quantity}`;
+        successMessage = `Added Item: ${itemTemplate.name} x${quantity}`;
       }
 
-      // 使用 setTimeout 延迟调用，避免在渲染期间更新父组件
+      // Use setTimeout to delay call, avoiding update parent during render
       setTimeout(() => {
         onUpdatePlayer({
           inventory: newInv,
@@ -842,32 +842,32 @@ const DebugModal: React.FC<Props> = ({
     });
   };
 
-  // 解锁丹方
+  // Unlock Recipe
   const handleUnlockRecipe = (recipeName: string) => {
     if (localPlayer.unlockedRecipes.includes(recipeName)) {
-      showError('该丹方已解锁');
-      return; // 已经解锁了
+      showError('Recipe already unlocked');
+      return; // Already unlocked
     }
     const updated = {
       ...localPlayer,
       unlockedRecipes: [...localPlayer.unlockedRecipes, recipeName],
     };
     setLocalPlayer(updated);
-    // 在状态更新回调外调用，避免在渲染期间更新父组件
+    // Call outside state update callback to avoid updating parent during render
     onUpdatePlayer({
       unlockedRecipes: updated.unlockedRecipes,
     });
-    showSuccess(`已解锁丹方：${recipeName}`);
+    showSuccess(`Unlocked Recipe: ${recipeName}`);
   };
 
-  // 关闭调试模式
+  // Disable Debug Mode
   const handleDisableDebugMode = () => {
     showConfirm(
-      '确定要关闭调试模式吗？关闭后需要重新点击游戏名称5次才能再次启用。',
-      '确认关闭',
+      'Are you sure you want to disable Debug Mode? You will need to click the Game Title 5 times to re-enable it.',
+      'Confirm Disable',
       () => {
         localStorage.removeItem(STORAGE_KEYS.DEBUG_MODE);
-        // 刷新页面以应用更改
+        // Reload page to apply changes
         window.location.reload();
       }
     );
@@ -882,7 +882,7 @@ const DebugModal: React.FC<Props> = ({
         className="bg-ink-950 w-full max-w-5xl h-[90vh] rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background Texture Layer */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
           style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
@@ -922,13 +922,13 @@ const DebugModal: React.FC<Props> = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10">
-          {/* 全局搜索 */}
+          {/* Global Search */}
           <div className="bg-stone-900/50 border border-stone-700 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Search size={18} className="text-stone-400" />
               <input
                 type="text"
-                placeholder="全局搜索所有内容..."
+                placeholder="Global search all content..."
                 value={globalSearchQuery}
                 onChange={(e) => setGlobalSearchQuery(e.target.value)}
                 className="flex-1 bg-stone-800 border border-stone-700 rounded px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:border-red-500"
@@ -944,20 +944,20 @@ const DebugModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 警告提示 */}
+          {/* Warning Alert */}
           <div className="bg-red-900/30 border border-red-700 rounded p-3 text-sm text-red-200">
-            ⚠️ 调试模式：修改数据可能导致游戏异常，请谨慎操作！
+            ⚠️ Debug Mode: Modifying data may cause game anomalies, please proceed with caution!
           </div>
 
-          {/* 基础信息 */}
+          {/* Basic Info */}
           <div>
             <h3 className="font-bold text-stone-200 mb-3 border-b border-stone-700 pb-2">
-              基础信息
+              Basic Info
             </h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  玩家名称
+                  Player Name
                 </label>
                 <input
                   type="text"
@@ -969,15 +969,15 @@ const DebugModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 境界和等级 */}
+          {/* Realm and Level */}
           <div>
             <h3 className="font-bold text-stone-200 mb-3 border-b border-stone-700 pb-2">
-              境界与等级
+              Realm & Level
             </h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  境界
+                  Realm
                 </label>
                 <select
                   value={localPlayer.realm}
@@ -995,7 +995,7 @@ const DebugModal: React.FC<Props> = ({
               </div>
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  境界等级 (1-9)
+                  Realm Level (1-9)
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1028,7 +1028,7 @@ const DebugModal: React.FC<Props> = ({
               </div>
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  经验值
+                  Experience
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1059,7 +1059,7 @@ const DebugModal: React.FC<Props> = ({
               </div>
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  最大经验值
+                  Max Experience
                 </label>
                 <input
                   type="number"
@@ -1077,23 +1077,23 @@ const DebugModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 属性 */}
+          {/* Attributes */}
           <div>
             <h3 className="font-bold text-stone-200 mb-3 border-b border-stone-700 pb-2">
-              属性
+              Attributes
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { key: 'hp', label: '气血', maxKey: 'maxHp' },
-                { key: 'maxHp', label: '最大气血' },
-                { key: 'attack', label: '攻击力' },
-                { key: 'defense', label: '防御力' },
-                { key: 'spirit', label: '神识' },
-                { key: 'physique', label: '体魄' },
-                { key: 'speed', label: '速度' },
-                { key: 'luck', label: '幸运值' },
-                { key: 'lifespan', label: '寿命', maxKey: 'maxLifespan' },
-                { key: 'maxLifespan', label: '最大寿命' },
+                { key: 'hp', label: 'HP', maxKey: 'maxHp' },
+                { key: 'maxHp', label: 'Max HP' },
+                { key: 'attack', label: 'Attack' },
+                { key: 'defense', label: 'Defense' },
+                { key: 'spirit', label: 'Spirit' },
+                { key: 'physique', label: 'Physique' },
+                { key: 'speed', label: 'Speed' },
+                { key: 'luck', label: 'Luck' },
+                { key: 'lifespan', label: 'Lifespan', maxKey: 'maxLifespan' },
+                { key: 'maxLifespan', label: 'Max Lifespan' },
               ].map(({ key, label, maxKey }) => {
                 const value = localPlayer[key as keyof PlayerStats] as number;
                 const maxValue = maxKey
@@ -1103,7 +1103,7 @@ const DebugModal: React.FC<Props> = ({
                   <div key={key}>
                     <label className="block text-sm text-stone-400 mb-1">
                       {label}
-                      {maxValue !== undefined && ` (最大: ${maxValue})`}
+                      {maxValue !== undefined && ` (Max: ${maxValue})`}
                     </label>
                     <div className="flex items-center gap-2">
                       <button
@@ -1150,15 +1150,15 @@ const DebugModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 资源 */}
+          {/* Resources */}
           <div>
             <h3 className="font-bold text-stone-200 mb-3 border-b border-stone-700 pb-2">
-              资源
+              Resources
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  灵石
+                  Spirit Stones
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1189,7 +1189,7 @@ const DebugModal: React.FC<Props> = ({
               </div>
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  抽奖券
+                  Lottery Tickets
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1220,7 +1220,7 @@ const DebugModal: React.FC<Props> = ({
               </div>
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  属性点
+                  Attribute Points
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1251,7 +1251,7 @@ const DebugModal: React.FC<Props> = ({
               </div>
               <div>
                 <label className="block text-sm text-stone-400 mb-1">
-                  传承等级
+                  Inheritance Level
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1284,10 +1284,10 @@ const DebugModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 快速操作 */}
+          {/* Quick Actions */}
           <div>
             <h3 className="font-bold text-stone-200 mb-3 border-b border-stone-700 pb-2">
-              快速操作
+              Quick Actions
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <button
@@ -1296,7 +1296,7 @@ const DebugModal: React.FC<Props> = ({
                 }}
                 className="bg-green-700 hover:bg-green-600 text-white rounded px-3 py-2 text-sm"
               >
-                回满血
+                Full HP
               </button>
               <button
                 onClick={() => {
@@ -1304,7 +1304,7 @@ const DebugModal: React.FC<Props> = ({
                 }}
                 className="bg-blue-700 hover:bg-blue-600 text-white rounded px-3 py-2 text-sm"
               >
-                经验差1升级
+                Exp to Level Up - 1
               </button>
               <button
                 onClick={() => {
@@ -1312,7 +1312,7 @@ const DebugModal: React.FC<Props> = ({
                 }}
                 className="bg-yellow-700 hover:bg-yellow-600 text-white rounded px-3 py-2 text-sm"
               >
-                灵石999K
+                Spirit Stones 999K
               </button>
               <button
                 onClick={() => {
@@ -1320,16 +1320,16 @@ const DebugModal: React.FC<Props> = ({
                 }}
                 className="bg-purple-700 hover:bg-purple-600 text-white rounded px-3 py-2 text-sm"
               >
-                抽奖券999
+                Lottery Tickets 999
               </button>
             </div>
           </div>
 
-          {/* 游戏内容选择 */}
+          {/* Game Content */}
           <div>
             <div className="mb-3 border-b border-stone-700 pb-2">
-              <h3 className="font-bold text-stone-200 mb-2">游戏内容</h3>
-              {/* 第一行：主要功能 */}
+              <h3 className="font-bold text-stone-200 mb-2">Game Content</h3>
+              {/* Row 1: Main Features */}
               <div className="flex gap-2 flex-wrap mb-2 justify-start">
                 <button
                   onClick={() => setActiveTab('equipment')}
@@ -1338,10 +1338,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="装备"
+                  title="Equipment"
                 >
                   <Package size={14} className="inline mr-1" />
-                  装备
+                  Equipment
                 </button>
                 <button
                   onClick={() => setActiveTab('item')}
@@ -1350,10 +1350,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="物品"
+                  title="Items"
                 >
                   <FlaskConical size={14} className="inline mr-1" />
-                  物品
+                  Items
                 </button>
                 <button
                   onClick={() => setActiveTab('recipe')}
@@ -1362,10 +1362,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="丹方"
+                  title="Recipes"
                 >
                   <Scroll size={14} className="inline mr-1" />
-                  丹方
+                  Recipes
                 </button>
                 <button
                   onClick={() => setActiveTab('cultivation')}
@@ -1374,10 +1374,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="功法"
+                  title="Cultivation"
                 >
                   <BookOpen size={14} className="inline mr-1" />
-                  功法
+                  Cultivation
                 </button>
                 <button
                   onClick={() => setActiveTab('breakthrough')}
@@ -1386,13 +1386,13 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="进阶物品"
+                  title="Breakthrough"
                 >
                   <Power size={14} className="inline mr-1" />
-                  进阶物品
+                  Breakthrough
                 </button>
               </div>
-              {/* 第二行：角色相关 */}
+              {/* Row 2: Character Related */}
               <div className="flex gap-2 flex-wrap mb-2 justify-start">
                 <button
                   onClick={() => setActiveTab('talent')}
@@ -1401,10 +1401,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="天赋"
+                  title="Talents"
                 >
                   <Sparkles size={14} className="inline mr-1" />
-                  天赋
+                  Talents
                 </button>
                 <button
                   onClick={() => setActiveTab('title')}
@@ -1413,10 +1413,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="称号"
+                  title="Titles"
                 >
                   <Award size={14} className="inline mr-1" />
-                  称号
+                  Titles
                 </button>
                 <button
                   onClick={() => setActiveTab('inheritance')}
@@ -1425,13 +1425,13 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="传承"
+                  title="Inheritance"
                 >
                   <Sparkles size={14} className="inline mr-1" />
-                  传承
+                  Inheritance
                 </button>
               </div>
-              {/* 第三行：其他功能 */}
+              {/* Row 3: Other Features */}
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setActiveTab('sect')}
@@ -1440,10 +1440,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="宗门"
+                  title="Sect"
                 >
                   <Building2 size={14} className="inline mr-1" />
-                  宗门
+                  Sect
                 </button>
                 <button
                   onClick={() => setActiveTab('pet')}
@@ -1452,10 +1452,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="灵宠"
+                  title="Pets"
                 >
                   <Heart size={14} className="inline mr-1" />
-                  灵宠
+                  Pets
                 </button>
                 <button
                   onClick={() => setActiveTab('achievement')}
@@ -1464,10 +1464,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="成就"
+                  title="Achievements"
                 >
                   <Trophy size={14} className="inline mr-1" />
-                  成就
+                  Achievements
                 </button>
                 <button
                   onClick={() => setActiveTab('reputation')}
@@ -1476,10 +1476,10 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="声望事件"
+                  title="Reputation"
                 >
                   <Award size={14} className="inline mr-1" />
-                  声望事件
+                  Reputation
                 </button>
                 <button
                   onClick={() => setActiveTab('death')}
@@ -1488,55 +1488,55 @@ const DebugModal: React.FC<Props> = ({
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/50'
                       : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-md'
                   }`}
-                  title="死亡测试"
+                  title="Death Test"
                 >
                   <Skull size={14} className="inline mr-1" />
-                  死亡测试
+                  Death Test
                 </button>
               </div>
             </div>
 
-            {/* 装备选择 */}
+            {/* Equipment Selection */}
             {activeTab === 'equipment' && (
               <div>
-                {/* 搜索框 */}
+                {/* Search Box */}
                 <div className="mb-3">
                   <input
                     type="text"
                     value={equipmentSearchQuery}
                     onChange={(e) => setEquipmentSearchQuery(e.target.value)}
-                    placeholder="搜索装备名称、描述、部位或稀有度..."
+                    placeholder="Search equipment name, description, slot or rarity..."
                     className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
                   />
                 </div>
 
-                {/* 稀有度筛选 */}
+                {/* Rarity Filter */}
                 <div className="flex gap-2 mb-3 flex-wrap">
-                  {(['all', '普通', '稀有', '传说', '仙品'] as const).map(
+                  {(['all', 'Common', 'Rare', 'Legendary', 'Mythic'] as const).map(
                     (rarity) => (
                       <button
                         key={rarity}
-                        onClick={() => setEquipmentFilter(rarity)}
+                        onClick={() => setEquipmentFilter(rarity as any)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       equipmentFilter === rarity
                         ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-500/50'
                         : 'bg-stone-700/80 text-stone-300 hover:bg-stone-600 hover:shadow-sm'
                     }`}
                       >
-                        {rarity === 'all' ? '全部' : rarity}
+                        {rarity === 'all' ? 'All' : rarity}
                       </button>
                     )
                   )}
                 </div>
 
-                {/* 显示搜索结果数量 */}
+                {/* Search Result Count */}
                 {equipmentSearchQuery.trim() && (
                   <div className="text-sm text-stone-400 mb-3">
-                    找到 {filteredEquipment.length} 个匹配的装备
+                    Found {filteredEquipment.length} matching equipment
                   </div>
                 )}
 
-                {/* 装备卡片列表 */}
+                {/* Equipment Card List */}
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
                   {filteredEquipment.map((equipment, index) => (
                     <div
@@ -1557,22 +1557,22 @@ const DebugModal: React.FC<Props> = ({
                       </p>
                       <div className="text-xs space-y-1">
                         <div className="text-stone-300">
-                          <span className="text-stone-500">部位：</span>
+                          <span className="text-stone-500">Slot:</span>
                           {equipment.slot}
                         </div>
                         {equipment.effect && (
                           <div className="text-stone-300">
-                            <span className="text-stone-500">效果：</span>
+                            <span className="text-stone-500">Effect:</span>
                             {Object.entries(equipment.effect)
                               .map(([key, value]) => {
                                 const keyMap: Record<string, string> = {
-                                  attack: '攻击',
-                                  defense: '防御',
-                                  hp: '气血',
-                                  spirit: '神识',
-                                  physique: '体魄',
-                                  speed: '速度',
-                                  exp: '经验',
+                                  attack: 'Attack',
+                                  defense: 'Defense',
+                                  hp: 'HP',
+                                  spirit: 'Spirit',
+                                  physique: 'Physique',
+                                  speed: 'Speed',
+                                  exp: 'Exp',
                                 };
                                 return `${keyMap[key] || key}+${value}`;
                               })
@@ -1587,7 +1587,7 @@ const DebugModal: React.FC<Props> = ({
                           handleAddEquipment(equipment);
                         }}
                       >
-                        添加到背包
+                        Add to Inventory
                       </button>
                     </div>
                   ))}
@@ -1595,14 +1595,14 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 天赋选择 */}
+            {/* Talent Selection */}
             {activeTab === 'talent' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  当前天赋：
+                  Current Talent:
                   <span className="text-stone-200 ml-2">
                     {TALENTS.find((t) => t.id === localPlayer.talentId)?.name ||
-                      '无'}
+                      'None'}
                   </span>
                 </div>
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
@@ -1623,7 +1623,7 @@ const DebugModal: React.FC<Props> = ({
                           <div className="flex items-center gap-1">
                             {isSelected && (
                               <span className="text-xs px-2 py-0.5 rounded bg-red-700 text-white">
-                                已选择
+                                Selected
                               </span>
                             )}
                             <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
@@ -1636,18 +1636,18 @@ const DebugModal: React.FC<Props> = ({
                         </p>
                         {Object.keys(talent.effects).length > 0 && (
                           <div className="text-xs text-stone-300">
-                            <span className="text-stone-500">效果：</span>
+                            <span className="text-stone-500">Effect:</span>
                             {Object.entries(talent.effects)
                               .map(([key, value]) => {
                                 const keyMap: Record<string, string> = {
-                                  attack: '攻击',
-                                  defense: '防御',
-                                  hp: '气血',
-                                  spirit: '神识',
-                                  physique: '体魄',
-                                  speed: '速度',
-                                  expRate: '修炼速度',
-                                  luck: '幸运',
+                                  attack: 'Attack',
+                                  defense: 'Defense',
+                                  hp: 'HP',
+                                  spirit: 'Spirit',
+                                  physique: 'Physique',
+                                  speed: 'Speed',
+                                  expRate: 'Cultivation Rate',
+                                  luck: 'Luck',
                                 };
                                 if (key === 'expRate') {
                                   return `${keyMap[key] || key}+${(value * 100).toFixed(0)}%`;
@@ -1671,7 +1671,7 @@ const DebugModal: React.FC<Props> = ({
                           }}
                           disabled={isSelected}
                         >
-                          {isSelected ? '已选择' : '选择天赋'}
+                          {isSelected ? 'Selected' : 'Select Talent'}
                         </button>
                       </div>
                     );
@@ -1680,14 +1680,14 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 称号选择 */}
+            {/* Title Selection */}
             {activeTab === 'title' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  当前称号：
+                  Current Title:
                   <span className="text-stone-200 ml-2">
                     {TITLES.find((t) => t.id === localPlayer.titleId)?.name ||
-                      '无'}
+                      'None'}
                   </span>
                 </div>
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
@@ -1707,7 +1707,7 @@ const DebugModal: React.FC<Props> = ({
                           <h4 className="font-bold text-sm">{title.name}</h4>
                           {isSelected && (
                             <span className="text-xs px-2 py-0.5 rounded bg-red-700 text-white">
-                              已选择
+                              Selected
                             </span>
                           )}
                         </div>
@@ -1715,22 +1715,22 @@ const DebugModal: React.FC<Props> = ({
                           {title.description}
                         </p>
                         <div className="text-xs text-stone-300 mb-2">
-                          <span className="text-stone-500">要求：</span>
+                          <span className="text-stone-500">Requirement:</span>
                           {title.requirement}
                         </div>
                         {Object.keys(title.effects).length > 0 && (
                           <div className="text-xs text-stone-300">
-                            <span className="text-stone-500">效果：</span>
+                            <span className="text-stone-500">Effect:</span>
                             {Object.entries(title.effects)
                               .map(([key, value]) => {
                                 const keyMap: Record<string, string> = {
-                                  attack: '攻击',
-                                  defense: '防御',
-                                  hp: '气血',
-                                  spirit: '神识',
-                                  physique: '体魄',
-                                  speed: '速度',
-                                  expRate: '修炼速度',
+                                  attack: 'Attack',
+                                  defense: 'Defense',
+                                  hp: 'HP',
+                                  spirit: 'Spirit',
+                                  physique: 'Physique',
+                                  speed: 'Speed',
+                                  expRate: 'Cultivation Rate',
                                 };
                                 if (key === 'expRate') {
                                   return `${keyMap[key] || key}+${(value * 100).toFixed(0)}%`;
@@ -1755,7 +1755,7 @@ const DebugModal: React.FC<Props> = ({
                             }}
                             disabled={isSelected}
                           >
-                            {isSelected ? '已选择' : '选择称号'}
+                            {isSelected ? 'Selected' : 'Select Title'}
                           </button>
                           <button
                             className={`flex-1 text-xs py-1 rounded transition-colors ${
@@ -1768,7 +1768,7 @@ const DebugModal: React.FC<Props> = ({
                               handleUnlockTitle(title);
                             }}
                           >
-                            {(localPlayer.unlockedTitles || []).includes(title.id) ? '已解锁' : '解锁称号'}
+                            {(localPlayer.unlockedTitles || []).includes(title.id) ? 'Unlocked' : 'Unlock Title'}
                           </button>
                         </div>
                       </div>
@@ -1778,11 +1778,11 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 功法选择 */}
+            {/* Cultivation Selection */}
             {activeTab === 'cultivation' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  已学功法：{localPlayer.cultivationArts.length} 种
+                  Learned Arts: {localPlayer.cultivationArts.length}
                 </div>
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
                   {CULTIVATION_ARTS.map((art) => {
@@ -1811,16 +1811,16 @@ const DebugModal: React.FC<Props> = ({
                           <div className="flex items-center gap-1">
                             {isActive && (
                               <span className="text-xs px-2 py-0.5 rounded bg-red-700 text-white">
-                                激活中
+                                Active
                               </span>
                             )}
                             {isLearned && !isActive && (
                               <span className="text-xs px-2 py-0.5 rounded bg-green-700 text-white">
-                                已学习
+                                Learned
                               </span>
                             )}
                             <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
-                              {art.type === 'mental' ? '心法' : '体术'}
+                              {art.type === 'mental' ? 'Mental' : 'Physical'}
                             </span>
                           </div>
                         </div>
@@ -1828,22 +1828,22 @@ const DebugModal: React.FC<Props> = ({
                           {art.description}
                         </p>
                         <div className="text-xs text-stone-300 mb-2">
-                          <span className="text-stone-500">境界要求：</span>
+                          <span className="text-stone-500">Realm Req:</span>
                           {art.realmRequirement}
                         </div>
                         {Object.keys(art.effects).length > 0 && (
                           <div className="text-xs text-stone-300">
-                            <span className="text-stone-500">效果：</span>
+                            <span className="text-stone-500">Effect:</span>
                             {Object.entries(art.effects)
                               .map(([key, value]) => {
                                 const keyMap: Record<string, string> = {
-                                  attack: '攻击',
-                                  defense: '防御',
-                                  hp: '气血',
-                                  spirit: '神识',
-                                  physique: '体魄',
-                                  speed: '速度',
-                                  expRate: '修炼速度',
+                                  attack: 'Attack',
+                                  defense: 'Defense',
+                                  hp: 'HP',
+                                  spirit: 'Spirit',
+                                  physique: 'Physique',
+                                  speed: 'Speed',
+                                  expRate: 'Cultivation Rate',
                                 };
                                 if (key === 'expRate') {
                                   return `${keyMap[key] || key}+${(value * 100).toFixed(0)}%`;
@@ -1867,7 +1867,7 @@ const DebugModal: React.FC<Props> = ({
                           }}
                           disabled={isLearned}
                         >
-                          {isLearned ? '已学习' : '学习功法'}
+                          {isLearned ? 'Learned' : 'Learn Art'}
                         </button>
                       </div>
                     );
@@ -1876,16 +1876,16 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 宗门选择 */}
+            {/* Sect Selection */}
             {activeTab === 'sect' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  当前宗门：
+                  Current Sect:
                   <span className="text-stone-200 ml-2">
                     {localPlayer.sectId
                       ? SECTS.find((s) => s.id === localPlayer.sectId)?.name ||
-                        '未知'
-                      : '无'}
+                        'Unknown'
+                      : 'None'}
                   </span>
                   {localPlayer.sectId && (
                     <span className="text-stone-200 ml-2">
@@ -1896,7 +1896,7 @@ const DebugModal: React.FC<Props> = ({
                 {localPlayer.sectId && (
                   <div className="mb-4 p-3 bg-stone-800/50 rounded border border-stone-700">
                     <label className="block text-sm text-stone-400 mb-2">
-                      宗门贡献
+                      Sect Contribution
                     </label>
                     <div className="flex items-center gap-2">
                       <button
@@ -1948,11 +1948,11 @@ const DebugModal: React.FC<Props> = ({
                           <div className="flex items-center gap-1">
                             {isJoined && (
                               <span className="text-xs px-2 py-0.5 rounded bg-red-700 text-white">
-                                已加入
+                                Joined
                               </span>
                             )}
                             <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
-                              {sect.grade}级
+                              {sect.grade} Level
                             </span>
                           </div>
                         </div>
@@ -1960,7 +1960,7 @@ const DebugModal: React.FC<Props> = ({
                           {sect.description}
                         </p>
                         <div className="text-xs text-stone-300">
-                          <span className="text-stone-500">境界要求：</span>
+                          <span className="text-stone-500">Realm Req:</span>
                           {sect.reqRealm}
                         </div>
                         <button
@@ -1977,7 +1977,7 @@ const DebugModal: React.FC<Props> = ({
                           }}
                           disabled={isJoined}
                         >
-                          {isJoined ? '已加入' : '加入宗门'}
+                          {isJoined ? 'Joined' : 'Join Sect'}
                         </button>
                       </div>
                     );
@@ -1986,11 +1986,11 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 成就选择 */}
+            {/* Achievement Selection */}
             {activeTab === 'achievement' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  已完成成就：{localPlayer.achievements.length} /{' '}
+                  Completed Achievements: {localPlayer.achievements.length} /{' '}
                   {ACHIEVEMENTS.length}
                 </div>
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
@@ -2019,7 +2019,7 @@ const DebugModal: React.FC<Props> = ({
                           <div className="flex items-center gap-1">
                             {isCompleted && (
                               <span className="text-xs px-2 py-0.5 rounded bg-green-700 text-white">
-                                已完成
+                                Completed
                               </span>
                             )}
                             <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
@@ -2031,47 +2031,47 @@ const DebugModal: React.FC<Props> = ({
                           {achievement.description}
                         </p>
                         <div className="text-xs text-stone-300 mb-2">
-                          <span className="text-stone-500">要求：</span>
+                          <span className="text-stone-500">Requirement:</span>
                           {achievement.requirement.type === 'realm'
-                            ? `达到${achievement.requirement.target}`
+                            ? `Reach ${achievement.requirement.target}`
                             : achievement.requirement.type === 'kill'
-                              ? `击败${achievement.requirement.value}个敌人`
+                              ? `Defeat ${achievement.requirement.value} enemies`
                               : achievement.requirement.type === 'collect'
-                                ? `收集${achievement.requirement.value}种物品`
+                                ? `Collect ${achievement.requirement.value} items`
                                 : achievement.requirement.type === 'meditate'
-                                  ? `完成${achievement.requirement.value}次打坐`
+                                  ? `Meditate ${achievement.requirement.value} times`
                                   : achievement.requirement.type === 'adventure'
-                                    ? `完成${achievement.requirement.value}次历练`
+                                    ? `Adventure ${achievement.requirement.value} times`
                                     : achievement.requirement.type === 'equip'
-                                      ? `装备${achievement.requirement.value}件物品`
+                                      ? `Equip ${achievement.requirement.value} items`
                                       : achievement.requirement.type === 'pet'
-                                        ? `获得${achievement.requirement.value}个灵宠`
+                                        ? `Obtain ${achievement.requirement.value} pets`
                                         : achievement.requirement.type ===
                                             'recipe'
-                                          ? `解锁${achievement.requirement.value}个丹方`
+                                          ? `Unlock ${achievement.requirement.value} recipes`
                                           : achievement.requirement.type ===
                                               'art'
-                                            ? `学习${achievement.requirement.value}种功法`
+                                            ? `Learn ${achievement.requirement.value} arts`
                                             : achievement.requirement.type ===
                                                 'breakthrough'
-                                              ? `完成${achievement.requirement.value}次突破`
+                                              ? `Breakthrough ${achievement.requirement.value} times`
                                               : achievement.requirement.type ===
                                                   'secret_realm'
-                                                ? `进入${achievement.requirement.value}次秘境`
+                                                ? `Enter secret realm ${achievement.requirement.value} times`
                                                 : achievement.requirement
                                                       .type === 'lottery'
-                                                  ? `进行${achievement.requirement.value}次抽奖`
+                                                  ? `Lottery ${achievement.requirement.value} times`
                                                   : `${achievement.requirement.type} ${achievement.requirement.value}`}
                         </div>
                         {achievement.reward && (
                           <div className="text-xs text-stone-300">
-                            <span className="text-stone-500">奖励：</span>
+                            <span className="text-stone-500">Reward:</span>
                             {[
                               achievement.reward.exp &&
-                                `修为+${achievement.reward.exp}`,
+                                `Exp+${achievement.reward.exp}`,
                               achievement.reward.spiritStones &&
-                                `灵石+${achievement.reward.spiritStones}`,
-                              achievement.reward.titleId && '称号',
+                                `Spirit Stones+${achievement.reward.spiritStones}`,
+                              achievement.reward.titleId && 'Title',
                             ]
                               .filter(Boolean)
                               .join(', ')}
@@ -2091,7 +2091,7 @@ const DebugModal: React.FC<Props> = ({
                           }}
                           disabled={isCompleted}
                         >
-                          {isCompleted ? '已完成' : '完成成就'}
+                          {isCompleted ? 'Completed' : 'Complete'}
                         </button>
                       </div>
                     );
@@ -2100,18 +2100,18 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 灵宠选择 */}
+            {/* Pet Selection */}
             {activeTab === 'pet' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  拥有灵宠：{localPlayer.pets.length} 只
+                  Owned Pets: {localPlayer.pets.length}
                 </div>
 
-                {/* 当前灵宠列表 */}
+                {/* Current Pets */}
                 {localPlayer.pets.length > 0 && (
                   <div className="mb-4">
                     <h4 className="font-bold text-stone-200 mb-2 border-b border-stone-700 pb-1">
-                      当前灵宠
+                      Current Pets
                     </h4>
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {localPlayer.pets.map((pet) => (
@@ -2125,7 +2125,7 @@ const DebugModal: React.FC<Props> = ({
                                 {pet.name}
                               </h5>
                               <p className="text-xs text-stone-400">
-                                {pet.species} | Lv.{pet.level} | 亲密度:{' '}
+                                {pet.species} | Lv.{pet.level} | Affection:{' '}
                                 {pet.affection}
                               </p>
                             </div>
@@ -2136,12 +2136,12 @@ const DebugModal: React.FC<Props> = ({
                               }}
                               className="px-2 py-1 bg-blue-700 hover:bg-blue-600 text-white text-xs rounded"
                             >
-                              编辑
+                              Edit
                             </button>
                           </div>
                           <div className="text-xs text-stone-300">
-                            攻击: {Math.floor(pet.stats.attack)} | 防御: {Math.floor(pet.stats.defense)}{' '}
-                            | 气血: {Math.floor(pet.stats.hp)} | 速度: {Math.floor(pet.stats.speed)}
+                            Atk: {Math.floor(pet.stats.attack)} | Def: {Math.floor(pet.stats.defense)}{' '}
+                            | HP: {Math.floor(pet.stats.hp)} | Spd: {Math.floor(pet.stats.speed)}
                           </div>
                         </div>
                       ))}
@@ -2149,17 +2149,17 @@ const DebugModal: React.FC<Props> = ({
                   </div>
                 )}
 
-                {/* 编辑灵宠弹窗 */}
+                {/* Edit Pet Modal */}
                 {editingPet && editingPetId && (
                   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
                     <div className="bg-stone-800 border border-stone-700 rounded-lg p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
                       <h3 className="font-bold text-stone-200 mb-4">
-                        编辑灵宠：{editingPet.name}
+                        Edit Pet: {editingPet.name}
                       </h3>
                       <div className="space-y-3">
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            等级
+                            Level
                           </label>
                           <input
                             type="number"
@@ -2179,7 +2179,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            经验值
+                            Experience
                           </label>
                           <input
                             type="number"
@@ -2196,7 +2196,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            最大经验值
+                            Max Experience
                           </label>
                           <input
                             type="number"
@@ -2216,7 +2216,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            亲密度 (0-100)
+                            Affection (0-100)
                           </label>
                           <input
                             type="number"
@@ -2237,7 +2237,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            进化阶段 (0-2)
+                            Evolution Stage (0-2)
                           </label>
                           <input
                             type="number"
@@ -2258,7 +2258,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            攻击力
+                            Attack
                           </label>
                           <input
                             type="number"
@@ -2281,7 +2281,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            防御力
+                            Defense
                           </label>
                           <input
                             type="number"
@@ -2304,7 +2304,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            气血
+                            HP
                           </label>
                           <input
                             type="number"
@@ -2327,7 +2327,7 @@ const DebugModal: React.FC<Props> = ({
                         </div>
                         <div>
                           <label className="block text-sm text-stone-400 mb-1">
-                            速度
+                            Speed
                           </label>
                           <input
                             type="number"
@@ -2361,17 +2361,17 @@ const DebugModal: React.FC<Props> = ({
                               pets: updatedPets,
                             };
                             setLocalPlayer(updated);
-                            // 在状态更新回调外调用，避免在渲染期间更新父组件
+                            // Call outside state update callback to avoid updating parent during render
                             onUpdatePlayer({
                               pets: updatedPets,
                             });
                             setEditingPet(null);
                             setEditingPetId(null);
-                            showSuccess('已更新灵宠参数');
+                            showSuccess('Pet stats updated');
                           }}
                           className="flex-1 bg-green-700 hover:bg-green-600 text-white py-2 rounded"
                         >
-                          保存
+                          Save
                         </button>
                         <button
                           onClick={() => {
@@ -2380,17 +2380,17 @@ const DebugModal: React.FC<Props> = ({
                           }}
                           className="flex-1 bg-stone-700 hover:bg-stone-600 text-stone-200 py-2 rounded"
                         >
-                          取消
+                          Cancel
                         </button>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* 添加新灵宠 */}
+                {/* Add New Pet */}
                 <div className="mt-4">
                   <h4 className="font-bold text-stone-200 mb-2 border-b border-stone-700 pb-1">
-                    添加新灵宠
+                    Add New Pet
                   </h4>
                   <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
                     {PET_TEMPLATES.map((template) => {
@@ -2412,7 +2412,7 @@ const DebugModal: React.FC<Props> = ({
                             <div className="flex items-center gap-1">
                               {hasPet && (
                                 <span className="text-xs px-2 py-0.5 rounded bg-green-700 text-white">
-                                  已拥有
+                                  Owned
                                 </span>
                               )}
                               <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
@@ -2424,14 +2424,14 @@ const DebugModal: React.FC<Props> = ({
                             {template.description}
                           </p>
                           <div className="text-xs text-stone-300 mb-2">
-                            <span className="text-stone-500">种类：</span>
+                            <span className="text-stone-500">Species:</span>
                             {template.species}
                           </div>
                           <div className="text-xs text-stone-300">
-                            <span className="text-stone-500">基础属性：</span>
-                            攻击{template.baseStats.attack} 防御
-                            {template.baseStats.defense} 气血
-                            {template.baseStats.hp} 速度
+                            <span className="text-stone-500">Base Stats:</span>
+                            Atk {template.baseStats.attack} Def
+                            {template.baseStats.defense} HP
+                            {template.baseStats.hp} Spd
                             {template.baseStats.speed}
                           </div>
                           <button
@@ -2441,7 +2441,7 @@ const DebugModal: React.FC<Props> = ({
                               handleAddPet(template);
                             }}
                           >
-                            添加灵宠
+                            Add Pet
                           </button>
                         </div>
                       );
@@ -2451,21 +2451,21 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 物品选择 */}
+            {/* Item Selection */}
             {activeTab === 'item' && (
               <div>
-                {/* 搜索框 */}
+                {/* Search Box */}
                 <div className="mb-3">
                   <input
                     type="text"
                     value={itemSearchQuery}
                     onChange={(e) => setItemSearchQuery(e.target.value)}
-                    placeholder="搜索物品名称、描述、类型或稀有度..."
+                    placeholder="Search item name, description, type or rarity..."
                     className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600"
                   />
                 </div>
 
-                {/* 物品类型筛选 */}
+                {/* Item Type Filter */}
                 <div className="flex gap-2 mb-3 flex-wrap">
                   {(['all', ...Object.values(ItemType)] as const).map(
                     (type) => (
@@ -2478,20 +2478,20 @@ const DebugModal: React.FC<Props> = ({
                             : 'bg-stone-700 text-stone-300 hover:bg-stone-600'
                         }`}
                       >
-                        {type === 'all' ? '全部' : type}
+                        {type === 'all' ? 'All' : type}
                       </button>
                     )
                   )}
                 </div>
 
-                {/* 显示搜索结果数量 */}
+                {/* Search Result Count */}
                 {itemSearchQuery.trim() && (
                   <div className="text-sm text-stone-400 mb-3">
-                    找到 {filteredItems.length} 个匹配的物品
+                    Found {filteredItems.length} matching items
                   </div>
                 )}
 
-                {/* 物品卡片列表 */}
+                {/* Item Card List */}
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
                   {filteredItems.map((item, index) => (
                     <div
@@ -2519,23 +2519,23 @@ const DebugModal: React.FC<Props> = ({
                         {item.description}
                       </p>
                       <div className="text-xs text-stone-300 mb-1">
-                        <span className="text-stone-500">类型：</span>
+                        <span className="text-stone-500">Type:</span>
                         {item.type}
                       </div>
                       {item.effect && (
                         <div className="text-xs text-stone-300 mb-1">
-                          <span className="text-stone-500">效果：</span>
+                          <span className="text-stone-500">Effect:</span>
                           {Object.entries(item.effect)
                             .map(([key, value]) => {
                               const keyMap: Record<string, string> = {
-                                attack: '攻击',
-                                defense: '防御',
-                                hp: '气血',
-                                spirit: '神识',
-                                physique: '体魄',
-                                speed: '速度',
-                                exp: '经验',
-                                lifespan: '寿命',
+                                attack: 'Attack',
+                                defense: 'Defense',
+                                hp: 'HP',
+                                spirit: 'Spirit',
+                                physique: 'Physique',
+                                speed: 'Speed',
+                                exp: 'Exp',
+                                lifespan: 'Lifespan',
                               };
                               return `${keyMap[key] || key}+${value}`;
                             })
@@ -2544,34 +2544,34 @@ const DebugModal: React.FC<Props> = ({
                       )}
                       {item.permanentEffect && (
                         <div className="text-xs text-yellow-300 mb-1">
-                          <span className="text-stone-500">永久效果：</span>
+                          <span className="text-stone-500">Permanent Effect:</span>
                           {Object.entries(item.permanentEffect)
                             .map(([key, value]) => {
                               const keyMap: Record<string, string> = {
-                                attack: '攻击',
-                                defense: '防御',
-                                maxHp: '最大气血',
-                                maxLifespan: '最大寿命',
-                                spirit: '神识',
-                                physique: '体魄',
-                                speed: '速度',
+                                attack: 'Attack',
+                                defense: 'Defense',
+                                maxHp: 'Max HP',
+                                maxLifespan: 'Max Lifespan',
+                                spirit: 'Spirit',
+                                physique: 'Physique',
+                                speed: 'Speed',
                               };
 
-                              // 特殊处理spiritualRoots对象
+                              // Special handling for spiritualRoots object
                               if (key === 'spiritualRoots' && typeof value === 'object' && value !== null) {
                                 const roots = value as Record<string, number>;
                                 const rootNames: Record<string, string> = {
-                                  metal: '金',
-                                  wood: '木',
-                                  water: '水',
-                                  fire: '火',
-                                  earth: '土',
+                                  metal: 'Metal',
+                                  wood: 'Wood',
+                                  water: 'Water',
+                                  fire: 'Fire',
+                                  earth: 'Earth',
                                 };
                                 const rootEntries = Object.entries(roots)
                                   .filter(([_, val]) => val > 0)
-                                  .map(([rootKey, val]) => `${rootNames[rootKey] || rootKey}灵根+${val}`)
+                                  .map(([rootKey, val]) => `${rootNames[rootKey] || rootKey} Spirit Root+${val}`)
                                   .join(', ');
-                                return rootEntries || '灵根提升';
+                                return rootEntries || 'Spirit Root Increase';
                               }
 
                               return `${keyMap[key] || key}+${value}`;
@@ -2582,8 +2582,8 @@ const DebugModal: React.FC<Props> = ({
                       )}
                       {item.isEquippable && (
                         <div className="text-xs text-blue-300 mb-1">
-                          <span className="text-stone-500">可装备：</span>
-                          {item.equipmentSlot || '未知部位'}
+                          <span className="text-stone-500">Equippable:</span>
+                          {item.equipmentSlot || 'Unknown Slot'}
                         </div>
                       )}
                       <div className="mt-2 flex gap-2">
@@ -2611,7 +2611,7 @@ const DebugModal: React.FC<Props> = ({
                             handleAddItem(item, quantity);
                           }}
                         >
-                          添加到背包
+                          Add to Inv
                         </button>
                       </div>
                     </div>
@@ -2620,11 +2620,11 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 丹方选择 */}
+            {/* Recipe Selection */}
             {activeTab === 'recipe' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  已解锁丹方：{localPlayer.unlockedRecipes.length} 个
+                  Unlocked Recipes: {localPlayer.unlockedRecipes.length}
                 </div>
                 <div className="modal-scroll-container modal-scroll-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96">
                   {[...PILL_RECIPES, ...DISCOVERABLE_RECIPES].map((recipe) => {
@@ -2650,7 +2650,7 @@ const DebugModal: React.FC<Props> = ({
                           <div className="flex items-center gap-1">
                             {isUnlocked && (
                               <span className="text-xs px-2 py-0.5 rounded bg-green-700 text-white">
-                                已解锁
+                                Unlocked
                               </span>
                             )}
                             <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
@@ -2662,28 +2662,28 @@ const DebugModal: React.FC<Props> = ({
                           {recipe.result.description}
                         </p>
                         <div className="text-xs text-stone-300 mb-2">
-                          <span className="text-stone-500">材料：</span>
+                          <span className="text-stone-500">Ingredients:</span>
                           {recipe.ingredients
                             .map((ing) => `${ing.name}x${ing.qty}`)
                             .join(', ')}
                         </div>
                         <div className="text-xs text-stone-300 mb-2">
-                          <span className="text-stone-500">成本：</span>
-                          {recipe.cost} 灵石
+                          <span className="text-stone-500">Cost:</span>
+                          {recipe.cost} Spirit Stones
                         </div>
                         {recipe.result.effect && (
                           <div className="text-xs text-stone-300">
-                            <span className="text-stone-500">效果：</span>
+                            <span className="text-stone-500">Effect:</span>
                             {Object.entries(recipe.result.effect)
                               .map(([key, value]) => {
                                 const keyMap: Record<string, string> = {
-                                  attack: '攻击',
-                                  defense: '防御',
-                                  hp: '气血',
-                                  spirit: '神识',
-                                  physique: '体魄',
-                                  speed: '速度',
-                                  exp: '经验',
+                                  attack: 'Attack',
+                                  defense: 'Defense',
+                                  hp: 'HP',
+                                  spirit: 'Spirit',
+                                  physique: 'Physique',
+                                  speed: 'Speed',
+                                  exp: 'Exp',
                                 };
                                 return `${keyMap[key] || key}+${value}`;
                               })
@@ -2704,7 +2704,7 @@ const DebugModal: React.FC<Props> = ({
                           }}
                           disabled={isUnlocked}
                         >
-                          {isUnlocked ? '已解锁' : '解锁丹方'}
+                          {isUnlocked ? 'Unlocked' : 'Unlock Recipe'}
                         </button>
                       </div>
                     );
@@ -2714,19 +2714,18 @@ const DebugModal: React.FC<Props> = ({
             )}
 
 
-            {/* 传承系统 */}
+            {/* Inheritance System */}
             {activeTab === 'inheritance' && (
               <div>
                 <div className="text-sm text-stone-400 mb-3">
-                  传承系统：可以设置传承路线、等级、经验和技能
+                  Inheritance System: Set inheritance path, level, exp and skills
                 </div>
 
-                {/* 传承路线选择 */}
-                {/* 传承等级 */}
+                {/* Inheritance Level */}
                 <div className="mb-4">
-                  <h3 className="font-bold text-stone-200 mb-2">传承等级</h3>
+                  <h3 className="font-bold text-stone-200 mb-2">Inheritance Level</h3>
                   <div>
-                    <label className="text-sm text-stone-400">传承等级 (0-4)</label>
+                    <label className="text-sm text-stone-400">Inheritance Level (0-4)</label>
                     <div className="flex items-center gap-2 mt-1">
                       <button
                         onClick={() => adjustNumber('inheritanceLevel', -1, 0)}
@@ -2755,100 +2754,100 @@ const DebugModal: React.FC<Props> = ({
                       </button>
                     </div>
                     <p className="text-xs text-stone-500 mt-1">
-                      传承等级只能通过历练获得，用于突破境界
+                      Inheritance Level can only be obtained through adventure, used for realm breakthrough
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 死亡测试 */}
+            {/* Death Test */}
             {activeTab === 'death' && (
               <div>
                 <div className="bg-red-900/30 border border-red-700 rounded p-4 mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Skull size={20} className="text-red-400" />
-                    <h3 className="font-bold text-red-400">死亡测试</h3>
+                    <h3 className="font-bold text-red-400">Death Test</h3>
                   </div>
                   <p className="text-sm text-stone-300 mb-2">
-                    此功能用于测试死亡机制和不同难度模式下的死亡惩罚。
+                    This function is used to test death mechanics and penalties in different difficulty modes.
                   </p>
                   <p className="text-xs text-stone-400">
-                    当前气血：{localPlayer.hp} / {localPlayer.maxHp}
+                    Current HP: {localPlayer.hp} / {localPlayer.maxHp}
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  {/* 快速设置气血 */}
+                  {/* Quick Set HP */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-2">
-                      快速设置气血
+                      Quick Set HP
                     </h4>
                     <div className="flex gap-2 flex-wrap">
                       <button
                         onClick={() => {
                           onUpdatePlayer({ hp: 0 });
-                          showInfo('已将气血设置为 0，将触发死亡检测');
+                          showInfo('HP set to 0, death check triggered');
                         }}
                         className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded transition-colors"
                       >
-                        设置为 0（立即死亡）
+                        Set to 0 (Immediate Death)
                       </button>
                       <button
                         onClick={() => {
                           onUpdatePlayer({ hp: 1 });
-                          showInfo('已将气血设置为 1');
+                          showInfo('HP set to 1');
                         }}
                         className="px-4 py-2 bg-orange-700 hover:bg-orange-600 text-white rounded transition-colors"
                       >
-                        设置为 1（濒死）
+                        Set to 1 (Near Death)
                       </button>
                       <button
                         onClick={() => {
                           const halfHp = Math.floor(localPlayer.maxHp * 0.5);
                           onUpdatePlayer({ hp: halfHp });
-                          showInfo(`已将气血设置为 ${halfHp}（50%）`);
+                          showInfo(`HP set to ${halfHp} (50%)`);
                         }}
                         className="px-4 py-2 bg-yellow-700 hover:bg-yellow-600 text-white rounded transition-colors"
                       >
-                        设置为 50%
+                        Set to 50%
                       </button>
                       <button
                         onClick={() => {
                           onUpdatePlayer({ hp: localPlayer.maxHp });
-                          showInfo('已将气血设置为最大值');
+                          showInfo('HP set to max');
                         }}
                         className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded transition-colors"
                       >
-                        恢复满血
+                        Full HP
                       </button>
                     </div>
                   </div>
 
-                  {/* 触发死亡 */}
+                  {/* Trigger Death */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-2">
-                      触发死亡
+                      Trigger Death
                     </h4>
                     <div className="bg-stone-800/50 border border-stone-700 rounded p-4">
                       <p className="text-sm text-stone-300 mb-4">
-                        直接触发死亡机制，测试不同难度模式下的死亡处理：
+                        Directly trigger death mechanism to test death handling in different difficulty modes:
                       </p>
                       <button
                         onClick={() => {
                           showConfirm(
-                            '确定要触发死亡吗？这将根据当前难度模式执行相应的死亡惩罚。',
-                            '确认触发',
+                            'Are you sure you want to trigger death? This will execute death penalties based on current difficulty.',
+                            'Confirm Trigger',
                             () => {
-                              // 先将气血设置为0
+                              // Set HP to 0 first
                               onUpdatePlayer({ hp: 0 });
-                              // 然后触发死亡回调
+                              // Then trigger death callback
                               if (onTriggerDeath) {
                                 setTimeout(() => {
                                   onTriggerDeath();
                                 }, 100);
                               } else {
-                                showError('死亡测试回调未配置');
+                                showError('Death test callback not configured');
                               }
                             }
                           );
@@ -2856,23 +2855,23 @@ const DebugModal: React.FC<Props> = ({
                         className="w-full px-4 py-3 bg-gradient-to-r from-red-700 via-red-600 to-red-700 hover:from-red-600 hover:via-red-500 hover:to-red-600 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                       >
                         <Skull size={20} />
-                        触发死亡测试
+                        Trigger Death Test
                       </button>
                       <p className="text-xs text-stone-400 mt-2">
                         *
-                        注意：这将立即触发死亡机制，根据当前难度模式执行相应惩罚
+                        Note: This will immediately trigger death mechanism and execute penalties
                       </p>
                     </div>
                   </div>
 
-                  {/* 当前难度信息 */}
+                  {/* Current Difficulty Mode */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-2">
-                      当前难度模式
+                      Current Difficulty Mode
                     </h4>
                     <div className="bg-stone-800/50 border border-stone-700 rounded p-3">
                       <p className="text-sm text-stone-300">
-                        <span className="text-stone-400">难度：</span>
+                        <span className="text-stone-400">Difficulty:</span>
                         <span className="font-semibold ml-2">
                           {(() => {
                             try {
@@ -2885,24 +2884,24 @@ const DebugModal: React.FC<Props> = ({
                               if (difficulty === 'easy') {
                                 return (
                                   <span className="text-green-400">
-                                    简单模式
+                                    Easy Mode
                                   </span>
                                 );
                               } else if (difficulty === 'normal') {
                                 return (
                                   <span className="text-yellow-400">
-                                    普通模式
+                                    Normal Mode
                                   </span>
                                 );
                               } else {
                                 return (
-                                  <span className="text-red-400">困难模式</span>
+                                  <span className="text-red-400">Hard Mode</span>
                                 );
                               }
                             } catch {
                               return (
                                 <span className="text-yellow-400">
-                                  普通模式
+                                  Normal Mode
                                 </span>
                               );
                             }
@@ -2910,9 +2909,9 @@ const DebugModal: React.FC<Props> = ({
                         </span>
                       </p>
                       <div className="mt-2 text-xs text-stone-400 space-y-1">
-                        <p>• 简单模式：死亡无惩罚，直接复活</p>
-                        <p>• 普通模式：死亡掉落部分属性(10-20%)和装备(1-3件)</p>
-                        <p>• 困难模式：死亡清除存档</p>
+                        <p>• Easy Mode: No death penalty, immediate revive</p>
+                        <p>• Normal Mode: Death drops some stats (10-20%) and equipment (1-3 items)</p>
+                        <p>• Hard Mode: Death deletes save file</p>
                       </div>
                     </div>
                   </div>
@@ -2920,29 +2919,29 @@ const DebugModal: React.FC<Props> = ({
               </div>
             )}
 
-            {/* 声望事件调试 */}
+            {/* Reputation Event Debug */}
             {activeTab === 'breakthrough' && (
               <div>
                 <div className="bg-purple-900/30 border border-purple-700 rounded p-4 mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Power size={20} className="text-purple-400" />
                     <h3 className="text-lg font-bold text-purple-400">
-                      进阶物品管理
+                      Breakthrough Item Management
                     </h3>
                   </div>
                   <p className="text-xs text-stone-400">
-                    管理突破境界所需的各种物品和条件
+                    Manage items and conditions required for realm breakthrough
                   </p>
                 </div>
 
                 <div className="space-y-6">
-                  {/* 筑基奇物 */}
+                  {/* Foundation Treasure */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-3 flex items-center gap-2">
-                      <span className="text-green-400">筑基奇物</span>
+                      <span className="text-green-400">Foundation Treasure</span>
                       {localPlayer.foundationTreasure && (
                         <span className="text-xs text-green-400">
-                          (已拥有: {FOUNDATION_TREASURES[localPlayer.foundationTreasure]?.name || localPlayer.foundationTreasure})
+                          (Owned: {FOUNDATION_TREASURES[localPlayer.foundationTreasure]?.name || localPlayer.foundationTreasure})
                         </span>
                       )}
                     </h4>
@@ -2967,7 +2966,7 @@ const DebugModal: React.FC<Props> = ({
                               : `${getRarityColor(treasure.rarity)} ${getRarityBgColor(treasure.rarity)}`
                           }`}
                           onClick={() => {
-                            // 添加到背包
+                            // Add to inventory
                             const newItem: Item = {
                               id: uid(),
                               name: treasure.name,
@@ -2984,7 +2983,7 @@ const DebugModal: React.FC<Props> = ({
                             };
                             setLocalPlayer(updated);
                             onUpdatePlayer({ inventory: updated.inventory });
-                            showSuccess(`已添加筑基奇物到背包: ${treasure.name}`);
+                            showSuccess(`Added Foundation Treasure to inventory: ${treasure.name}`);
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -3011,22 +3010,22 @@ const DebugModal: React.FC<Props> = ({
                       <button
                         onClick={() => {
                           updateField('foundationTreasure', undefined);
-                          showInfo('已清除筑基奇物');
+                          showInfo('Foundation Treasure cleared');
                         }}
                         className="mt-2 px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded"
                       >
-                        清除筑基奇物
+                        Clear Foundation Treasure
                       </button>
                     )}
                   </div>
 
-                  {/* 天地精华 */}
+                  {/* Heaven-Earth Essence */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-3 flex items-center gap-2">
-                      <span className="text-blue-400">天地精华</span>
+                      <span className="text-blue-400">Heaven-Earth Essence</span>
                       {localPlayer.heavenEarthEssence && (
                         <span className="text-xs text-blue-400">
-                          (已拥有: {HEAVEN_EARTH_ESSENCES[localPlayer.heavenEarthEssence]?.name || localPlayer.heavenEarthEssence})
+                          (Owned: {HEAVEN_EARTH_ESSENCES[localPlayer.heavenEarthEssence]?.name || localPlayer.heavenEarthEssence})
                         </span>
                       )}
                     </h4>
@@ -3052,7 +3051,7 @@ const DebugModal: React.FC<Props> = ({
                               : `${getRarityColor(essence.rarity)} ${getRarityBgColor(essence.rarity)}`
                           }`}
                           onClick={() => {
-                            // 添加到背包
+                            // Add to inventory
                             const newItem: Item = {
                               id: uid(),
                               name: essence.name,
@@ -3069,7 +3068,7 @@ const DebugModal: React.FC<Props> = ({
                             };
                             setLocalPlayer(updated);
                             onUpdatePlayer({ inventory: updated.inventory });
-                            showSuccess(`已添加天地精华到背包: ${essence.name}`);
+                            showSuccess(`Added Heaven-Earth Essence to inventory: ${essence.name}`);
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -3084,7 +3083,7 @@ const DebugModal: React.FC<Props> = ({
                             {essence.description}
                           </p>
                           <div className="text-xs text-stone-500">
-                            品质: {essence.quality} |{' '}
+                            Quality: {essence.quality} |{' '}
                             {Object.entries(essence.effects)
                               .filter(([key, value]) => key !== 'specialEffect' && value !== undefined && typeof value === 'number')
                               .map(([key, value]) => `${key.replace('Bonus', '')}+${value}`)
@@ -3097,22 +3096,22 @@ const DebugModal: React.FC<Props> = ({
                       <button
                         onClick={() => {
                           updateField('heavenEarthEssence', undefined);
-                          showInfo('已清除天地精华');
+                          showInfo('Heaven-Earth Essence cleared');
                         }}
                         className="mt-2 px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded"
                       >
-                        清除天地精华
+                        Clear Heaven-Earth Essence
                       </button>
                     )}
                   </div>
 
-                  {/* 天地之髓 */}
+                  {/* Heaven-Earth Marrow */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-3 flex items-center gap-2">
-                      <span className="text-yellow-400">天地之髓</span>
+                      <span className="text-yellow-400">Heaven-Earth Marrow</span>
                       {localPlayer.heavenEarthMarrow && (
                         <span className="text-xs text-yellow-400">
-                          (已拥有: {HEAVEN_EARTH_MARROWS[localPlayer.heavenEarthMarrow]?.name || localPlayer.heavenEarthMarrow}, 炼化进度: {localPlayer.marrowRefiningProgress || 0}%)
+                          (Owned: {HEAVEN_EARTH_MARROWS[localPlayer.heavenEarthMarrow]?.name || localPlayer.heavenEarthMarrow}, Refining Progress: {localPlayer.marrowRefiningProgress || 0}%)
                         </span>
                       )}
                     </h4>
@@ -3138,7 +3137,7 @@ const DebugModal: React.FC<Props> = ({
                               : `${getRarityColor(marrow.rarity)} ${getRarityBgColor(marrow.rarity)}`
                           }`}
                           onClick={() => {
-                            // 添加到背包
+                            // Add to inventory
                             const newItem: Item = {
                               id: uid(),
                               name: marrow.name,
@@ -3155,7 +3154,7 @@ const DebugModal: React.FC<Props> = ({
                             };
                             setLocalPlayer(updated);
                             onUpdatePlayer({ inventory: updated.inventory });
-                            showSuccess(`已添加天地之髓到背包: ${marrow.name}`);
+                            showSuccess(`Added Heaven-Earth Marrow to inventory: ${marrow.name}`);
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -3170,7 +3169,7 @@ const DebugModal: React.FC<Props> = ({
                             {marrow.description}
                           </p>
                           <div className="text-xs text-stone-500">
-                            品质: {marrow.quality} | 炼化时间: {marrow.refiningTime}天 |{' '}
+                            Quality: {marrow.quality} | Refining Time: {marrow.refiningTime} Days |{' '}
                             {Object.entries(marrow.effects)
                               .filter(([key, value]) => key !== 'specialEffect' && value !== undefined && typeof value === 'number')
                               .map(([key, value]) => `${key.replace('Bonus', '')}+${value}`)
@@ -3182,7 +3181,7 @@ const DebugModal: React.FC<Props> = ({
                     {localPlayer.heavenEarthMarrow && (
                       <div className="mt-2 space-y-2">
                         <div className="flex items-center gap-2">
-                          <label className="text-sm text-stone-300">炼化进度:</label>
+                          <label className="text-sm text-stone-300">Refining Progress:</label>
                           <input
                             type="number"
                             min="0"
@@ -3200,38 +3199,38 @@ const DebugModal: React.FC<Props> = ({
                           onClick={() => {
                             updateField('heavenEarthMarrow', undefined);
                             updateField('marrowRefiningProgress', 0);
-                            showInfo('已清除天地之髓');
+                            showInfo('Heaven-Earth Marrow cleared');
                           }}
                           className="px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded"
                         >
-                          清除天地之髓
+                          Clear Heaven-Earth Marrow
                         </button>
                       </div>
                     )}
                   </div>
 
-                  {/* 合道挑战 */}
+                  {/* Dao Combining Challenge */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-3 flex items-center gap-2">
-                      <span className="text-orange-400">合道挑战</span>
+                      <span className="text-orange-400">Dao Combining Challenge</span>
                       {localPlayer.daoCombiningChallenged && (
-                        <span className="text-xs text-green-400">(已完成)</span>
+                        <span className="text-xs text-green-400">(Completed)</span>
                       )}
                     </h4>
                     <div className="bg-stone-800/50 border border-stone-700 rounded p-4">
                       <p className="text-sm text-stone-300 mb-3">
-                        合道期需要挑战天地之魄才能突破
+                        Dao Combining realm requires challenging Heaven-Earth Soul to breakthrough
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {onChallengeDaoCombining && (
                           <button
                             onClick={() => {
                               onChallengeDaoCombining();
-                              showSuccess('开始挑战天地之魄...');
+                              showSuccess('Starting challenge against Heaven-Earth Soul...');
                             }}
                             className="px-4 py-2 rounded text-sm font-semibold bg-orange-600 hover:bg-orange-500 text-white transition-colors"
                           >
-                            ⚔️ 挑战天地之魄
+                            ⚔️ Challenge Heaven-Earth Soul
                           </button>
                         )}
                         <button
@@ -3239,8 +3238,8 @@ const DebugModal: React.FC<Props> = ({
                             updateField('daoCombiningChallenged', !localPlayer.daoCombiningChallenged);
                             showSuccess(
                               localPlayer.daoCombiningChallenged
-                                ? '已取消合道挑战标记'
-                                : '已标记完成合道挑战'
+                                ? 'Dao Combining challenge marker cancelled'
+                                : 'Marked Dao Combining challenge as completed'
                             );
                           }}
                           className={`px-4 py-2 rounded text-sm font-semibold ${
@@ -3249,18 +3248,18 @@ const DebugModal: React.FC<Props> = ({
                               : 'bg-stone-700 hover:bg-stone-600 text-stone-300'
                           }`}
                         >
-                          {localPlayer.daoCombiningChallenged ? '已完成挑战' : '标记为已完成'}
+                          {localPlayer.daoCombiningChallenged ? 'Challenge Completed' : 'Mark as Completed'}
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* 规则之力 */}
+                  {/* Power of Rules */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-3 flex items-center gap-2">
-                      <span className="text-purple-400">规则之力</span>
+                      <span className="text-purple-400">Power of Rules</span>
                       <span className="text-xs text-stone-400">
-                        (已拥有: {localPlayer.longevityRules?.length || 0} 个)
+                        (Owned: {localPlayer.longevityRules?.length || 0})
                       </span>
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
@@ -3283,17 +3282,17 @@ const DebugModal: React.FC<Props> = ({
                             className={`border-2 rounded-lg p-3 cursor-pointer transition-all hover:scale-105 ${
                               hasRule
                                 ? 'border-purple-500 bg-purple-900/20'
-                                : `${getRarityColor('仙品')} ${getRarityBgColor('仙品')}`
+                                : `${getRarityColor('Mythic')} ${getRarityBgColor('Mythic')}`
                             }`}
                             onClick={() => {
-                              // 添加到背包
+                              // Add to inventory
                               const newItem: Item = {
                                 id: uid(),
                                 name: rule.name,
                                 type: ItemType.AdvancedItem,
                                 description: rule.description,
                                 quantity: 1,
-                                rarity: '仙品',
+                                rarity: 'Mythic',
                                 advancedItemType: 'longevityRule',
                                 advancedItemId: rule.id,
                               };
@@ -3303,7 +3302,7 @@ const DebugModal: React.FC<Props> = ({
                               };
                               setLocalPlayer(updated);
                               onUpdatePlayer({ inventory: updated.inventory });
-                              showSuccess(`已添加规则之力到背包: ${rule.name}`);
+                              showSuccess(`Added Power of Rule to inventory: ${rule.name}`);
                             }}
                           >
                             <div className="flex items-start justify-between mb-2">
@@ -3311,7 +3310,7 @@ const DebugModal: React.FC<Props> = ({
                                 {rule.name}
                               </h5>
                               <span className="text-xs px-2 py-0.5 rounded bg-stone-700">
-                                力量: {rule.power}
+                                Power: {rule.power}
                               </span>
                             </div>
                             <p className="text-xs text-stone-400 mb-2">
@@ -3331,11 +3330,11 @@ const DebugModal: React.FC<Props> = ({
                       <button
                         onClick={() => {
                           updateField('longevityRules', []);
-                          showInfo('已清除所有规则之力');
+                          showInfo('All Power of Rules cleared');
                         }}
                         className="mt-2 px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded"
                       >
-                        清除所有规则之力
+                        Clear All Power of Rules
                       </button>
                     )}
                   </div>
@@ -3349,278 +3348,278 @@ const DebugModal: React.FC<Props> = ({
                   <div className="flex items-center gap-2 mb-2">
                     <Award size={20} className="text-yellow-400" />
                     <h3 className="text-lg font-bold text-yellow-400">
-                      声望事件调试
+                      Reputation Event Debug
                     </h3>
                   </div>
                   <p className="text-sm text-stone-300 mb-2">
-                    当前声望：<span className="font-semibold text-yellow-400">{localPlayer.reputation || 0}</span>
+                    Current Reputation: <span className="font-semibold text-yellow-400">{localPlayer.reputation || 0}</span>
                   </p>
                   <p className="text-xs text-stone-400">
-                    可以触发不同类型的声望事件来测试声望弹窗功能
+                    Can trigger different types of reputation events to test modal functionality
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  {/* 预设声望事件 */}
+                  {/* Preset Reputation Events */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-2">
-                      预设声望事件
+                      Preset Reputation Events
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {/* 正面事件 - 帮助村民 */}
+                      {/* Positive Event - Help Villagers */}
                       <button
                         onClick={() => {
                           if (onTriggerReputationEvent) {
                             onTriggerReputationEvent({
-                              title: '助人为乐',
-                              description: '你在历练途中遇到了一群被妖兽围攻的村民。你决定出手相助，帮助他们击退了妖兽。村民们对你感激不尽。',
+                              title: 'Helping Others',
+                              description: 'You encountered a group of villagers being besieged by monsters during your adventure. You decided to help them and repelled the monsters. The villagers are grateful to you.',
                               choices: [
                                 {
-                                  text: '接受村民的感谢，收取一些谢礼',
+                                  text: 'Accept villagers\' thanks and take some gifts',
                                   reputationChange: 10,
-                                  description: '你接受了村民的谢礼，声望提升了。',
+                                  description: 'You accepted the villagers\' gifts, and your reputation increased.',
                                   spiritStonesChange: 50,
                                 },
                                 {
-                                  text: '婉拒谢礼，只求村民平安',
+                                  text: 'Refuse gifts, only wish for their safety',
                                   reputationChange: 20,
-                                  description: '你的善举让村民们更加敬佩，声望大幅提升。',
+                                  description: 'Your kindness made the villagers admire you even more, reputation greatly increased.',
                                 },
                                 {
-                                  text: '要求村民提供更多信息',
+                                  text: 'Ask villagers for more information',
                                   reputationChange: 5,
-                                  description: '你从村民那里获得了一些有用的信息。',
+                                  description: 'You got some useful information from the villagers.',
                                   expChange: 20,
                                 },
                               ],
                             });
-                            showSuccess('已触发声望事件：助人为乐');
+                            showSuccess('Triggered Reputation Event: Helping Others');
                           } else {
-                            showError('声望事件回调未配置');
+                            showError('Reputation event callback not configured');
                           }
                         }}
                         className="p-4 bg-stone-800/50 border border-stone-700 rounded hover:border-yellow-500 transition-colors text-left"
                       >
                         <div className="font-semibold text-stone-200 mb-1">
-                          助人为乐
+                          Helping Others
                         </div>
                         <div className="text-xs text-stone-400">
-                          帮助村民击退妖兽，获得声望奖励
+                          Help villagers repel monsters, gain reputation
                         </div>
                       </button>
 
-                      {/* 正面事件 - 宗门任务 */}
+                      {/* Positive Event - Sect Mission */}
                       <button
                         onClick={() => {
                           if (onTriggerReputationEvent) {
                             onTriggerReputationEvent({
-                              title: '宗门委托',
-                              description: '你收到了宗门的委托任务，需要前往危险区域收集灵草。这是一个提升声望的好机会。',
+                              title: 'Sect Mission',
+                              description: 'You received a mission from the Sect to collect spirit herbs in a dangerous area. This is a good opportunity to increase your reputation.',
                               choices: [
                                 {
-                                  text: '接受任务，立即前往',
+                                  text: 'Accept mission, go immediately',
                                   reputationChange: 15,
-                                  description: '你成功完成了任务，获得了宗门的认可。',
+                                  description: 'You successfully completed the mission and gained recognition from the Sect.',
                                   expChange: 30,
                                   hpChange: -20,
                                 },
                                 {
-                                  text: '谨慎考虑，要求更多报酬',
+                                  text: 'Consider carefully, ask for more reward',
                                   reputationChange: 8,
-                                  description: '你获得了额外的报酬，但声望提升较少。',
+                                  description: 'You got extra rewards, but reputation increased less.',
                                   spiritStonesChange: 100,
                                 },
                                 {
-                                  text: '拒绝任务',
+                                  text: 'Refuse mission',
                                   reputationChange: -5,
-                                  description: '你拒绝了任务，声望略有下降。',
+                                  description: 'You refused the mission, reputation slightly decreased.',
                                 },
                               ],
                             });
-                            showSuccess('已触发声望事件：宗门委托');
+                            showSuccess('Triggered Reputation Event: Sect Mission');
                           } else {
-                            showError('声望事件回调未配置');
+                            showError('Reputation event callback not configured');
                           }
                         }}
                         className="p-4 bg-stone-800/50 border border-stone-700 rounded hover:border-yellow-500 transition-colors text-left"
                       >
                         <div className="font-semibold text-stone-200 mb-1">
-                          宗门委托
+                          Sect Mission
                         </div>
                         <div className="text-xs text-stone-400">
-                          完成宗门任务，提升声望
+                          Complete Sect mission, increase reputation
                         </div>
                       </button>
 
-                      {/* 负面事件 - 道德抉择 */}
+                      {/* Negative Event - Moral Choice */}
                       <button
                         onClick={() => {
                           if (onTriggerReputationEvent) {
                             onTriggerReputationEvent({
-                              title: '道德抉择',
-                              description: '你发现了一个受伤的邪修，他请求你的帮助。帮助他可能会获得一些好处，但也会影响你的声誉。',
+                              title: 'Moral Choice',
+                              description: 'You found an injured evil cultivator asking for your help. Helping him might bring some benefits, but it will also affect your reputation.',
                               choices: [
                                 {
-                                  text: '帮助邪修，获得他的宝物',
+                                  text: 'Help evil cultivator, get his treasures',
                                   reputationChange: -15,
-                                  description: '你帮助了邪修，虽然获得了宝物，但声望下降了。',
+                                  description: 'You helped the evil cultivator, although you got treasures, your reputation decreased.',
                                   spiritStonesChange: 200,
                                   hpChange: -10,
                                 },
                                 {
-                                  text: '拒绝帮助，但也不伤害他',
+                                  text: 'Refuse to help, but don\'t hurt him either',
                                   reputationChange: 0,
-                                  description: '你保持了中立，没有影响声望。',
+                                  description: 'You remained neutral, reputation unaffected.',
                                 },
                                 {
-                                  text: '为民除害，击败邪修',
+                                  text: 'Eliminate evil for the people, defeat him',
                                   reputationChange: 25,
-                                  description: '你为民除害，声望大幅提升！',
+                                  description: 'You eliminated evil for the people, reputation greatly increased!',
                                   expChange: 50,
                                   hpChange: -30,
                                 },
                               ],
                             });
-                            showSuccess('已触发声望事件：道德抉择');
+                            showSuccess('Triggered Reputation Event: Moral Choice');
                           } else {
-                            showError('声望事件回调未配置');
+                            showError('Reputation event callback not configured');
                           }
                         }}
                         className="p-4 bg-stone-800/50 border border-stone-700 rounded hover:border-yellow-500 transition-colors text-left"
                       >
                         <div className="font-semibold text-stone-200 mb-1">
-                          道德抉择
+                          Moral Choice
                         </div>
                         <div className="text-xs text-stone-400">
-                          面对邪修，做出你的选择
+                          Face evil cultivator, make your choice
                         </div>
                       </button>
 
-                      {/* 复杂事件 - 秘境发现 */}
+                      {/* Complex Event - Secret Realm Discovery */}
                       <button
                         onClick={() => {
                           if (onTriggerReputationEvent) {
                             onTriggerReputationEvent({
-                              title: '秘境发现',
-                              description: '你在历练中发现了一处隐秘的秘境入口。这个发现可能会改变你的命运，但也需要做出重要的选择。',
+                              title: 'Secret Realm Discovery',
+                              description: 'You discovered a hidden secret realm entrance during your adventure. This discovery might change your destiny, but also requires important choices.',
                               choices: [
                                 {
-                                  text: '独自探索秘境',
+                                  text: 'Explore alone',
                                   reputationChange: 5,
-                                  description: '你独自探索了秘境，获得了一些收获。',
+                                  description: 'You explored the secret realm alone and gained some harvest.',
                                   expChange: 100,
                                   hpChange: -50,
                                 },
                                 {
-                                  text: '将秘境信息告知宗门',
+                                  text: 'Inform Sect about secret realm',
                                   reputationChange: 30,
-                                  description: '你的贡献让宗门对你刮目相看，声望大幅提升！',
+                                  description: 'Your contribution impressed the Sect, reputation greatly increased!',
                                   spiritStonesChange: 150,
                                 },
                                 {
-                                  text: '与好友分享秘境',
+                                  text: 'Share with friends',
                                   reputationChange: 15,
-                                  description: '你与好友共同探索，获得了友谊和声望。',
+                                  description: 'You explored with friends, gained friendship and reputation.',
                                   expChange: 60,
                                   hpChange: -25,
                                 },
                               ],
                             });
-                            showSuccess('已触发声望事件：秘境发现');
+                            showSuccess('Triggered Reputation Event: Secret Realm Discovery');
                           } else {
-                            showError('声望事件回调未配置');
+                            showError('Reputation event callback not configured');
                           }
                         }}
                         className="p-4 bg-stone-800/50 border border-stone-700 rounded hover:border-yellow-500 transition-colors text-left"
                       >
                         <div className="font-semibold text-stone-200 mb-1">
-                          秘境发现
+                          Secret Realm Discovery
                         </div>
                         <div className="text-xs text-stone-400">
-                          发现秘境，做出重要选择
+                          Discover secret realm, make important choices
                         </div>
                       </button>
                     </div>
                   </div>
 
-                  {/* 自定义声望事件 */}
+                  {/* Custom Reputation Event */}
                   <div>
                     <h4 className="font-semibold text-stone-200 mb-2">
-                      快速测试
+                      Quick Test
                     </h4>
                     <div className="bg-stone-800/50 border border-stone-700 rounded p-4">
                       <p className="text-sm text-stone-300 mb-4">
-                        快速测试不同类型的声望变化：
+                        Quickly test different types of reputation changes:
                       </p>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         <button
                           onClick={() => {
                             if (onTriggerReputationEvent) {
                               onTriggerReputationEvent({
-                                title: '测试：大幅提升声望',
-                                description: '这是一个测试事件，用于测试大幅提升声望的情况。',
+                                title: 'Test: Major Rep Increase',
+                                description: 'This is a test event for major reputation increase.',
                                 choices: [
                                   {
-                                    text: '选择1：+50声望',
+                                    text: 'Choice 1: +50 Reputation',
                                     reputationChange: 50,
-                                    description: '声望大幅提升！',
+                                    description: 'Reputation greatly increased!',
                                   },
                                 ],
                               });
-                              showSuccess('已触发测试事件：大幅提升声望');
+                              showSuccess('Triggered Test Event: Major Rep Increase');
                             } else {
-                              showError('声望事件回调未配置');
+                              showError('Reputation event callback not configured');
                             }
                           }}
                           className="px-3 py-2 bg-green-700 hover:bg-green-600 text-white rounded text-sm"
                         >
-                          +50声望
+                          +50 Rep
                         </button>
                         <button
                           onClick={() => {
                             if (onTriggerReputationEvent) {
                               onTriggerReputationEvent({
-                                title: '测试：中等提升声望',
-                                description: '这是一个测试事件，用于测试中等提升声望的情况。',
+                                title: 'Test: Medium Rep Increase',
+                                description: 'This is a test event for medium reputation increase.',
                                 choices: [
                                   {
-                                    text: '选择1：+20声望',
+                                    text: 'Choice 1: +20 Reputation',
                                     reputationChange: 20,
-                                    description: '声望提升！',
+                                    description: 'Reputation increased!',
                                   },
                                 ],
                               });
-                              showSuccess('已触发测试事件：中等提升声望');
+                              showSuccess('Triggered Test Event: Medium Rep Increase');
                             } else {
-                              showError('声望事件回调未配置');
+                              showError('Reputation event callback not configured');
                             }
                           }}
                           className="px-3 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded text-sm"
                         >
-                          +20声望
+                          +20 Rep
                         </button>
                         <button
                           onClick={() => {
                             if (onTriggerReputationEvent) {
                               onTriggerReputationEvent({
-                                title: '测试：降低声望',
-                                description: '这是一个测试事件，用于测试降低声望的情况。',
+                                title: 'Test: Rep Decrease',
+                                description: 'This is a test event for reputation decrease.',
                                 choices: [
                                   {
-                                    text: '选择1：-20声望',
+                                    text: 'Choice 1: -20 Reputation',
                                     reputationChange: -20,
-                                    description: '声望下降了。',
+                                    description: 'Reputation decreased.',
                                   },
                                 ],
                               });
-                              showSuccess('已触发测试事件：降低声望');
+                              showSuccess('Triggered Test Event: Rep Decrease');
                             } else {
-                              showError('声望事件回调未配置');
+                              showError('Reputation event callback not configured');
                             }
                           }}
                           className="px-3 py-2 bg-red-700 hover:bg-red-600 text-white rounded text-sm"
                         >
-                          -20声望
+                          -20 Rep
                         </button>
                       </div>
                     </div>

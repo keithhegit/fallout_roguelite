@@ -120,12 +120,16 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
 
   return (
     <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-101 transition-all duration-300 ease-in-out w-9 md:w-11">
-      {/* 消息气泡统计 / 红点 */}
-      {!isOpen && hasNew && (
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-stone-900" />
+      {/* Message bubble stats / Red dot */}
+      {(!isOpen || hasNew) && (
+        <div className="absolute -top-1 -right-1 flex items-center gap-1 z-50">
+          {hasNew && (
+            <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-lg ring-2 ring-black"></span>
+          )}
+        </div>
       )}
 
-      {/* 切换按钮 */}
+      {/* Toggle button */}
       <button
         onClick={toggleOpen}
         className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg transition-all border ${isOpen
@@ -240,9 +244,9 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
           )}
         </div>
 
-        {/* 输入区域 - 减少高度占比 */}
+        {/* Input area - Reduce height ratio */}
         <div className="p-2 bg-stone-800/50 border-t border-amber-500/20 relative">
-          {/* 表情选择器悬浮层 - 以表情按钮为基准 */}
+          {/* Emoji picker popover - Based on emoji button */}
           {showEmojiPicker && (
             <div className="absolute bottom-full left-0  z-10 bg-stone-800/95 backdrop-blur-xl border border-amber-500/30 rounded-xl rounded-b-none p-3 max-h-40 overflow-y-auto  shadow-2xl">
               <div className="flex flex-wrap gap-2">
@@ -270,7 +274,7 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
           )}
 
           <div className="flex items-center gap-2">
-            {/* 表情按钮 */}
+            {/* Emoji button */}
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               className={`p-1.5 rounded-lg transition-all duration-200 border relative ${showEmojiPicker

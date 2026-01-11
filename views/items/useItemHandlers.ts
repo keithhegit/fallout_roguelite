@@ -12,12 +12,12 @@ interface UseItemHandlersProps {
   setPlayer: React.Dispatch<React.SetStateAction<PlayerStats>>;
   addLog: (message: string, type?: string) => void;
   setItemActionLog?: (log: { text: string; type: string } | null) => void;
-  onOpenTreasureVault?: () => void; // 打开宗门宝库弹窗的回调
+  onOpenTreasureVault?: () => void; // Callback to open Sect Vault modal
 }
 
 /**
- * 辅助函数：应用单个物品效果
- * 抽离核心逻辑以复用，减少 handleUseItem 和 handleBatchUseItems 的重复
+ * Helper function: Apply single item effect
+ * Extract core logic for reuse, reduce duplication in handleUseItem and handleBatchUseItems
  */
 const applyItemEffect = (
   prev: PlayerStats,
@@ -30,7 +30,7 @@ const applyItemEffect = (
 ): PlayerStats => {
   const { addLog, setItemActionLog, isBatch = false } = options;
 
-  // 基础数据克隆
+  // Clone base data
   let newStats = { ...prev };
   let newInv = prev.inventory
     .map((i) => {
@@ -41,10 +41,10 @@ const applyItemEffect = (
   let newPets = [...prev.pets];
   const effectLogs: string[] = [];
 
-  // 1. 处理传承石（特殊物品）- 已删除传承路线功能，仅提升传承等级
-  const isInheritanceStone = item.name === '传承石';
+  // 1. Handle Inheritance Stone (Special Item) - Inheritance path feature removed, only increases inheritance level
+  const isInheritanceStone = item.name === 'Inheritance Stone';
   if (isInheritanceStone) {
-    addLog(`✨ 你使用了传承石，传承等级 +1！`, 'special');
+    addLog(`✨ Used Inheritance Stone. Inheritance Level +1!`, 'special');
     return {
       ...newStats,
       inventory: newInv,
@@ -53,24 +53,24 @@ const applyItemEffect = (
     };
   }
 
-  // 2. 处理灵兽蛋孵化
+  // 2. Handle Spirit Pet Egg hatching
   const isPetEgg =
-    item.name.includes('蛋') ||
+    item.name.includes('Egg') ||
     item.name.toLowerCase().includes('egg') ||
-    item.name.includes('灵兽蛋') ||
-    item.name.includes('灵宠蛋') ||
+    item.name.includes('Spirit Beast Egg') ||
+    item.name.includes('Spirit Pet Egg') ||
     (item.description &&
-      (item.description.includes('孵化') ||
-        item.description.includes('灵宠') ||
-        item.description.includes('灵兽') ||
-        item.description.includes('宠物')));
+      (item.description.includes('Hatch') ||
+        item.description.includes('Spirit Pet') ||
+        item.description.includes('Spirit Beast') ||
+        item.description.includes('Pet')));
 
   if (isPetEgg) {
     const availablePets = PET_TEMPLATES.filter((t) => {
-      if (item.rarity === '普通') return t.rarity === '普通' || t.rarity === '稀有';
-      if (item.rarity === '稀有') return t.rarity === '稀有' || t.rarity === '传说';
-      if (item.rarity === '传说') return t.rarity === '传说' || t.rarity === '仙品';
-      if (item.rarity === '仙品') return t.rarity === '仙品';
+      if (item.rarity === 'Common') return t.rarity === 'Common' || t.rarity === 'Rare';
+      if (item.rarity === 'Rare') return t.rarity === 'Rare' || t.rarity === 'Legendary';
+      if (item.rarity === 'Legendary') return t.rarity === 'Legendary' || t.rarity === 'Mythic';
+      if (item.rarity === 'Mythic') return t.rarity === 'Mythic';
       return true;
     });
 
@@ -90,56 +90,56 @@ const applyItemEffect = (
         affection: 50,
       };
       newPets.push(newPet);
-      const logMsg = `✨ 孵化出了灵宠【${newPet.name}】！`;
+      const logMsg = `✨ Hatched Spirit Pet [${newPet.name}]!`;
       effectLogs.push(logMsg);
       if (!isBatch) {
-        addLog(`🎉 你成功孵化了${item.name}，获得了灵宠【${newPet.name}】！`, 'special');
+        addLog(`🎉 Successfully hatched ${item.name} and obtained Spirit Pet [${newPet.name}]!`, 'special');
       }
     } else {
-      const logMsg = '但似乎什么都没有孵化出来...';
+      const logMsg = 'But nothing seems to have hatched...';
       effectLogs.push(logMsg);
-      if (!isBatch) addLog(`你尝试孵化${item.name}，但似乎什么都没有发生...`, 'normal');
+      if (!isBatch) addLog(`You tried to hatch ${item.name}, but nothing happened...`, 'normal');
     }
   }
 
-  // 3. 处理临时效果
+  // 3. Handle temporary effects
   if (item.effect?.hp) {
-    // 使用实际最大血量（包含金丹法数加成等）作为上限
+    // Use actual max HP (including Golden Core method bonus, etc.) as limit
     const totalStats = getPlayerTotalStats(newStats);
     const actualMaxHp = totalStats.maxHp;
     newStats.hp = Math.min(actualMaxHp, newStats.hp + item.effect.hp);
-    effectLogs.push(`恢复了 ${item.effect.hp} 点气血。`);
+    effectLogs.push(`Recovered ${item.effect.hp} HP.`);
   }
   if (item.effect?.exp) {
     newStats.exp += item.effect.exp;
-    effectLogs.push(`增长了 ${item.effect.exp} 点修为。`);
+    effectLogs.push(`Gained ${item.effect.exp} Exp.`);
   }
   if (item.effect?.lifespan) {
     const currentLifespan = newStats.lifespan ?? newStats.maxLifespan ?? 100;
     const maxLifespan = newStats.maxLifespan ?? 100;
     const lifespanIncrease = item.effect.lifespan;
 
-    // 修复：普通效果增加寿命不应超过当前上限
+    // Fix: Normal effect lifespan increase should not exceed current limit
     const nextLifespan = Math.min(maxLifespan, currentLifespan + lifespanIncrease);
 
-    // 确保寿命不会因为普通效果减少（除非增加值为负，但通常为正）
+    // Ensure lifespan doesn't decrease due to normal effects (unless increase is negative, but usually positive)
     newStats.lifespan = Math.max(newStats.lifespan ?? 0, nextLifespan);
-    effectLogs.push(`寿命增加了 ${lifespanIncrease} 年。`);
+    effectLogs.push(`Lifespan increased by ${lifespanIncrease} years.`);
   }
 
-  // 4. 处理永久效果（装备类型不应该有永久效果，只有消耗品如丹药才有）
+  // 4. Handle permanent effects (Equipment types shouldn't have permanent effects, only consumables like pills)
   if (item.permanentEffect && !item.isEquippable) {
     const permLogs: string[] = [];
     const pe = item.permanentEffect;
-    if (pe.attack) { newStats.attack += pe.attack; permLogs.push(`攻击力永久 +${pe.attack}`); }
-    if (pe.defense) { newStats.defense += pe.defense; permLogs.push(`防御力永久 +${pe.defense}`); }
-    if (pe.spirit) { newStats.spirit += pe.spirit; permLogs.push(`神识永久 +${pe.spirit}`); }
-    if (pe.physique) { newStats.physique += pe.physique; permLogs.push(`体魄永久 +${pe.physique}`); }
-    if (pe.speed) { newStats.speed += pe.speed; permLogs.push(`速度永久 +${pe.speed}`); }
+    if (pe.attack) { newStats.attack += pe.attack; permLogs.push(`Permanent Attack +${pe.attack}`); }
+    if (pe.defense) { newStats.defense += pe.defense; permLogs.push(`Permanent Defense +${pe.defense}`); }
+    if (pe.spirit) { newStats.spirit += pe.spirit; permLogs.push(`Permanent Spirit +${pe.spirit}`); }
+    if (pe.physique) { newStats.physique += pe.physique; permLogs.push(`Permanent Physique +${pe.physique}`); }
+    if (pe.speed) { newStats.speed += pe.speed; permLogs.push(`Permanent Speed +${pe.speed}`); }
     if (pe.maxHp) {
       newStats.maxHp += pe.maxHp;
       newStats.hp += pe.maxHp;
-      permLogs.push(`气血上限永久 +${pe.maxHp}`);
+      permLogs.push(`Permanent Max HP +${pe.maxHp}`);
     }
     if (pe.maxLifespan) {
       newStats.maxLifespan = (newStats.maxLifespan ?? 100) + pe.maxLifespan;
@@ -147,12 +147,12 @@ const applyItemEffect = (
         newStats.maxLifespan,
         (newStats.lifespan ?? newStats.maxLifespan ?? 100) + pe.maxLifespan
       );
-      permLogs.push(`最大寿命永久 +${pe.maxLifespan} 年`);
+      permLogs.push(`Permanent Max Lifespan +${pe.maxLifespan} Years`);
     }
     if (pe.spiritualRoots) {
-      const rootNames: Record<string, string> = { metal: '金', wood: '木', water: '水', fire: '火', earth: '土' };
+      const rootNames: Record<string, string> = { metal: 'Metal', wood: 'Wood', water: 'Water', fire: 'Fire', earth: 'Earth' };
       const rootChanges: string[] = [];
-      // 确保 spiritualRoots 对象存在并初始化
+      // Ensure spiritualRoots object exists and is initialized
       if (!newStats.spiritualRoots) {
         newStats.spiritualRoots = { metal: 0, wood: 0, water: 0, fire: 0, earth: 0 };
       } else {
@@ -163,43 +163,43 @@ const applyItemEffect = (
         const rootTypes: Array<keyof typeof rootNames> = ['metal', 'wood', 'water', 'fire', 'earth'];
         const randomRoot = rootTypes[Math.floor(Math.random() * rootTypes.length)];
         newStats.spiritualRoots[randomRoot] = Math.min(100, (newStats.spiritualRoots[randomRoot] || 0) + 5);
-        rootChanges.push(`${rootNames[randomRoot]}灵根 +5`);
+        rootChanges.push(`${rootNames[randomRoot]} Root +5`);
       } else {
         Object.entries(pe.spiritualRoots).forEach(([key, value]) => {
-          // 处理 undefined、null 和 0 的情况
+          // Handle undefined, null, and 0 cases
           const numValue = value ?? 0;
           if (numValue > 0) {
             const rootKey = key as keyof typeof newStats.spiritualRoots;
             const currentValue = newStats.spiritualRoots[rootKey] || 0;
             newStats.spiritualRoots[rootKey] = Math.min(100, currentValue + numValue);
-            rootChanges.push(`${rootNames[key]}灵根 +${numValue}`);
+            rootChanges.push(`${rootNames[key]} Root +${numValue}`);
           }
         });
       }
-      if (rootChanges.length > 0) permLogs.push(`灵根提升：${rootChanges.join('，')}`);
+      if (rootChanges.length > 0) permLogs.push(`Spiritual Root Improvement: ${rootChanges.join(', ')}`);
     }
-    if (permLogs.length > 0) effectLogs.push(`✨ ${permLogs.join('，')}`);
+    if (permLogs.length > 0) effectLogs.push(`✨ ${permLogs.join(', ')}`);
   }
 
-  // 4. 处理材料包（使用后获得若干对应品级的丹药）
-  const isMaterialPack = item.name.includes('材料包');
+  // 4. Handle Material Pack (Use to obtain several pills of corresponding rarity)
+  const isMaterialPack = item.name.includes('Material Pack');
   if (isMaterialPack) {
-    // 根据材料包的稀有度确定要生成的丹药稀有度
-    const packRarity = item.rarity || '普通';
-    let targetRarity: ItemRarity = '普通';
+    // Determine rarity of pills to generate based on pack rarity
+    const packRarity = item.rarity || 'Common';
+    let targetRarity: ItemRarity = 'Common';
 
-    // 材料包的稀有度对应生成丹药的稀有度
-    if (packRarity === '仙品') {
-      targetRarity = '仙品';
-    } else if (packRarity === '传说') {
-      targetRarity = '传说';
-    } else if (packRarity === '稀有') {
-      targetRarity = '稀有';
+    // Pack rarity corresponds to generated pill rarity
+    if (packRarity === 'Mythic') {
+      targetRarity = 'Mythic';
+    } else if (packRarity === 'Legendary') {
+      targetRarity = 'Legendary';
+    } else if (packRarity === 'Rare') {
+      targetRarity = 'Rare';
     } else {
-      targetRarity = '普通';
+      targetRarity = 'Common';
     }
 
-    // 从对应稀有度的丹药中筛选
+    // Filter from pills of corresponding rarity
     const allPills = LOOT_ITEMS.pills;
     let availablePills: Array<{
       name: string;
@@ -210,17 +210,17 @@ const applyItemEffect = (
       description?: string;
     }> = allPills.filter(p => p.rarity === targetRarity);
 
-    // 如果没有找到对应稀有度的丹药，降级查找
-    if (availablePills.length === 0 && targetRarity !== '普通') {
-      availablePills = allPills.filter(p => p.rarity === '普通');
+    // If no pills of corresponding rarity found, downgrade search
+    if (availablePills.length === 0 && targetRarity !== 'Common') {
+      availablePills = allPills.filter(p => p.rarity === 'Common');
     }
 
-    // 如果还是没有，从草药中获取（草药也可以作为丹药材料）
+    // If still none, get from herbs (herbs can also be pill materials)
     if (availablePills.length === 0) {
       const allHerbs = LOOT_ITEMS.herbs;
-      availablePills = allHerbs.filter(h => h.rarity === targetRarity || targetRarity === '普通').map(h => ({
+      availablePills = allHerbs.filter(h => h.rarity === targetRarity || targetRarity === 'Common').map(h => ({
         name: h.name,
-        type: ItemType.Pill, // 强制设置为丹药类型，因为材料包应该生成丹药
+        type: ItemType.Pill, // Force set to Pill type, as material pack should generate pills
         rarity: h.rarity,
         effect: h.effect,
         permanentEffect: (h as any).permanentEffect,
@@ -228,21 +228,21 @@ const applyItemEffect = (
       }));
     }
 
-    // 如果仍然为空，使用默认丹药
+    // If still empty, use default pill
     if (availablePills.length === 0) {
-      // 创建一个默认丹药作为后备
+      // Create a default pill as backup
       availablePills = [{
-        name: '聚气丹',
+        name: 'Qi Gathering Pill',
         type: ItemType.Pill,
-        rarity: '普通' as ItemRarity,
+        rarity: 'Common' as ItemRarity,
         effect: { exp: 50 },
         permanentEffect: { spirit: 1 },
-        description: '基础的聚气丹药，可恢复少量修为。',
+        description: 'Basic Qi Gathering Pill, restores a small amount of Exp.',
       }];
     }
 
-    // 生成3-6个随机丹药
-    const pillCount = 3 + Math.floor(Math.random() * 4); // 3-6个
+    // Generate 3-6 random pills
+    const pillCount = 3 + Math.floor(Math.random() * 4); // 3-6
     const obtainedPills: Item[] = [];
     const pillNames = new Set<string>();
 
@@ -250,15 +250,15 @@ const applyItemEffect = (
       const randomPill = availablePills[Math.floor(Math.random() * availablePills.length)];
       const pillName = randomPill.name;
 
-      // 避免重复（如果丹药池不够大，允许少量重复）
+      // Avoid duplicates (allow small amount of duplicates if pill pool is not large enough)
       if (!pillNames.has(pillName) || pillNames.size >= availablePills.length) {
         pillNames.add(pillName);
-        const quantity = 1 + Math.floor(Math.random() * 3); // 每个丹药1-3个
+        const quantity = 1 + Math.floor(Math.random() * 3); // 1-3 per pill
         obtainedPills.push({
           id: uid(),
           name: pillName,
-          type: ItemType.Pill, // 强制设置为丹药类型，确保类型正确
-          description: randomPill.description || `${pillName}，来自材料包的丹药。`,
+          type: ItemType.Pill, // Force set to Pill type to ensure correct type
+          description: randomPill.description || `${pillName}, obtained from Material Pack.`,
           quantity,
           rarity: randomPill.rarity,
           effect: randomPill.effect,
@@ -267,10 +267,10 @@ const applyItemEffect = (
       }
     }
 
-    // 将获得的丹药添加到背包
+    // Add obtained pills to inventory
     obtainedPills.forEach(pill => {
-      // 检查背包中是否已有相同丹药（按名称、类型、稀有度、效果匹配）
-      // 使用优化的深度比较函数替代 JSON.stringify，提高性能
+      // Check if same pill exists in inventory (match by name, type, rarity, effect)
+      // Use optimized deep compare function instead of JSON.stringify for better performance
       const existingIndex = newInv.findIndex(
         i => i.name === pill.name &&
         i.type === pill.type &&
@@ -286,21 +286,21 @@ const applyItemEffect = (
     });
 
     if (obtainedPills.length > 0) {
-      const pillList = obtainedPills.map(p => `${p.name} x${p.quantity}`).join('、');
-      effectLogs.push(`✨ 获得了：${pillList}`);
+      const pillList = obtainedPills.map(p => `${p.name} x${p.quantity}`).join(', ');
+      effectLogs.push(`✨ Obtained: ${pillList}`);
       if (!isBatch) {
-        addLog(`你打开了${item.name}，获得了：${pillList}`, 'gain');
+        addLog(`You opened ${item.name} and obtained: ${pillList}`, 'gain');
       }
     } else {
       if (!isBatch) {
-        addLog(`你打开了${item.name}，但似乎什么都没有...`, 'normal');
+        addLog(`You opened ${item.name}, but it seems empty...`, 'normal');
       }
     }
   }
 
-  // 5. 处理丹方使用
+  // 5. Handle Recipe use
   if (item.type === ItemType.Recipe) {
-    let recipeName = item.recipeData?.name || item.name.replace(/丹方$/, '');
+    let recipeName = item.recipeData?.name || item.name.replace(/ Recipe$/, '');
     if (!item.recipeData) {
       const matched = DISCOVERABLE_RECIPES.find(r => r.name === recipeName);
       if (matched) recipeName = matched.name;
@@ -309,32 +309,32 @@ const applyItemEffect = (
     if (recipeName) {
       newStats.unlockedRecipes = [...(newStats.unlockedRecipes || [])];
       if (newStats.unlockedRecipes.includes(recipeName)) {
-        if (!isBatch) addLog(`你已经学会了【${recipeName}】的炼制方法。`, 'normal');
+        if (!isBatch) addLog(`You have already learned the recipe for [${recipeName}].`, 'normal');
       } else {
         const recipeExists = DISCOVERABLE_RECIPES.some(r => r.name === recipeName);
         if (!recipeExists) {
-          if (!isBatch) addLog(`【${recipeName}】的配方不存在，无法学习。`, 'danger');
+          if (!isBatch) addLog(`Recipe for [${recipeName}] does not exist, cannot learn.`, 'danger');
         } else {
           newStats.unlockedRecipes.push(recipeName);
           const stats = { ...(newStats.statistics || { killCount: 0, meditateCount: 0, adventureCount: 0, equipCount: 0, petCount: 0, recipeCount: 0, artCount: 0, breakthroughCount: 0, secretRealmCount: 0 }) };
           newStats.statistics = { ...stats, recipeCount: newStats.unlockedRecipes.length };
-          effectLogs.push(`✨ 学会了【${recipeName}】的炼制方法！`);
+          effectLogs.push(`✨ Learned recipe for [${recipeName}]!`);
           if (!isBatch) {
-            addLog(`你研读了【${item.name}】，学会了【${recipeName}】的炼制方法！`, 'special');
+            addLog(`You studied [${item.name}] and learned the recipe for [${recipeName}]!`, 'special');
           }
         }
       }
     } else if (!isBatch) {
-      addLog(`无法从【${item.name}】中识别出配方名称。`, 'danger');
+      addLog(`Cannot identify recipe name from [${item.name}].`, 'danger');
     }
   }
 
-  // 5. 显示使用日志 (非灵兽蛋且非丹方)
+  // 5. Show use log (Not pet egg or recipe)
   if (!isPetEgg && item.type !== ItemType.Recipe) {
     if (item.type === ItemType.Pill || effectLogs.length > 0) {
       const logMessage = effectLogs.length > 0
-        ? `你使用了 ${item.name}。 ${effectLogs.join(' ')}`
-        : `你使用了 ${item.name}。`;
+        ? `You used ${item.name}. ${effectLogs.join(' ')}`
+        : `You used ${item.name}.`;
 
       if (!isBatch) addLog(logMessage, 'gain');
       if (setItemActionLog) setItemActionLog({ text: logMessage, type: 'gain' });
@@ -348,27 +348,27 @@ const applyItemEffect = (
 };
 
 /**
- * 整理背包逻辑
+ * Organize inventory logic
  */
 const organizeInventory = (player: PlayerStats): Item[] => {
   const inventory = [...player.inventory];
   const equippedIds = new Set(Object.values(player.equippedItems).filter(Boolean) as string[]);
 
-  // 1. 合并可堆叠物品
+  // 1. Merge stackable items
   const mergedInventory: Item[] = [];
   const stackMap = new Map<string, Item>();
 
   for (const item of inventory) {
-    // 已装备的物品不参与合并，直接保留
+    // Equipped items are not merged, kept directly
     if (equippedIds.has(item.id)) {
       mergedInventory.push(item);
       continue;
     }
 
-    // 生成唯一标识符用于判断是否可堆叠
-    const itemKey = `${item.name}-${item.type}-${item.rarity || '普通'}-${item.level || 0}-${JSON.stringify(item.effect || {})}-${JSON.stringify(item.permanentEffect || {})}`;
+    // Generate unique identifier to check stackability
+    const itemKey = `${item.name}-${item.type}-${item.rarity || 'Common'}-${item.level || 0}-${JSON.stringify(item.effect || {})}-${JSON.stringify(item.permanentEffect || {})}`;
 
-    // 只有非装备类物品（草药、丹药、材料、丹方等）才自动合并
+    // Only non-equipment items (Herbs, Pills, Materials, Recipes, etc.) are automatically merged
     const isStackable =
       item.type === ItemType.Herb ||
       item.type === ItemType.Pill ||
@@ -385,12 +385,12 @@ const organizeInventory = (player: PlayerStats): Item[] => {
         mergedInventory.push(newItem);
       }
     } else {
-      // 装备类或不可堆叠类物品，直接加入
+      // Equipment or non-stackable items added directly
       mergedInventory.push(item);
     }
   }
 
-  // 2. 排序逻辑
+  // 2. Sorting logic
   const typeOrder: Record<string, number> = {
     [ItemType.Weapon]: 1,
     [ItemType.Armor]: 2,
@@ -400,45 +400,45 @@ const organizeInventory = (player: PlayerStats): Item[] => {
     [ItemType.Pill]: 6,
     [ItemType.Herb]: 7,
     [ItemType.Material]: 8,
-    [ItemType.AdvancedItem]: 9, // 进阶物品
+    [ItemType.AdvancedItem]: 9, // Advanced Item
     [ItemType.Recipe]: 10,
   };
 
   const rarityOrder: Record<string, number> = {
-    '仙品': 1,
-    '传说': 2,
-    '稀有': 3,
-    '普通': 4,
+    'Mythic': 1,
+    'Legendary': 2,
+    'Rare': 3,
+    'Common': 4,
   };
 
   return mergedInventory.sort((a, b) => {
-    // 已装备优先
+    // Equipped first
     const aEquipped = equippedIds.has(a.id);
     const bEquipped = equippedIds.has(b.id);
     if (aEquipped !== bEquipped) return aEquipped ? -1 : 1;
 
-    // 按类型排序
+    // Sort by type
     const aType = typeOrder[a.type] || 99;
     const bType = typeOrder[b.type] || 99;
     if (aType !== bType) return aType - bType;
 
-    // 按稀有度排序
-    const aRarity = rarityOrder[a.rarity || '普通'] || 99;
-    const bRarity = rarityOrder[b.rarity || '普通'] || 99;
-    if (aRarity !== bRarity) return aRarity - bRarity; // 仙品(1) < 普通(4)，所以 aRarity - bRarity 为负，a 排在前面
+    // Sort by rarity
+    const aRarity = rarityOrder[a.rarity || 'Common'] || 99;
+    const bRarity = rarityOrder[b.rarity || 'Common'] || 99;
+    if (aRarity !== bRarity) return aRarity - bRarity; // Mythic(1) < Common(4), so aRarity - bRarity is negative, a comes first
 
-    // 按等级排序（高到低）
+    // Sort by level (High to Low)
     const aLevel = a.level || 0;
     const bLevel = b.level || 0;
     if (aLevel !== bLevel) return bLevel - aLevel;
 
-    // 按名称排序
-    return a.name.localeCompare(b.name, 'zh-CN');
+    // Sort by name
+    return a.name.localeCompare(b.name, 'en-US');
   });
 };
 
 /**
- * 物品处理钩子
+ * Item Handler Hooks
  */
 export function useItemHandlers({
   player,
@@ -448,45 +448,45 @@ export function useItemHandlers({
   onOpenTreasureVault,
 }: UseItemHandlersProps) {
   const handleUseItem = (item: Item) => {
-    // 检查是否是宗门宝库钥匙
-    const isTreasureVaultKey = item.name === '宗门宝库钥匙';
+    // Check if it is Sect Vault Key
+    const isTreasureVaultKey = item.name === 'Sect Vault Key';
 
     if (isTreasureVaultKey) {
-      // 宗主身份，钥匙可重复使用，不消耗钥匙
-      addLog('你使用了宗门宝库钥匙，打开了宗门宝库！', 'special');
+      // Sect Leader can reuse key, key is not consumed
+      addLog('You used the Sect Vault Key and opened the Sect Vault!', 'special');
 
-      // 打开宗门宝库弹窗
+      // Open Sect Vault modal
       if (onOpenTreasureVault) {
         onOpenTreasureVault();
       }
       return;
     }
 
-    // 其他物品正常使用
+    // Other items used normally
     setPlayer((prev) => applyItemEffect(prev, item, { addLog, setItemActionLog }));
   };
 
   const handleOrganizeInventory = () => {
     setPlayer((prev) => {
       const newInventory = organizeInventory(prev);
-      addLog('背包整理完毕。', 'gain');
+      addLog('Inventory organized.', 'gain');
       return { ...prev, inventory: newInventory };
     });
   };
 
   const handleDiscardItem = (item: Item) => {
     showConfirm(
-      `确定要丢弃 ${item.name} x${item.quantity} 吗？`,
-      '确认丢弃',
+      `Are you sure you want to discard ${item.name} x${item.quantity}?`,
+      'Confirm Discard',
       () => {
         setPlayer((prev) => {
           const isEquipped = Object.values(prev.equippedItems).includes(item.id);
           if (isEquipped) {
-            addLog('无法丢弃已装备的物品！请先卸下。', 'danger');
+            addLog('Cannot discard equipped items! Unequip first.', 'danger');
             return prev;
           }
           const newInv = prev.inventory.filter((i) => i.id !== item.id);
-          addLog(`你丢弃了 ${item.name} x${item.quantity}。`, 'normal');
+          addLog(`You discarded ${item.name} x${item.quantity}.`, 'normal');
           return { ...prev, inventory: newInv };
         });
       }
@@ -512,13 +512,13 @@ export function useItemHandlers({
     });
 
     if (itemIds.length > 0) {
-      addLog(`批量使用了 ${itemIds.length} 件物品。`, 'gain');
+      addLog(`Batch used ${itemIds.length} items.`, 'gain');
     }
   };
 
   const handleRefineAdvancedItem = (item: Item) => {
     if (item.type !== ItemType.AdvancedItem || !item.advancedItemType || !item.advancedItemId) {
-      addLog('该物品不是进阶物品！', 'danger');
+      addLog('This is not an Advanced Item!', 'danger');
       return;
     }
 
@@ -530,19 +530,19 @@ export function useItemHandlers({
     if (item.advancedItemType === 'foundationTreasure') {
       requiredRealm = RealmType.QiRefining;
       canRefine = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.QiRefining);
-      warningMessage = '天道警告：炼化筑基奇物需要达到炼气期！';
+      warningMessage = 'Warning: Refining Foundation Treasure requires Qi Refining realm!';
     } else if (item.advancedItemType === 'heavenEarthEssence') {
       requiredRealm = RealmType.GoldenCore;
       canRefine = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.GoldenCore);
-      warningMessage = '天道警告：炼化天地精华需要达到金丹期！';
+      warningMessage = 'Warning: Refining Heaven Earth Essence requires Golden Core realm!';
     } else if (item.advancedItemType === 'heavenEarthMarrow') {
       requiredRealm = RealmType.NascentSoul;
       canRefine = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.NascentSoul);
-      warningMessage = '天道警告：炼化天地之髓需要达到元婴期！';
+      warningMessage = 'Warning: Refining Heaven Earth Marrow requires Nascent Soul realm!';
     } else if (item.advancedItemType === 'longevityRule') {
       requiredRealm = RealmType.DaoCombining;
       canRefine = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.DaoCombining);
-      warningMessage = '天道警告：炼化规则之力需要达到合道期！';
+      warningMessage = 'Warning: Refining Law of Longevity requires Dao Combining realm!';
     }
 
     if (!canRefine) {
@@ -550,32 +550,32 @@ export function useItemHandlers({
       return;
     }
 
-    // 检查是否已经拥有
+    // Check if already owned
     if (item.advancedItemType === 'foundationTreasure' && player.foundationTreasure) {
-      addLog('你已经拥有筑基奇物，无法重复炼化！', 'danger');
+      addLog('You already have a Foundation Treasure!', 'danger');
       return;
     }
     if (item.advancedItemType === 'heavenEarthEssence' && player.heavenEarthEssence) {
-      addLog('你已经拥有天地精华，无法重复炼化！', 'danger');
+      addLog('You already have Heaven Earth Essence!', 'danger');
       return;
     }
     if (item.advancedItemType === 'heavenEarthMarrow' && player.heavenEarthMarrow) {
-      addLog('你已经拥有天地之髓，无法重复炼化！', 'danger');
+      addLog('You already have Heaven Earth Marrow!', 'danger');
       return;
     }
     if (item.advancedItemType === 'longevityRule' && item.advancedItemId) {
       if ((player.longevityRules || []).includes(item.advancedItemId)) {
-        addLog('你已经拥有该规则之力，无法重复炼化！', 'danger');
+        addLog('You already have this Law!', 'danger');
         return;
       }
       const maxRules = player.maxLongevityRules || 3;
       if ((player.longevityRules || []).length >= maxRules) {
-        addLog('你已经拥有最大数量的规则之力，无法继续炼化！', 'danger');
+        addLog('You have reached the maximum number of Laws!', 'danger');
         return;
       }
     }
 
-    // 执行炼化
+    // Execute refining
     setPlayer((prev) => {
       const newInventory = prev.inventory
         .map((i) => {
@@ -595,14 +595,14 @@ export function useItemHandlers({
 
       if (item.advancedItemType === 'foundationTreasure') {
         newFoundationTreasure = item.advancedItemId;
-        const successMessage = `✨ 你成功炼化了筑基奇物【${item.name}】！`;
+        const successMessage = `✨ Successfully refined Foundation Treasure [${item.name}]!`;
         addLog(successMessage, 'special');
         if (setItemActionLog) {
           setItemActionLog({ text: successMessage, type: 'special' });
         }
       } else if (item.advancedItemType === 'heavenEarthEssence') {
         newHeavenEarthEssence = item.advancedItemId;
-        const successMessage = `✨ 你成功炼化了天地精华【${item.name}】！`;
+        const successMessage = `✨ Successfully refined Heaven Earth Essence [${item.name}]!`;
         addLog(successMessage, 'special');
         if (setItemActionLog) {
           setItemActionLog({ text: successMessage, type: 'special' });
@@ -611,14 +611,14 @@ export function useItemHandlers({
         newHeavenEarthMarrow = item.advancedItemId;
         marrowRefiningProgress = 0;
         marrowRefiningSpeed = 1.0;
-        const successMessage = `✨ 你成功炼化了天地之髓【${item.name}】！`;
+        const successMessage = `✨ Successfully refined Heaven Earth Marrow [${item.name}]!`;
         addLog(successMessage, 'special');
         if (setItemActionLog) {
           setItemActionLog({ text: successMessage, type: 'special' });
         }
       } else if (item.advancedItemType === 'longevityRule' && item.advancedItemId) {
         newLongevityRules.push(item.advancedItemId);
-        const successMessage = `✨ 你成功炼化了规则之力【${item.name}】！`;
+        const successMessage = `✨ Successfully refined Law of Longevity [${item.name}]!`;
         addLog(successMessage, 'special');
         if (setItemActionLog) {
           setItemActionLog({ text: successMessage, type: 'special' });

@@ -55,16 +55,16 @@ interface ExecuteAdventureCoreProps {
   realmName?: string;
   adventureType: AdventureType;
   skipBattle?: boolean;
-  skipReputationEvent?: boolean; // 是否跳过声望事件
+  skipReputationEvent?: boolean; // Whether to skip reputation event
   onReputationEvent?: (event: AdventureResult['reputationEvent']) => void;
-  onPauseAutoAdventure?: () => void; // 暂停自动历练回调（用于天地之魄等特殊事件）
+  onPauseAutoAdventure?: () => void; // Pause auto adventure callback (for Heaven Earth Soul etc.)
 }
 
-// 已移除 ensureEquipmentAttributes 函数
-// 不再调整装备属性，直接使用常量池中的原始属性
+// Removed ensureEquipmentAttributes function
+// No longer adjusting equipment attributes, using raw attributes from constant pool directly
 
 /**
- * 核心玩家状态更新逻辑 (Refactored)
+ * Core Player State Update Logic (Refactored)
  */
 const applyResultToPlayer = (
   prev: PlayerStats,
@@ -88,8 +88,8 @@ const applyResultToPlayer = (
 
   let newInv = [...prev.inventory];
   let newArts = [...prev.cultivationArts];
-  // 使用 Set 确保唯一性，然后转回数组
-  // 修复：初始化 Set 时应包含 prev.unlockedArts，确保之前已解锁的功法不被丢失
+  // Use Set to ensure uniqueness, then convert back to array
+  // Fix: Include prev.unlockedArts when initializing Set to ensure previously unlocked arts are not lost
   const unlockedArtsSet = new Set([...(prev.unlockedArts || []), ...prev.cultivationArts]);
   let newUnlockedArts = Array.from(unlockedArtsSet);
 
@@ -116,7 +116,7 @@ const applyResultToPlayer = (
   if (realmName || isSecretRealm) newStats.secretRealmCount += 1;
   if (battleContext?.victory) newStats.killCount += 1;
 
-  // 灵宠冷却
+  // Pet cooldowns
   if (petSkillCooldowns && prev.activePetId) {
     newPets = newPets.map(p => {
       if (p.id === prev.activePetId) {
@@ -130,19 +130,19 @@ const applyResultToPlayer = (
     });
   }
 
-  // 物品处理逻辑
+  // Item processing logic
   const itemsToProcess = [...(result.itemsObtained || [])];
   if (result.itemObtained) itemsToProcess.push(result.itemObtained);
 
   const currentBatchNames = new Set<string>();
   itemsToProcess.forEach(itemData => {
-    // 修复：提前检查 itemData 是否有效，避免无效数据导致处理失败
+    // Fix: Check if itemData is valid early to avoid processing failure due to invalid data
     if (!itemData || !itemData.name) {
       console.error('Item data is null/undefined or has no name, skipping:', itemData);
       return;
     }
 
-    // 将变量声明移到 try 块外部，以便 catch 块也能访问
+    // Move variable declarations outside try block so catch block can access them
     let itemName = '';
     let itemType = ItemType.Material;
     let itemRarity: ItemRarity = 'Common';
@@ -157,13 +157,13 @@ const applyResultToPlayer = (
       isEquippable = !!itemData.isEquippable;
       equipmentSlot = itemData.equipmentSlot as EquipmentSlot | undefined;
 
-      // 修复：神神秘法宝处理只对普通物品生效，避免高级物品被替换
+      // Fix: Mystery Artifact logic only applies to basic items to avoid replacing advanced items
       const isBasicItem = !(itemData as any).advancedItemType &&
         !(itemData as any).advancedItemId &&
         !(itemData as any).recipeData;
 
       if (isBasicItem && (itemName.includes('Relic') || itemName.includes('Artifact'))) {
-        // 从常量池获取随机法宝
+        // Get random artifact from constant pool
         const artifacts = getAllArtifacts();
         if (artifacts.length > 0) {
           const randomArtifact = artifacts[Math.floor(Math.random() * artifacts.length)];
@@ -171,7 +171,7 @@ const applyResultToPlayer = (
           itemType = randomArtifact.type;
           isEquippable = randomArtifact.isEquippable || true;
           equipmentSlot = (randomArtifact.equipmentSlot as EquipmentSlot) || (Math.random() < 0.5 ? EquipmentSlot.Artifact1 : EquipmentSlot.Artifact2);
-          // 使用常量池中的描述和效果
+          // Use description and effects from constant pool
           if (randomArtifact.description) {
             itemData.description = randomArtifact.description;
           }
@@ -185,7 +185,7 @@ const applyResultToPlayer = (
             itemData.rarity = randomArtifact.rarity;
           }
         } else {
-          // 如果常量池中没有法宝，使用默认处理
+          // If no artifacts in constant pool, use default processing
           itemName = 'Unknown Relic';
           itemType = ItemType.Artifact;
           isEquippable = true;
@@ -440,8 +440,8 @@ const applyResultToPlayer = (
     } else {
       // If no available arts, log debug info
       if (import.meta.env.DEV) {
-        console.log('【功法解锁失败】', {
-          reason: '没有可用的功法',
+        console.log('[Protocol Unlock Failed]', {
+          reason: 'No available protocols',
           availableArtsCount: availableArts.length,
           prevUnlockedArtsCount: prev.unlockedArts?.length || 0,
           prevCultivationArtsCount: prev.cultivationArts?.length || 0,
@@ -450,18 +450,18 @@ const applyResultToPlayer = (
     }
   }
 
-  // 灵宠奖励
+  // Pet Reward
   if (result.petObtained) {
     const template = PET_TEMPLATES.find(t => t.id === result.petObtained);
     if (template) {
-      // 检查是否已拥有该种类的灵宠
+      // Check if already own this species
       const hasPet = newPets.some(p => p.species === template.species);
       if (!hasPet) {
         const newPet: Pet = { id: uid(), name: getRandomPetName(template), species: template.species, level: 1, exp: 0, maxExp: 60, rarity: template.rarity, stats: { ...template.baseStats }, skills: [...template.skills], evolutionStage: 0, affection: 50 };
         newPets.push(newPet);
         newStats.petCount += 1;
-        // 事件描述中已经提到了灵宠（如"你与它建立了联系"），这里不再重复提示
-        // 只在事件描述中没有提到灵宠相关词汇时才添加提示
+        // Event description already mentions pet (e.g., "You bonded with it"), so no duplicate prompt here
+        // Only prompt if event description doesn't mention pet related keywords
         const storyHasPet = result.story && (
           result.story.includes('Mutant') ||
           result.story.includes('Companion') ||
@@ -478,7 +478,7 @@ const applyResultToPlayer = (
     }
   }
 
-  // 灵宠机缘
+  // Pet Opportunity
   if (result.petOpportunity && newPets.length > 0) {
     const targetPetId = result.petOpportunity.petId || prev.activePetId;
     const petIdx = newPets.findIndex(p => p.id === targetPetId);
@@ -509,7 +509,7 @@ const applyResultToPlayer = (
     newPets[petIdx >= 0 ? petIdx : 0] = pet;
   }
 
-  // 属性降低
+  // Attribute Reduction
   if (result.attributeReduction) {
     const r = result.attributeReduction;
     const totalR = (r.attack || 0) + (r.defense || 0) + (r.spirit || 0) + (r.physique || 0) + (r.speed || 0) + (r.maxHp || 0);
@@ -523,7 +523,7 @@ const applyResultToPlayer = (
     if (r.physique) newPhysique = Math.max(0, newPhysique - Math.floor(Math.min(r.physique * scale, prev.physique * 0.1)));
     if (r.speed) newSpeed = Math.max(0, newSpeed - Math.floor(Math.min(r.speed * scale, prev.speed * 0.1)));
     if (r.maxHp) {
-      // 使用实际最大血量（包含金丹法数加成等）进行计算
+      // Use actual max HP (including bonuses) for calculation
       const totalStats = getPlayerTotalStats(prev);
       const actualMaxHp = totalStats.maxHp;
       const red = Math.floor(Math.min(r.maxHp * scale, actualMaxHp * 0.1));
@@ -556,7 +556,7 @@ const applyResultToPlayer = (
     addLog(`🎁 Found Mutant Evolution Material: 【${m.name}】!`, 'gain');
   }
 
-  // 进阶物品获取逻辑（改为添加到背包）
+  // Advanced item acquisition logic (changed to add to inventory)
   const currentRealmIndex = REALM_ORDER.indexOf(prev.realm);
 
   // Pre-War Artifacts: Scavenger/Wastelander stages
@@ -688,23 +688,23 @@ const applyResultToPlayer = (
     }
   }
 
-  // 天地之魄挑战胜利：给予对应天地之魄功法（作为进阶物品显示）
+  // Victory in Heaven Earth Soul challenge: grant corresponding Heaven Earth Soul Art (displayed as advanced item)
   if (adventureType === 'dao_combining_challenge' && battleContext?.victory && battleContext?.bossId) {
     const bossId = battleContext.bossId;
     const boss = HEAVEN_EARTH_SOUL_BOSSES[bossId];
 
     if (boss) {
-      // 根据bossId查找对应的天地之魄功法
+      // Find corresponding Heaven Earth Soul Art based on bossId
       const soulArt = CULTIVATION_ARTS.find(art =>
         (art as any).isHeavenEarthSoulArt && (art as any).bossId === bossId
       );
 
       if (soulArt && !newUnlockedArts.includes(soulArt.id)) {
-        // 添加到功法解锁列表
+        // Add to unlocked arts list
         newUnlockedArts.push(soulArt.id);
 
-        // 同时作为进阶物品添加到背包（用于在进阶物品中显示）
-        // 注意：功法的 hp 属性需要转换为 permanentEffect 的 maxHp
+        // Also add to inventory as advanced item (for display in advanced items)
+        // Note: Art's hp property needs to be converted to permanentEffect's maxHp
         const permanentEffect: any = {
           attack: soulArt.effects.attack,
           defense: soulArt.effects.defense,
@@ -730,7 +730,7 @@ const applyResultToPlayer = (
           advancedItemId: soulArt.id,
         };
 
-        // 检查是否已存在同名物品
+        // Check if item with same name already exists
         const existingIdx = newInv.findIndex(i => i.name === soulArt.name);
         if (existingIdx >= 0) {
           newInv[existingIdx] = { ...newInv[existingIdx], quantity: newInv[existingIdx].quantity + 1 };
@@ -744,7 +744,7 @@ const applyResultToPlayer = (
     }
   }
 
-  // 抽奖券结算（优先处理事件模板中的抽奖券变化）
+  // Lottery tickets settlement (prioritize changes from event template)
   if (result.lotteryTicketsChange !== undefined) {
     newLotteryTickets = Math.max(0, newLotteryTickets + result.lotteryTicketsChange);
     if (result.lotteryTicketsChange > 0) {
@@ -759,11 +759,11 @@ const applyResultToPlayer = (
     }
   }
 
-  // 传承等级获取（只能通过事件模板获得，不能随机获得）
-  // 如果事件模板中指定了传承等级变化，则应用
+  // Inheritance level acquisition (only via event template, not random)
+  // If event template specifies inheritance level change, apply it
   if ((result.inheritanceLevelChange || 0) > 0) {
     const oldLevel = newInheritanceLevel;
-    // 传承等级每次只能增加1级，最多到4级
+    // Inheritance level increases by 1 each time, up to max 4
     newInheritanceLevel = Math.min(4, newInheritanceLevel + 1);
     if (newInheritanceLevel > oldLevel) {
       addLog(`🌟 You found an Ancient Inheritance! Vault Level increased to ${newInheritanceLevel}!`, 'special');
@@ -774,7 +774,7 @@ const applyResultToPlayer = (
   const lifespanLoss = isSecretRealm ? 1.0 : (riskLevel === 'Low' ? 0.3 : riskLevel === 'Medium' ? 0.6 : riskLevel === 'High' ? 1.0 : riskLevel === 'Extreme' ? 1.5 : 0.4);
   newLifespan = Math.max(0, Math.min(prev.maxLifespan, newLifespan + (result.lifespanChange || 0) - lifespanLoss));
 
-  // 灵根变化
+  // Spiritual Roots change
   if (result.spiritualRootsChange) {
     const src = result.spiritualRootsChange;
     newSpiritualRoots = {
@@ -786,12 +786,12 @@ const applyResultToPlayer = (
     };
   }
 
-  // 修为灵石结算
+  // Cultivation and Spirit Stones settlement
   newExp = Math.max(0, newExp + (result.expChange || 0));
   newStones = Math.max(0, newStones + (result.spiritStonesChange || 0));
 
-  // 计算实际最大血量（包含功法加成等）
-  // 先构建更新后的玩家状态来计算实际最大血量
+  // Calculate actual max HP (including art bonuses etc.)
+  // First build updated player state to calculate actual max HP
   const updatedPlayer = {
     ...prev,
     maxHp: newMaxHp,
@@ -809,15 +809,15 @@ const applyResultToPlayer = (
   const totalStats = getPlayerTotalStats(updatedPlayer);
   const actualMaxHp = totalStats.maxHp;
 
-  // 计算血量变化：直接基于实际最大血量进行计算
-  // 按比例调整当前血量到实际最大血量（如果功法增加了最大血量）
-  const baseMaxHp = newMaxHp || 1; // 避免除零
-  const hpRatio = baseMaxHp > 0 ? newHp / baseMaxHp : 0; // 当前血量比例
-  const adjustedHp = Math.floor(actualMaxHp * hpRatio); // 按比例调整到实际最大血量
+  // Calculate HP change: calculate based directly on actual max HP
+  // Adjust current HP proportionally to actual max HP (if art increased max HP)
+  const baseMaxHp = newMaxHp || 1; // Avoid division by zero
+  const hpRatio = baseMaxHp > 0 ? newHp / baseMaxHp : 0; // Current HP ratio
+  const adjustedHp = Math.floor(actualMaxHp * hpRatio); // Adjust proportionally to actual max HP
 
-  // 应用血量变化，使用实际最大血量作为上限
+  // Apply HP change, use actual max HP as upper limit
   let finalHp = adjustedHp + (result.hpChange || 0);
-  // 限制在 0 到实际最大血量之间
+  // Limit between 0 and actual max HP
   finalHp = Math.max(0, Math.min(actualMaxHp, finalHp));
 
   // Secret realm: Ensure HP is non-negative
@@ -825,8 +825,8 @@ const applyResultToPlayer = (
     finalHp = Math.max(0, finalHp);
   }
 
-  // 同步新学习的功法到解锁列表（确保新学习的功法也在解锁列表中）
-  // 使用 Set 确保唯一性
+  // Sync newly learned arts to unlocked list (ensure newly learned arts are also in unlocked list)
+  // Use Set to ensure uniqueness
   const finalUnlockedArtsSet = new Set(newUnlockedArts);
   newArts.forEach(id => finalUnlockedArtsSet.add(id));
   newUnlockedArts = Array.from(finalUnlockedArtsSet);
@@ -852,34 +852,34 @@ export async function executeAdventureCore({
   if (result.eventColor === 'danger' || adventureType === 'secret_realm') triggerVisual('slash');
 
   // Apply Main Result
-  // 根据 adventureType 判断是否为秘境
+  // Determine if it is a Secret Realm
   const isSecretRealm = adventureType === 'secret_realm';
 
-  // 在应用结果之前，检查是否触发了天地之魄，如果是则立即暂停自动历练
+  // Before applying result, check if Heaven Earth Soul is triggered, if so pause auto adventure immediately
   if ((result.adventureType === 'dao_combining_challenge' || result.heavenEarthSoulEncounter)) {
     onPauseAutoAdventure?.();
   }
 
-  // 处理追杀战斗结果（只有在追杀状态下才处理，正常挑战宗主不在这里处理）
-  // 注意：必须先应用战斗结果（包括血量变化），然后再处理追杀相关的特殊逻辑
+  // Handle Hunt Battle Result (Only handle here if in hunt state, normal sect challenge not handled here)
+  // Note: Must apply battle result (including HP change) first, then handle hunt special logic
   const isHuntBattle = adventureType === 'sect_challenge' &&
     player.sectHuntSectId &&
     player.sectHuntEndTime &&
     player.sectHuntEndTime > Date.now() &&
-    player.sectId === null; // 确保不是在宗门内正常挑战
+    player.sectId === null; // Ensure not challenging inside own sect
 
   if (isHuntBattle && battleContext && battleContext.victory) {
     const huntLevel = player.sectHuntLevel || 0;
     const huntSectId = player.sectHuntSectId;
 
-    // 先应用战斗结果（包括血量变化），然后再更新追杀相关状态
+    // Apply battle result first (including HP change), then update hunt status
     setPlayer((prev) => {
-      // 先应用战斗结果，包括血量变化
+      // Apply battle result first
       const updatedPlayer = applyResultToPlayer(prev, result, { isSecretRealm, adventureType, realmName, riskLevel, battleContext, petSkillCooldowns, addLog, triggerVisual });
 
       if (huntLevel >= 3) {
-        // 战胜宗主，成为宗主
-        // 优先使用保存的宗门名称，否则从SECTS中查找，最后使用ID
+        // Defeated Overseer, become Overseer
+        // Prioritize saved sect name, otherwise find in SECTS, lastly use ID
         let sectName = player.sectHuntSectName;
         if (!sectName) {
           const sect = SECTS.find((s) => s.id === huntSectId);
@@ -892,8 +892,8 @@ export async function executeAdventureCore({
           ...updatedPlayer,
           sectId: huntSectId,
           sectRank: SectRank.Leader,
-          sectMasterId: 'player-leader', // 玩家成为宗主时，设置为玩家标识
-          sectHuntEndTime: null, // 清除追杀状态
+          sectMasterId: 'player-leader', // Set to player ID when becoming leader
+          sectHuntEndTime: null, // Clear hunt status
           sectHuntLevel: 0,
           sectHuntSectId: null,
           sectHuntSectName: null,
@@ -903,7 +903,7 @@ export async function executeAdventureCore({
         // Defeated disciples/elders, increase hunt intensity
         const newHuntLevel = Math.min(3, huntLevel + 1);
         const levelNames = ['Recruit', 'Veteran', 'Paladin', 'Overseer'];
-        // 优先使用保存的宗门名称，否则从SECTS中查找，最后使用ID
+        // Prioritize saved sect name, otherwise find in SECTS, lastly use ID
         let sectName = player.sectHuntSectName;
         if (!sectName) {
           const sect = SECTS.find((s) => s.id === huntSectId);
@@ -919,7 +919,7 @@ export async function executeAdventureCore({
       }
     });
   } else {
-    // 非追杀战斗或非胜利情况，直接应用结果（包括血量变化）
+    // Non-hunt battle or non-victory, apply result directly (including HP change)
     setPlayer(prev => applyResultToPlayer(prev, result, { isSecretRealm, adventureType, realmName, riskLevel, battleContext, petSkillCooldowns, addLog, triggerVisual }));
   }
 
@@ -949,7 +949,7 @@ export async function executeAdventureCore({
     }
   }
 
-  // 确保事件描述被添加到日志
+  // Ensure event description is added to log
   if (result.story && result.story.trim()) {
     addLog(result.story, result.eventColor || 'normal');
   } else {
@@ -975,7 +975,7 @@ export async function executeAdventureCore({
   const items = [...(result.itemsObtained || [])]; if (result.itemObtained) items.push(result.itemObtained);
   items.forEach(i => { if (i?.name) addLog(`Gained: ${normalizeRarityValue(i.rarity) ? `【${normalizeRarityValue(i.rarity)}】` : ''}${i.name}`, 'gain'); });
 
-  // 战斗弹窗延迟2秒后打开（如果跳过了战斗则不打开弹窗）
+  // Battle modal delayed opening (if not skipped)
   if (battleContext && !skipBattle) {
     setTimeout(() => {
       onOpenBattleModal(battleContext);
@@ -990,7 +990,7 @@ export async function executeAdventureCore({
       const srTemplate = getRandomEventTemplate('secret_realm', undefined, player.realm, player.realmLevel);
 
       if (srTemplate) {
-        // 使用实际最大血量（包含金丹法数加成等）
+        // Use actual max HP (including bonuses)
         const totalStats = getPlayerTotalStats(player);
         const srResult = templateToAdventureResult(srTemplate, {
           realm: player.realm,

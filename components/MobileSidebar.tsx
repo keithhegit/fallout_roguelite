@@ -27,7 +27,7 @@ interface Props {
   achievementCount?: number;
   petCount?: number;
   lotteryTickets?: number;
-  player?: PlayerStats; // 用于显示洞府等级
+  player?: PlayerStats; // Used to display grotto level
 }
 
 const MobileSidebar: React.FC<Props> = ({

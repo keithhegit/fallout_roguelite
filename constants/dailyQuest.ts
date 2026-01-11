@@ -66,23 +66,23 @@ export const DAILY_QUEST_CONFIGS: Partial<Record<DailyQuestType, Omit<DailyQuest
   },
 };
 
-// 任务目标数量范围（根据类型）
+// Task target quantity range (based on type)
 export const DAILY_QUEST_TARGET_RANGES: Record<DailyQuestType, { min: number; max: number }> = {
-  meditate: { min: 3, max: 8 }, // 打坐：3-8次，比较轻松
-  adventure: { min: 3, max: 10 }, // 历练：3-10次，适中
-  breakthrough: { min: 0, max: 1 }, // 境界突破：0-1次（0表示不出现，1表示最多1次），因为突破需要积累修为
-  alchemy: { min: 2, max: 6 }, // 炼丹：2-6次，适中
-  equip: { min: 1, max: 3 }, // 装备强化：1-3次，适中
-  pet: { min: 1, max: 3 }, // 灵宠培养：1-3次，适中
-  sect: { min: 2, max: 5 }, // 宗门任务：2-5次，适中
-  realm: { min: 1, max: 3 }, // 秘境探索：1-3次，适中
-  kill: { min: 5, max: 20 }, // 击败敌人：5-20次（AI生成）
-  collect: { min: 3, max: 10 }, // 收集物品：3-10次（AI生成）
-  learn: { min: 1, max: 3 }, // 学习功法：1-3次（AI生成）
-  other: { min: 1, max: 5 }, // 其他任务：1-5次（AI生成）
+  meditate: { min: 3, max: 8 }, // Meditation: 3-8 times, relatively easy
+  adventure: { min: 3, max: 10 }, // Adventure: 3-10 times, moderate
+  breakthrough: { min: 0, max: 1 }, // Realm Breakthrough: 0-1 times (0 means not appearing, 1 means max 1 time), as breakthrough requires accumulating Exp
+  alchemy: { min: 2, max: 6 }, // Alchemy: 2-6 times, moderate
+  equip: { min: 1, max: 3 }, // Equipment Enhancement: 1-3 times, moderate
+  pet: { min: 1, max: 3 }, // Pet Training: 1-3 times, moderate
+  sect: { min: 2, max: 5 }, // Sect Task: 2-5 times, moderate
+  realm: { min: 1, max: 3 }, // Secret Realm Exploration: 1-3 times, moderate
+  kill: { min: 5, max: 20 }, // Defeat Enemies: 5-20 times (AI generated)
+  collect: { min: 3, max: 10 }, // Collect Items: 3-10 times (AI generated)
+  learn: { min: 1, max: 3 }, // Learn Arts: 1-3 times (AI generated)
+  other: { min: 1, max: 5 }, // Other Tasks: 1-5 times (AI generated)
 };
 
-// 根据稀有度计算奖励
+// Calculate rewards based on rarity
 export const calculateDailyQuestReward = (
   type: DailyQuestType,
   target: number,
@@ -96,7 +96,7 @@ export const calculateDailyQuestReward = (
   const rarityMultiplier = RARITY_MULTIPLIERS[rarity];
   const baseReward = target * config.rewardMultiplier * rarityMultiplier;
 
-  // 根据任务类型分配奖励
+  // Allocate rewards based on task type
   switch (type) {
     case 'meditate':
       return {
@@ -159,13 +159,13 @@ export const generateDailyQuestRarity = (): ItemRarity => {
   return 'Mythic';
 };
 
-// 30个预定义的日常任务模板
+// 30 Predefined Daily Quest Templates
 export interface PredefinedDailyQuest {
   type: DailyQuestType;
   name: string;
   description: string;
   targetRange: { min: number; max: number };
-  rarity: ItemRarity; // 固定稀有度
+  rarity: ItemRarity; // Fixed rarity
 }
 
 export const PREDEFINED_DAILY_QUESTS: PredefinedDailyQuest[] = [

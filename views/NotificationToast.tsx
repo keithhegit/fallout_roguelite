@@ -7,9 +7,9 @@ interface PurchaseSuccessProps {
 }
 /**
  *
- * @param item 物品名称
- * @param quantity 物品数量
- * 购买成功弹窗
+ * @param item Item Name
+ * @param quantity Item Quantity
+ * Purchase Success Toast
  * @returns
  */
 export function PurchaseSuccessToast({ item, quantity }: PurchaseSuccessProps) {
@@ -19,9 +19,9 @@ export function PurchaseSuccessToast({ item, quantity }: PurchaseSuccessProps) {
         <div className="flex items-center gap-3">
           <span className="text-2xl">✓</span>
           <div>
-            <div className="font-bold text-lg">购买成功！</div>
+            <div className="font-bold text-lg">Purchase Successful!</div>
             <div className="text-sm">
-              获得 {item} x{quantity}
+              Obtained {item} x{quantity}
             </div>
           </div>
         </div>
@@ -35,8 +35,8 @@ interface ItemActionToastProps {
 }
 
 /**
- * 物品使用/装备后的轻提示组件
- * 显示与LogPanel相同格式的内容
+ * Item use/equip toast component
+ * Displays content in the same format as LogPanel
  */
 export function ItemActionToast({ log }: ItemActionToastProps) {
   if (!log) return null;
@@ -47,9 +47,9 @@ export function ItemActionToast({ log }: ItemActionToastProps) {
       case 'normal':
         return `${baseClass} border-stone-600 text-stone-300 bg-ink-800/90`;
       case 'gain':
-        return `${baseClass} border-mystic-jade text-emerald-100 bg-emerald-900/90`;
+        return `${baseClass} border-emerald-500 text-emerald-100 bg-emerald-900/90`;
       case 'danger':
-        return `${baseClass} border-mystic-blood text-red-100 bg-red-900/90`;
+        return `${baseClass} border-red-600 text-red-100 bg-red-900/90`;
       case 'special':
         return `${baseClass} border-amber-500 text-amber-100 bg-amber-900/90`;
       default:
@@ -95,9 +95,9 @@ export function LotteryRewardsToast({ rewards, onClose }: LotteryRewardsProps) {
 
           <div className="text-center">
             <div className="text-2xl font-serif text-amber-400 font-bold tracking-widest">
-              机缘到手
+              Fortune Obtained
             </div>
-            <div className="text-stone-400 text-sm mt-1">恭喜道友获得以下宝物</div>
+            <div className="text-stone-400 text-sm mt-1">You obtained the following treasures</div>
           </div>
 
           <div className="w-full space-y-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
@@ -123,7 +123,7 @@ export function LotteryRewardsToast({ rewards, onClose }: LotteryRewardsProps) {
           <div className="w-full h-px bg-gradient-to-r from-transparent via-stone-600 to-transparent" />
 
           <div className="text-stone-500 text-xs animate-pulse">
-            点击空白处关闭
+            Click empty space to close
           </div>
         </div>
       </div>

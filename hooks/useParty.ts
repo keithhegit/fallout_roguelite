@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
 import PartySocket from 'partysocket';
 
-// 智能检测PartyKit服务器地址
-// 开发环境：使用当前访问的hostname + 1999端口（支持localhost和IP地址访问）
-// 生产环境：使用环境变量或默认的远程服务器
+// Smartly detect PartyKit server address
+// Dev: Use current hostname + 1999 port (supports localhost and IP access)
+// Prod: Use env var or default remote server
 const getPartyKitHost = () => {
   if (import.meta.env.DEV) {
-    // 开发环境：使用当前页面的hostname，这样IP访问时也能正确连接
+    // Dev: Use current page hostname to support IP access
     const hostname = window.location.hostname;
     return `${hostname}:1999`;
   } else {
-    // 生产环境：使用配置的远程服务器
+    // Prod: Use configured remote server
     return import.meta.env.VITE_PARTYKIT_HOST;
   }
 };
 
 const PARTYKIT_HOST = getPartyKitHost();
 
-// 全局状态管理
+// Global state management
 let globalSocket: PartySocket | null = null;
 let messageListeners: ((data: any) => void)[] = [];
 let onlineCountListeners: ((count: number) => void)[] = [];
@@ -36,27 +36,27 @@ function setupGlobalConnection(roomName: string) {
     try {
       const data = JSON.parse(event.data);
 
-      // 处理在线人数更新
+      // Handle online count update
       if (data.type === 'onlineCountUpdate') {
         currentOnlineCount = data.onlineCount;
         onlineCountListeners.forEach((listener) =>
           listener(currentOnlineCount)
         );
       } else if (data.type === 'welcome') {
-        // 欢迎消息包含初始在线人数
+        // Welcome message contains initial online count
         currentOnlineCount = data.onlineCount || 0;
         onlineCountListeners.forEach((listener) =>
           listener(currentOnlineCount)
         );
 
-        // 同时触发消息监听器
+        // Trigger message listeners as well
         messageListeners.forEach((listener) => listener(data));
       } else {
-        // 普通消息
+        // Normal message
         messageListeners.forEach((listener) => listener(data));
       }
     } catch (e) {
-      // 非JSON消息
+      // Non-JSON message
       messageListeners.forEach((listener) => listener(event.data));
     }
   };
@@ -79,7 +79,7 @@ export function useParty(roomName: string = 'main', limit: number = 150) {
     }
     setSocket(s);
 
-    // 添加消息监听器
+    // Add message listener
     const messageListener = (data: any) => {
       setMessages((prev) => {
         const newMessages = [...prev, data];
@@ -87,7 +87,7 @@ export function useParty(roomName: string = 'main', limit: number = 150) {
       });
     };
 
-    // 添加在线人数监听器
+    // Add online count listener
     const onlineCountListener = (count: number) => {
       setOnlineCount(count);
     };
@@ -95,7 +95,7 @@ export function useParty(roomName: string = 'main', limit: number = 150) {
     messageListeners.push(messageListener);
     onlineCountListeners.push(onlineCountListener);
 
-    // 设置初始在线人数
+    // Set initial online count
     setOnlineCount(currentOnlineCount);
 
     return () => {

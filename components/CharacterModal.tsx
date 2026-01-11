@@ -47,7 +47,7 @@ interface Props {
   addLog?: (message: string, type?: string) => void;
 }
 
-// HoverableCard 组件 - 带 tooltip 的卡片
+// HoverableCard Component - Card with tooltip
 const HoverableCard: React.FC<{
   children: React.ReactNode;
   tooltipContent: React.ReactNode;
@@ -119,12 +119,12 @@ const HoverableCard: React.FC<{
             left: `${position.left}px`,
           }}
         >
-          {/* 背景纹理层 */}
+          {/* Background texture layer */}
           <div 
             className="absolute inset-0 opacity-[0.03] pointer-events-none" 
             style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
           />
-          {/* CRT 扫描线效果 */}
+          {/* CRT scanline effect */}
           <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50" />
           
           <div className="relative z-10">
@@ -203,9 +203,9 @@ const Tooltip: React.FC<{
         left: `${position.left}px`,
       }}
     >
-      {/* 背景纹理层 */}
+      {/* Background texture layer */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-      {/* CRT 扫描线效果 */}
+      {/* CRT scanline effect */}
       <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
       <div className="relative z-10">
         {children}
@@ -263,7 +263,7 @@ const CharacterModal: React.FC<Props> = ({
           const seed = (hash % 1000) / 1000; // 0-1 stable value
 
           const rarity = item.rarity || 'Common';
-          const baseProgress = (rarity === 'Common' || rarity === '普通') ? 1.5 : (rarity === 'Rare' || rarity === '稀有') ? 4 : (rarity === 'Legendary' || rarity === '传说') ? 8 : 20;
+          const baseProgress = (rarity === 'Common') ? 1.5 : (rarity === 'Rare') ? 4 : (rarity === 'Legendary') ? 8 : 20;
           // Use stable seed instead of Math.random() for consistent value
           cache[item.id] = Math.floor(baseProgress * (0.8 + seed * 0.4)); // 80%-120% variance
         });
@@ -273,7 +273,7 @@ const CharacterModal: React.FC<Props> = ({
   const currentTalent = TALENTS.find((t) => t.id === player.talentId);
   const currentTitle = TITLES.find((t) => t.id === player.titleId);
 
-  // 检查称号是否满足解锁条件
+  // Check if title meets unlock requirements
   const checkTitleRequirement = useCallback(
     (title: Title, player: PlayerStats): boolean => {
       const requirement = title.requirement.toLowerCase();
@@ -523,7 +523,7 @@ const CharacterModal: React.FC<Props> = ({
       secretRealmCount: 0,
     };
 
-    // 计算额外统计数据
+    // Calculate extra statistics
     const totalInventoryItems = player.inventory.reduce(
       (sum, item) => sum + item.quantity,
       0
@@ -597,12 +597,12 @@ const CharacterModal: React.FC<Props> = ({
     const attributeName = attributeNames[type];
     const points = player.attributePoints;
     const realmIndex = REALM_ORDER.indexOf(player.realm);
-    // 确保realmIndex有效，防止NaN
+    // Ensure realmIndex is valid to prevent NaN
     const validRealmIndex = realmIndex >= 0 ? realmIndex : 0;
-    // 与useCharacterHandlers.ts保持一致：线性增长
-    const multiplier = 1 + validRealmIndex * 2; // 炼气期1倍，渡劫飞升13倍
+    // Consistent with useCharacterHandlers.ts: linear growth
+    const multiplier = 1 + validRealmIndex * 2; // Scavenger 1x, Apex 13x
 
-    // 计算总增加值
+    // Calculate total gain
     let totalGain = 0;
     let totalPhysiqueGain = 0;
     let totalHpGain = 0;
@@ -628,7 +628,7 @@ const CharacterModal: React.FC<Props> = ({
         : `+${totalGain}`;
 
     showConfirm(
-      `Are you sure you want to allocate all ${points} points to 【${attributeName}】?
+      `Are you sure you want to allocate all ${points} points to [${attributeName}]?
  
  Predicted Gain: ${gainText}
  
@@ -648,19 +648,19 @@ const CharacterModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="bg-ink-950 rounded-none border-0 md:border border-stone-800 shadow-2xl w-full h-[80vh] md:h-auto md:max-w-2xl md:max-h-[90vh] flex flex-col overflow-hidden font-mono relative"
+        className="bg-stone-950 rounded-none border-0 md:border border-amber-500/30 shadow-2xl w-full h-[80vh] md:h-auto md:max-w-2xl md:max-h-[90vh] flex flex-col overflow-hidden font-mono relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background texture layer */}
         <div 
           className="absolute inset-0 opacity-[0.03] pointer-events-none" 
           style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
         />
-        {/* CRT 扫描线效果 */}
+        {/* CRT scanline effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50" />
         <div className="absolute inset-0 bg-crt-noise opacity-[0.02] pointer-events-none z-50" />
         
-        <div className="p-3 md:p-4 border-b border-stone-800 bg-ink-950 flex justify-between items-center relative z-10">
+        <div className="p-3 md:p-4 border-b border-amber-500/30 bg-stone-950 flex justify-between items-center relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 bg-amber-500 animate-pulse"></div>
             <h2 className="text-lg md:text-xl font-mono text-amber-400 uppercase tracking-[0.2em]">
@@ -669,7 +669,7 @@ const CharacterModal: React.FC<Props> = ({
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center text-stone-500 hover:text-red-500 hover:bg-red-950/10 transition-all border border-stone-800 hover:border-red-900/50 relative group overflow-hidden"
+            className="w-10 h-10 flex items-center justify-center text-stone-500 hover:text-red-500 hover:bg-red-950/10 transition-all border border-amber-500/30 hover:border-red-500/50 relative group overflow-hidden"
             aria-label="CLOSE"
           >
             <div 
@@ -680,11 +680,11 @@ const CharacterModal: React.FC<Props> = ({
           </button>
         </div>
         {/* Tab Switcher */}
-        <div className="flex border-b border-stone-800 bg-ink-950 relative z-10">
+        <div className="flex border-b border-amber-500/30 bg-stone-950 relative z-10">
           <button
             onClick={() => setActiveTab('character')}
-            className={`flex-1 px-4 py-3 text-xs font-bold transition-all uppercase tracking-[0.2em] border-r border-stone-800/50 relative group overflow-hidden ${activeTab === 'character'
-              ? 'bg-stone-900/50 text-amber-400'
+            className={`flex-1 px-4 py-3 text-xs font-bold transition-all uppercase tracking-[0.2em] border-r border-amber-500/30 relative group overflow-hidden ${activeTab === 'character'
+              ? 'bg-stone-900/80 text-amber-400'
               : 'text-stone-600 hover:text-stone-400 hover:bg-stone-900/30'
               }`}
           >
@@ -743,7 +743,7 @@ const CharacterModal: React.FC<Props> = ({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
-                  {/* 筑基奇物 */}
+                  {/* Foundation Treasure */}
                   {player.foundationTreasure ? (() => {
                     const treasure = FOUNDATION_TREASURES[player.foundationTreasure];
                     const effects = treasure?.effects || {};
@@ -1603,7 +1603,7 @@ const CharacterModal: React.FC<Props> = ({
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-3">
-                          <span className={`text-lg font-mono uppercase tracking-[0.2em] ${getRarityTextColor((currentTitle.rarity || '普通') as ItemRarity)}`}>
+                          <span className={`text-lg font-mono uppercase tracking-[0.2em] ${getRarityTextColor((currentTitle.rarity || 'Common') as ItemRarity)}`}>
                             {currentTitle.name}
                           </span>
                           {currentTitle.rarity && (
@@ -1695,7 +1695,7 @@ const CharacterModal: React.FC<Props> = ({
                               <div className="flex justify-between items-center">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-3 mb-2">
-                                    <span className={`text-sm font-mono uppercase tracking-widest ${getRarityTextColor((title.rarity || '普通') as ItemRarity)}`}>
+                                    <span className={`text-sm font-mono uppercase tracking-widest ${getRarityTextColor((title.rarity || 'Common') as ItemRarity)}`}>
                                       {title.name}
                                     </span>
                                     {isEquipped && (
@@ -1746,7 +1746,7 @@ const CharacterModal: React.FC<Props> = ({
                                 className={`bg-ink-950/50 rounded-none p-4 border font-mono transition-all ${isMet ? 'border-emerald-900/50 opacity-100' : 'border-stone-900/50 opacity-40'}`}
                               >
                                 <div className="flex items-center justify-between mb-2">
-                                  <span className={`text-xs font-mono uppercase tracking-widest ${getRarityTextColor((title.rarity || '普通') as ItemRarity)}`}>
+                                  <span className={`text-xs font-mono uppercase tracking-widest ${getRarityTextColor((title.rarity || 'Common') as ItemRarity)}`}>
                                     {title.name}
                                   </span>
                                   {isMet && (
@@ -2047,7 +2047,7 @@ const CharacterModal: React.FC<Props> = ({
                     return !isEquipped && item.quantity > 0;
                   })
                   .map((item) => {
-                    const rarity = item.rarity || '普通';
+                    const rarity = item.rarity || 'Common';
                     const progressGain = itemProgressCache[item.id] || 0;
 
                     return (

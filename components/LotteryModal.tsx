@@ -20,7 +20,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
   const [customCountInput, setCustomCountInput] = useState<string>('');
   const drawTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 将输入值转换为数字，空字符串时返回0
+  // Convert input value to number, return 0 if empty string
   const customCount = customCountInput === '' ? 0 : parseInt(customCountInput, 10) || 0;
 
   // Listen for changes in ticket count to update display and adjust custom draw count
@@ -36,7 +36,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player.lotteryTickets]);
 
-  // 清理定时器
+  // Clear timer
   useEffect(() => {
     return () => {
       if (drawTimeoutRef.current) {
@@ -57,7 +57,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
       return;
     }
 
-    // 清理之前的定时器
+    // Clear previous timer
     if (drawTimeoutRef.current) {
       clearTimeout(drawTimeoutRef.current);
     }
@@ -65,27 +65,27 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
     setIsDrawing(true);
     setLastResult(null);
 
-    // 抽奖动画持续时间（根据抽奖次数调整，但不超过5秒）
+    // Draw animation duration (adjusted by draw count, max 5 seconds)
     const drawDuration = Math.min(2500 + (count - 1) * 200, 5000);
 
-    // 模拟抽奖动画
+    // Simulate draw animation
     drawTimeoutRef.current = setTimeout(() => {
       setIsDrawing(false);
       onDraw(count);
-      // 这里应该从实际抽奖结果中获取，暂时用空数组
+      // Should get actual draw results here, temporarily use empty array
       setLastResult([]);
       drawTimeoutRef.current = null;
     }, drawDuration);
   };
 
-  // 渲染抽奖动画遮罩
+  // Render drawing overlay
   const renderDrawingOverlay = () => {
     if (!isDrawing) return null;
 
     return (
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 animate-in fade-in duration-500">
         <div className="relative w-64 h-64 flex items-center justify-center">
-          {/* 八卦阵背景 */}
+          {/* Bagua array background */}
           <div className="absolute inset-0 border-4 border-amber-500/20 rounded-full animate-bagua flex items-center justify-center">
             <div className="w-[90%] h-[90%] border-2 border-amber-500/10 rounded-full border-dashed" />
             <div className="absolute inset-0 flex items-center justify-center opacity-20">
@@ -93,7 +93,7 @@ const LotteryModal: React.FC<LotteryModalProps> = ({ isOpen, onClose, player, on
             </div>
           </div>
 
-          {/* 灵气汇聚粒子 */}
+          {/* Spirit gathering particles */}
           {[...Array(12)].map((_, i) => (
             <div
               key={i}

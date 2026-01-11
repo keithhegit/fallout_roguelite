@@ -16,6 +16,8 @@ import {
   RealmType,
   RiskLevel,
 } from '../types';
+import BattleLog from './BattleLog';
+import CombatVisuals, { VisualEffect } from './CombatVisuals';
 import {
   executePlayerAction,
   executeEnemyTurn,
@@ -32,8 +34,8 @@ interface TurnBasedBattleModalProps {
   adventureType: 'normal' | 'lucky' | 'secret_realm' | 'sect_challenge' | 'dao_combining_challenge';
   riskLevel?: RiskLevel;
   realmMinRealm?: RealmType;
-  bossId?: string; // 指定的天地之魄BOSS ID（用于事件模板）
-  autoAdventure?: boolean; // 是否在自动历练模式下
+  bossId?: string; // Specified Heaven Earth Essence BOSS ID (for event template)
+  autoAdventure?: boolean; // Whether in auto-adventure mode
   onClose: (
     result?: {
       victory: boolean;
@@ -51,7 +53,7 @@ interface TurnBasedBattleModalProps {
         effect?: any;
         permanentEffect?: any;
       }>;
-      petSkillCooldowns?: Record<string, number>; // 灵宠技能冷却状态
+      petSkillCooldowns?: Record<string, number>; // Pet skill cooldown status
     },
     updatedInventory?: Item[]
   ) => void;
@@ -73,13 +75,71 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
   const [showAdvancedItems, setShowAdvancedItems] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  // 使用 ref 来创建一个更可靠的锁，防止在状态更新期间重复点击（同步检查）
-  const isActionLockedRef = useRef(false);
-  // 使用状态来触发重新渲染，确保按钮禁用状态正确更新
+  const [visualEffects, setVisualEffects] = useState<VisualEffect[]>([]);
+  const lastProcessedActionIdRef = useRef<string | null>(null);
 
-  // 初始化战斗 - 使用 ref 防止重复初始化
+  // Watch for new history items to trigger visual effects
+  useEffect(() => {
+    if (!battleState?.history?.length) return;
+    const lastAction = battleState.history[battleState.history.length - 1];
+    
+    if (lastAction.id === lastProcessedActionIdRef.current) return;
+    lastProcessedActionIdRef.current = lastAction.id;
+
+    const newEffects: VisualEffect[] = [];
+    
+    if (lastAction.result.damage && lastAction.result.damage > 0) {
+      // Determine target for positioning
+      // If turn is 'player', player attacked, so enemy takes damage (isPlayer=false)
+      // If turn is 'enemy', enemy attacked, so player takes damage (isPlayer=true)
+      const isPlayerTakingDamage = lastAction.turn === 'enemy';
+
+      newEffects.push({
+        id: `dmg-${lastAction.id}`,
+        type: lastAction.result.crit ? 'crit' : 'damage',
+        value: lastAction.result.crit ? 'CRIT!' : `-${lastAction.result.damage}`,
+        // Color: Red if player takes damage, Amber if enemy takes damage
+        color: isPlayerTakingDamage ? 'text-red-500' : 'text-amber-400',
+        isPlayer: isPlayerTakingDamage
+      });
+      
+      if (lastAction.result.crit) {
+          // Add specific crit damage number if crit text is separate
+          newEffects.push({
+            id: `crit-dmg-${lastAction.id}`,
+            type: 'damage',
+            value: `-${lastAction.result.damage}`,
+            color: isPlayerTakingDamage ? 'text-red-600' : 'text-yellow-400',
+            isPlayer: isPlayerTakingDamage
+          });
+      }
+    }
+    
+    if (lastAction.result.miss) {
+        const isPlayerTakingDamage = lastAction.turn === 'enemy';
+        newEffects.push({
+            id: `miss-${lastAction.id}`,
+            type: 'miss',
+            value: 'MISS',
+            isPlayer: isPlayerTakingDamage
+        });
+    }
+
+    if (newEffects.length > 0) {
+      setVisualEffects(prev => [...prev, ...newEffects]);
+      setTimeout(() => {
+        setVisualEffects(prev => prev.filter(e => !newEffects.find(ne => ne.id === e.id)));
+      }, 2000);
+    }
+  }, [battleState?.history]);
+
+  // Use ref to create a more reliable lock to prevent duplicate clicks during state updates (synchronous check)
+  const isActionLockedRef = useRef(false);
+  // Use state to trigger re-render, ensuring button disabled state updates correctly
+
+  // Initialize battle - Use ref to prevent duplicate initialization
   const isInitializedRef = useRef(false);
-  // 用于跟踪初始化是否已超时
+  // Track if initialization has timed out
   const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasInitTimedOutRef = useRef(false);
 
@@ -87,9 +147,9 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     if (isOpen && !battleState && !isInitializedRef.current) {
       isInitializedRef.current = true;
       isActionLockedRef.current = false;
-      setIsProcessing(true); // 初始化时设置为处理中
+      setIsProcessing(true); // Set to processing during initialization
 
-      // 重置超时标志
+      // Reset timeout flag
       hasInitTimedOutRef.current = false;
 
       // Add initialization timeout protection (10s)
@@ -100,7 +160,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           setErrorMessage('Combat initialization timeout, please retry');
           setIsProcessing(false);
           isActionLockedRef.current = false;
-          isInitializedRef.current = false; // 允许重试
+          isInitializedRef.current = false; // Allow retry
           initTimeoutRef.current = null;
           setTimeout(() => setErrorMessage(null), 3000);
         }
@@ -116,7 +176,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
       )
         .then((state) => {
           if (hasInitTimedOutRef.current || !isInitializedRef.current) {
-            // 如果已超时，忽略结果
+            // If timed out, ignore result
             if (initTimeoutRef.current) {
               clearTimeout(initTimeoutRef.current);
               initTimeoutRef.current = null;
@@ -128,12 +188,12 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
             initTimeoutRef.current = null;
           }
           setBattleState(state);
-          setIsProcessing(false); // 初始化完成后重置
+          setIsProcessing(false); // Reset after initialization complete
           isActionLockedRef.current = false;
         })
         .catch((error) => {
           if (hasInitTimedOutRef.current || !isInitializedRef.current) {
-            // 如果已超时，忽略错误
+            // If timed out, ignore error
             if (initTimeoutRef.current) {
               clearTimeout(initTimeoutRef.current);
               initTimeoutRef.current = null;
@@ -148,11 +208,11 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           setErrorMessage('Combat initialization failed');
           setIsProcessing(false);
           isActionLockedRef.current = false;
-          isInitializedRef.current = false; // 初始化失败，允许重试
+          isInitializedRef.current = false; // Initialization failed, allow retry
           setTimeout(() => setErrorMessage(null), 3000);
         });
     } else if (!isOpen && battleState) {
-      // 关闭时重置所有状态
+      // Reset all state on close
       if (initTimeoutRef.current) {
         clearTimeout(initTimeoutRef.current);
         initTimeoutRef.current = null;
@@ -170,23 +230,23 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     }
   }, [isOpen, player, adventureType, riskLevel, realmMinRealm, bossId]);
 
-  // 监控状态，确保操作栏能正确显示（防止 isProcessing 卡住）
+  // Monitor state to ensure action bar displays correctly (prevent isProcessing stuck)
   useEffect(() => {
     if (!battleState) return;
 
-    // 如果应该是玩家回合但 isProcessing 被卡住，自动重置
+    // If it should be player turn but isProcessing is stuck, auto reset
     if (
       battleState.waitingForPlayerAction &&
       battleState.playerActionsRemaining > 0 &&
       isProcessing
     ) {
-      // 检查是否真的在处理中（通过检查是否有正在进行的异步操作）
-      // 如果超过2秒还在处理中，可能是卡住了，自动重置
+      // Check if really processing (by checking for ongoing async operations)
+      // If processing for more than 2 seconds, might be stuck, auto reset
       const timeout = setTimeout(() => {
         setIsProcessing((prev) => {
-          // 只有在仍然是处理中且仍然是玩家回合时才重置
+          // Only reset if still processing and still player turn
           if (prev && battleState?.waitingForPlayerAction) {
-            console.warn('检测到 isProcessing 可能卡住，自动重置');
+            console.warn('Detected isProcessing stuck, auto-resetting');
             return false;
           }
           return prev;
@@ -197,14 +257,14 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     }
   }, [battleState?.waitingForPlayerAction, battleState?.playerActionsRemaining, isProcessing]);
 
-  // 如果是敌方先手，自动驱动敌人行动，避免界面没有操作栏
-  // 使用 useRef 存储最新的 onClose，避免依赖项变化导致频繁触发
+  // If enemy goes first, auto drive enemy action to avoid missing action bar
+  // Use useRef to store latest onClose to avoid frequent triggers due to dependency changes
   const onCloseRef = useRef(onClose);
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  // 使用 ref 跟踪是否正在处理敌人回合，避免重复触发
+  // Use ref to track if processing enemy turn to avoid duplicate triggers
   const isProcessingEnemyTurnRef = useRef(false);
 
   useEffect(() => {
@@ -213,7 +273,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
       battleState.waitingForPlayerAction ||
       battleState.enemyActionsRemaining <= 0
     ) {
-      // 如果应该是玩家回合但没有操作栏，确保 isProcessing 被重置
+      // If it should be player turn but no action bar, ensure isProcessing is reset
       if (battleState?.waitingForPlayerAction && isProcessing) {
         setIsProcessing(false);
       }
@@ -221,7 +281,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
       return;
     }
 
-    // 避免多次触发：使用 ref 检查是否正在处理
+    // Avoid multiple triggers: use ref to check if processing
     if (isProcessingEnemyTurnRef.current || isProcessing) {
       return;
     }
@@ -229,13 +289,13 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     isProcessingEnemyTurnRef.current = true;
     setIsProcessing(true);
 
-    // 使用更短的延迟，让界面更新更快
+    // Use shorter delay for faster UI updates
     const timer = setTimeout(() => {
       try {
         let newState = executeEnemyTurn(battleState);
 
-        // 如果玩家行动次数为0（速度太慢），继续执行敌人回合直到玩家可以行动或战斗结束
-        // executeEnemyTurn 已经处理了这种情况，但为了安全起见，这里再检查一次
+        // If player action count is 0 (too slow), continue enemy turn until player can act or battle ends
+        // executeEnemyTurn already handles this, but check again for safety
         let safety = 0;
         while (
           newState.waitingForPlayerAction &&
@@ -243,7 +303,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           !checkBattleEnd(newState) &&
           safety < 10
         ) {
-          // 玩家无法行动，立即切换回敌人回合（executeEnemyTurn 应该已经处理，但以防万一）
+          // Player cannot act, switch back to enemy turn immediately (executeEnemyTurn should have handled this, but just in case)
           if (newState.enemyActionsRemaining <= 0) {
             newState.waitingForPlayerAction = false;
             newState.turn = 'enemy';
@@ -253,7 +313,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           safety += 1;
         }
 
-        // 战斗结束立即结算并回调
+        // Battle ended, settle immediately and callback
         if (checkBattleEnd(newState)) {
           const victory = newState.enemy.hp <= 0;
           const hpLoss = player.hp - newState.player.hp;
@@ -274,7 +334,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           }
           isProcessingEnemyTurnRef.current = false;
           setIsProcessing(false);
-          isActionLockedRef.current = false; // 释放锁
+          isActionLockedRef.current = false; // Release lock
           onCloseRef.current(
             {
               victory,
@@ -293,38 +353,38 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           return;
         }
 
-        // 直接设置状态，然后在下一个事件循环中重置处理标志
+        // Set state directly, then reset processing flag in next event loop
         setBattleState(newState);
 
-        // 使用 setTimeout 确保状态更新完成后再重置处理标志
+        // Use setTimeout to ensure processing flag is reset after state update completes
         setTimeout(() => {
           isProcessingEnemyTurnRef.current = false;
           setIsProcessing(false);
-          isActionLockedRef.current = false; // 释放锁，敌人回合结束后允许玩家操作
+          isActionLockedRef.current = false; // Release lock, allow player action after enemy turn ends
         }, 50);
       } catch (error) {
-        console.error('敌人先手回合错误:', error);
+        console.error('Enemy turn error:', error);
         isProcessingEnemyTurnRef.current = false;
-        setErrorMessage('敌人行动出错');
+        setErrorMessage('Enemy action error');
         setIsProcessing(false);
-        isActionLockedRef.current = false; // 释放锁
+        isActionLockedRef.current = false; // Release lock
         setTimeout(() => setErrorMessage(null), 3000);
       }
-    }, 100); // 减少延迟时间
+    }, 100); // Reduce delay time
 
     return () => {
       clearTimeout(timer);
     };
   }, [battleState?.waitingForPlayerAction, battleState?.enemyActionsRemaining, battleState?.id]);
 
-  // 处理玩家行动
+  // Handle player action
   const handlePlayerAction = async (action: PlayerAction) => {
-    // 使用 ref 锁进行第一层检查（同步，立即生效）
+    // Use ref lock for first layer check (synchronous, immediate effect)
     if (isActionLockedRef.current) {
       return;
     }
 
-    // 严格检查：必须满足所有条件才能操作
+    // Strict check: must meet all conditions to operate
     if (
       !battleState ||
       isProcessing ||
@@ -334,7 +394,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
       return;
     }
 
-    // 立即设置锁，防止重复点击（同时更新 ref 和 state）
+    // Set lock immediately to prevent duplicate clicks (update ref and state simultaneously)
     isActionLockedRef.current = true;
     setIsProcessing(true);
     setShowSkills(false);
@@ -342,12 +402,12 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     setShowAdvancedItems(false);
 
     try {
-      // 执行玩家行动
+      // Execute player action
       let newState = executePlayerAction(battleState, action);
 
-      // 检查战斗是否结束
+      // Check if battle ended
       if (checkBattleEnd(newState)) {
-        // 战斗结束，计算奖励
+        // Battle ended, calculate rewards
         const victory = newState.enemy.hp <= 0;
         const hpLoss = player.hp - newState.player.hp;
         const rewards = calculateBattleRewards(
@@ -356,7 +416,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           adventureType,
           riskLevel
         );
-        // 清理冷却时间为0的技能冷却
+        // Clear cooldowns for skills with 0 cooldown
         const finalPetSkillCooldowns: Record<string, number> = {};
         if (newState.petSkillCooldowns) {
           Object.keys(newState.petSkillCooldowns).forEach((skillId) => {
@@ -382,27 +442,27 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
         return;
       }
 
-      // 如果玩家还有剩余行动次数，继续玩家回合
-      // 但需要等待状态更新完成，防止快速连续点击
+      // If player has remaining actions, continue player turn
+      // But wait for state update to complete to prevent rapid clicks
       if (
         newState.waitingForPlayerAction &&
         newState.playerActionsRemaining > 0
       ) {
         setBattleState(newState);
-        // 添加短暂延迟，确保状态更新完成后再允许下一次操作
+        // Add short delay to ensure next action allowed after state update
         setTimeout(() => {
           setIsProcessing(false);
           isActionLockedRef.current = false;
-        }, 500); // 增加到500ms延迟，确保状态更新完成
-        return; // 继续等待玩家行动
+        }, 500); // Increase to 500ms delay to ensure state update complete
+        return; // Continue waiting for player action
       }
 
-      // 玩家回合结束，延迟后执行敌人回合
+      // Player turn ended, execute enemy turn after delay
       setTimeout(() => {
         try {
           newState = executeEnemyTurn(newState);
 
-          // 再次检查战斗是否结束
+          // Check if battle ended again
           if (checkBattleEnd(newState)) {
             const victory = newState.enemy.hp <= 0;
             const hpLoss = player.hp - newState.player.hp;
@@ -413,7 +473,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
               riskLevel
             );
             setIsProcessing(false);
-            isActionLockedRef.current = false; // 释放锁
+            isActionLockedRef.current = false; // Release lock
             onClose(
               {
                 victory,
@@ -444,13 +504,13 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
       const errorMsg = error instanceof Error ? error.message : 'Combat action failed';
       setErrorMessage(errorMsg);
       setIsProcessing(false);
-      isActionLockedRef.current = false; // 释放锁
-      // 3秒后清除错误提示
+      isActionLockedRef.current = false; // Release lock
+      // Clear error message after 3 seconds
       setTimeout(() => setErrorMessage(null), 3000);
     }
   };
 
-  // 跳过战斗
+  // Skip battle
   const handleSkipBattle = () => {
     if (!battleState || isProcessing) return;
 
@@ -464,13 +524,13 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
         let currentState = { ...battleState };
         let isBattleEnded = false;
         let loopCount = 0;
-        const MAX_LOOPS = 200; // 防止死循环
+        const MAX_LOOPS = 200; // Prevent infinite loop
 
         try {
           while (!isBattleEnded && loopCount < MAX_LOOPS) {
             loopCount++;
 
-            // 玩家回合
+            // Player turn
             if (
               currentState.waitingForPlayerAction &&
               currentState.playerActionsRemaining > 0
@@ -480,7 +540,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
               if (isBattleEnded) break;
             }
 
-            // 敌人回合 (如果玩家行动耗尽或不是玩家回合)
+            // Enemy turn (if player actions exhausted or not player turn)
             if (
               !isBattleEnded &&
               (!currentState.waitingForPlayerAction ||
@@ -491,7 +551,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
             }
           }
 
-          // 战斗结束结算
+          // Battle end settlement
           const victory = currentState.enemy.hp <= 0;
           const hpLoss = player.hp - currentState.player.hp;
           const rewards = calculateBattleRewards(
@@ -519,12 +579,12 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
         }
       },
       () => {
-        // 用户取消，不做任何操作
+        // User cancelled, do nothing
       }
     );
   };
 
-  // 获取可用技能（检查冷却和MP）
+  // Get available skills (check cooldown and MP)
   const availableSkills = useMemo(() => {
     if (!battleState) return [];
     return battleState.player.skills.filter((skill) => {
@@ -535,7 +595,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     });
   }, [battleState]);
 
-  // 获取冷却中或MP不足的技能
+  // Get skills on cooldown or insufficient MP
   const unavailableSkills = useMemo(() => {
     if (!battleState) return [];
     return battleState.player.skills.filter((skill) => {
@@ -546,7 +606,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     });
   }, [battleState]);
 
-  // 获取可用丹药（从战斗状态中的背包获取，因为物品使用会更新背包）
+  // Get available chems (get from battle state inventory as item usage updates inventory)
   const availablePotions = useMemo(() => {
     if (!battleState) return [];
     const inventory = battleState.playerInventory || player.inventory;
@@ -562,7 +622,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
   if (!isOpen || !battleState) return null;
 
   const { player: playerUnit, enemy: enemyUnit } = battleState;
-  // 确保HP值是整数（避免浮点数精度问题）
+  // Ensure HP is integer (avoid floating point precision issues)
   const playerHp = Math.floor(playerUnit.hp);
   const playerMaxHp = Math.floor(playerUnit.maxHp);
   const enemyHp = Math.floor(enemyUnit.hp);
@@ -574,7 +634,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
     <div
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-[80] p-4"
       onClick={(e) => {
-        // 自动历练模式下不允许点击外部关闭，只能通过逃跑或快进结束战斗
+        // In auto-adventure mode, clicking outside to close is not allowed, only flee or fast forward to end battle
         if (autoAdventure) {
           return;
         }
@@ -582,15 +642,15 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           e.target === e.currentTarget &&
           !battleState.waitingForPlayerAction
         ) {
-          // 只在战斗结束时允许点击外部关闭
+          // Only allow clicking outside to close when battle ends
         }
       }}
     >
       <div
-        className="bg-ink-900 border border-stone-700 w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+        className="bg-stone-950 border border-amber-500/30 w-full max-w-4xl max-h-[90vh] rounded-none shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 头部 */}
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700">
           <div>
             <div className="text-xs text-stone-500 uppercase tracking-widest">
@@ -599,7 +659,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
             <div className="flex items-center gap-2 text-lg font-terminal text-amber-400">
               <Sword size={18} className="text-amber-400" />
               {enemyUnit.name}
-              <span className="text-[11px] text-stone-400 bg-ink-800 px-2 py-0.5 rounded border border-stone-700">
+              <span className="text-[11px] text-stone-400 bg-stone-900 px-2 py-0.5 rounded-none border border-stone-700">
                 {enemyUnit.realm}
               </span>
             </div>
@@ -623,9 +683,9 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           </div>
         </div>
 
-        {/* 战斗区域 */}
+        {/* Battle Area */}
         <div className="modal-scroll-container modal-scroll-content px-6 py-4 space-y-4">
-          {/* 敌人信息 */}
+          {/* Enemy Info */}
           <div className="bg-rose-900/20 border border-rose-700/40 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-rose-300 font-semibold">
@@ -649,7 +709,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
             </div>
           </div>
 
-          {/* 玩家信息 */}
+          {/* Player Info */}
           <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-emerald-300 font-semibold">
@@ -678,7 +738,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
               <span>SPD: {playerUnit.speed}</span>
               <span>PER: {playerUnit.spirit}</span>
             </div>
-            {/* Buff/Debuff显示 */}
+            {/* Buff/Debuff Display */}
             {(playerUnit.buffs.length > 0 || playerUnit.debuffs.length > 0) && (
               <div className="mt-2 flex gap-2 flex-wrap">
                 {playerUnit.buffs.map((buff) => (
@@ -704,29 +764,17 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           </div>
 
           {/* Battle Journal */}
-          {battleState.history.length > 0 && (
-            <div className="bg-ink-800/60 rounded-lg p-4 max-h-40 overflow-y-auto">
-              <div className="text-xs text-stone-400 mb-2">Combat Journal</div>
-              <div className="space-y-2">
-                {battleState.history.slice(-5).map((action) => (
-                  <div
-                    key={action.id}
-                    className={`text-sm ${action.turn === 'player'
-                      ? 'text-emerald-300'
-                      : 'text-rose-300'
-                      }`}
-                  >
-                    {action.description}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="mt-4">
+            <BattleLog history={battleState.history} />
+          </div>
+
+          {/* Combat Visuals Overlay */}
+          <CombatVisuals effects={visualEffects} />
         </div>
 
-        {/* 行动选择区域 */}
+        {/* Action Selection Area */}
         {battleState.waitingForPlayerAction && battleState.playerActionsRemaining > 0 && !isProcessing && (
-          <div className="border-t border-stone-700 px-6 py-4 bg-ink-900/90">
+          <div className="border-t border-stone-700 px-6 py-4 bg-stone-950/90">
             <div className="flex flex-wrap gap-2 mb-3">
               <button
                 onClick={() => handlePlayerAction({ type: 'attack' })}
@@ -796,7 +844,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
               </button>
             </div>
 
-            {/* 技能列表 */}
+            {/* Skills List */}
             {showSkills && (
               <div className="mt-3 p-3 bg-ink-800 rounded border border-stone-700 max-h-[300px] overflow-y-auto">
                 <div className="text-xs text-stone-400 mb-2">Available Skills / Perks</div>
@@ -873,7 +921,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
               </div>
             )}
 
-            {/* 丹药列表 */}
+            {/* Chems List */}
             {showPotions && (
               <div className="mt-3 p-3 bg-ink-800 rounded border border-stone-700 max-h-[300px] overflow-y-auto">
                 <div className="text-xs text-stone-400 mb-2">Available Chems</div>
@@ -922,7 +970,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
               </div>
             )}
 
-            {/* 进阶物品列表 */}
+            {/* Advanced Items List */}
             {showAdvancedItems && (() => {
               const availableAdvancedItems: Array<{
                 type: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule';
@@ -933,7 +981,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                 cooldown?: number;
               }> = [];
 
-              // 检查筑基奇物
+              // Check Foundation Treasures
               if (player?.foundationTreasure) {
                 const treasure = FOUNDATION_TREASURES[player.foundationTreasure];
                 if (treasure) {
@@ -949,20 +997,20 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                       cooldown,
                     });
                   } else {
-                    // 如果没有battleEffect，也显示但标记为不可用
+                    // If no battleEffect, show but mark as unavailable
                     availableAdvancedItems.push({
                       type: 'foundationTreasure',
                       id: treasure.id,
                       name: treasure.name,
                       rarity: treasure.rarity,
-                      battleEffect: null as any, // 标记为null表示没有战斗效果
+                      battleEffect: null as any, // Mark as null indicating no battle effect
                       cooldown: 0,
                     });
                   }
                 }
               }
 
-              // 检查天地精华
+              // Check Heaven Earth Essence
               if (player?.heavenEarthEssence) {
                 const essence = HEAVEN_EARTH_ESSENCES[player.heavenEarthEssence];
                 if (essence) {
@@ -990,7 +1038,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                 }
               }
 
-              // 检查天地之髓
+              // Check Heaven Earth Marrow
               if (player?.heavenEarthMarrow) {
                 const marrow = HEAVEN_EARTH_MARROWS[player.heavenEarthMarrow];
                 if (marrow) {
@@ -1018,7 +1066,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                 }
               }
 
-              // 检查规则之力
+              // Check Longevity Rules
               if (player?.longevityRules && Array.isArray(player.longevityRules)) {
                 player.longevityRules.forEach((ruleId) => {
                   const rule = LONGEVITY_RULES[ruleId];
@@ -1030,7 +1078,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                         type: 'longevityRule',
                         id: rule.id,
                         name: rule.name,
-                        rarity: '仙品',
+                        rarity: 'Mythic',
                         battleEffect: rule.battleEffect,
                         cooldown,
                       });
@@ -1039,7 +1087,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                         type: 'longevityRule',
                         id: rule.id,
                         name: rule.name,
-                        rarity: '仙品',
+                        rarity: 'Mythic',
                         battleEffect: null as any,
                         cooldown: 0,
                       });
@@ -1082,16 +1130,16 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
                               <span className="text-yellow-300 font-semibold">
                                 {item.name}
                               </span>
-                              <span className={`text-xs ${item.rarity === '仙品' ? 'text-purple-400' :
-                                item.rarity === '传说' ? 'text-orange-400' :
-                                  item.rarity === '稀有' ? 'text-blue-400' :
+                              <span className={`text-xs ${item.rarity === 'Mythic' ? 'text-amber-400' :
+                                item.rarity === 'Legendary' ? 'text-purple-400' :
+                                  item.rarity === 'Rare' ? 'text-blue-400' :
                                     'text-stone-400'
                                 }`}>
-                                {item.rarity === '仙品'
-                                  ? 'Prototype'
-                                  : item.rarity === '传说'
+                                {item.rarity === 'Mythic'
+                                  ? 'Mythic'
+                                  : item.rarity === 'Legendary'
                                     ? 'Legendary'
-                                    : item.rarity === '稀有'
+                                    : item.rarity === 'Rare'
                                       ? 'Rare'
                                       : item.rarity}
                               </span>
@@ -1153,7 +1201,7 @@ const TurnBasedBattleModal: React.FC<TurnBasedBattleModalProps> = ({
           </div>
         )}
 
-        {/* 错误提示 */}
+        {/* Error Message */}
         {errorMessage && (
           <div className="border-t border-stone-700 px-6 py-4 bg-rose-900/20 border-rose-700/40">
             <div className="text-center text-rose-300 text-sm">

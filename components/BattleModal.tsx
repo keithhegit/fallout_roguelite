@@ -57,7 +57,7 @@ const BattleModal: React.FC<BattleModalProps> = ({
       }}
     >
       <div
-        className="bg-ink-950 border border-stone-800 w-full md:max-w-3xl max-h-[92vh] rounded-none shadow-2xl flex flex-col relative overflow-hidden font-mono"
+        className="bg-stone-950 border border-amber-500/30 w-full md:max-w-3xl max-h-[92vh] rounded-none shadow-2xl flex flex-col relative overflow-hidden font-mono"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
@@ -68,14 +68,14 @@ const BattleModal: React.FC<BattleModalProps> = ({
 
         <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-stone-800 bg-stone-950 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-stone-900 border border-stone-800 flex items-center justify-center text-red-500/80 shadow-inner">
+            <div className="w-10 h-10 bg-stone-950 border border-stone-800 flex items-center justify-center text-red-500/80 shadow-inner">
               <Sword size={24} />
             </div>
             <div>
               <div className="text-[10px] text-stone-600 uppercase tracking-[0.3em] font-bold">
                 COMBAT_ENCOUNTER // SEQ_v2.01
               </div>
-              <div className="flex items-center gap-2 text-lg md:text-xl font-bold text-stone-200 uppercase tracking-widest">
+              <div className="flex items-center gap-2 text-lg md:text-xl font-bold text-amber-400 uppercase tracking-widest">
                 {replay.enemy.title}·{replay.enemy.name}
                 <span className="text-[9px] text-yellow-600 bg-stone-950 px-2 py-0.5 rounded-none border border-yellow-900/30">
                   {replay.enemy.realm}

@@ -29,7 +29,7 @@ const BatchUseModal: React.FC<Props> = ({
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [itemQuantities, setItemQuantities] = useState<Map<string, number>>(new Map());
 
-  // 判断物品分类
+  // Determine item category
   const getItemCategory = (item: Item): ItemCategory => {
     if (item.type === ItemType.Pill) {
       return 'pill';
@@ -37,37 +37,37 @@ const BatchUseModal: React.FC<Props> = ({
     return 'consumable';
   };
 
-  // 判断物品是否可使用
+  // Determine if item is usable
   const isUsable = (item: Item): boolean => {
-    // 装备不可使用
+    // Equipment cannot be used
     if (item.isEquippable) return false;
-    // 材料包和宗门宝库钥匙可以使用
-    const isMaterialPack = item.name.includes('材料包') && item.type === ItemType.Material;
-    const isTreasureVaultKey = item.name === '宗门宝库钥匙' && item.type === ItemType.Material;
+    // Material packs and sect vault keys can be used
+    const isMaterialPack = item.name.includes('Material Pack') && item.type === ItemType.Material;
+    const isTreasureVaultKey = item.name === 'Sect Vault Key' && item.type === ItemType.Material;
     if (isMaterialPack || isTreasureVaultKey) return true;
-    // 其他材料不可使用（除非有 effect）
+    // Other materials cannot be used (unless they have an effect)
     if (item.type === ItemType.Material && !item.effect) return false;
-    // 有 effect 或 Recipe 类型的物品可以使用
+    // Items with effect or Recipe type can be used
     return !!(item.effect || item.type === ItemType.Recipe);
   };
 
-  // 过滤物品
+  // Filter items
   const filteredItems = useMemo(() => {
     let filtered = inventory.filter((item) => {
-      // 只显示可使用的物品
+      // Only show usable items
       if (!isUsable(item)) return false;
 
-      // 排除已装备的物品
+      // Exclude equipped items
       const isEquipped = Object.values(equippedItems).includes(item.id);
       if (isEquipped) return false;
 
-      // 按分类过滤
+      // Filter by category
       if (selectedCategory !== 'all') {
         const category = getItemCategory(item);
         if (category !== selectedCategory) return false;
       }
 
-      // 按品质过滤
+      // Filter by rarity
       if (selectedRarity !== 'all') {
         if (item.rarity !== selectedRarity) return false;
       }
@@ -82,7 +82,7 @@ const BatchUseModal: React.FC<Props> = ({
     const isSelected = selectedItems.has(itemId);
 
     if (isSelected) {
-      // 取消选中
+      // Deselect
       setSelectedItems((prev) => {
         const newSet = new Set(prev);
         newSet.delete(itemId);
@@ -94,7 +94,7 @@ const BatchUseModal: React.FC<Props> = ({
         return newQty;
       });
     } else {
-      // 选中
+      // Select
       setSelectedItems((prev) => {
         const newSet = new Set(prev);
         newSet.add(itemId);

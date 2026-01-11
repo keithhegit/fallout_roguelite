@@ -376,13 +376,13 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-dragon-scale',
-    name: 'Tough Scale',
+    name: 'Deathclaw Hide',
     type: 'item',
     rarity: 'Legendary',
     weight: 3,
     value: {
       item: {
-        name: 'Tough Scale',
+        name: 'Deathclaw Hide',
         type: ItemType.Material,
         description: 'A thick, near-indestructible scale from a prime mutant.',
         quantity: 1,
@@ -392,15 +392,15 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-herb',
-    name: 'Energy Bloom',
+    name: 'Glowing Fungus',
     type: 'item',
     rarity: 'Common',
     weight: 15,
     value: {
       item: {
-        name: 'Energy Bloom',
+        name: 'Glowing Fungus',
         type: ItemType.Herb,
-        description: 'A plant that synthesizes energy from the background radiation.',
+        description: 'A neon-green mushroom. Essential for synthesizing RadAway.',
         quantity: 10,
         rarity: 'Common',
       },
@@ -408,15 +408,15 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-herb-2',
-    name: 'Energy Bloom x20',
+    name: 'Glowing Fungus x20',
     type: 'item',
     rarity: 'Common',
     weight: 10,
     value: {
       item: {
-        name: 'Energy Bloom',
+        name: 'Glowing Fungus',
         type: ItemType.Herb,
-        description: 'A plant that synthesizes energy from the background radiation.',
+        description: 'A neon-green mushroom. Essential for synthesizing RadAway.',
         quantity: 20,
         rarity: 'Common',
       },
@@ -424,13 +424,13 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-rare',
-    name: 'Purple Dusk',
+    name: 'Mutated Fern',
     type: 'item',
     rarity: 'Rare',
     weight: 8,
     value: {
       item: {
-        name: 'Purple Dusk',
+        name: 'Mutated Fern',
         type: ItemType.Herb,
         description: 'A rare flower used in genetic purging chemicals.',
         quantity: 3,
@@ -440,13 +440,13 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-snow-lotus',
-    name: 'Cryo-Bloom',
+    name: 'Glow Pod',
     type: 'item',
     rarity: 'Rare',
     weight: 6,
     value: {
       item: {
-        name: 'Cryo-Bloom',
+        name: 'Glow Pod',
         type: ItemType.Herb,
         description: 'A glowing flower that grows in frozen radioactive zones.',
         quantity: 2,
@@ -456,13 +456,13 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-legend',
-    name: 'Primal Root',
+    name: 'Ash Rose',
     type: 'item',
     rarity: 'Legendary',
     weight: 4,
     value: {
       item: {
-        name: 'Primal Root',
+        name: 'Ash Rose',
         type: ItemType.Herb,
         description: 'An ancient root containing immense biological data.',
         quantity: 2,
@@ -472,15 +472,15 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
   },
   {
     id: 'lottery-material-phoenix-feather',
-    name: 'Fiery Feather',
+    name: 'Scorchbeast Wing',
     type: 'item',
     rarity: 'Legendary',
     weight: 2,
     value: {
       item: {
-        name: 'Fiery Feather',
+        name: 'Scorchbeast Wing',
         type: ItemType.Material,
-        description: 'A feather that never stops smoldering with phoenix energy.',
+        description: 'A wing membrane that never stops smoldering with phoenix energy.',
         quantity: 1,
         rarity: 'Legendary',
       },
@@ -776,7 +776,7 @@ export const LOTTERY_PRIZES: LotteryPrize[] = [
     },
   },
 
-  // 普通奖励 - 装备（饰品）
+  // Common Rewards - Equipment (Accessories)
   {
     id: 'lottery-ring-copper',
     name: 'Dilapidated Ring',
@@ -1801,7 +1801,7 @@ const pillRarities: Array<{ rarity: ItemRarity; weight: number }> = [
 
 pillRarities.forEach(({ rarity, weight }) => {
   const generatedPrizes = generateLotteryPrizes({ type: ItemType.Pill, rarity: rarity as any });
-  // 调整权重
+  // Adjust weight
   generatedPrizes.forEach(prize => {
     prize.weight = weight;
   });
@@ -1818,7 +1818,7 @@ const herbRarities: Array<{ rarity: ItemRarity; weight: number }> = [
 
 herbRarities.forEach(({ rarity, weight }) => {
   const generatedPrizes = generateLotteryPrizes({ type: ItemType.Herb, rarity: rarity as any });
-  // 调整权重
+  // Adjust weight
   generatedPrizes.forEach(prize => {
     prize.weight = weight;
   });
@@ -1835,7 +1835,7 @@ const materialRarities: Array<{ rarity: ItemRarity; weight: number }> = [
 
 materialRarities.forEach(({ rarity, weight }) => {
   const generatedPrizes = generateLotteryPrizes({ type: ItemType.Material, rarity: rarity as any });
-  // 调整权重
+  // Adjust weight
   generatedPrizes.forEach(prize => {
     prize.weight = weight;
   });

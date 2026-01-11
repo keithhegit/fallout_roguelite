@@ -4,169 +4,309 @@ import { getItemFromConstants } from '../utils/itemConstantsUtils';
 
 const randomId = () => Math.random().toString(36).slice(2, 9);
 
+// Realm Assets Map (Name -> URLs)
+const REALM_ASSETS: Record<string, { banner: string; thumbnail: string }> = {
+  'Vault 111 Surroundings': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_vault111.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_vault111.png'
+  },
+  'Sanctuary Hills': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_sanctuary_hills.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_sanctuary_hills.png'
+  },
+  'Concord Ruins': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_concord_ruins.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_concord_ruins.png'
+  },
+  'Diamond City Outskirts': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_diamond_city.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_diamond_city.png'
+  },
+  'Super-Duper Mart': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_super_duper_mart.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_super_duper_mart.png'
+  },
+  'Corvega Assembly Plant': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_corvega_assembly_plant.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_corvega_assembly_plant.png'
+  },
+  'West-Tek Research Facility': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_west_tek.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_west_tek.png'
+  },
+  'Mass Fusion Building': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_mass_fusion.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_mass_fusion.png'
+  },
+  'The Institute': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_the_institute.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_the_institute.png'
+  },
+  'The Glowing Sea': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_glowing_sea.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_glowing_sea.png'
+  },
+  'The Prydwen': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_the_prydwen.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_the_prydwen.png'
+  },
+  'Enclave Oil Rig': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_enclave_rig.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_enclave_rig.png'
+  },
+  'Big MT Research Center': {
+    banner: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_big_mt.png',
+    thumbnail: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_big_mt.png'
+  }
+};
+
+// Helper to get assets for a realm with fallback logic
+const getRealmAssets = (name: string, riskLevel: string): { banner: string; thumbnail: string } => {
+  // 1. Exact Match
+  if (REALM_ASSETS[name]) return REALM_ASSETS[name];
+
+  // 2. Keyword Matching
+  const lowerName = name.toLowerCase();
+  const useAsset = (key: string) => REALM_ASSETS[key];
+
+  // Vault / Underground
+  if (lowerName.includes('vault') || lowerName.includes('bunker') || lowerName.includes('silo') || lowerName.includes('shelter') || lowerName.includes('tunnel') || lowerName.includes('cave') || lowerName.includes('underground') || lowerName.includes('subway') || lowerName.includes('sewer')) {
+    return useAsset('Vault 111 Surroundings');
+  }
+
+  // Industrial / Factory
+  if (lowerName.includes('plant') || lowerName.includes('factory') || lowerName.includes('assembly') || lowerName.includes('works') || lowerName.includes('yard') || lowerName.includes('industrial') || lowerName.includes('brewery') || lowerName.includes('hardware') || lowerName.includes('mining') || lowerName.includes('borers')) {
+    return useAsset('Corvega Assembly Plant');
+  }
+
+  // Science / Tech / Medical
+  if (lowerName.includes('lab') || lowerName.includes('research') || lowerName.includes('facility') || lowerName.includes('tech') || lowerName.includes('science') || lowerName.includes('hospital') || lowerName.includes('clinic') || lowerName.includes('med') || lowerName.includes('hallucigen') || lowerName.includes('sales') || lowerName.includes('robot') || lowerName.includes('general atomics')) {
+    return useAsset('West-Tek Research Facility');
+  }
+
+  // Commercial / Retail
+  if (lowerName.includes('mart') || lowerName.includes('shop') || lowerName.includes('store') || lowerName.includes('galleria') || lowerName.includes('market') || lowerName.includes('diner') || lowerName.includes('motel') || lowerName.includes('theater') || lowerName.includes('comics')) {
+    return useAsset('Super-Duper Mart');
+  }
+
+  // Urban / City / Ruins
+  if (lowerName.includes('city') || lowerName.includes('town') || lowerName.includes('plaza') || lowerName.includes('tower') || lowerName.includes('building') || lowerName.includes('ruins') || lowerName.includes('street') || lowerName.includes('library') || lowerName.includes('hall') || lowerName.includes('hub') || lowerName.includes('lexington') || lowerName.includes('quincy') || lowerName.includes('boston') || lowerName.includes('faneuil')) {
+    return useAsset('Diamond City Outskirts');
+  }
+
+  // Military / Fort
+  if (lowerName.includes('fort') || lowerName.includes('base') || lowerName.includes('outpost') || lowerName.includes('checkpoint') || lowerName.includes('armory') || lowerName.includes('airport') || lowerName.includes('prydwen') || lowerName.includes('castle') || lowerName.includes('battery')) {
+    return useAsset('The Prydwen');
+  }
+
+  // Radiation / Glowing Sea
+  if (lowerName.includes('glowing') || lowerName.includes('sea') || lowerName.includes('rad') || lowerName.includes('crater') || lowerName.includes('toxic') || lowerName.includes('waste') || lowerName.includes('bog') || lowerName.includes('marsh') || lowerName.includes('reactor') || lowerName.includes('ground zero')) {
+    return useAsset('The Glowing Sea');
+  }
+
+  // Enclave / High Tech / Ocean
+  if (lowerName.includes('enclave') || lowerName.includes('rig') || lowerName.includes('oil') || lowerName.includes('island') || lowerName.includes('coast') || lowerName.includes('libertalia') || lowerName.includes('spectacle')) {
+    return useAsset('Enclave Oil Rig');
+  }
+
+  // Institute / Advanced
+  if (lowerName.includes('institute') || lowerName.includes('synth') || lowerName.includes('citadel') || lowerName.includes('mothership') || lowerName.includes('zeta') || lowerName.includes('alien')) {
+    return useAsset('The Institute');
+  }
+
+  // Big MT / Desert
+  if (lowerName.includes('big mt') || lowerName.includes('desert') || lowerName.includes('canyon') || lowerName.includes('divide') || lowerName.includes('sierra') || lowerName.includes('lonesome') || lowerName.includes('vegas')) {
+    return useAsset('Big MT Research Center');
+  }
+
+  // Residential / Rural (Default for Low/Medium)
+  if (lowerName.includes('shack') || lowerName.includes('farm') || lowerName.includes('cabin') || lowerName.includes('house') || lowerName.includes('home') || lowerName.includes('hills') || lowerName.includes('park') || lowerName.includes('field') || lowerName.includes('riverbed') || lowerName.includes('bridge') || lowerName.includes('reservoir')) {
+    return useAsset('Sanctuary Hills');
+  }
+
+  // 3. Fallback by Risk Level
+  switch (riskLevel) {
+    case 'Extreme':
+    case 'High':
+      return useAsset('The Glowing Sea');
+    case 'Medium':
+      return useAsset('Concord Ruins');
+    case 'Low':
+    default:
+      return useAsset('Sanctuary Hills');
+  }
+};
+
 // Realm Name Pool - Categorized by Risk Level
 const REALM_NAMES_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[]> = {
   'Low': [
-    'Mystic Realm', 'Star Ruins', 'Beast Mountain Outer', 'Herb Garden', 'Breeze Valley',
-    'Jade Pool', 'Purple Bamboo Forest', 'Bird Habitat', 'Spirit Stone Mine', 'Ancient Cave',
-    'Flower Valley', 'Moonlit Pool', 'Cloud Peak', 'Bamboo Ridge', 'Spring Cave',
-    'Crane Lake', 'Rainbow Bridge', 'Medicine Field', 'Quiet Pavilion', 'Waterfall Cliff'
+    'Vault 111 Surroundings', 'Sanctuary Hills', 'Concord Ruins', 'Diamond City Outskirts',
+    'Abandoned Shack', 'Farm Ruins', 'Dry Riverbed', 'Scavenger Camp', 'Small Vault Access',
+    'Old Gas Station', 'Collapsed Tunnel', 'Rust Yard', 'Makeshift Shelter', 'Highway Underpass',
+    'Junk Heap', 'Radio Tower Base', 'Cracked Reservoir', 'Overgrown Park', 'Burnt Forest',
+    'Empty Silo', 'Broken Bridge', 'Train Yard', 'Subway Station', 'Water Treatment Plant',
+    'Drive-In Theater', 'Diner Ruins', 'Trailer Park', 'Roadside Motel', 'Ranger Cabin', 'Picnic Area'
   ],
   'Medium': [
-    'Ancient Sword Tomb', 'Frozen Snowfield', 'Illusion Cave', 'Dragon Tomb', 'Beast Mountain Deep',
-    'Battlefield Ruins', 'Echo Valley', 'Mist Forest', 'Spirit Cave', 'Trial Tower',
-    'Thunder Valley', 'Flame Mountain', 'Ice Cave', 'Snake Valley', 'Beast Lair',
-    'Tomb Maze', 'Sword Peak', 'Dragon Vein', 'Inheritance Hall', 'Trial Realm'
+    'Super-Duper Mart', 'Corvega Assembly Plant', 'Mass Fusion Building', 'West-Tek Research Facility',
+    'Metro Tunnel', 'Raider Outpost', 'Medical Facility', 'Relay Tower', 'Armory Cache',
+    'Red Rocket Station', 'Vault 111 Entrance', 'Lexington Ruins',
+    'Saugus Ironworks', 'Dunwich Borers', 'Hubris Comics', 'Trinity Tower', 'Boston Public Library',
+    'General Atomics Galleria', 'RobCo Sales Center', 'Poseidon Energy', 'Hallucigen, Inc.',
+    'Vault 81', 'Hardware Town', 'Beantown Brewery', 'Faneuil Hall', 'Combat Zone', 'Satellite Station'
   ],
   'High': [
-    'Lava Flow', 'Toxic Swamp', 'Nether Cave', 'Time Rift', 'Death Canyon',
-    'Blood Sea Edge', 'Thunder Valley', 'Demon Cave', 'Black Wind Mountain', 'White Bone Ridge',
-    'Demon Flame Abyss', 'Ghost Ridge', 'Blood Moon Cave', 'Shadow Forest', 'Cursed Land',
-    'Despair Abyss', 'Dragon Lair', 'Evil Altar', 'Necro Domain', 'Void Fracture'
+    'The Glowing Sea', 'The Prydwen', 'The Institute',
+    'Irradiated Plant', 'Blacksite Lab', 'Toxic Marsh', 'Super Mutant Nest', 'Collapsed Reactor',
+    'Glowing Sea Edge', 'Crater of Atom', 'Sentinel Site', 'Mass Pike Tunnel', 'Kendall Hospital',
+    'Malden Middle School', 'Parsons State Insane Asylum', 'Spectacle Island', 'Fort Strong', 'The Castle',
+    'Boston Airport', 'Libertalia', 'Quincy Ruins', 'Gunners Plaza',
+    'Fort Hagen', 'Vault 95', 'Huntersville', 'The Burrows', 'Abandoned Bog'
   ],
   'Extreme': [
-    'Thunder Purgatory', 'Blood Sea Abyss', 'Nine Nether Abyss', 'Heavenly Tribulation Pool', 'Chaos Void',
-    'God Demon Battlefield', 'World Extinction Forbidden Land', 'Kingdom of the Dead', 'Void Rift', 'Eternal Demon Domain',
-    'Heavenly Dao Forbidden Zone', 'Reincarnation Land', 'Eternal Purgatory', 'Nothingness Realm', 'Source of Destruction',
-    'Taboo Land', 'Punishment Domain', 'Demon Origin', 'Death Core', 'Ultimate Abyss'
+    'Enclave Oil Rig', 'Big MT Research Center',
+    'Ground Zero', 'Quarantine Vault', 'FEV Lab Core', 'Dead Zone', 'Containment Breach Site',
+    'Glowing Sea Crater', 'Institute Reactor', 'Mariposa Military Base', 'The Divide',
+    'Sierra Madre Casino', 'Lonesome Road', 'Vault 87', 'Raven Rock',
+    'Adams Air Force Base', 'Mobile Crawler', 'Liberty Prime Hangar', 'Zeta Mothership', 'The Master\'s Lair',
+    'Glassed Cavern', 'Site Alpha', 'Whitespring Bunker', 'Watoga Underground', 'The Deep', 'Wendigo Cave'
   ]
 };
 
 // Realm Description Pool - Categorized by Risk Level
 const REALM_DESCRIPTIONS_BY_RISK: Record<'Low' | 'Medium' | 'High' | 'Extreme', string[]> = {
   'Low': [
-    'Rich in spiritual energy, suitable for cultivation, relatively safe.',
-    'Gathering power of stars, full of spiritual energy.',
-    'The outer area is relatively safe.',
-    'Herbs are everywhere, suitable for gathering.',
-    'Gentle breeze, pleasant environment.',
-    'Clear water, misty spiritual energy.',
-    'Purple bamboo swaying, quiet environment.',
-    'Where spiritual birds gather.',
-    'Spirit stone mine, watch out for guardians.',
-    'Ancient cultivator cave, structurally intact.',
-    'Flowers blooming, fragrant.',
-    'Moonlight like water.',
-    'Clouds rolling.',
-    'Bamboo forest.',
-    'Spring water bubbling.',
-    'Cranes dancing.',
-    'Rainbow spanning across.',
-    'Medicinal herbs in patches.',
-    'Quiet pavilion.',
-    'Waterfall like silk.'
+    'A relatively safe area, though radiation is still present.',
+    'Scavengers often frequent this place.',
+    'Signs of recent habitation, but currently empty.',
+    'Overgrown with mutated vegetation.',
+    'The wind howls through the rusted structures.',
+    'A quiet spot, perfect for a quick rest.',
+    'Scattered debris suggests a skirmish happened here long ago.',
+    'The air is thick with dust, but breathable.',
+    'Faint radio signals can be heard nearby.',
+    'Old world ads are still visible on the walls.',
+    'A few radroaches skitter about.',
+    'Sunlight filters through the broken roof.',
+    'Smells of ozone and rust.',
+    'A small stash might be hidden here.',
+    'Looks like someone camped here recently.',
+    'Quiet... too quiet.',
+    'A good place to find scrap metal.',
+    'The water here is irradiated, best avoid it.',
+    'An old terminal flickers with green text.',
+    'Shadows stretch long in the fading light.'
   ],
   'Medium': [
-    'Burial ground of ancient sword cultivators.',
-    'Icy and snowy.',
-    'Illusions abound.',
-    'Dragon ruins.',
-    'Deep in the mountains.',
-    'Ancient battlefield ruins.',
-    'Echoes of heaven.',
-    'Heavy fog.',
-    'Spirit stone cave.',
-    'Trial tower.',
-    'Wind and thunder.',
-    'Raging flames.',
-    'Biting cold.',
-    'Venomous snakes.',
-    'Beast lair.',
-    'Tomb maze.',
-    'Soaring sword intent.',
-    'Dragon vein land.',
-    'Inheritance hall.',
-    'Trial realm.'
+    'Raider graffiti covers the walls.',
+    'The Geiger counter clicks steadily here.',
+    'Watch your step, traps might be set.',
+    'Mechanical noises echo from the depths.',
+    'A known hotspot for feral ghouls.',
+    'The structure is unstable, tread carefully.',
+    'High value loot rumored to be inside.',
+    'Heavy blast doors block the main path.',
+    'Automated defenses might still be active.',
+    'The air tastes metallic.',
+    'Bloodstains on the floor are fresh.',
+    'Distant gunfire can be heard.',
+    'A thick fog obscures vision.',
+    'Energy readings are spiking.',
+    'This area was a military checkpoint.',
+    'Scavengers avoid this place for a reason.',
+    'Mutated creatures have made a nest here.',
+    'Old security bots patrol the perimeter.',
+    'A feeling of dread hangs in the air.',
+    'The silence is broken by mechanical whirring.'
   ],
   'High': [
-    'Lava surging.',
-    'Toxic gas permeating.',
-    'Gloomy and cold.',
-    'Time distortion.',
-    'Deadly atmosphere.',
-    'Edge of the blood sea.',
-    'Thunder valley.',
-    'Evil gathering place.',
-    'Black wind mountain.',
-    'White bone ridge.',
-    'Demon flame burning.',
-    'Ghostly wailing.',
-    'Blood moon hanging high.',
-    'Shadow shrouded.',
-    'Cursed power permeating.',
-    'Despair atmosphere.',
-    'Demon dragon coiling.',
-    'Evil god altar.',
-    'Necro domain.',
-    'Space shattered.'
+    'Radiation levels are critical. Rad-X recommended.',
+    'Super Mutants claim this territory.',
+    'The air glows with a sickly green hue.',
+    'Reality seems to distort near the center.',
+    'Only the desperate or foolish come here.',
+    'Heavily fortified by high-tech hostiles.',
+    'The ground is scorched and barren.',
+    'Screams echo from the darkness.',
+    'Elite units are patrolling the area.',
+    'A massive creature slumbers nearby.',
+    'The toxicity here melts standard armor.',
+    'Ghostly apparitions of the old world linger.',
+    'A pre-war experiment gone wrong.',
+    'The very walls seem to bleed radiation.',
+    'Intense heat radiates from the core.',
+    'Darkness swallows all light here.',
+    'A legendary deathclaw was spotted nearby.',
+    'The laws of physics seem optional here.',
+    'Madness takes hold of those who linger.',
+    'No one returns from here unchanged.'
   ],
   'Extreme': [
-    'Thunder never ceases.',
-    'Monstrous demonic energy.',
-    'Land of Nine Nether.',
-    'Remnant power of heavenly tribulation.',
-    'Chaotic power.',
-    'Ruins of ancient god-demon war.',
-    'Forbidden land of extinction.',
-    'Kingdom of the dead.',
-    'Void rift.',
-    'Eternal demon domain.',
-    'Forbidden zone of heavenly dao.',
-    'Land of reincarnation.',
-    'Eternal purgatory.',
-    'Realm of nothingness.',
-    'Source of destruction.',
-    'Taboo land.',
-    'Domain of heavenly punishment.',
-    'Origin of demonic path.',
-    'Core of death.',
-    'Ultimate abyss.'
+    'The Geiger counter is screaming.',
+    'Pure entropy manifests here.',
+    'A hellscape of radiation and death.',
+    'The epicenter of a nuclear detonation.',
+    'Ancient, forbidden technology pulses with power.',
+    'The fabric of reality is tearing apart.',
+    'Home to the wasteland\'s greatest horrors.',
+    'Even Power Armor melts in this heat.',
+    'The ultimate test of survival.',
+    'God has abandoned this place.',
+    'A chaotic void of energy and matter.',
+    'The source of the wasteland\'s corruption.',
+    'Time flows differently here.',
+    'Every step is a battle for existence.',
+    'The final resting place of civilizations.',
+    'An eternal storm rages endlessly.',
+    'Absolute zero or infinite fire.',
+    'The domain of the apex predators.',
+    'Death is a mercy here.',
+    'The end of the world starts here.'
   ]
 };
 
 // Drop Item Pool
 const DROP_ITEMS = [
   'Mutant Parts',
-  'Bio Sample',
   'Rare Herbs',
-  'Med Supplies',
   'Weapon Mod',
+  'Combat Manual',
   'Damaged Relic',
+  'Stimulant Plant',
+  'Fusion Core',
+  'Chem Components',
+  'Advanced Schematics',
   'Pre-War Artifact',
+  'Mutant Gland',
+  'Crafting Materials',
+  'Tech Blueprint',
   'Circuit Diagram',
   'Data Holotape',
-  'Fusion Core',
-  'Energy Cell',
-  'Alloy Plate',
-  'Scrap Metal',
+  'Medicinal Herb',
   'Rare Mineral',
-  'Fusion Cell',
-  'Stimpak',
-  'Rad-X',
-  'Mentats',
-  'Buffout',
+  'Weapon Fragment',
 ];
 
 // Faction Data Pool (Names and Descriptions)
 const SECT_DATA: Array<{ name: string; description: string }> = [
-  { name: 'Haven Outpost', description: 'A stable settlement. Trades food, meds, and clean water.' },
-  { name: 'Sunfire Gang', description: 'Pyromaniacs and raiders. Known for arson and ambushes.' },
+  { name: 'Free States', description: 'Survivalist separatists. Bunkers, traps, and independence.' },
+  { name: 'The Forged', description: 'Raiders obsessed with fire and iron. "Forged in the flame."' },
   { name: 'Brotherhood of Steel', description: 'Military order. Hoards advanced tech. Heavy armor presence.' },
-  { name: 'The Sanctuary Clinic', description: 'Field medics and caretakers. Neutral… until threatened.' },
+  { name: 'Followers of the Apocalypse', description: 'Pacifist medics and scholars. "Knowledge for the people."' },
   { name: 'The Institute', description: 'Covert research network. Synth rumors persist.' },
-  { name: 'Bloodcap Raiders', description: 'Raiders with a taste for violence. No negotiations.' },
-  { name: 'Greenblade Company', description: 'Mercenary outfit. Fast strikes, close-quarters specialists.' },
+  { name: 'The Disciples', description: 'Sadistic raiders. They enjoy the kill more than the loot.' },
+  { name: 'The Gunners', description: 'High-end mercenaries. Combat armor, laser weapons, no morals.' },
   { name: 'The Minutemen', description: 'Citizen militia. Answers distress calls—sometimes.' },
   { name: 'The Railroad', description: 'Underground operators. Codes, safehouses, and secrets.' },
-  { name: 'Starlight Surveyors', description: 'Scavengers of satellites and signal towers. Obsessed with data.' },
-  { name: 'Dragonblood Tribe', description: 'Heavily modified humans. Tough, proud, territorial.' },
-  { name: 'Phoenix Reclaimers', description: 'Salvage-and-rebuild zealots. "Nothing stays broken."' },
-  { name: 'Thunder Legion', description: 'Generator lords. Controls power grids and energy weapons.' },
-  { name: 'Cryo Wardens', description: 'Cold storage keepers. Guards of sealed facilities and vaults.' },
-  { name: 'Venom Works', description: 'Chem-brewers. Poison, antidotes, and everything between.' },
-  { name: 'Mirage Syndicate', description: 'Scammers and infiltrators. Masters of misdirection.' },
-  { name: 'Iron Temple', description: 'Hardcore survivalists. Armor plating, discipline, endurance.' },
-  { name: 'The Balance Collective', description: 'Pragmatists. Trades in favors, intel, and uneasy alliances.' }
+  { name: 'Reilly\'s Rangers', description: 'Elite mapping unit. Explorers of the unknown.' },
+  { name: 'The Pack', description: 'Animalistic raiders. Survival of the fittest. Colorful armor.' },
+  { name: 'The Responders', description: 'Emergency services. Firefighters, police, and medics rebuilding.' },
+  { name: 'The Enclave', description: 'US Government remnants. Advanced Power Armor and Vertibirds.' },
+  { name: 'Children of Atom', description: 'Worshippers of the Glow. "Bask in Division."' },
+  { name: 'Caesar\'s Legion', description: 'Slaver army modeled after Rome. Machetes and discipline.' },
+  { name: 'The Great Khans', description: 'Proud warrior tribe. Drug runners and survivors.' },
+  { name: 'Atom Cats', description: 'Power Armor enthusiasts. "Coolest cats in the wasteland."' },
+  { name: 'The Operators', description: 'Profit-driven gang. Stylish armor, pragmatic, deadly efficient.' }
 ];
 
 // Task Name Pool (Categorized by Type)
@@ -367,13 +507,13 @@ interface TaskTypeConfig {
 
 // Item Pool Definitions
 const ITEM_POOLS = {
-  herbs: ['Mutfruit', 'Glowing Fungus', 'Bloodleaf', 'Healing Herb', 'Brain Fungus'],
-  materials: ['Scrap Metal', 'Mutant Parts', 'Rare Mineral', 'Circuit Board', 'Steel', 'Tungsten', 'Star Core'],
-  alchemy: ['Mutfruit', 'Glowing Fungus', 'Bloodleaf', 'Healing Herb'],
-  forge: ['Scrap Metal', 'Steel', 'Rare Mineral', 'Mutant Parts'],
-  maintain: ['Scrap Metal', 'Circuit Board', 'Rare Mineral'],
-  repair: ['Scrap Metal', 'Steel', 'Tungsten', 'Star Core'],
-  masterAlchemy: ['Pure Water', 'Rare Isotope', 'Fusion Cell', 'Quantum Particle'],
+  herbs: ['Mutfruit', 'Glowing Fungus', 'Bloodleaf', 'Hubflower', 'Brain Fungus'],
+  materials: ['Scrap Metal', 'Circuit Board', 'Fiberglass', 'Nuclear Material', 'Adhesive', 'Gears', 'Springs'],
+  alchemy: ['Purified Water', 'Antiseptic', 'Stimulant Plant', 'Glowing Fungus'],
+  forge: ['Steel', 'Aluminum', 'Tungsten', 'Adhesive'],
+  maintain: ['Scrap Metal', 'Circuit Board', 'Gears', 'Springs'],
+  repair: ['Scrap Metal', 'Steel', 'Adhesive', 'Fiberglass'],
+  masterAlchemy: ['Nuka-Cola Quantum', 'Fusion Cell', 'HalluciGen Gas', 'Ultracite'],
 };
 
 // Detailed Task Type Configurations
@@ -841,6 +981,9 @@ export const generateRandomRealms = (
     const name = availableNames[Math.floor(Math.random() * availableNames.length)];
     const description = availableDescriptions[Math.floor(Math.random() * availableDescriptions.length)];
 
+    // Get assets for this realm (with fallback)
+    const assets = getRealmAssets(name, riskLevel);
+
     // Randomly generate drops (2-4 items)
     const dropCount = 2 + Math.floor(Math.random() * 3);
     const drops: string[] = [];
@@ -862,6 +1005,8 @@ export const generateRandomRealms = (
       cost,
       riskLevel,
       drops,
+      banner: assets.banner,
+      thumbnail: assets.thumbnail,
     });
   }
 
@@ -1192,11 +1337,25 @@ const createPillItem = (pillName: string, cost: number, defaultItem?: Partial<It
     };
   }
 
-  // If still not found, use default (e.g., Healing Pill)
+  // If still not found, use default (e.g., Healing Pill) or a fallback to avoid crash
   if (defaultItem) {
     return { name: pillName, cost, item: { ...defaultItem, name: pillName, quantity: 1 } as Omit<Item, 'id'> };
   }
-  throw new Error(`Item definition not found: ${pillName}`);
+
+  // Fallback to avoid complete failure
+  console.warn(`Item definition not found: ${pillName}. Using fallback item.`);
+  return {
+    name: pillName,
+    cost,
+    item: {
+      name: pillName,
+      type: ItemType.Pill,
+      description: 'A standard medical supply found in the wasteland.',
+      rarity: 'Common',
+      quantity: 1,
+      effect: { hp: 50 }
+    }
+  };
 };
 
 /**
@@ -1226,7 +1385,8 @@ const createItemFromConstants = (itemName: string, cost: number): { name: string
 };
 
 // Faction shop item pool (used to generate armory items)
-const SECT_SHOP_ITEM_POOL: Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> = [
+// Changed to lazy-loaded functions to avoid initialization order issues
+const getSectShopItemPool = (): Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> => [
   createItemFromConstants('Reinforcement Kit', 10),
   createPillItem('Energy Drink', 20),
   createItemFromConstants('Mutant Flower', 50),
@@ -1236,7 +1396,7 @@ const SECT_SHOP_ITEM_POOL: Array<{ name: string; cost: number; item: Omit<Item, 
 ].filter((item): item is { name: string; cost: number; item: Omit<Item, 'id'> } => item !== null);
 
 // Floor 2 high-tier pool
-const SECT_SHOP_ITEM_POOL_FLOOR2: Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> = [
+const getSectShopItemPoolFloor2 = (): Array<{ name: string; cost: number; item: Omit<Item, 'id'> }> => [
   createPillItem('Survival Protocol', 2000),
   createPillItem('Breakthrough Cocktail', 3000),
   createPillItem('Apex Serum', 3500),
@@ -1251,7 +1411,7 @@ export const generateSectShopItems = (floor: 1 | 2 = 1): Array<{ name: string; c
   const usedItems = new Set<string>();
 
   // Choose pool by floor
-  const itemPool = floor === 2 ? SECT_SHOP_ITEM_POOL_FLOOR2 : SECT_SHOP_ITEM_POOL;
+  const itemPool = floor === 2 ? getSectShopItemPoolFloor2() : getSectShopItemPool();
 
   for (let i = 0; i < itemCount; i++) {
     // Randomly select an item

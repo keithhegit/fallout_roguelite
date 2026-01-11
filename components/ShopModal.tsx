@@ -60,7 +60,7 @@ const ShopModal: React.FC<Props> = ({
   );
 
   const canBuyItem = (shopItem: ShopItem): boolean => {
-    // 检查声望要求（声望商店）
+    // Check reputation requirement (Reputation Shop)
     if (shop.reputationRequired && (player.reputation || 0) < shop.reputationRequired) {
       return false;
     }
@@ -86,12 +86,12 @@ const ShopModal: React.FC<Props> = ({
     }
   };
 
-  // 过滤物品（根据类型，但不根据境界过滤，让所有物品都显示）
-  // 声望商店应该显示所有物品，即使当前境界无法购买
+  // Filter items (by type, but not by realm, show all items)
+  // Reputation shop should show all items, even if current realm cannot buy
   const availableItems = useMemo(() => {
     let filtered = shop.items;
 
-    // 按类型筛选
+    // Filter by type
     if (selectedTypeFilter !== 'all') {
       filtered = filtered.filter((item) => item.type === selectedTypeFilter);
     }
@@ -99,20 +99,20 @@ const ShopModal: React.FC<Props> = ({
     return filtered;
   }, [shop.items, selectedTypeFilter]);
 
-  // 可出售的物品（排除已装备的，并根据类型和品质筛选）
+  // Sellable items (exclude equipped, and filter by type and rarity)
   const sellableItems = useMemo(() => {
     if (!Array.isArray(player.inventory)) return [];
     let filtered = player.inventory.filter((item) => {
-      // 不能出售已装备的物品
+      // Cannot sell equipped items
       const isEquipped = Object.values(player.equippedItems).includes(item.id);
       if (isEquipped) return false;
 
-      // 按类型筛选
+      // Filter by type
       if (selectedTypeFilter !== 'all' && item.type !== selectedTypeFilter) {
         return false;
       }
 
-      // 按品质筛选
+      // Filter by rarity
       if (selectedRarity !== 'all' && item.rarity !== selectedRarity) {
         return false;
       }
@@ -128,16 +128,16 @@ const ShopModal: React.FC<Props> = ({
     selectedRarity,
   ]);
 
-  // 获取所有可用的物品类型（用于筛选器，基于未筛选的原始数据）
+  // Get all available item types (for filter, based on unfiltered raw data)
   const availableTypes = useMemo(() => {
     if (activeTab === 'buy') {
       const types = new Set<ItemType>();
-      // 使用原始商店物品列表，不根据境界过滤（显示所有物品类型）
+      // Use raw shop item list, do not filter by realm (show all item types)
       shop.items.forEach((item) => types.add(item.type as ItemType));
       return Array.from(types);
     } else {
       const types = new Set<ItemType>();
-      // 使用原始库存列表，只排除已装备的物品
+      // Use raw inventory list, only exclude equipped items
       player.inventory
         .filter((item) => {
           const isEquipped = Object.values(player.equippedItems).includes(
@@ -146,7 +146,7 @@ const ShopModal: React.FC<Props> = ({
           return !isEquipped;
         })
         .forEach((item) =>
-          types.add(item.type === '材料' ? ItemType.Material : item.type)
+          types.add(item.type === 'Material' ? ItemType.Material : item.type)
         );
       return Array.from(types);
     }
@@ -157,7 +157,7 @@ const ShopModal: React.FC<Props> = ({
     player.equippedItems,
   ]);
 
-  // 当切换标签页时，如果当前筛选的类型在新标签页中不存在，则重置为'all'
+  // When switching tabs, if current selected type does not exist in new tab, reset to 'all'
   React.useEffect(() => {
     if (
       selectedTypeFilter !== 'all' &&
@@ -165,7 +165,7 @@ const ShopModal: React.FC<Props> = ({
     ) {
       setSelectedTypeFilter('all');
     }
-    // 切换标签页时清空选择
+    // Clear selection when switching tabs
     setSelectedItems(new Set());
   }, [activeTab, availableTypes, selectedTypeFilter]);
 
@@ -198,17 +198,17 @@ const ShopModal: React.FC<Props> = ({
     itemsToSell.forEach((item) => {
       const shopItem = shop.items.find((si) => si.name === item.name);
       const sellPrice = shopItem?.sellPrice || calculateItemSellPrice(item);
-      // 确保 sellPrice 和 quantity 都是有效数字
+      // Ensure sellPrice and quantity are valid numbers
       const validSellPrice = isNaN(sellPrice) || sellPrice <= 0 ? 1 : sellPrice;
       const validQuantity = item.quantity || 1;
       const itemPrice = validSellPrice * validQuantity;
-      // 确保不是 NaN 才累加
+      // Ensure not NaN before adding
       if (!isNaN(itemPrice)) {
         totalPrice += itemPrice;
       }
     });
 
-    // 确保 totalPrice 是有效数字
+    // Ensure totalPrice is valid number
     if (isNaN(totalPrice) || totalPrice <= 0) {
       showConfirm('Error calculating price. Please try again.', 'Error', () => { });
       return;
@@ -238,9 +238,9 @@ const ShopModal: React.FC<Props> = ({
         className="bg-ink-950 w-full h-[80vh] md:h-auto md:max-w-4xl md:rounded-none border-0 md:border border-stone-800 shadow-2xl flex flex-col md:max-h-[90vh] overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background texture layer */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 扫描线效果 */}
+        {/* CRT scanline effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
 
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 md:rounded-none z-10">
@@ -273,7 +273,7 @@ const ShopModal: React.FC<Props> = ({
             {onRefreshShop && (
               <button
                 onClick={() => {
-                  const refreshCost = shop.refreshCost || 100; // 使用商店的刷新费用，默认100
+                  const refreshCost = shop.refreshCost || 100; // Use shop refresh cost, default 100
                   if (player.spiritStones < refreshCost) {
                     showError(`Low Caps! Restock requires ${refreshCost} Caps.`);
                     return;
@@ -346,7 +346,7 @@ const ShopModal: React.FC<Props> = ({
                     {shop.type} VENDOR
                   </span>
                 </div>
-                {/* 物品分类筛选器 */}
+                {/* Item category filter */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="flex items-center gap-1.5 text-stone-500 text-[10px] uppercase font-bold tracking-widest">
                     <Filter size={12} />
@@ -442,7 +442,7 @@ const ShopModal: React.FC<Props> = ({
                           </div>
                         )}
                         <div className="mt-4 flex flex-col justify-between space-y-2">
-                          {/* 价格和描述 */}
+                          {/* Price and description */}
                           <div className="flex flex-col space-y-1">
                             <div className="flex justify-between items-center">
                               <div className="flex items-center gap-1 text-amber-400">
@@ -462,7 +462,7 @@ const ShopModal: React.FC<Props> = ({
                             )}
                           </div>
 
-                          {/* 数量控制和购买按钮 */}
+                          {/* Quantity control and buy button */}
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1 border border-stone-800 rounded-none bg-stone-900">
                               <button
@@ -565,7 +565,7 @@ const ShopModal: React.FC<Props> = ({
                     SELECTED: <span className="text-amber-400">{selectedItems.size}</span>
                   </span>
                 </div>
-                {/* 批量操作栏 */}
+                {/* Batch operation bar */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button
@@ -589,7 +589,7 @@ const ShopModal: React.FC<Props> = ({
                     BULK SELL ({selectedItems.size})
                   </button>
                 </div>
-                {/* 过滤器 */}
+                {/* Filters */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="flex items-center gap-1.5 text-stone-500 text-[10px] uppercase font-bold tracking-widest">
@@ -629,12 +629,12 @@ const ShopModal: React.FC<Props> = ({
                       <Box size={12} />
                       <span>Rarity:</span>
                     </div>
-                    {(['all', '普通', '稀有', '传说', '仙品'] as const).map(
+                    {(['all', 'Common', 'Rare', 'Legendary', 'Mythic'] as const).map(
                       (rarity) => (
                         <button
                           key={rarity}
                           onClick={() => {
-                            setSelectedRarity(rarity);
+                            setSelectedRarity(rarity as any);
                             setSelectedItems(new Set());
                           }}
                           className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${selectedRarity === rarity
@@ -659,7 +659,7 @@ const ShopModal: React.FC<Props> = ({
                   {sellableItems.map((item) => {
                     const shopItem = shop.items.find((si) => si.name === item.name);
                     const sellPrice = shopItem?.sellPrice || calculateItemSellPrice(item);
-                    const rarity = item.rarity || '普通';
+                    const rarity = item.rarity || 'Common';
                     const isSelected = selectedItems.has(item.id);
 
                     return (

@@ -1,11 +1,11 @@
 /**
- * Alert 弹窗工具函数
- * 用于显示提示弹窗，替代 alert 和轻提示
+ * Alert Modal Utility Functions
+ * Used to show alert modals, replacing alert and toast
  */
 
 import { AlertType } from '../components/AlertModal';
 
-// 全局 alert 状态管理
+// Global alert state management
 interface AlertState {
   isOpen: boolean;
   type: AlertType;
@@ -19,7 +19,7 @@ interface AlertState {
 let globalAlertSetter: ((alert: AlertState | null) => void) | null = null;
 
 /**
- * 设置全局 alert setter
+ * Set global alert setter
  */
 export const setGlobalAlertSetter = (
   setter: (alert: AlertState | null) => void
@@ -28,12 +28,12 @@ export const setGlobalAlertSetter = (
 };
 
 /**
- * 显示 alert 弹窗
- * @param message 提示文本
- * @param type 提示类型: 'success' | 'error' | 'info' | 'warning'
- * @param title 标题（可选）
- * @param onConfirm 确认回调（可选）
- * @param showCancel 是否显示取消按钮（可选）
+ * Show alert modal
+ * @param message Message text
+ * @param type Alert type: 'success' | 'error' | 'info' | 'warning'
+ * @param title Title (optional)
+ * @param onConfirm Confirm callback (optional)
+ * @param showCancel Whether to show cancel button (optional)
  */
 export const showAlert = (
   message: string,
@@ -52,14 +52,14 @@ export const showAlert = (
       showCancel,
     });
   } else {
-    // 如果没有设置全局 setter，降级使用 alert（开发阶段）
+    // If global setter not set, fallback to alert (dev stage)
     console.warn('Alert setter not initialized, using alert fallback:', message);
     alert(message);
   }
 };
 
 /**
- * 显示成功提示
+ * Show success alert
  */
 export const showSuccess = (
   message: string,
@@ -70,7 +70,7 @@ export const showSuccess = (
 };
 
 /**
- * 显示错误提示
+ * Show error alert
  */
 export const showError = (
   message: string,
@@ -81,7 +81,7 @@ export const showError = (
 };
 
 /**
- * 显示警告提示
+ * Show warning alert
  */
 export const showWarning = (
   message: string,
@@ -93,7 +93,7 @@ export const showWarning = (
 };
 
 /**
- * 显示普通提示
+ * Show info alert
  */
 export const showInfo = (
   message: string,
@@ -104,11 +104,11 @@ export const showInfo = (
 };
 
 /**
- * 显示确认对话框
+ * Show confirm dialog
  */
 export const showConfirm = (
   message: string,
-  title: string = '确认',
+  title: string = 'Confirm',
   onConfirm?: () => void,
   onCancel?: () => void
 ) => {
@@ -123,7 +123,7 @@ export const showConfirm = (
       onCancel,
     });
   } else {
-    // 降级使用原生 confirm
+    // Fallback to native confirm
     const confirmed = window.confirm(`${title}\n\n${message}`);
     if (confirmed && onConfirm) {
       onConfirm();

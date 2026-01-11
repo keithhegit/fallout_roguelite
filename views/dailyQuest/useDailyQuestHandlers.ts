@@ -18,29 +18,29 @@ interface UseDailyQuestHandlersProps {
 }
 
 /**
- * 日常任务处理函数
- * 包含生成日常任务、更新任务进度、完成任务等
+ * Daily Quest Handler
+ * Includes generating daily quests, updating quest progress, completing quests, etc.
  */
 export function useDailyQuestHandlers({
   player,
   setPlayer,
   addLog,
 }: UseDailyQuestHandlersProps) {
-  // 生成日常任务（从30个预定义任务中随机选择）
+  // Generate daily quests (randomly select from 30 predefined quests)
   const generateDailyQuests = (): DailyQuest[] => {
-    // 随机生成10-20个任务
+    // Randomly generate 10-20 quests
     const questCount = Math.floor(Math.random() * 11) + 10; // 10-20
 
-    // 从30个预定义任务中随机选择
+    // Randomly select from predefined quests
     const availableQuests = [...PREDEFINED_DAILY_QUESTS];
     const selectedQuests: DailyQuest[] = [];
     const usedIndices = new Set<number>();
 
-    // 随机选择指定数量的任务，确保不重复
+    // Randomly select specified number of quests, ensuring no duplicates
     while (selectedQuests.length < questCount && usedIndices.size < availableQuests.length) {
       const randomIndex = Math.floor(Math.random() * availableQuests.length);
 
-      // 如果已经使用过这个索引，跳过
+      // If index already used, skip
       if (usedIndices.has(randomIndex)) {
         continue;
       }
@@ -48,19 +48,19 @@ export function useDailyQuestHandlers({
       usedIndices.add(randomIndex);
       const questTemplate = availableQuests[randomIndex];
 
-      // 对于突破任务，50%概率生成
+      // For breakthrough quests, 50% chance to generate
       if (questTemplate.type === 'breakthrough') {
         if (Math.random() < 0.5) {
-          continue; // 跳过，不生成突破任务
+          continue; // Skip
         }
       }
 
-      // 随机生成目标数量
+      // Randomly generate target amount
       const target = Math.floor(
         Math.random() * (questTemplate.targetRange.max - questTemplate.targetRange.min + 1)
       ) + questTemplate.targetRange.min;
 
-      // 计算奖励
+      // Calculate reward
       const reward = calculateDailyQuestReward(
         questTemplate.type,
         target,
@@ -80,7 +80,7 @@ export function useDailyQuestHandlers({
       });
     }
 
-    // 如果选择的任务数量不足，补充任务（避免重复）
+    // If selected quests are not enough, fill up (avoid duplicates)
     if (selectedQuests.length < questCount) {
       const remainingQuests = availableQuests.filter((_, index) => !usedIndices.has(index));
       const needed = questCount - selectedQuests.length;
@@ -90,7 +90,7 @@ export function useDailyQuestHandlers({
         const questTemplate = remainingQuests[randomIndex];
         remainingQuests.splice(randomIndex, 1);
 
-        // 对于突破任务，50%概率生成
+        // For breakthrough quests, 50% chance to generate
         if (questTemplate.type === 'breakthrough' && Math.random() < 0.5) {
           continue;
         }
@@ -122,16 +122,16 @@ export function useDailyQuestHandlers({
     return selectedQuests.slice(0, questCount);
   };
 
-  // 重置日常任务（每天重置）
+  // Reset daily quests (reset every day)
   const resetDailyQuests = () => {
     const today = new Date().toISOString().split('T')[0];
     const lastReset = player.lastDailyQuestResetDate || today;
 
-    // 如果日期变化或 dailyQuests 不存在/为空，则重置
+    // If date changed or dailyQuests not exist/empty, reset
     if (lastReset !== today || !player.dailyQuests || player.dailyQuests.length === 0) {
-      // 只有在日期变化时才显示生成提示
+      // Only show generating hint when date changed
       if (lastReset !== today) {
-        addLog('正在生成日常任务...', 'special');
+        addLog('Generating daily quests...', 'special');
       }
 
       const newQuests = generateDailyQuests();
@@ -143,28 +143,28 @@ export function useDailyQuestHandlers({
           return {
             ...prev,
             dailyQuests: newQuests,
-            // 如果是新的一天，重置进度和已完成列表
+            // If new day, reset progress and completed list
             dailyQuestProgress: isNewDay ? {} : (prev.dailyQuestProgress || {}),
             dailyQuestCompleted: isNewDay ? [] : (prev.dailyQuestCompleted || []),
             lastDailyQuestResetDate: today,
-            gameDays: isNewDay ? currentGameDays + 1 : currentGameDays, // 只有日期变化时才增加游戏天数
+            gameDays: isNewDay ? currentGameDays + 1 : currentGameDays, // Only increase game days when date changes
           };
         });
 
       if (lastReset !== today) {
-        addLog(`新的日常任务已刷新！今日共${newQuests.length}个任务。`, 'special');
+        addLog(`New daily quests refreshed! Total ${newQuests.length} quests today.`, 'special');
       }
     }
   };
 
-  // 初始化日常任务（如果为空）
+  // Initialize daily quests (if empty)
   const initializeDailyQuests = () => {
     const today = new Date().toISOString().split('T')[0];
     const lastReset = player.lastDailyQuestResetDate || today;
 
-    // 只有在以下情况才生成任务：
-    // 1. 任务不存在或为空
-    // 2. 日期变化（新的一天）
+    // Generate quests only if:
+    // 1. Quests not exist or empty
+    // 2. Date changed (new day)
     const needsReset =
       !player.dailyQuests ||
       player.dailyQuests.length === 0 ||
@@ -173,25 +173,25 @@ export function useDailyQuestHandlers({
     if (needsReset) {
       resetDailyQuests();
     }
-    // 如果任务已存在且日期未变化，不做任何操作
+    // If quests exist and date not changed, do nothing
   };
 
-  // 更新任务进度（不自动发放奖励，需要手动领取）
+  // Update quest progress (rewards not auto-issued, need manual claim)
   const updateQuestProgress = (
     questType: DailyQuestType,
     amount: number = 1
   ) => {
     setPlayer((prev) => {
-      // 确保 dailyQuests 存在
+      // Ensure dailyQuests exists
       if (!prev.dailyQuests || prev.dailyQuests.length === 0) {
         return prev;
       }
       const updatedQuests = prev.dailyQuests.map((quest) => {
-        // 只更新匹配类型且未完成的任务
+        // Only update matching type and not completed quests
         if (quest.type === questType && !quest.completed) {
-          // 计算新进度，确保不超过目标值
+          // Calculate new progress, ensure not exceeding target
           const newProgress = Math.min(quest.progress + amount, quest.target);
-          // 完成判定：当进度达到或超过目标值时，任务完成
+          // Completion check: when progress reaches or exceeds target, quest completed
           const completed = newProgress >= quest.target;
 
           return {
@@ -203,10 +203,10 @@ export function useDailyQuestHandlers({
         return quest;
       });
 
-      // 更新进度记录（保存所有匹配类型的任务的当前进度）
+      // Update progress record (save current progress of all matching type quests)
       const updatedProgress = { ...prev.dailyQuestProgress };
       updatedQuests.forEach((quest) => {
-        // 只更新匹配类型的任务进度（包括已完成的任务，用于记录）
+        // Only update matching type quest progress (including completed ones, for record)
         if (quest.type === questType) {
           updatedProgress[quest.id] = quest.progress;
         }
@@ -220,10 +220,10 @@ export function useDailyQuestHandlers({
     });
   };
 
-  // 领取任务奖励（手动领取，用于UI）
+  // Claim quest reward (manual claim for UI)
   const claimQuestReward = (questId: string) => {
     setPlayer((prev) => {
-      // 确保 dailyQuests 存在
+      // Ensure dailyQuests exists
       if (!prev.dailyQuests || prev.dailyQuests.length === 0) {
         return prev;
       }
@@ -236,16 +236,16 @@ export function useDailyQuestHandlers({
       const stoneGain = quest.reward.spiritStones || 0;
       const ticketGain = quest.reward.lotteryTickets || 0;
 
-      // 进阶物品奖励（高品质任务有概率获得）- 添加到背包
+      // Advanced item reward (chance to get for high quality quests) - Add to inventory
       const currentRealmIndex = REALM_ORDER.indexOf(prev.realm);
       let advancedItemMsg = '';
       let newInventory = [...prev.inventory];
 
-      // 只有传说或仙品任务才有概率获得进阶物品
-      if ((quest.rarity === '传说' || quest.rarity === '仙品') && Math.random() < 0.05) {
-        // 5%概率获得进阶物品
+      // Only Legendary or Mythic quests have chance to get advanced items
+      if ((quest.rarity === 'Legendary' || quest.rarity === 'Mythic') && Math.random() < 0.05) {
+        // 5% chance to get advanced item
 
-        // 筑基奇物（炼气期、筑基期）
+        // Foundation Treasure (Qi Refining, Foundation)
         if (currentRealmIndex <= REALM_ORDER.indexOf(RealmType.Foundation)) {
           const treasures = Object.values(FOUNDATION_TREASURES);
           const availableTreasures = treasures.filter(t => !t.requiredLevel || prev.realmLevel >= t.requiredLevel);
@@ -261,11 +261,11 @@ export function useDailyQuestHandlers({
               advancedItemType: 'foundationTreasure',
               advancedItemId: selected.id,
             });
-            advancedItemMsg = ` ✨ 额外获得筑基奇物【${selected.name}】！`;
+            advancedItemMsg = ` ✨ Bonus Foundation Treasure [${selected.name}]!`;
           }
         }
 
-        // 天地精华（金丹期、元婴期）
+        // Heaven Earth Essence (Golden Core, Nascent Soul)
         if (currentRealmIndex >= REALM_ORDER.indexOf(RealmType.GoldenCore) &&
             currentRealmIndex <= REALM_ORDER.indexOf(RealmType.NascentSoul)) {
           const essences = Object.values(HEAVEN_EARTH_ESSENCES);
@@ -281,11 +281,11 @@ export function useDailyQuestHandlers({
               advancedItemType: 'heavenEarthEssence',
               advancedItemId: selected.id,
             });
-            advancedItemMsg = ` ✨ 额外获得天地精华【${selected.name}】！`;
+            advancedItemMsg = ` ✨ Bonus Essence [${selected.name}]!`;
           }
         }
 
-        // 天地之髓（化神期及以上）
+        // Heaven Earth Marrow (Spirit Severing and above)
         if (currentRealmIndex >= REALM_ORDER.indexOf(RealmType.SpiritSevering)) {
           const marrows = Object.values(HEAVEN_EARTH_MARROWS);
           if (marrows.length > 0) {
@@ -300,11 +300,11 @@ export function useDailyQuestHandlers({
               advancedItemType: 'heavenEarthMarrow',
               advancedItemId: selected.id,
             });
-            advancedItemMsg = ` ✨ 额外获得天地之髓【${selected.name}】！`;
+            advancedItemMsg = ` ✨ Bonus Marrow [${selected.name}]!`;
           }
         }
 
-        // 规则之力（长生境）
+        // Longevity Rule (Longevity Realm)
         if (currentRealmIndex >= REALM_ORDER.indexOf(RealmType.LongevityRealm)) {
           const rules = Object.values(LONGEVITY_RULES);
           const currentRules = prev.longevityRules || [];
@@ -318,25 +318,25 @@ export function useDailyQuestHandlers({
               type: ItemType.AdvancedItem,
               description: selected.description,
               quantity: 1,
-              rarity: '仙品',
+              rarity: 'Mythic',
               advancedItemType: 'longevityRule',
               advancedItemId: selected.id,
             });
-            advancedItemMsg = ` ✨ 额外获得规则之力【${selected.name}】！`;
+            advancedItemMsg = ` ✨ Bonus Rule [${selected.name}]!`;
           }
         }
       }
 
-      // 构建奖励文本
+      // Build reward message
       const rewardParts: string[] = [];
-      if (expGain > 0) rewardParts.push(`${expGain} 修为`);
-      if (stoneGain > 0) rewardParts.push(`${stoneGain} 灵石`);
-      if (ticketGain > 0) rewardParts.push(`${ticketGain} 抽奖券`);
+      if (expGain > 0) rewardParts.push(`${expGain} Exp`);
+      if (stoneGain > 0) rewardParts.push(`${stoneGain} Spirit Stones`);
+      if (ticketGain > 0) rewardParts.push(`${ticketGain} Tickets`);
 
-      const rewardText = rewardParts.length > 0 ? rewardParts.join('、') : '无奖励';
+      const rewardText = rewardParts.length > 0 ? rewardParts.join(', ') : 'No Reward';
 
       addLog(
-        `领取日常任务【${quest.name}】奖励！获得 ${rewardText}。${advancedItemMsg}`,
+        `Claimed Daily Quest [${quest.name}] reward! Obtained ${rewardText}.${advancedItemMsg}`,
         advancedItemMsg ? 'special' : 'gain'
       );
 

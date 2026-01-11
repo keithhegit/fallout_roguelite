@@ -55,12 +55,12 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
     setConflictActionId(null);
   };
 
-  // 处理键盘输入
+  // Handle keyboard input
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, actionId: string) => {
       if (editingActionId !== actionId) return;
 
-      // 忽略修饰键本身
+      // Ignore modifier keys themselves
       if (
         event.key === 'Control' ||
         event.key === 'Shift' ||
@@ -81,7 +81,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
         meta: event.metaKey,
       };
 
-      // 检查冲突
+      // Check for conflicts
       const allShortcuts = { ...DEFAULT_SHORTCUTS, ...editedShortcuts };
       const conflictId = checkShortcutConflict(
         newShortcut,
@@ -92,7 +92,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
       if (conflictId) {
         setConflictActionId(conflictId);
         showError(
-          `快捷键冲突！该快捷键已被 "${SHORTCUT_DESCRIPTIONS[conflictId]?.description || conflictId}" 使用`
+          `Shortcut conflict! This key is already assigned to "${SHORTCUT_DESCRIPTIONS[conflictId]?.description || conflictId}"`
         );
         return;
       }
@@ -107,12 +107,12 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
     [editingActionId, editedShortcuts]
   );
 
-  // 全局键盘事件处理（用于编辑模式）
+  // Global keyboard event handler (for editing mode)
   useEffect(() => {
     if (!isEditing || !editingActionId) return;
 
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
-      // 忽略修饰键本身
+      // Ignore modifier keys themselves
       if (
         event.key === 'Control' ||
         event.key === 'Shift' ||
@@ -133,7 +133,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
         meta: event.metaKey,
       };
 
-      // 检查冲突
+      // Check for conflicts
       const allShortcuts = { ...DEFAULT_SHORTCUTS, ...editedShortcuts };
       const conflictId = checkShortcutConflict(
         newShortcut,
@@ -144,7 +144,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
       if (conflictId) {
         setConflictActionId(conflictId);
         showError(
-          `快捷键冲突！该快捷键已被 "${SHORTCUT_DESCRIPTIONS[conflictId]?.description || conflictId}" 使用`
+          `Shortcut conflict! This key is already assigned to "${SHORTCUT_DESCRIPTIONS[conflictId]?.description || conflictId}"`
         );
         return;
       }
@@ -163,7 +163,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
     };
   }, [isEditing, editingActionId, editedShortcuts]);
 
-  // 重置单个快捷键
+  // Reset single shortcut
   const handleResetOne = (actionId: string) => {
     setEditedShortcuts((prev) => {
       const newShortcuts = { ...prev };
@@ -173,14 +173,14 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
     setConflictActionId(null);
   };
 
-  // 重置所有快捷键
+  // Reset all shortcuts
   const handleResetAll = () => {
     setEditedShortcuts({});
     setConflictActionId(null);
     showSuccess('All shortcuts reset to defaults');
   };
 
-  // 保存快捷键
+  // Save shortcuts
   const handleSave = () => {
     if (onUpdateShortcuts) {
       onUpdateShortcuts(editedShortcuts);
@@ -189,7 +189,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
     }
   };
 
-  // 取消编辑
+  // Cancel editing
   const handleCancel = () => {
     setEditedShortcuts(customShortcuts || {});
     setEditingActionId(null);
@@ -235,7 +235,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
         className="bg-ink-950 w-full max-w-2xl rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background texture layer */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
           style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
@@ -368,7 +368,7 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
                           : 'border-stone-800/50 hover:border-stone-700 hover:bg-stone-900/40'
                         }`}
                     >
-                      {/* 悬停纹理 */}
+                      {/* Hover texture */}
                       <div className="absolute inset-0 pointer-events-none opacity-0 group-hover/item:opacity-[0.02] transition-opacity"
                         style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />
 

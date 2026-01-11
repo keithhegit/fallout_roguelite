@@ -176,3 +176,139 @@
   
     https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/status_icon_bleeding.png
 
+
+关键界面“头图/占位插画”（让弹窗不再像表单）
+
+- Radio（主界面）背景：竖屏 1 张（推荐 1080×1920，可与 Welcome 同系列，但层级更弱，可适当压暗）
+
+  cdn: https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/radio_background.jpg
+
+- Factions（派系）头图占位：1 张（推荐宽 1080，高 360~480，例如 1080×400 的长横幅通用派系插画）
+
+  cdn: https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_factions_background.png
+
+- Inventory（背包）头图占位：1 张（推荐宽 1080，高 280~360，例如 1080×320，视觉权重低于 Radio/Factions）
+
+  cdn: https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_inventory_background.png
+
+
+## 1) Vault / 地点（Secret Realm / Zone）资源清单
+
+**主要使用位置**
+
+- Zone 列表卡片： [SecretRealmModal.tsx](file:///D:/Code/fallout_roguelike/components/SecretRealmModal.tsx)
+- Zone 数据来源： [secretRealms.ts](file:///D:/Code/fallout_roguelike/constants/secretRealms.ts)
+
+**每个地点需要 2 张图**
+
+1. **地点缩略图（用于列表卡片）**
+
+- 尺寸：512×512（推荐输出），同时可再导出 256×256
+- 宽高比：1:1
+- 用途：Zone 卡片左侧/顶部图位（未来接入时），也可用于日志里“进入区域”提示图
+
+1. **地点横幅（用于进入/详情头图）**
+
+- 尺寸：1080×360（或 960×320）
+- 宽高比：3:1
+- 用途：进入 Zone 时的标题区、结算弹窗头图、地图页头部
+
+**需要做的地点列表（全量：13 个）**
+
+- realm-vault-111 Vault 111 Surroundings
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_big_mt.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_vault111.png
+
+- realm-sanctuary Sanctuary Hills
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_sanctuary_hills.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_sanctuary_hills.png
+
+- realm-concord Concord Ruins
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_concord_ruins.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_concord_ruins.png
+
+- realm-diamond-city Diamond City Outskirts
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_diamond_city.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_diamond_city.png
+
+- realm-super-duper-mart Super-Duper Mart
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_super_duper_mart.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_super_duper_mart.png
+
+- realm-corvega Corvega Assembly Plant
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_corvega_assembly_plant.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_corvega_assembly_plant.png
+
+- realm-west-tek West-Tek Research Facility
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_west_tek.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_west_tek.png
+
+- realm-mass-fusion Mass Fusion Building
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_mass_fusion.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_mass_fusion.png
+
+- realm-institute The Institute
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_the_institute.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_the_institute.png
+
+- realm-glowing-sea The Glowing Sea
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_glowing_sea.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_glowing_sea.png
+
+- realm-prydwen The Prydwen
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_the_prydwen.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_the_prydwen.png
+
+- realm-enclave-rig Enclave Oil Rig
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_enclave_rig.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_enclave_rig.png
+
+- realm-big-mt Big MT Research Center
+
+  横幅：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/banner_zone_big_mt.png
+  缩略图：https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/wasteland/thumbnail_zone_big_mt.png
+
+
+## 2) 补充地点素材需求（Remaining Locations）
+
+以下地点已在游戏字典中，但尚未分配美术素材。请补充 **缩略图 (512x512)** 和 **横幅 (1080x360)**。
+
+**Low Risk**
+- Abandoned Shack, Farm Ruins, Dry Riverbed, Scavenger Camp, Small Vault Access
+- Old Gas Station, Collapsed Tunnel, Rust Yard, Makeshift Shelter, Highway Underpass
+- Junk Heap, Radio Tower Base, Cracked Reservoir, Overgrown Park, Burnt Forest
+- Empty Silo, Broken Bridge, Train Yard, Subway Station, Water Treatment Plant
+- Drive-In Theater, Diner Ruins, Trailer Park, Roadside Motel, Ranger Cabin, Picnic Area
+
+**Medium Risk**
+- Metro Tunnel, Raider Outpost, Medical Facility, Relay Tower, Armory Cache
+- Red Rocket Station, Vault 111 Entrance, Lexington Ruins
+- Saugus Ironworks, Dunwich Borers, Hubris Comics, Trinity Tower, Boston Public Library
+- General Atomics Galleria, RobCo Sales Center, Poseidon Energy, Hallucigen, Inc.
+- Vault 81, Hardware Town, Beantown Brewery, Faneuil Hall, Combat Zone, Satellite Station
+
+**High Risk**
+- Irradiated Plant, Blacksite Lab, Toxic Marsh, Super Mutant Nest, Collapsed Reactor
+- Glowing Sea Edge, Crater of Atom, Sentinel Site, Mass Pike Tunnel, Kendall Hospital
+- Malden Middle School, Parsons State Insane Asylum, Spectacle Island, Fort Strong, The Castle
+- Boston Airport, Libertalia, Quincy Ruins, Gunners Plaza
+- Fort Hagen, Vault 95, Huntersville, The Burrows, Abandoned Bog
+
+**Extreme Risk**
+- Ground Zero, Quarantine Vault, FEV Lab Core, Dead Zone, Containment Breach Site
+- Glowing Sea Crater, Institute Reactor, Mariposa Military Base, The Divide
+- Sierra Madre Casino, Lonesome Road, Vault 87, Raven Rock
+- Adams Air Force Base, Mobile Crawler, Liberty Prime Hangar, Zeta Mothership, The Master's Lair
+- Glassed Cavern, Site Alpha, Whitespring Bunker, Watoga Underground, The Deep, Wendigo Cave

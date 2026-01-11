@@ -110,17 +110,17 @@ function App() {
     saveGame, // Save game function
   } = useGameState();
 
-  // 欢迎界面状态 - 总是显示欢迎界面，让用户选择继续或开始
+  // Welcome Screen State - Always show welcome screen, let user choose to continue or start
   const [showWelcome, setShowWelcome] = useState(true);
 
-  // 修仙法门弹窗状态
+  // Cultivation Intro Modal State
   const [showCultivationIntro, setShowCultivationIntro] = useState(false);
 
-  // 使用自定义hooks管理游戏效果
+  // Use custom hooks to manage game effects
   const { visualEffects, createAddLog, triggerVisual } = useGameEffects();
   const addLog = createAddLog(setLogs);
 
-  // 使用统一的 App 状态管理 (通过 Context)
+  // Use unified App state management (via Context)
   const appState = useUI();
   const {
     modals,
@@ -146,7 +146,7 @@ function App() {
 
   const { closeCurrentModal: handleCloseCurrentModal, openTurnBasedBattle: handleOpenTurnBasedBattle } = actions;
 
-  // 解构状态以便使用
+  // Destructure state for use
   const {
     isInventoryOpen,
     isCultivationOpen,
@@ -199,7 +199,7 @@ function App() {
 
   const { isDebugModeEnabled, isAutoAdventureConfigOpen } = modals;
 
-  // 检查调试模式是否启用
+  // Check if debug mode is enabled
   useEffect(() => {
     const debugMode = localStorage.getItem(STORAGE_KEYS.DEBUG_MODE) === 'true';
     setIsDebugModeEnabled(debugMode);
@@ -228,19 +228,19 @@ function App() {
   const { value: itemActionLogValue, setValue: setItemActionLogRaw } =
     itemActionLog;
 
-  // 使用公共 hook 管理 itemActionLog，自动处理延迟清除
+  // Use common hook to manage itemActionLog, automatically handle delayed clearing
   const { itemActionLog: delayedItemActionLog, setItemActionLog } = useItemActionLog({
     delay: 3000,
     externalSetter: setItemActionLogRaw,
   });
 
-  // 使用自定义 hook 处理游戏初始化
+  // Use custom hook to handle game initialization
   useGameInitialization();
 
-  // 检查是否需要显示修仙法门弹窗（新游戏时显示，已显示过则不显示）
+  // Check if cultivation intro modal needs to be shown (show on new game, do not show if already shown)
   useEffect(() => {
     if (gameStarted && player && !localStorage.getItem(STORAGE_KEYS.CULTIVATION_INTRO_SHOWN)) {
-      // 延迟一小段时间显示，确保游戏界面已加载完成
+      // Delay showing for a short time to ensure game interface is loaded
       const timer = setTimeout(() => {
         setShowCultivationIntro(true);
       }, 500);
@@ -250,7 +250,7 @@ function App() {
 
   const { loading, setLoading, cooldown, setCooldown } = appState.global;
 
-  // 使用自定义 hook 处理游戏时长和保存
+  // Use custom hook to handle playtime and saving
   usePlayTime({
     gameStarted,
     player,
@@ -261,16 +261,16 @@ function App() {
 
   const { alertState, setAlertState, closeAlert } = useGlobalAlert();
 
-  // 存档管理器状态
+  // Save Manager State
   const [isSaveManagerOpen, setIsSaveManagerOpen] = useState(false);
   const [isSaveCompareOpen, setIsSaveCompareOpen] = useState(false);
   const [compareSave1, setCompareSave1] = useState<SaveData | null>(null);
   const [compareSave2, setCompareSave2] = useState<SaveData | null>(null);
 
-  // 天劫弹窗状态
+  // Tribulation Modal State
   const [tribulationState, setTribulationState] = useState<TribulationState | null>(null);
 
-  // 初始化所有模块化的 handlers
+  // Initialize all modular handlers
   const battleHandlers = useBattleHandlers({
     battleReplay,
     setBattleReplay,
@@ -281,14 +281,14 @@ function App() {
     animationSpeed: settings.animationSpeed,
   });
 
-  // 使用战斗结果处理 hook
+  // Use battle result handling hook
   const { handleBattleResult } = useBattleResultHandler({
     player,
     setPlayer,
     addLog,
     setLoading,
     updateQuestProgress: (type: string, amount: number = 1) => {
-      // 类型安全转换：string -> DailyQuestType，运行时验证
+      // Type safe conversion: string -> DailyQuestType, runtime validation
       if (isValidDailyQuestType(type)) {
         dailyQuestHandlers.updateQuestProgress(type, amount);
       }
@@ -299,7 +299,7 @@ function App() {
     player,
     setPlayer,
     addLog,
-    checkLevelUp: () => { }, // 检查升级逻辑在 useEffect 中处理
+    checkLevelUp: () => { }, // Level up logic handled in useEffect
   });
 
   const breakthroughHandlers = useBreakthroughHandlers({
@@ -310,7 +310,7 @@ function App() {
     loading,
   });
 
-  // 使用等级提升与天劫处理 hook
+  // Use level up and tribulation handling hook
   const { isTribulationTriggeredRef } = useLevelUp({
     player,
     setPlayer,
@@ -318,15 +318,15 @@ function App() {
     setTribulationState,
     handleBreakthrough: breakthroughHandlers.handleBreakthrough,
     addLog,
-    autoAdventure, // 传递自动历练状态，自动历练时不触发突破
+    autoAdventure, // Pass auto adventure state, do not trigger breakthrough during auto adventure
   });
 
-  // 处理天劫完成
+  // Handle tribulation completion
   const handleTribulationComplete = (result: TribulationResult) => {
-    // 不在这里重置标志位，让境界变化时的 useEffect 来重置
+    // Do not reset flag here, let useEffect reset it when realm changes
     if (result.success) {
-      // 渡劫成功，执行突破（跳过成功率检查）
-      // 将天劫产生的扣血传递给突破处理器，确保在同一次状态更新中处理
+      // Tribulation successful, execute breakthrough (skip success rate check)
+      // Pass tribulation HP loss to breakthrough handler, ensure processing in same state update
       breakthroughHandlers.handleBreakthrough(true, result.hpLoss || 0);
 
       if (result.hpLoss && result.hpLoss > 0) {
@@ -336,7 +336,7 @@ function App() {
       }
       setTribulationState(null);
     } else {
-      // 渡劫失败，触发死亡
+      // Tribulation failed, trigger death
       setDeathReason(result.description || t('messages.evolutionFailed'));
       setPlayer((prev) => {
         if (!prev) return prev;
@@ -346,12 +346,12 @@ function App() {
     }
   };
 
-  // 确保新游戏开始时自动历练状态被重置
-  // 当检测到新游戏开始时（玩家从null变为有值，且是初始状态），重置自动历练状态
+  // Ensure auto adventure state is reset when new game starts
+  // Reset auto adventure state when new game is detected (player changes from null to value, and is in initial state)
   const prevPlayerNameRef = useRef<string | null>(null);
   useEffect(() => {
     if (gameStarted && player) {
-      // 检测是否是真正的新游戏：玩家名字变化，且玩家是初始状态（exp为0，境界为初始境界）
+      // Detect if it is a true new game: player name changes, and player is in initial state (exp is 0, realm is initial realm)
       const isNewPlayer = prevPlayerNameRef.current !== null &&
         prevPlayerNameRef.current !== player.name;
       const isInitialState = player.exp === 0 &&
@@ -359,13 +359,13 @@ function App() {
         player.realmLevel === 1;
 
       if (isNewPlayer && isInitialState) {
-        // 新游戏开始时，确保自动历练状态被重置
+        // Ensure auto adventure state is reset when new game starts
         setAutoAdventure(false);
       }
 
       prevPlayerNameRef.current = player.name;
     } else if (!gameStarted || !player) {
-      // 游戏未开始或玩家为null时，重置ref
+      // Reset ref when game not started or player is null
       prevPlayerNameRef.current = null;
     }
   }, [gameStarted, player?.name, player?.exp, player?.realm, player?.realmLevel]);
@@ -376,7 +376,7 @@ function App() {
   );
   const [deathReason, setDeathReason] = useState('');
 
-  // 使用自定义 hook 处理涅槃重生
+  // Use custom hook to handle rebirth
   const { handleRebirth } = useRebirth({
     setPlayer,
     setLogs,
@@ -422,7 +422,7 @@ function App() {
     setItemActionLog,
   });
 
-  // 初始化新的模块化 handlers
+  // Initialize new modular handlers
   const shopHandlers = useShopHandlers({
     player,
     setPlayer,
@@ -451,7 +451,7 @@ function App() {
     setLotteryRewards,
   });
 
-  // 洞府相关逻辑
+  // Grotto related logic
   const grottoHandlers = useGrottoHandlers({
     player,
     setPlayer,
@@ -459,7 +459,7 @@ function App() {
     setItemActionLog,
   });
 
-  // 冒险相关逻辑抽离到 useAdventureHandlers
+  // Adventure related logic extracted to useAdventureHandlers
   const adventureHandlers = useAdventureHandlers({
     player,
     setPlayer,
@@ -470,51 +470,51 @@ function App() {
     loading,
     cooldown,
     onOpenShop: (shopType: ShopType) => {
-      // 如果配置了跳过商店，不打开商店
+      // If skip shop is configured, do not open shop
       if (autoAdventure && autoAdventureConfig.skipShop) {
         return;
       }
-      // 复用 shopHandlers 的逻辑
+      // Reuse shopHandlers logic
       shopHandlers.handleOpenShop(shopType);
     },
     onOpenBattleModal: (replay: BattleReplay) => {
-      // 保存最近的战斗数据，用于死亡统计
+      // Save recent battle data for death statistics
       setLastBattleReplay(replay);
-      // 打开战斗弹窗（自动模式下也会打开）
+      // Open battle modal (also opens in auto mode)
       battleHandlers.openBattleModal(replay);
     },
     onReputationEvent: (event) => {
-      // 测试环境打印调试信息
-      logger.debug('【声望事件回调触发】', {
+      // Print debug info in test environment
+      logger.debug('【Reputation Event Callback Triggered】', {
         event,
         hasChoices: !!event?.choices,
         choicesCount: event?.choices?.length || 0,
         autoAdventure,
       });
 
-      // 如果配置了跳过声望事件，不打开弹窗
+      // If skip reputation event is configured, do not open modal
       if (autoAdventure && autoAdventureConfig.skipReputationEvent) {
         return;
       }
 
-      // 打开声望事件弹窗
+      // Open reputation event modal
       setReputationEvent(event);
       setIsReputationEventOpen(true);
 
-      // 测试环境确认状态设置
-      logger.debug('【声望事件状态设置】', {
+      // Confirm state setting in test environment
+      logger.debug('【Reputation Event State Set】', {
         eventSet: !!event,
         shouldOpen: true,
       });
     },
     onOpenTurnBasedBattle: handleOpenTurnBasedBattle,
-    skipBattle: autoAdventure && autoAdventureConfig.skipBattle, // 根据配置决定是否跳过战斗
-    fleeOnBattle: autoAdventure && autoAdventureConfig.fleeOnBattle, // 根据配置决定是否逃跑
-    skipShop: autoAdventure && autoAdventureConfig.skipShop, // 根据配置决定是否跳过商店
-    skipReputationEvent: autoAdventure && autoAdventureConfig.skipReputationEvent, // 根据配置决定是否跳过声望事件
-    useTurnBasedBattle: true, // 使用新的回合制战斗系统
-    autoAdventure, // 传递自动历练状态
-    setAutoAdventure, // 传递设置自动历练状态的函数
+    skipBattle: autoAdventure && autoAdventureConfig.skipBattle, // Decide whether to skip battle based on config
+    fleeOnBattle: autoAdventure && autoAdventureConfig.fleeOnBattle, // Decide whether to flee based on config
+    skipShop: autoAdventure && autoAdventureConfig.skipShop, // Decide whether to skip shop based on config
+    skipReputationEvent: autoAdventure && autoAdventureConfig.skipReputationEvent, // Decide whether to skip reputation event based on config
+    useTurnBasedBattle: true, // Use new turn-based battle system
+    autoAdventure, // Pass auto adventure state
+    setAutoAdventure, // Pass function to set auto adventure state
   });
 
   const sectHandlers = useSectHandlers({
@@ -533,18 +533,18 @@ function App() {
     addLog,
   });
 
-  // 日常任务相关逻辑
+  // Daily quest related logic
   const dailyQuestHandlers = useDailyQuestHandlers({
     player,
     setPlayer,
     addLog,
   });
 
-  // 从 handlers 中提取函数
+  // Extract functions from handlers
   const handleSkipBattleLogs = battleHandlers.handleSkipBattleLogs;
   const handleCloseBattleModal = battleHandlers.handleCloseBattleModal;
 
-  // 使用死亡检测 hook
+  // Use death detection hook
   useDeathDetection({
     player,
     setPlayer,
@@ -574,25 +574,25 @@ function App() {
   const handleBatchDiscard = useCallback((itemIds: string[]) => {
     setPlayer((prev) => {
       if (!prev) return prev;
-      // 使用 Set 提高查找性能，特别是当 itemIds 数组较大时
+      // Use Set to improve lookup performance, especially when itemIds array is large
       const itemIdsSet = new Set(itemIds);
       const newInv = prev.inventory.filter((i) => !itemIdsSet.has(i.id));
-      addLog(`你批量丢弃了 ${itemIds.length} 件物品。`, 'normal');
+      addLog(`You batch discarded ${itemIds.length} items.`, 'normal');
       return { ...prev, inventory: newInv };
     });
   }, [addLog, setPlayer]);
 
-  // 处理从宗门宝库拿取物品
+  // Handle taking items from Sect Treasure Vault
   const handleTakeTreasureVaultItem = useCallback((item: Item) => {
     setPlayer((prev) => {
       if (!prev) return prev;
       const newInv = [...prev.inventory];
-      // 检查背包中是否已有相同物品（装备类物品不叠加）
+      // Check if same item exists in inventory (equipment items do not stack)
       const isEquipment = item.isEquippable || false;
 
       if (!isEquipment) {
-        // 非装备类物品尝试叠加
-        // 使用优化的深度比较函数替代 JSON.stringify，提高性能
+        // Try to stack non-equipment items
+        // Use optimized deep comparison function instead of JSON.stringify to improve performance
         const existingIndex = newInv.findIndex(
           i => i.name === item.name &&
             i.type === item.type &&
@@ -606,11 +606,11 @@ function App() {
           newInv.push(item);
         }
       } else {
-        // 装备类物品直接添加（不叠加）
+        // Directly add equipment items (do not stack)
         newInv.push(item);
       }
 
-      // 更新宝库状态：将物品ID添加到已拿取列表（使用 Set 提高性能）
+      // Update vault state: add item ID to taken list (use Set to improve performance)
       const currentVault = prev.sectTreasureVault || { items: [], takenItemIds: [] };
       const takenIdsSet = new Set(currentVault.takenItemIds || []);
       if (!takenIdsSet.has(item.id)) {
@@ -618,7 +618,7 @@ function App() {
       }
       const newTakenIds = Array.from(takenIdsSet);
 
-      addLog(`✨ 你从宗门宝库中获得了【${item.name}】！`, 'special');
+      addLog(`✨ You obtained [${item.name}] from Sect Treasure Vault!`, 'special');
       return {
         ...prev,
         inventory: newInv,
@@ -630,7 +630,7 @@ function App() {
     });
   }, [addLog, setPlayer]);
 
-  // 处理更新宗门宝库（初始化宝库物品）
+  // Handle updating Sect Treasure Vault (initialize vault items)
   const handleUpdateVault = useCallback((vault: { items: Item[]; takenItemIds: string[] }) => {
     setPlayer((prev) => ({
       ...prev,
@@ -638,7 +638,7 @@ function App() {
     }));
   }, [setPlayer]);
 
-  // 包装 handleEquipItem，添加任务进度更新
+  // Wrap handleEquipItem, add quest progress update
   const handleEquipItem = useCallback((item: Item, slot: EquipmentSlot) => {
     equipmentHandlers.handleEquipItem(item, slot);
     dailyQuestHandlers.updateQuestProgress('equip', 1);
@@ -646,7 +646,7 @@ function App() {
 
   const handleUnequipItem = equipmentHandlers.handleUnequipItem;
 
-  // 包装 handleRefineNatalArtifact，添加任务进度更新
+  // Wrap handleRefineNatalArtifact, add quest progress update
   const handleRefineNatalArtifact = useCallback((item: Item) => {
     equipmentHandlers.handleRefineNatalArtifact(item);
     dailyQuestHandlers.updateQuestProgress('equip', 1);
@@ -655,7 +655,7 @@ function App() {
   const handleUnrefineNatalArtifact =
     equipmentHandlers.handleUnrefineNatalArtifact;
 
-  // 包装 handleLearnArt，添加任务进度更新
+  // Wrap handleLearnArt, add quest progress update
   const handleLearnArt = useCallback((art: CultivationArt) => {
     cultivationHandlers.handleLearnArt(art);
     dailyQuestHandlers.updateQuestProgress('learn', 1);
@@ -663,7 +663,7 @@ function App() {
 
   const handleActivateArt = cultivationHandlers.handleActivateArt;
 
-  // 包装 handleCraft，添加任务进度更新
+  // Wrap handleCraft, add quest progress update
   const handleCraft = useCallback(async (recipe: Recipe) => {
     await alchemyHandlers.handleCraft(recipe);
     dailyQuestHandlers.updateQuestProgress('alchemy', 1);
@@ -675,15 +675,15 @@ function App() {
   const handleAllocateAllAttributes =
     characterHandlers.handleAllocateAllAttributes;
 
-  // 提取新的模块化 handlers
+  // Extract new modular handlers
   const handleBuyItem = shopHandlers.handleBuyItem;
   const handleSellItem = shopHandlers.handleSellItem;
 
   const handleRefreshShop = useCallback((newItems: ShopItem[]) => {
     if (!currentShop || !player) return;
-    const refreshCost = currentShop.refreshCost || 100; // 使用商店的刷新费用，默认100
+    const refreshCost = currentShop.refreshCost || 100; // Use shop refresh cost, default 100
     if (player.spiritStones < refreshCost) {
-      addLog(`灵石不足，无法刷新商店。需要${refreshCost}灵石。`, 'danger');
+      addLog(`Insufficient Spirit Stones to refresh shop. Need ${refreshCost} Spirit Stones.`, 'danger');
       return;
     }
     setCurrentShop({
@@ -694,13 +694,13 @@ function App() {
       if (!prev) return prev;
       return {
         ...prev,
-        spiritStones: prev.spiritStones - refreshCost, // 扣除刷新费用
+        spiritStones: prev.spiritStones - refreshCost, // Deduct refresh cost
       };
     });
-    addLog('商店物品已刷新！', 'special');
+    addLog('Shop items refreshed!', 'special');
   }, [currentShop, player, addLog, setCurrentShop, setPlayer]);
 
-  // 处理声望事件选择
+  // Handle reputation event selection
   const handleReputationEventChoice = useCallback((choiceIndex: number) => {
     if (!reputationEvent || !player) return;
 
@@ -717,9 +717,9 @@ function App() {
       let newExp = prev.exp;
       let newSpiritStones = prev.spiritStones;
 
-      // 处理其他变化
+      // Handle other changes
       if (choice.hpChange !== undefined) {
-        // 使用实际最大血量（包含金丹法数加成等）作为上限
+        // Use actual max HP (including Golden Core method bonuses etc.) as limit
         const totalStats = getPlayerTotalStats(prev);
         const actualMaxHp = totalStats.maxHp;
         newHp = Math.max(0, Math.min(actualMaxHp, prev.hp + choice.hpChange));
@@ -734,15 +734,15 @@ function App() {
         );
       }
 
-      // 记录日志
+      // Record log
       if (choice.reputationChange > 0) {
         addLog(
-          `✨ 你的声望增加了 ${choice.reputationChange} 点！当前声望：${newReputation}`,
+          `✨ Your reputation increased by ${choice.reputationChange}! Current reputation: ${newReputation}`,
           'gain'
         );
       } else if (choice.reputationChange < 0) {
         addLog(
-          `⚠️ 你的声望减少了 ${Math.abs(choice.reputationChange)} 点！当前声望：${newReputation}`,
+          `⚠️ Your reputation decreased by ${Math.abs(choice.reputationChange)}! Current reputation: ${newReputation}`,
           'danger'
         );
       }
@@ -767,11 +767,11 @@ function App() {
       };
     });
 
-    // 关闭弹窗并清除事件
+    // Close modal and clear event
     setIsReputationEventOpen(false);
     setReputationEvent(null);
 
-    // 如果自动历练是因为声望事件暂停的，恢复自动历练
+    // If auto adventure was paused due to reputation event, resume auto adventure
   }, [
     reputationEvent,
     player,
@@ -785,7 +785,7 @@ function App() {
   const handleUpdateSettings = settingsHandlers.handleUpdateSettings;
   const handleActivatePet = petHandlers.handleActivatePet;
   const handleDeactivatePet = petHandlers.handleDeactivatePet;
-  // 包装 handleFeedPet，添加任务进度更新
+  // Wrap handleFeedPet, add quest progress update
   const handleFeedPet = useCallback((
     petId: string,
     feedType: 'hp' | 'item' | 'exp',
@@ -797,7 +797,7 @@ function App() {
 
   const handleBatchFeedItems = petHandlers.handleBatchFeedItems;
   const handleBatchFeedHp = petHandlers.handleBatchFeedHp;
-  // 包装 handleEvolvePet，添加任务进度更新
+  // Wrap handleEvolvePet, add quest progress update
   const handleEvolvePet = useCallback((petId: string) => {
     petHandlers.handleEvolvePet(petId);
     dailyQuestHandlers.updateQuestProgress('pet', 1);
@@ -809,7 +809,7 @@ function App() {
   const handleJoinSect = sectHandlers.handleJoinSect;
   const handleLeaveSect = sectHandlers.handleLeaveSect;
   const handleSafeLeaveSect = sectHandlers.handleSafeLeaveSect;
-  // 包装 handleSectTask，添加任务进度更新
+  // Wrap handleSectTask, add quest progress update
   const handleSectTask = useCallback((task: RandomSectTask, encounterResult?: AdventureResult) => {
     sectHandlers.handleSectTask(task, encounterResult);
     dailyQuestHandlers.updateQuestProgress('sect', 1);
@@ -818,28 +818,28 @@ function App() {
   const handleSectBuy = sectHandlers.handleSectBuy;
   const checkAchievements = achievementHandlers.checkAchievements;
 
-  // 从冒险 handlers 中提取函数
+  // Extract functions from adventure handlers
   const { handleAdventure: originalHandleAdventure, executeAdventure } =
     adventureHandlers;
 
-  // 包装 handleAdventure，添加自动打坐检查
+  // Wrap handleAdventure, add auto meditate check
   const handleAdventure = async () => {
-    // 如果正在自动打坐，则不能手动历练
+    // If auto meditating, cannot manually adventure
     if (autoMeditate) {
-      addLog('正在打坐中，无法历练。请先停止自动打坐。', 'danger');
+      addLog('Meditating, cannot adventure. Please stop auto meditate first.', 'danger');
       return;
     }
     await originalHandleAdventure();
-    // 更新日常任务进度
+    // Update daily quest progress
     dailyQuestHandlers.updateQuestProgress('adventure', 1);
   };
 
-  // 包装 handleMeditate，添加自动打坐检查
+  // Wrap handleMeditate, add auto meditate check
   const handleMeditate = () => {
     if (loading || cooldown > 0 || !player) return;
-    // 如果正在自动历练，则不能手动打坐
+    // If auto adventuring, cannot manually meditate
     if (autoAdventure) {
-      addLog('正在历练中，无法打坐。请先停止自动历练。', 'danger');
+      addLog('Adventuring, cannot meditate. Please stop auto adventure first.', 'danger');
       return;
     }
     meditationHandlers.handleMeditate();
@@ -847,7 +847,7 @@ function App() {
     setCooldown(1);
   };
 
-  // 使用被动回血和冷却管理 hook
+  // Use passive regeneration and cooldown management hook
   usePassiveRegeneration({
     player,
     setPlayer,
@@ -855,14 +855,14 @@ function App() {
     setCooldown,
   });
 
-  // 使用洞府自动收获 hook
+  // Use auto grotto harvest hook
   useAutoGrottoHarvest({
     player,
     setPlayer,
     addLog,
   });
 
-  // 使用自动功能 hook
+  // Use auto features hook
   useAutoFeatures({
     autoMeditate,
     autoAdventure,
@@ -875,12 +875,12 @@ function App() {
     handleMeditate,
     handleAdventure,
     setCooldown,
-    autoAdventureConfig, // 传递自动历练配置
-    setAutoAdventure, // 传递设置自动历练状态的函数
-    addLog, // 传递日志函数
+    autoAdventureConfig, // Pass auto adventure config
+    setAutoAdventure, // Pass function to set auto adventure state
+    addLog, // Pass log function
   });
 
-  // 现在可以使用 executeAdventure 初始化 realmHandlers
+  // Now executeAdventure can be used to initialize realmHandlers
   const realmHandlers = useRealmHandlers({
     player,
     setPlayer,
@@ -893,40 +893,40 @@ function App() {
     setIsRealmOpen,
     executeAdventure,
   });
-  // 包装 handleEnterRealm，添加任务进度更新
+  // Wrap handleEnterRealm, add quest progress update
   const handleEnterRealm = async (realm: SecretRealm) => {
     await realmHandlers.handleEnterRealm(realm);
     dailyQuestHandlers.updateQuestProgress('realm', 1);
   };
-  // 冒险行为由 useAdventureHandlers 提供的 handleAdventure 实现
+  // Adventure behavior implemented by handleAdventure provided by useAdventureHandlers
 
   // Reactive Level Up Check
   useEffect(() => {
     if (player && player.exp >= player.maxExp) {
-      // 检查是否达到绝对巅峰
+      // Check if absolute peak is reached
       const realms = REALM_ORDER;
       const isMaxRealm = player.realm === realms[realms.length - 1];
       if (isMaxRealm && player.realmLevel >= 9) {
-        // 锁定经验为满值
+        // Lock exp to max value
         if (player.exp > player.maxExp) {
           setPlayer((prev) => (prev ? { ...prev, exp: prev.maxExp } : null));
         }
         return;
       }
 
-      // 检查是否已经触发了天劫（防止重复触发）
-      // 如果经验值只是等于 maxExp（可能是取消后锁定的），且标志位为 true，则不触发
-      // 只有当经验值真正超过 maxExp 时，才允许触发（此时标志位会在境界变化时重置）
+      // Check if tribulation already triggered (prevent duplicate trigger)
+      // If exp just equals maxExp (maybe locked after cancellation), and flag is true, do not trigger
+      // Only allow trigger when exp truly exceeds maxExp (flag resets on realm change)
       if (isTribulationTriggeredRef.current && player.exp === player.maxExp) {
         return;
       }
 
-      // 如果经验值超过 maxExp，说明是新的经验值增加，重置标志位允许触发
+      // If exp exceeds maxExp, it means new exp added, reset flag to allow trigger
       if (player.exp > player.maxExp) {
         isTribulationTriggeredRef.current = false;
       }
 
-      // 检查是否需要渡劫
+      // Check if tribulation is needed
       const isRealmUpgrade = player.realmLevel >= 9;
       let targetRealm = player.realm;
       if (isRealmUpgrade) {
@@ -936,47 +936,47 @@ function App() {
         }
       }
 
-      // 如果是境界升级，先检查是否满足突破条件
-      // 注意：shouldTriggerTribulation 内部也会检查条件，但这里提前检查是为了：
-      // 1. 给用户明确的错误提示
-      // 2. 锁定经验值避免反复触发
+      // If realm upgrade, first check if breakthrough conditions met
+      // Note: shouldTriggerTribulation also checks conditions internally, but pre-check here to:
+      // 1. Give user explicit error message
+      // 2. Lock exp to avoid repeated triggering
       if (isRealmUpgrade && targetRealm !== player.realm) {
         const conditionCheck = checkBreakthroughConditions(player, targetRealm);
         if (!conditionCheck.canBreakthrough) {
           addLog(conditionCheck.message, 'danger');
-          // 锁定经验值，避免反复触发
+          // Lock exp to avoid repeated triggering
           setPlayer((prev) => (prev ? { ...prev, exp: prev.maxExp } : null));
           return;
         }
       }
 
-      // 检查是否需要渡劫（只有在满足条件后才检查，shouldTriggerTribulation 内部会再次验证条件）
+      // Check if tribulation needed (only check after conditions met, shouldTriggerTribulation verifies again)
       if (shouldTriggerTribulation(player) && !tribulationState?.isOpen) {
-        // 设置标志位，防止重复触发
+        // Set flag to prevent duplicate trigger
         isTribulationTriggeredRef.current = true;
 
-        // 获取天劫名称
+        // Get tribulation name
         const config = TRIBULATION_CONFIG[targetRealm];
-        const tribulationName = config?.tribulationLevel || `${targetRealm}天劫`;
+        const tribulationName = config?.tribulationLevel || `${targetRealm} Tribulation`;
 
-        // 显示确认弹窗
+        // Show confirmation modal
         showConfirm(
-          `你的${tribulationName}来了，是否现在渡劫？`,
-          '确认渡劫',
+          `Your ${tribulationName} has arrived, undergo tribulation now?`,
+          'Confirm',
           () => {
-            // 用户确认后，创建天劫状态并触发弹窗
+            // After user confirms, create tribulation state and trigger modal
             const newTribulationState = createTribulationState(player, targetRealm);
             setTribulationState(newTribulationState);
           },
           () => {
-            // 用户取消，保持标志位为 true（防止立即再次触发）、清除天劫状态并锁定经验值
-            // 标志位会在经验值真正变化或境界变化时重置
-            setTribulationState(null); // 清除天劫状态
+            // User cancelled, keep flag true (prevent immediate re-trigger), clear tribulation state and lock exp
+            // Flag will reset when exp truly changes or realm changes
+            setTribulationState(null); // Clear tribulation state
             setPlayer((prev) => (prev ? { ...prev, exp: prev.maxExp } : null));
           }
         );
       } else if (!tribulationState?.isOpen) {
-        // 不需要渡劫，直接执行突破
+        // No tribulation needed, execute breakthrough directly
         breakthroughHandlers.handleBreakthrough();
       }
     }
@@ -988,16 +988,16 @@ function App() {
     tribulationState?.isOpen,
   ]);
 
-  // 监听突破成功，更新任务进度
+  // Monitor breakthrough success, update quest progress
   const prevRealmRef = useRef<{ realm: string; level: number } | null>(null);
   useEffect(() => {
     if (player && prevRealmRef.current) {
       const prevRealm = prevRealmRef.current.realm;
       const prevLevel = prevRealmRef.current.level;
       if (player.realm !== prevRealm || player.realmLevel !== prevLevel) {
-        // 境界或等级变化，说明突破成功
+        // Realm or level change indicates breakthrough success
         dailyQuestHandlers.updateQuestProgress('breakthrough', 1);
-        // 重置天劫触发标志
+        // Reset tribulation trigger flag
         isTribulationTriggeredRef.current = false;
       }
     }
@@ -1006,13 +1006,13 @@ function App() {
     }
   }, [player?.realm, player?.realmLevel, dailyQuestHandlers]);
 
-  // 保留 handleOpenUpgrade 和 handleUpgradeItem，因为它们需要状态管理
+  // Keep handleOpenUpgrade and handleUpgradeItem as they need state management
   const handleOpenUpgrade = (item: Item) => {
     setItemToUpgrade(item);
     setIsUpgradeOpen(true);
   };
 
-  // handleUpgradeItem 不关闭弹窗，让用户可以继续强化
+  // handleUpgradeItem does not close modal, allowing user to continue upgrading
   const handleUpgradeItem = async (
     item: Item,
     costStones: number,
@@ -1025,14 +1025,14 @@ function App() {
       costMats,
       upgradeStones
     );
-    // 不关闭弹窗，让用户可以继续强化
-    // 弹窗会自动从 player.inventory 中获取最新的物品信息
+    // Do not close modal, allow user to continue upgrading
+    // Modal will automatically get latest item info from player.inventory
     return result || 'success';
   };
 
-  // Sect handlers、Achievement、Pet、Lottery、Settings handlers 已全部移到对应模块
+  // Sect, Achievement, Pet, Lottery, Settings handlers have all been moved to corresponding modules
 
-  // 检查成就（境界变化、统计变化时）
+  // Check achievements (on realm change, stats change)
   useEffect(() => {
     if (player) {
       checkAchievements();
@@ -1049,7 +1049,7 @@ function App() {
     checkAchievements,
   ]);
 
-  // 定义键盘快捷键（使用保存的配置）
+  // Define keyboard shortcuts (use saved config)
   const keyboardShortcuts: KeyboardShortcut[] = useMemo(() => {
     if (!player || !gameStarted) return [];
 
@@ -1057,19 +1057,19 @@ function App() {
 
     const shortcuts: KeyboardShortcut[] = [];
 
-    // 打坐
+    // Meditate
     const meditateConfig = getShortcutConfig('meditate', customShortcuts);
     shortcuts.push(
-      configToShortcut(meditateConfig, handleMeditate, '打坐', '基础操作')
+      configToShortcut(meditateConfig, handleMeditate, 'Meditate', 'Basic')
     );
 
-    // 历练
+    // Adventure
     const adventureConfig = getShortcutConfig('adventure', customShortcuts);
     shortcuts.push(
-      configToShortcut(adventureConfig, handleAdventure, '历练', '基础操作')
+      configToShortcut(adventureConfig, handleAdventure, 'Adventure', 'Basic')
     );
 
-    // 切换自动打坐
+    // Toggle Auto Meditate
     const toggleAutoMeditateConfig = getShortcutConfig(
       'toggleAutoMeditate',
       customShortcuts
@@ -1080,22 +1080,22 @@ function App() {
         () => {
           setAutoMeditate(!autoMeditate);
         },
-        '切换自动打坐',
-        '基础操作'
+        'Toggle Auto Meditate',
+        'Basic'
       )
     );
 
-    // 切换自动历练
+    // Toggle Auto Adventure
     const toggleAutoAdventureConfig = getShortcutConfig(
       'toggleAutoAdventure',
       customShortcuts
     );
     const toggleAutoAdventureAction = () => {
       if (autoAdventure) {
-        // 如果正在自动历练，直接关闭
+        // If auto adventuring, close directly
         setAutoAdventure(false);
       } else {
-        // 如果未开启，打开配置弹窗
+        // If not enabled, open config modal
         setIsAutoAdventureConfigOpen(true);
       }
     };
@@ -1103,20 +1103,20 @@ function App() {
       configToShortcut(
         toggleAutoAdventureConfig,
         toggleAutoAdventureAction,
-        '切换自动历练',
-        '基础操作'
+        'Toggle Auto Adventure',
+        'Basic'
       )
     );
 
-    // 空格键切换自动历练（优先级高于配置的快捷键）
+    // Space key toggles auto adventure (higher priority than configured shortcut)
     shortcuts.push({
       key: ' ',
       action: toggleAutoAdventureAction,
-      description: '切换自动历练',
-      category: '基础操作',
+      description: 'Toggle Auto Adventure',
+      category: 'Basic',
     });
 
-    // 打开储物袋
+    // Open Inventory
     const openInventoryConfig = getShortcutConfig(
       'openInventory',
       customShortcuts
@@ -1125,12 +1125,12 @@ function App() {
       configToShortcut(
         openInventoryConfig,
         () => setIsInventoryOpen(true),
-        '打开储物袋',
-        '打开面板'
+        'Open Inventory',
+        'Panels'
       )
     );
 
-    // 打开功法
+    // Open Cultivation
     const openCultivationConfig = getShortcutConfig(
       'openCultivation',
       customShortcuts
@@ -1139,12 +1139,12 @@ function App() {
       configToShortcut(
         openCultivationConfig,
         () => setIsCultivationOpen(true),
-        '打开功法',
-        '打开面板'
+        'Open Cultivation',
+        'Panels'
       )
     );
 
-    // 打开角色
+    // Open Character
     const openCharacterConfig = getShortcutConfig(
       'openCharacter',
       customShortcuts
@@ -1153,12 +1153,12 @@ function App() {
       configToShortcut(
         openCharacterConfig,
         () => setIsCharacterOpen(true),
-        '打开角色',
-        '打开面板'
+        'Open Character',
+        'Panels'
       )
     );
 
-    // 打开成就
+    // Open Achievement
     const openAchievementConfig = getShortcutConfig(
       'openAchievement',
       customShortcuts
@@ -1173,34 +1173,34 @@ function App() {
             viewedAchievements: [...prev.achievements],
           }));
         },
-        '打开成就',
-        '打开面板'
+        'Open Achievement',
+        'Panels'
       )
     );
 
-    // 打开灵宠
+    // Open Pet
     const openPetConfig = getShortcutConfig('openPet', customShortcuts);
     shortcuts.push(
       configToShortcut(
         openPetConfig,
         () => setIsPetOpen(true),
-        '打开灵宠',
-        '打开面板'
+        'Open Pet',
+        'Panels'
       )
     );
 
-    // 打开抽奖
+    // Open Lottery
     const openLotteryConfig = getShortcutConfig('openLottery', customShortcuts);
     shortcuts.push(
       configToShortcut(
         openLotteryConfig,
         () => setIsLotteryOpen(true),
-        '打开抽奖',
-        '打开面板'
+        'Open Lottery',
+        'Panels'
       )
     );
 
-    // 打开设置
+    // Open Settings
     const openSettingsConfig = getShortcutConfig(
       'openSettings',
       customShortcuts
@@ -1209,45 +1209,45 @@ function App() {
       configToShortcut(
         openSettingsConfig,
         () => setIsSettingsOpen(true),
-        '打开设置',
-        '打开面板'
+        'Open Settings',
+        'Panels'
       )
     );
 
-    // 打开秘境
+    // Open Realm
     const openRealmConfig = getShortcutConfig('openRealm', customShortcuts);
     shortcuts.push(
       configToShortcut(
         openRealmConfig,
         () => setIsRealmOpen(true),
-        '打开秘境',
-        '打开面板'
+        'Open Realm',
+        'Panels'
       )
     );
 
-    // 打开炼丹
+    // Open Alchemy
     const openAlchemyConfig = getShortcutConfig('openAlchemy', customShortcuts);
     shortcuts.push(
       configToShortcut(
         openAlchemyConfig,
         () => setIsAlchemyOpen(true),
-        '打开炼丹',
-        '打开面板'
+        'Open Alchemy',
+        'Panels'
       )
     );
 
-    // 打开宗门
+    // Open Sect
     const openSectConfig = getShortcutConfig('openSect', customShortcuts);
     shortcuts.push(
       configToShortcut(
         openSectConfig,
         () => setIsSectOpen(true),
-        '打开宗门',
-        '打开面板'
+        'Open Sect',
+        'Panels'
       )
     );
 
-    // 打开日常任务
+    // Open Daily Quest
     const openDailyQuestConfig = getShortcutConfig(
       'openDailyQuest',
       customShortcuts
@@ -1256,19 +1256,19 @@ function App() {
       configToShortcut(
         openDailyQuestConfig,
         () => setIsDailyQuestOpen(true),
-        '打开日常任务',
-        '打开面板'
+        'Open Daily Quest',
+        'Panels'
       )
     );
 
-    // 关闭当前弹窗
+    // Close Current Modal
     const closeModalConfig = getShortcutConfig('closeModal', customShortcuts);
     shortcuts.push(
       configToShortcut(
         closeModalConfig,
         handleCloseCurrentModal,
-        '关闭当前弹窗',
-        '通用操作'
+        'Close Modal',
+        'General'
       )
     );
 
@@ -1292,13 +1292,13 @@ function App() {
     handleCloseCurrentModal,
   ]);
 
-  // 使用键盘快捷键
+  // Use keyboard shortcuts
   useKeyboardShortcuts({
     shortcuts: keyboardShortcuts,
     enabled: gameStarted && !!player && !isDead,
   });
 
-  // 缓存 GameView 的 handlers
+  // Cache GameView handlers
   const gameViewHandlers = useMemo(() => ({
     onMeditate: handleMeditate,
     onAdventure: handleAdventure,
@@ -1336,10 +1336,10 @@ function App() {
     },
     onToggleAutoAdventure: () => {
       if (autoAdventure) {
-        // 如果正在自动历练，直接关闭
+        // If auto adventuring, close directly
         setAutoAdventure(false);
       } else {
-        // 如果未开启，打开配置弹窗
+        // If not enabled, open config modal
         setIsAutoAdventureConfigOpen(true);
       }
     },
@@ -1365,7 +1365,7 @@ function App() {
     autoAdventure,
   ]);
 
-  // 缓存 ModalsContainer 的 handlers
+  // Cache ModalsContainer handlers
   const modalsHandlers = useMemo(() => ({
     setIsInventoryOpen,
     setIsCultivationOpen,
@@ -1472,7 +1472,7 @@ function App() {
       }
     },
     handleTurnBasedBattleClose: (result: BattleResult | null, updatedInventory?: Item[]) => {
-      // 检查是否是天地之魄战斗
+      // Check if it is a Heaven Earth Soul battle
       const isHeavenEarthSoulBattle = turnBasedBattleParams?.bossId !== undefined;
 
       setIsTurnBasedBattleOpen(false);
@@ -1511,7 +1511,7 @@ function App() {
     turnBasedBattleParams
   ]);
 
-  // 检查是否有任何弹窗处于打开状态
+  // Check if any modal is open
   const isAnyModalOpen = useMemo(() => {
     return (
       isInventoryOpen ||
@@ -1541,10 +1541,10 @@ function App() {
     isReputationEventOpen, isTreasureVaultOpen
   ]);
 
-  // 显示欢迎界面
+  // Show Welcome Screen
   if (showWelcome) {
     return (
-      <div className="font-mono text-emerald-400 min-h-screen bg-ink-950 relative overflow-hidden">
+      <div className="font-mono text-stone-200 min-h-screen bg-stone-950 relative overflow-hidden">
         <CRTOverlay />
         <WelcomeScreen
           hasSave={hasSave}
@@ -1568,7 +1568,7 @@ function App() {
   // Show start screen (naming) - only if no save and game not started
   if (!hasSave && (!gameStarted || !player)) {
     return (
-      <div className="font-terminal text-pip-green min-h-screen bg-pip-dark">
+      <div className="font-terminal text-amber-400 min-h-screen bg-stone-950">
         <CRTOverlay />
         <StartScreen onStart={handleStartGame} />
       </div>
@@ -1578,20 +1578,20 @@ function App() {
   // If there is a save but player is still loading
   if (hasSave && !player) {
     return (
-      <div className="font-terminal text-pip-green fixed inset-0 bg-pip-dark flex items-center justify-center z-50">
+      <div className="font-terminal text-amber-400 fixed inset-0 bg-stone-950 flex items-center justify-center z-50">
         <CRTOverlay />
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pip-green mx-auto mb-4"></div>
-          <p className="text-pip-green text-lg">Loading Genetic Data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-amber-400 text-lg">Loading Genetic Data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="font-terminal text-pip-green min-h-screen bg-pip-dark selection:bg-pip-green selection:text-pip-dark">
+    <div className="font-terminal text-stone-200 min-h-screen bg-stone-950 selection:bg-amber-500/30 selection:text-amber-100">
       <CRTOverlay />
-      {/* 天劫弹窗 */}
+      {/* Tribulation Modal */}
       {tribulationState && (
         <TribulationModal
           tribulationState={tribulationState}
@@ -1600,7 +1600,7 @@ function App() {
         />
       )}
 
-      {/* 死亡弹窗 - 无法关闭 */}
+      {/* Death Modal - Cannot Close */}
       {isDead && player && (
         <DeathModal
           player={player}
@@ -1661,7 +1661,7 @@ function App() {
         isDebugModeEnabled={isDebugModeEnabled}
       />
 
-      {/* 调试弹窗 */}
+      {/* Debug Modal */}
       {player && isDebugModeEnabled && (
         <DebugModal
           isOpen={isDebugOpen}
@@ -1674,27 +1674,27 @@ function App() {
             });
           }}
           onTriggerDeath={() => {
-            // 触发死亡：将hp设置为0，死亡检测useEffect会自动处理
+            // Trigger death: set hp to 0, death detection useEffect will handle it
             setPlayer((prev) => {
               if (!prev) return prev;
               return { ...prev, hp: 0 };
             });
           }}
           onTriggerReputationEvent={(event) => {
-            // 设置声望事件并打开弹窗
+            // Set reputation event and open modal
             setReputationEvent(event);
             setIsReputationEventOpen(true);
           }}
           onChallengeDaoCombining={() => {
-            // 挑战天地之魄：使用executeAdventure执行特殊挑战
+            // Challenge Heaven Earth Soul: use executeAdventure to execute special challenge
             if (adventureHandlers) {
-              adventureHandlers.executeAdventure('dao_combining_challenge', undefined, '极度危险');
+              adventureHandlers.executeAdventure('dao_combining_challenge', undefined, 'Extreme Danger');
             }
           }}
         />
       )}
 
-      {/* Alert 提示弹窗 */}
+      {/* Alert Modal */}
       {alertState && (
         <AlertModal
           isOpen={alertState.isOpen}
@@ -1716,7 +1716,7 @@ function App() {
           currentPlayer={player}
           currentLogs={logs}
           onLoadSave={(loadedPlayer, loadedLogs) => {
-            // 应用兼容性处理，确保旧存档包含新字段
+            // Apply compatibility handling, ensure old save contains new fields
             const compatiblePlayer = ensurePlayerStatsCompatibility(loadedPlayer);
             setPlayer(compatiblePlayer);
             setLogs(loadedLogs);

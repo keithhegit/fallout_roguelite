@@ -10,13 +10,13 @@ interface UseCultivationHandlersProps {
 }
 
 /**
- * 功法处理函数
- * 包含领悟功法、激活功法
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @returns handleLearnArt 领悟功法
- * @returns handleActivateArt 激活功法
+ * Cultivation Art Handlers
+ * Includes learning and activating cultivation arts
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @returns handleLearnArt Learn cultivation art
+ * @returns handleActivateArt Activate cultivation art
  */
 
 export function useCultivationHandlers({
@@ -26,128 +26,128 @@ export function useCultivationHandlers({
 }: UseCultivationHandlersProps) {
   const handleLearnArt = (art: CultivationArt) => {
     if (!player) {
-      showError('玩家数据不存在！', '错误');
-      addLog('玩家数据不存在！', 'danger');
+      showError('Player data not found!', 'Error');
+      addLog('Player data not found!', 'danger');
       return;
     }
 
-    // 检查是否已经学习过
+    // Check if already learned
     if (player.cultivationArts.includes(art.id)) {
-      showWarning(`你已经学习过功法【${art.name}】了！`, '无法学习');
-      addLog(`你已经学习过功法【${art.name}】了！`, 'danger');
+      showWarning(`You have already learned the cultivation art [${art.name}]!`, 'Cannot Learn');
+      addLog(`You have already learned the cultivation art [${art.name}]!`, 'danger');
       return;
     }
 
-    // 检查是否已解锁（只有通过历练解锁的功法才能学习）
+    // Check if unlocked (only arts unlocked through adventure can be learned)
     const unlockedArts = player.unlockedArts || [];
     if (!unlockedArts.includes(art.id)) {
-      showWarning(`你尚未解锁功法【${art.name}】！需要通过历练获得。`, '未解锁');
-      addLog(`你尚未解锁功法【${art.name}】！需要通过历练获得。`, 'danger');
+      showWarning(`You have not unlocked the cultivation art [${art.name}] yet! Obtain it through adventures.`, 'Locked');
+      addLog(`You have not unlocked the cultivation art [${art.name}] yet! Obtain it through adventures.`, 'danger');
       return;
     }
 
     if (player.spiritStones < art.cost) {
-      showError(`灵石不足！\n需要 ${art.cost} 灵石，你当前只有 ${player.spiritStones} 灵石。`, '灵石不足');
-      addLog('灵石不足！', 'danger');
+      showError(`Not enough Spirit Stones!\nNeed ${art.cost}, but you only have ${player.spiritStones}.`, 'Insufficient Spirit Stones');
+      addLog('Not enough Spirit Stones!', 'danger');
       return;
     }
 
-    // 检查境界要求
+    // Check realm requirement
     const getRealmIndex = (realm: RealmType) => REALM_ORDER.indexOf(realm);
     if (getRealmIndex(player.realm) < getRealmIndex(art.realmRequirement)) {
       showWarning(
-        `学习该功法需要达到【${art.realmRequirement}】境界。\n你当前境界为【${player.realm}】。`,
-        '境界不足'
+        `Learning this art requires [${art.realmRequirement}] realm.\nYour current realm is [${player.realm}].`,
+        'Insufficient Realm'
       );
-      addLog(`学习该功法需要达到【${art.realmRequirement}】境界，你当前境界为【${player.realm}】。`, 'danger');
+      addLog(`Learning this art requires [${art.realmRequirement}] realm, but your current realm is [${player.realm}].`, 'danger');
       return;
     }
 
-    // 检查宗门要求
+    // Check sect requirement
     if (art.sectId !== null && art.sectId !== undefined) {
       if (player.sectId !== art.sectId) {
         const sect = SECTS.find((s) => s.id === art.sectId);
         const sectName = sect ? sect.name : art.sectId;
-        showWarning(`该功法为【${sectName}】专属功法，你无法学习。`, '无法学习');
-        addLog(`该功法为【${sectName}】专属功法，你无法学习。`, 'danger');
+        showWarning(`This art is exclusive to [${sectName}]. You cannot learn it.`, 'Cannot Learn');
+        addLog(`This art is exclusive to [${sectName}]. You cannot learn it.`, 'danger');
         return;
       }
     }
 
-    // 检查属性要求
+    // Check attribute requirements
     if (art.attributeRequirements) {
       const reqs = art.attributeRequirements;
       const missingReqs: string[] = [];
 
       if (reqs.attack && player.attack < reqs.attack) {
-        missingReqs.push(`攻击力：需要 ${reqs.attack}，当前 ${player.attack}`);
+        missingReqs.push(`Attack: Need ${reqs.attack}, Current ${player.attack}`);
       }
       if (reqs.defense && player.defense < reqs.defense) {
-        missingReqs.push(`防御力：需要 ${reqs.defense}，当前 ${player.defense}`);
+        missingReqs.push(`Defense: Need ${reqs.defense}, Current ${player.defense}`);
       }
       if (reqs.spirit && player.spirit < reqs.spirit) {
-        missingReqs.push(`神识：需要 ${reqs.spirit}，当前 ${player.spirit}`);
+        missingReqs.push(`Spirit: Need ${reqs.spirit}, Current ${player.spirit}`);
       }
       if (reqs.physique && player.physique < reqs.physique) {
-        missingReqs.push(`体魄：需要 ${reqs.physique}，当前 ${player.physique}`);
+        missingReqs.push(`Physique: Need ${reqs.physique}, Current ${player.physique}`);
       }
       if (reqs.speed && player.speed < reqs.speed) {
-        missingReqs.push(`速度：需要 ${reqs.speed}，当前 ${player.speed}`);
+        missingReqs.push(`Speed: Need ${reqs.speed}, Current ${player.speed}`);
       }
 
       if (missingReqs.length > 0) {
-        const message = `学习该功法需要满足以下属性要求：\n\n${missingReqs.join('\n')}`;
-        showWarning(message, '属性不足');
-        // 保留原有的日志记录（只记录第一个不满足的属性）
+        const message = `Learning this art requires the following stats:\n\n${missingReqs.join('\n')}`;
+        showWarning(message, 'Insufficient Stats');
+        // Keep original logging (only log the first missing requirement)
         if (reqs.attack && player.attack < reqs.attack) {
-          addLog(`学习该功法需要攻击力达到 ${reqs.attack}，你当前攻击力为 ${player.attack}。`, 'danger');
+          addLog(`Learning this art requires Attack ${reqs.attack}, but you have ${player.attack}.`, 'danger');
         } else if (reqs.defense && player.defense < reqs.defense) {
-          addLog(`学习该功法需要防御力达到 ${reqs.defense}，你当前防御力为 ${player.defense}。`, 'danger');
+          addLog(`Learning this art requires Defense ${reqs.defense}, but you have ${player.defense}.`, 'danger');
         } else if (reqs.spirit && player.spirit < reqs.spirit) {
-          addLog(`学习该功法需要神识达到 ${reqs.spirit}，你当前神识为 ${player.spirit}。`, 'danger');
+          addLog(`Learning this art requires Spirit ${reqs.spirit}, but you have ${player.spirit}.`, 'danger');
         } else if (reqs.physique && player.physique < reqs.physique) {
-          addLog(`学习该功法需要体魄达到 ${reqs.physique}，你当前体魄为 ${player.physique}。`, 'danger');
+          addLog(`Learning this art requires Physique ${reqs.physique}, but you have ${player.physique}.`, 'danger');
         } else if (reqs.speed && player.speed < reqs.speed) {
-          addLog(`学习该功法需要速度达到 ${reqs.speed}，你当前速度为 ${player.speed}。`, 'danger');
+          addLog(`Learning this art requires Speed ${reqs.speed}, but you have ${player.speed}.`, 'danger');
         }
         return;
       }
     }
 
-    // 使用函数式更新，确保状态一致性
+    // Use functional update to ensure state consistency
     setPlayer((prev) => {
-      // 再次检查，防止重复学习（双重保险）
+      // Check again to prevent double learning (double safety)
       if (prev.cultivationArts.includes(art.id)) {
-        // 如果已经学习过，不显示警告（可能是快速点击导致的）
+        // If already learned, don't show warning (might be caused by rapid clicking)
         return prev;
       }
 
-      // 再次检查解锁状态（防止状态不同步）
+      // Check unlocked status again (prevent state out of sync)
       const unlockedArts = prev.unlockedArts || [];
       if (!unlockedArts.includes(art.id)) {
-        // 如果未解锁，不更新状态，但也不显示错误（可能状态还未同步）
+        // If locked, don't update state, but don't show error (state might be out of sync)
         return prev;
       }
 
-      // 再次检查灵石（防止状态不同步）
+      // Check spirit stones again (prevent state out of sync)
       if (prev.spiritStones < art.cost) {
         return prev;
       }
 
-      // 再次检查境界要求（防止状态不同步）
+      // Check realm requirement again (prevent state out of sync)
       const getRealmIndex = (realm: RealmType) => REALM_ORDER.indexOf(realm);
       if (getRealmIndex(prev.realm) < getRealmIndex(art.realmRequirement)) {
         return prev;
       }
 
-      // 再次检查宗门要求（防止状态不同步）
+      // Check sect requirement again (prevent state out of sync)
       if (art.sectId !== null && art.sectId !== undefined) {
         if (prev.sectId !== art.sectId) {
           return prev;
         }
       }
 
-      // 再次检查属性要求（防止状态不同步）
+      // Check attribute requirements again (prevent state out of sync)
       if (art.attributeRequirements) {
         const reqs = art.attributeRequirements;
         if (reqs.attack && prev.attack < reqs.attack) return prev;
@@ -157,10 +157,10 @@ export function useCultivationHandlers({
         if (reqs.speed && prev.speed < reqs.speed) return prev;
       }
 
-      // 所有检查通过，执行学习
+      // All checks passed, execute learning
       const newStones = prev.spiritStones - art.cost;
 
-      // 计算灵根加成
+      // Calculate spiritual root bonus
       const spiritualRootBonus = calculateSpiritualRootArtBonus(art, prev.spiritualRoots || {
         metal: 0,
         wood: 0,
@@ -169,7 +169,7 @@ export function useCultivationHandlers({
         earth: 0,
       });
 
-      // 属性加成逻辑：体术功法永久增加属性，心法功法通过激活动态增加
+      // Attribute bonus logic: Body arts permanently increase stats, Mental arts dynamically increase via activation
       let newAttack = prev.attack;
       let newDefense = prev.defense;
       let newMaxHp = prev.maxHp;
@@ -182,7 +182,7 @@ export function useCultivationHandlers({
         newHp += Math.floor((art.effects.hp || 0) * spiritualRootBonus);
       }
 
-      // 确保不会重复添加（再次检查，防止竞态条件）
+      // Ensure not adding duplicate (check again, prevent race condition)
       if (prev.cultivationArts.includes(art.id)) {
         return prev;
       }
@@ -205,7 +205,7 @@ export function useCultivationHandlers({
       };
     });
 
-    // 显示灵根加成信息
+    // Show spiritual root bonus info
     const spiritualRootBonus = calculateSpiritualRootArtBonus(art, player.spiritualRoots || {
       metal: 0,
       wood: 0,
@@ -216,23 +216,23 @@ export function useCultivationHandlers({
 
     if (art.spiritualRoot && spiritualRootBonus > 1.0) {
       const rootNames: Record<string, string> = {
-        metal: '金',
-        wood: '木',
-        water: '水',
-        fire: '火',
-        earth: '土',
+        metal: 'Metal',
+        wood: 'Wood',
+        water: 'Water',
+        fire: 'Fire',
+        earth: 'Earth',
       };
       const bonusPercent = Math.floor((spiritualRootBonus - 1.0) * 100);
-      addLog(`你成功领悟了功法【${art.name}】！由于你的${rootNames[art.spiritualRoot]}灵根，功法效果提升了${bonusPercent}%！`, 'gain');
+      addLog(`You successfully learned [${art.name}]! Due to your ${rootNames[art.spiritualRoot]} Spirit Root, the effect is increased by ${bonusPercent}%!`, 'gain');
     } else {
-      addLog(`你成功领悟了功法【${art.name}】！实力大增。`, 'gain');
+      addLog(`You successfully learned [${art.name}]! Your power has increased.`, 'gain');
     }
   };
 
   const handleActivateArt = (art: CultivationArt) => {
     if (art.type !== 'mental') return;
     setPlayer((prev) => ({ ...prev, activeArtId: art.id }));
-    addLog(`你开始运转心法【${art.name}】。`, 'normal');
+    addLog(`You started circulating the mental art [${art.name}].`, 'normal');
   };
 
   return {

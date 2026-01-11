@@ -1,12 +1,12 @@
 /**
- * 装备相关的工具函数
- * 统一管理装备槽位查找、装备状态检查等逻辑
+ * Equipment related utility functions
+ * Unify management of equipment slot lookup, equipment status check, etc.
  */
 
 import { Item, ItemType, EquipmentSlot, PlayerStats } from '../types';
 
 /**
- * 获取指定装备类型的所有可用槽位
+ * Get all available slots for a specified equipment type
  */
 export const getEquipmentSlotsByType = (itemType: ItemType): EquipmentSlot[] => {
   switch (itemType) {
@@ -27,94 +27,94 @@ export const getEquipmentSlotsByType = (itemType: ItemType): EquipmentSlot[] => 
 };
 
 /**
- * 查找物品可以装备到的空槽位
- * @param item 要装备的物品
- * @param equippedItems 当前已装备的物品映射
- * @returns 可用的槽位，如果没有空槽位则返回物品的默认槽位（戒指会返回Ring1）
+ * Find an empty slot for an item to be equipped
+ * @param item The item to equip
+ * @param equippedItems Map of currently equipped items
+ * @returns Available slot, or default slot if no empty slot found (Ring returns Ring1)
  */
 export const findEmptyEquipmentSlot = (
   item: Item,
   equippedItems: Partial<Record<EquipmentSlot, string>>
 ): EquipmentSlot | null => {
-  // 对于戒指、首饰、法宝，即使有equipmentSlot属性，也要优先查找空槽位
-  // 忽略物品的equipmentSlot属性，因为多槽位装备应该优先使用空槽位
+  // For Rings, Accessories, Artifacts, even if they have equipmentSlot property, prioritize empty slots
+  // Ignore item's equipmentSlot property because multi-slot equipment should prioritize empty slots
   const slots = getEquipmentSlotsByType(item.type as ItemType);
   if (slots.length > 0) {
-    // 优先查找空槽位（明确检查是否为 undefined 或 null，确保空槽位检查正确）
-    // 遍历所有可能的槽位，找到第一个空的就返回
+    // Prioritize finding empty slots (explicitly check for undefined or null to ensure correct empty slot check)
+    // Iterate through all possible slots, return the first empty one found
     for (const slot of slots) {
       const equippedItemId = equippedItems[slot];
-      // 如果槽位为空（undefined 或不存在），直接返回这个空槽位
+      // If slot is empty (undefined or not exists), return this empty slot directly
       if (equippedItemId === undefined || equippedItemId === null || equippedItemId === '') {
         return slot;
       }
     }
-    // 只有当所有槽位都满了，才返回第一个槽位（用于替换已有装备）
+    // Only return the first slot when all slots are full (for replacing existing equipment)
     return slots[0];
   }
 
-  // 其他装备类型（武器、护甲等）需要equipmentSlot
+  // Other equipment types (Weapon, Armor, etc.) require equipmentSlot
   if (!item.equipmentSlot) {
     return null;
   }
 
-  // 其他装备类型直接使用默认槽位（如果已装备，则替换）
+  // Other equipment types use default slot directly (replace if equipped)
   return item.equipmentSlot;
 };
 
 /**
- * 检查物品是否已装备
- * @param item 要检查的物品
- * @param equippedItems 当前已装备的物品映射
- * @returns 是否已装备
+ * Check if item is equipped
+ * @param item Item to check
+ * @param equippedItems Map of currently equipped items
+ * @returns Whether it is equipped
  */
 export const isItemEquipped = (
   item: Item,
   equippedItems: Partial<Record<EquipmentSlot, string>>
 ): boolean => {
-  // 对于戒指、首饰、法宝，即使没有equipmentSlot也可以根据type检查所有同类型槽位
+  // For Rings, Accessories, Artifacts, even if no equipmentSlot, check all slots of the same type based on type
   const slots = getEquipmentSlotsByType(item.type as ItemType);
   if (slots.length > 0) {
     return slots.some((slot) => equippedItems[slot] === item.id);
   }
 
-  // 其他装备类型需要equipmentSlot才能检查
+  // Other equipment types need equipmentSlot to check
   if (!item.equipmentSlot) {
     return false;
   }
 
-  // 其他装备类型直接检查对应槽位
+  // Other equipment types check corresponding slot directly
   return equippedItems[item.equipmentSlot] === item.id;
 };
 
 /**
- * 查找物品实际装备的槽位
- * @param item 要查找的物品
- * @param equippedItems 当前已装备的物品映射
- * @returns 实际装备的槽位，如果未装备则返回 null
+ * Find the actual slot where the item is equipped
+ * @param item Item to find
+ * @param equippedItems Map of currently equipped items
+ * @returns Actual equipped slot, or null if not equipped
  */
 export const findItemEquippedSlot = (
   item: Item,
   equippedItems: Partial<Record<EquipmentSlot, string>>
 ): EquipmentSlot | null => {
-  // 对于戒指、首饰、法宝，即使没有equipmentSlot也可以根据type查找所有同类型槽位
+  // For Rings, Accessories, Artifacts, even if no equipmentSlot, find in all slots of the same type based on type
   const slots = getEquipmentSlotsByType(item.type as ItemType);
   if (slots.length > 0) {
     const equippedSlot = slots.find((slot) => equippedItems[slot] === item.id);
     return equippedSlot || null;
   }
 
-  // 其他装备类型需要equipmentSlot才能查找
+  // Other equipment types need equipmentSlot to find
   if (!item.equipmentSlot) {
     return null;
   }
 
-  // 其他装备类型直接检查对应槽位
+  // Other equipment types check corresponding slot directly
   return equippedItems[item.equipmentSlot] === item.id ? item.equipmentSlot : null;
 };
 
 /**
- * 获取装备槽位配置（用于渲染装备面板）
+ * Get equipment slot configuration (for rendering equipment panel)
  */
 export const getEquipmentSlotConfig = (): Array<{
   slot: EquipmentSlot;
@@ -122,28 +122,28 @@ export const getEquipmentSlotConfig = (): Array<{
   icon?: string;
 }> => {
   return [
-    { slot: EquipmentSlot.Head, label: '头部' },
-    { slot: EquipmentSlot.Shoulder, label: '肩部' },
-    { slot: EquipmentSlot.Chest, label: '胸甲' },
-    { slot: EquipmentSlot.Gloves, label: '手套' },
-    { slot: EquipmentSlot.Legs, label: '裤腿' },
-    { slot: EquipmentSlot.Boots, label: '鞋子' },
-    { slot: EquipmentSlot.Ring1, label: '戒指1' },
-    { slot: EquipmentSlot.Ring2, label: '戒指2' },
-    { slot: EquipmentSlot.Ring3, label: '戒指3' },
-    { slot: EquipmentSlot.Ring4, label: '戒指4' },
-    { slot: EquipmentSlot.Accessory1, label: '首饰1' },
-    { slot: EquipmentSlot.Accessory2, label: '首饰2' },
-    { slot: EquipmentSlot.Artifact1, label: '法宝1' },
-    { slot: EquipmentSlot.Artifact2, label: '法宝2' },
-    { slot: EquipmentSlot.Weapon, label: '武器' },
+    { slot: EquipmentSlot.Head, label: 'Head' },
+    { slot: EquipmentSlot.Shoulder, label: 'Shoulder' },
+    { slot: EquipmentSlot.Chest, label: 'Chest' },
+    { slot: EquipmentSlot.Gloves, label: 'Gloves' },
+    { slot: EquipmentSlot.Legs, label: 'Legs' },
+    { slot: EquipmentSlot.Boots, label: 'Boots' },
+    { slot: EquipmentSlot.Ring1, label: 'Ring 1' },
+    { slot: EquipmentSlot.Ring2, label: 'Ring 2' },
+    { slot: EquipmentSlot.Ring3, label: 'Ring 3' },
+    { slot: EquipmentSlot.Ring4, label: 'Ring 4' },
+    { slot: EquipmentSlot.Accessory1, label: 'Accessory 1' },
+    { slot: EquipmentSlot.Accessory2, label: 'Accessory 2' },
+    { slot: EquipmentSlot.Artifact1, label: 'Artifact 1' },
+    { slot: EquipmentSlot.Artifact2, label: 'Artifact 2' },
+    { slot: EquipmentSlot.Weapon, label: 'Weapon' },
   ];
 };
 
 /**
- * 获取装备槽位的中文标签
- * @param slot 装备槽位
- * @returns 中文标签，如果找不到则返回槽位值本身
+ * Get display label for equipment slot
+ * @param slot Equipment slot
+ * @returns Display label, returns slot value itself if not found
  */
 export const getEquipmentSlotLabel = (slot: EquipmentSlot): string => {
   const config = getEquipmentSlotConfig();
@@ -152,7 +152,7 @@ export const getEquipmentSlotLabel = (slot: EquipmentSlot): string => {
 };
 
 /**
- * 根据槽位获取对应的装备类型
+ * Get corresponding equipment type by slot
  */
 export const getItemTypeBySlot = (slot: EquipmentSlot): ItemType | null => {
   const ringSlots = [
@@ -185,8 +185,8 @@ export const getItemTypeBySlot = (slot: EquipmentSlot): ItemType | null => {
 };
 
 /**
- * 检查槽位是否属于同一组（用于过滤显示）
- * 例如：Ring1、Ring2、Ring3、Ring4 属于同一组
+ * Check if slots belong to the same group (for filtering display)
+ * e.g.: Ring1, Ring2, Ring3, Ring4 belong to the same group
  */
 export const areSlotsInSameGroup = (slot1: EquipmentSlot, slot2: EquipmentSlot): boolean => {
   const ringSlots = [
@@ -198,14 +198,14 @@ export const areSlotsInSameGroup = (slot1: EquipmentSlot, slot2: EquipmentSlot):
   const accessorySlots = [EquipmentSlot.Accessory1, EquipmentSlot.Accessory2];
   const artifactSlots = [EquipmentSlot.Artifact1, EquipmentSlot.Artifact2];
 
-  // 检查是否都在戒指组
+  // Check if both are in Ring group
   if (ringSlots.includes(slot1) && ringSlots.includes(slot2)) return true;
-  // 检查是否都在首饰组
+  // Check if both are in Accessory group
   if (accessorySlots.includes(slot1) && accessorySlots.includes(slot2)) return true;
-  // 检查是否都在法宝组
+  // Check if both are in Artifact group
   if (artifactSlots.includes(slot1) && artifactSlots.includes(slot2)) return true;
 
-  // 其他情况，只有完全相同才属于同一组
+  // Other cases, only if exactly same do they belong to same group
   return slot1 === slot2;
 };
 

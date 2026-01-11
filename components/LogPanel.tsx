@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { LogEntry } from '../types';
 import { GlobalChat } from './GlobalChat';
-import { ChevronsDown, Trash2 } from 'lucide-react';
+import { ChevronsDown, Trash2, Info, TrendingUp, AlertTriangle, Star } from 'lucide-react';
 
 interface Props {
   logs: LogEntry[];
@@ -26,29 +26,63 @@ const LogItem = React.memo<{ log: LogEntry }>(({ log }) => {
     [log.timestamp]
   );
 
-  const logClassName = useMemo(() => {
+  const { containerClass, icon, iconColor, borderColor } = useMemo(() => {
     const baseClass =
-      'p-2 md:p-3 rounded-none border-l-2 font-mono text-xs md:text-sm lg:text-base leading-relaxed animate-fade-in uppercase tracking-wider';
+      'p-3 rounded-none border font-mono text-xs md:text-sm lg:text-base leading-relaxed animate-fade-in uppercase tracking-wider relative overflow-hidden group transition-all duration-300 hover:translate-x-1';
+    
     switch (log.type) {
-      case 'normal':
-        return `${baseClass} border-stone-600 text-stone-300 bg-ink-800/50`;
       case 'gain':
-        return `${baseClass} border-mystic-jade text-emerald-100 bg-emerald-900/10`;
+        return {
+          containerClass: `${baseClass} border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20 hover:border-emerald-500/50`,
+          icon: <TrendingUp size={14} />,
+          iconColor: 'text-emerald-500',
+          borderColor: 'border-emerald-500/30'
+        };
       case 'danger':
-        return `${baseClass} border-mystic-blood text-red-100 bg-red-900/10`;
+        return {
+          containerClass: `${baseClass} border-red-600/30 bg-red-950/10 hover:bg-red-950/20 hover:border-red-500/50`,
+          icon: <AlertTriangle size={14} />,
+          iconColor: 'text-red-500',
+          borderColor: 'border-red-600/30'
+        };
       case 'special':
-        return `${baseClass} border-amber-500 text-amber-100 bg-amber-900/10`;
+        return {
+          containerClass: `${baseClass} border-amber-500/30 bg-amber-950/10 hover:bg-amber-950/20 hover:border-amber-500/50`,
+          icon: <Star size={14} />,
+          iconColor: 'text-amber-500',
+          borderColor: 'border-amber-500/30'
+        };
       default:
-        return `${baseClass} border-stone-600 text-stone-300 bg-ink-800/50`;
+        return {
+          containerClass: `${baseClass} border-stone-800 bg-stone-900/40 hover:bg-stone-900/60 hover:border-stone-600`,
+          icon: <Info size={14} />,
+          iconColor: 'text-stone-500',
+          borderColor: 'border-stone-800'
+        };
     }
   }, [log.type]);
 
   return (
-    <div className={logClassName}>
-      <span className="text-[10px] md:text-xs opacity-50 block mb-0.5 md:mb-1 font-mono">
-        {timeString}
-      </span>
-      {log.text}
+    <div className={containerClass}>
+      {/* Decorative corner */}
+      <div className={`absolute top-0 right-0 w-2 h-2 border-t border-r ${borderColor} opacity-50`}></div>
+      <div className={`absolute bottom-0 left-0 w-2 h-2 border-b border-l ${borderColor} opacity-50`}></div>
+
+      <div className="flex items-start gap-3">
+        <div className={`mt-0.5 shrink-0 ${iconColor} opacity-70`}>
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[10px] md:text-xs opacity-40 mb-1 font-mono flex items-center gap-2">
+            <span>{timeString}</span>
+            <span className="h-px w-4 bg-current opacity-30"></span>
+            <span>{log.type === 'normal' ? 'SYSTEM' : log.type}</span>
+          </div>
+          <div className={log.type === 'normal' ? 'text-stone-400' : log.type === 'gain' ? 'text-emerald-200' : log.type === 'danger' ? 'text-red-200' : 'text-amber-200'}>
+            {log.text}
+          </div>
+        </div>
+      </div>
     </div>
   );
 });
@@ -67,19 +101,19 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
     return logs.slice(-MAX_LOGS);
   }, [logs]);
 
-  // 检查是否在底部
+  // Check if at bottom
   const checkIfAtBottom = useCallback(() => {
     const container = containerRef.current;
     if (!container) return true;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
-    // 计算距离底部的距离
+    // Calculate distance from bottom
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    // 如果距离底部小于等于 50px，认为在底部（增加容差，避免频繁切换）
+    // If distance from bottom is <= 50px, consider it at bottom (add tolerance to avoid frequent toggling)
     return distanceFromBottom <= 50;
   }, []);
 
-  // 当有新日志时，如果用户在底部，自动滚动到底部
+  // Auto-scroll to bottom when new logs arrive if user is at bottom
   useEffect(() => {
     const container = containerRef.current;
     if (!container || logs.length === 0) return;
@@ -90,21 +124,21 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
     if (hasNewLog) {
       lastLogIdRef.current = lastLog.id;
 
-      // 检查用户是否在底部
+      // Check if user is at bottom
       const isAtBottom = checkIfAtBottom();
       shouldAutoScrollRef.current = isAtBottom;
 
       if (!isAtBottom) {
-        // 使用 requestAnimationFrame 确保 DOM 更新后再滚动
+        // Use requestAnimationFrame to ensure scroll happens after DOM update
         requestAnimationFrame(() => {
           endRef.current?.scrollIntoView({ behavior: 'smooth' });
         });
       }
     }
 
-    // 只有当日志真的增加时才去更新滚动按钮状态
-    // 这里的 timer 逻辑其实可以优化，只在滚动事件或新日志时触发
-  }, [logs.length, checkIfAtBottom]); // 依赖 logs.length 而不是 logs 数组引用
+    // Only update scroll button state when logs actually increase
+    // Timer logic here can be optimized to trigger only on scroll event or new log
+  }, [logs.length, checkIfAtBottom]); // Depend on logs.length instead of logs array reference
 
   useEffect(() => {
     const container = containerRef.current;
@@ -113,12 +147,12 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
     const handleScroll = () => {
       const isAtBottom = checkIfAtBottom();
       setShowScrollButton(!isAtBottom);
-      // 更新自动滚动状态：如果用户手动滚动到底部，则允许自动滚动
+      // Update auto-scroll state: if user manually scrolls to bottom, allow auto-scroll
       shouldAutoScrollRef.current = isAtBottom;
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
-    // 初始检查和每秒轮询（兜底）
+    // Initial check and 1-second polling (fallback)
     handleScroll();
     const interval = setInterval(handleScroll, 1000);
 
@@ -146,10 +180,10 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
       behavior: 'smooth',
     });
 
-    // 更新自动滚动状态
+    // Update auto-scroll state
     shouldAutoScrollRef.current = true;
 
-    // 延迟隐藏按钮，等待滚动完成
+    // Delay hiding button to wait for scroll completion
     setTimeout(() => {
       setShowScrollButton(false);
     }, 300);
@@ -157,12 +191,12 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
 
   return (
     <div
-      className={`flex-1 bg-ink-900 relative min-h-[200px] md:min-h-[300px] ${className || ''}`}
+      className={`flex-1 bg-stone-950 relative min-h-[200px] md:min-h-[300px] ${className || ''}`}
     >
       {/* Top Gradient Header Mask */}
-      <div className="absolute top-0 left-0 w-full h-8 md:h-12 bg-gradient-to-b from-ink-900 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 left-0 w-full h-8 md:h-12 bg-gradient-to-b from-stone-950 to-transparent pointer-events-none z-10" />
 
-      {/* 滚动容器 */}
+      {/* Scroll Container */}
       <div
         ref={containerRef}
         className="h-full overflow-y-auto scrollbar-hide relative"
@@ -187,9 +221,9 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
       </div>
 
       {/* Bottom Gradient Footer Mask */}
-      <div className="absolute bottom-0 left-0 w-full h-8 md:h-12 bg-gradient-to-t from-ink-900 to-transparent pointer-events-none z-10" />
+      <div className="absolute bottom-0 left-0 w-full h-8 md:h-12 bg-gradient-to-t from-stone-950 to-transparent pointer-events-none z-10" />
 
-      {/* 清除日志按钮 - 固定在日志窗口右下角，聊天按钮左边 */}
+      {/* Clear Logs Button - Fixed at bottom right of log window, left of chat button */}
       {onClearLogs && displayedLogs.length > 0 && (
         <button
           onClick={onClearLogs}
@@ -201,14 +235,14 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
                      shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95
                      transition-all duration-200
                      cursor-pointer pointer-events-auto"
-          title="清空日志"
-          aria-label="清空日志"
+          title="Clear Logs"
+          aria-label="Clear Logs"
         >
           <Trash2 size={18} strokeWidth={2.5} />
         </button>
       )}
 
-      {/* 滚动到底部按钮 - 固定在日志窗口右下角，清除按钮左边 */}
+      {/* Scroll to Bottom Button - Fixed at bottom right of log window, left of clear button */}
       {showScrollButton && (
         <button
           onClick={scrollToBottom}
@@ -220,14 +254,14 @@ const LogPanel: React.FC<Props> = ({ logs, playerName, className, onClearLogs })
                      shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95
                      transition-all duration-200
                      cursor-pointer pointer-events-auto"
-          title="滚动到底部"
-          aria-label="滚动到底部"
+          title="Scroll to Bottom"
+          aria-label="Scroll to Bottom"
         >
           <ChevronsDown size={20} strokeWidth={2.5} />
         </button>
       )}
 
-      {/* 世界聊天按钮 */}
+      {/* Global Chat Button */}
       <GlobalChat playerName={playerName} />
     </div>
   );

@@ -1,81 +1,81 @@
 {
     "factions": {
         "cloud": {
-            "name": "Haven Outpost",
-            "description": "A peaceful survivor settlement. Welcoming to most wastelanders."
+            "name": "Free States",
+            "description": "Survivalist separatists. Bunkers, traps, and independence."
         },
         "fire": {
-            "name": "Inferno Gang",
-            "description": "Built near a volcanic vent. Specialists in fire and explosives."
+            "name": "The Forged",
+            "description": "Raiders obsessed with fire and iron. \"Forged in the flame.\""
         },
         "sword": {
-            "name": "Steel Brotherhood",
-            "description": "Weapon masters. Their fighters are among the deadliest."
+            "name": "Brotherhood of Steel",
+            "description": "Military order. Hoards advanced tech. Heavy armor presence."
         },
         "temple": {
-            "name": "The Sanctuary",
-            "description": "A community of healers. Known for their defensive capabilities."
+            "name": "Followers of the Apocalypse",
+            "description": "Pacifist medics and scholars. \"Knowledge for the people.\""
         },
         "taoist": {
-            "name": "Tech Cult",
-            "description": "Worshippers of pre-war technology. Fast learners."
+            "name": "The Institute",
+            "description": "Covert research network. Synth rumors persist."
         },
         "blood": {
-            "name": "Blood Raiders",
-            "description": "Ruthless raiders. Powerful but dangerous to join."
+            "name": "The Disciples",
+            "description": "Sadistic raiders. They enjoy the kill more than the loot."
         },
         "lotus": {
-            "name": "Blue Lotus Militia",
-            "description": "Precision fighters. Masters of blade combat."
+            "name": "The Gunners",
+            "description": "High-end mercenaries. Combat armor, laser weapons, no morals."
         },
         "xuantian": {
-            "name": "Vault Dwellers",
-            "description": "Survivors from an ancient vault. Deep resources."
+            "name": "The Minutemen",
+            "description": "Citizen militia. Answers distress calls—sometimes."
         },
         "jiuyou": {
-            "name": "Shadow Syndicate",
-            "description": "Masters of stealth and assassination."
+            "name": "The Railroad",
+            "description": "Underground operators. Codes, safehouses, and secrets."
         },
         "star": {
-            "name": "Stargazers",
-            "description": "Mysterious group studying pre-war satellite technology."
+            "name": "Reilly's Rangers",
+            "description": "Elite mapping unit. Explorers of the unknown."
         },
         "dragon": {
-            "name": "Mutant Legion",
-            "description": "A faction of powerful mutants. Strong bloodlines."
+            "name": "The Pack",
+            "description": "Animalistic raiders. Survival of the fittest. Colorful armor."
         },
         "phoenix": {
-            "name": "Phoenix Clan",
-            "description": "Known for their regenerative abilities."
+            "name": "The Responders",
+            "description": "Emergency services. Firefighters, police, and medics rebuilding."
         },
         "thunder": {
-            "name": "Thunder Legion",
-            "description": "Controls power generators. Masters of electricity."
+            "name": "The Enclave",
+            "description": "US Government remnants. Advanced Power Armor and Vertibirds."
         },
         "ice": {
-            "name": "Frost Bunker",
-            "description": "Survivors from a frozen bunker. Strong defense."
+            "name": "Children of Atom",
+            "description": "Worshippers of the Glow. \"Bask in Division.\""
         },
         "poison": {
-            "name": "Toxic Valley",
-            "description": "Masters of poisons and chemicals."
+            "name": "Caesar's Legion",
+            "description": "Slaver army modeled after Rome. Machetes and discipline."
         },
         "illusion": {
-            "name": "Mirage Runners",
-            "description": "Experts in deception and misdirection."
+            "name": "The Great Khans",
+            "description": "Proud warrior tribe. Drug runners and survivors."
         },
         "diamond": {
-            "name": "Iron Fist Gym",
-            "description": "Physical training specialists. Tough bodies."
+            "name": "Atom Cats",
+            "description": "Power Armor enthusiasts. \"Coolest cats in the wasteland.\""
         },
         "yinyang": {
-            "name": "Balance Keepers",
-            "description": "Believe in balance. Well-rounded in all areas."
+            "name": "The Operators",
+            "description": "Profit-driven gang. Stylish armor, pragmatic, deadly efficient."
         }
     },
     "ranks": {
         "outer": {
-            "title": "Newcomer",
+            "title": "Recruit",
             "description": "Just joined the faction."
         },
         "inner": {
@@ -83,11 +83,11 @@
             "description": "Recognized faction member."
         },
         "core": {
-            "title": "Trusted",
+            "title": "Veteran",
             "description": "Trusted inner circle member."
         },
         "elder": {
-            "title": "Lieutenant",
+            "title": "Officer",
             "description": "High-ranking faction officer."
         },
         "leader": {

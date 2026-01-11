@@ -32,7 +32,7 @@ const BatchFeedModal: React.FC<Props> = ({
 
   const pet = player.pets.find((p) => p.id === petId);
 
-  // 判断物品分类
+  // Determine item category
   const getItemCategory = (item: Item): ItemCategory => {
     if (item.type === ItemType.Pill) {
       return 'pill';
@@ -48,29 +48,29 @@ const BatchFeedModal: React.FC<Props> = ({
     return 'consumable';
   };
 
-  // 可喂养的物品（所有未装备的物品）
+  // Feedable items (all unequipped items)
   const equippedItemIds = new Set(Object.values(player.equippedItems).filter(Boolean));
 
-  // 所有可喂养的物品（不考虑筛选）
+  // All feedable items (regardless of filter)
   const allFeedableItems = useMemo(() => {
     return player.inventory.filter((item) => {
-      // 只显示可喂养的物品（未装备且数量>0）
+      // Only show feedable items (unequipped and quantity > 0)
       if (equippedItemIds.has(item.id)) return false;
       if (item.quantity <= 0) return false;
       return true;
     });
   }, [player.inventory, equippedItemIds]);
 
-  // 过滤物品
+  // Filter items
   const filteredItems = useMemo(() => {
     let filtered = allFeedableItems.filter((item) => {
-      // 按分类过滤
+      // Filter by category
       if (selectedCategory !== 'all') {
         const category = getItemCategory(item);
         if (category !== selectedCategory) return false;
       }
 
-      // 按品质过滤
+      // Filter by rarity
       if (selectedRarity !== 'all') {
         if (item.rarity !== selectedRarity) return false;
       }
@@ -97,7 +97,7 @@ const BatchFeedModal: React.FC<Props> = ({
         if (item) {
           setItemQuantities((prevQty) => {
             const newQty = new Map(prevQty);
-            newQty.set(itemId, 1); // 默认喂养1个
+            newQty.set(itemId, 1); // Default feed 1
             return newQty;
           });
         }
@@ -206,7 +206,7 @@ const BatchFeedModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="bg-ink-950 w-full max-w-4xl max-h-[90vh] rounded-none border border-stone-800 shadow-2xl flex flex-col overflow-hidden relative font-mono"
+        className="bg-stone-950 w-full max-w-4xl max-h-[90vh] rounded-none border border-amber-500/30 shadow-2xl flex flex-col overflow-hidden relative font-mono"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 背景纹理层 */}
@@ -222,7 +222,7 @@ const BatchFeedModal: React.FC<Props> = ({
 
         <div className="p-4 md:p-6 border-b border-stone-800 flex justify-between items-center bg-stone-950/50 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
+            <div className="w-12 h-12 bg-stone-950 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
               <div 
                 className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
                 style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
@@ -230,7 +230,7 @@ const BatchFeedModal: React.FC<Props> = ({
               <Heart size={24} className="relative z-10" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-stone-200 tracking-[0.2em] uppercase">
+              <h3 className="text-xl font-bold text-amber-400 tracking-[0.2em] uppercase">
                 PET_NOURISHMENT_PROTOCOL
               </h3>
               <p className="text-[10px] text-stone-600 tracking-widest uppercase">

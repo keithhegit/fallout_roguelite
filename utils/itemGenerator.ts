@@ -1,6 +1,6 @@
 /**
- * 物品生成工具函数
- * 支持根据类型、品级、数量生成物品
+ * Item Generation Utility Functions
+ * Support generating items based on type, rarity, and count
  */
 
 import { Item, ItemType, ItemRarity, EquipmentSlot, LotteryPrize } from '../types';
@@ -8,19 +8,19 @@ import { ITEM_TEMPLATES, getItemTemplatesByType, getItemTemplatesByRarity, getIt
 import { uid } from './gameUtils';
 
 /**
- * 物品生成配置
+ * Item Generation Options
  */
 interface GenerateItemsOptions {
-  type?: ItemType; // 物品类型，如果不指定则从所有类型中选择
-  rarity?: ItemRarity; // 稀有度，如果不指定则根据权重随机
-  count: number; // 生成数量
-  allowDuplicates?: boolean; // 是否允许重复
-  realm?: 'QiRefining' | 'Foundation' | 'GoldenCore' | 'NascentSoul' | 'SpiritSevering' | 'DaoCombining' | 'LongevityRealm'; // 境界，用于调整数值
-  realmLevel?: number; // 境界等级，用于调整数值
+  type?: ItemType; // Item type, select from all types if not specified
+  rarity?: ItemRarity; // Rarity, random by weight if not specified
+  count: number; // Number of items to generate
+  allowDuplicates?: boolean; // Whether to allow duplicates
+  realm?: 'QiRefining' | 'Foundation' | 'GoldenCore' | 'NascentSoul' | 'SpiritSevering' | 'DaoCombining' | 'LongevityRealm'; // Realm, used for adjusting stats
+  realmLevel?: number; // Realm level, used for adjusting stats
 }
 
 /**
- * 根据稀有度获取权重
+ * Get weight by rarity
  */
 function getRarityWeight(rarity: ItemRarity): number {
   const weights: Record<ItemRarity, number> = {
@@ -28,19 +28,15 @@ function getRarityWeight(rarity: ItemRarity): number {
     Rare: 30,
     Legendary: 20,
     Mythic: 10,
-    普通: 40,
-    稀有: 30,
-    传说: 20,
-    仙品: 10,
   };
-  return weights[rarity];
+  return weights[rarity] || 0;
 }
 
 /**
- * 根据权重随机选择稀有度
+ * Randomly select rarity based on weight
  */
 function randomRarityByWeight(): ItemRarity {
-  const rarities: ItemRarity[] = ['普通', '稀有', '传说', '仙品'];
+  const rarities: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
   const totalWeight = rarities.reduce((sum, rarity) => sum + getRarityWeight(rarity), 0);
 
   let random = Math.random() * totalWeight;
@@ -51,12 +47,12 @@ function randomRarityByWeight(): ItemRarity {
     }
   }
 
-  return '普通';
+  return 'Common';
 }
 
 /**
- * 根据境界调整物品数值
- * 优化：降低倍数增长，与装备调整函数保持一致，防止数值膨胀
+ * Adjust item stats based on realm
+ * Optimization: Reduce multiplier growth, consistent with equipment adjustment, prevent stat inflation
  */
 function adjustStatsByRealm(
   effect: Item['effect'],
@@ -64,8 +60,8 @@ function adjustStatsByRealm(
   realm: string,
   realmLevel: number = 1
 ): { effect?: Item['effect']; permanentEffect?: Item['permanentEffect'] } {
-  // 优化后的境界倍数：与装备调整函数保持一致
-  // 从 [1, 2, 4, 8, 16, 32, 64] 改为 [1, 1.5, 2.5, 4, 6, 10, 16]
+  // Optimized realm multipliers: consistent with equipment adjustment
+  // Changed from [1, 2, 4, 8, 16, 32, 64] to [1, 1.5, 2.5, 4, 6, 10, 16]
   const realmMultipliers: Record<string, number> = {
     QiRefining: 1,
     Foundation: 1.5,
@@ -77,14 +73,14 @@ function adjustStatsByRealm(
   };
 
   const realmMultiplier = realmMultipliers[realm] || 1;
-  // 降低层数加成：从10%降低到8%，与装备调整保持一致
+  // Reduce level bonus: from 10% to 8%, consistent with equipment adjustment
   const levelMultiplier = 1 + (realmLevel - 1) * 0.08;
   const totalMultiplier = realmMultiplier * levelMultiplier;
 
   const adjusted: Item['effect'] = {};
   const adjustedPermanent: Item['permanentEffect'] = {};
 
-  // 调整临时效果
+  // Adjust temporary effects
   if (effect) {
     if (effect.attack) adjusted.attack = Math.floor(effect.attack * totalMultiplier);
     if (effect.defense) adjusted.defense = Math.floor(effect.defense * totalMultiplier);
@@ -93,10 +89,10 @@ function adjustStatsByRealm(
     if (effect.physique) adjusted.physique = Math.floor(effect.physique * totalMultiplier);
     if (effect.speed) adjusted.speed = Math.floor(effect.speed * totalMultiplier);
     if (effect.exp) adjusted.exp = Math.floor(effect.exp * totalMultiplier);
-    if (effect.lifespan) adjusted.lifespan = effect.lifespan; // 寿命不受境界调整影响
+    if (effect.lifespan) adjusted.lifespan = effect.lifespan; // Lifespan not affected by realm adjustment
   }
 
-  // 调整永久效果
+  // Adjust permanent effects
   if (permanentEffect) {
     if (permanentEffect.attack) adjustedPermanent.attack = Math.floor(permanentEffect.attack * totalMultiplier);
     if (permanentEffect.defense) adjustedPermanent.defense = Math.floor(permanentEffect.defense * totalMultiplier);
@@ -104,7 +100,7 @@ function adjustStatsByRealm(
     if (permanentEffect.physique) adjustedPermanent.physique = Math.floor(permanentEffect.physique * totalMultiplier);
     if (permanentEffect.speed) adjustedPermanent.speed = Math.floor(permanentEffect.speed * totalMultiplier);
     if (permanentEffect.maxHp) adjustedPermanent.maxHp = Math.floor(permanentEffect.maxHp * totalMultiplier);
-    if (permanentEffect.maxLifespan) adjustedPermanent.maxLifespan = permanentEffect.maxLifespan; // 最大寿命不受境界调整影响
+    if (permanentEffect.maxLifespan) adjustedPermanent.maxLifespan = permanentEffect.maxLifespan; // Max lifespan not affected by realm adjustment
 
     if (permanentEffect.spiritualRoots) {
       adjustedPermanent.spiritualRoots = {};
@@ -124,60 +120,60 @@ function adjustStatsByRealm(
 }
 
 /**
- * 生成物品
- * @param options 生成配置
- * @returns 生成的物品数组
+ * Generate Items
+ * @param options Generation options
+ * @returns Generated items array
  */
 export function generateItems(options: GenerateItemsOptions): Item[] {
   const { type, rarity, count, allowDuplicates = true, realm, realmLevel = 1 } = options;
 
-  // 获取可用的物品模板
+  // Get available item templates
   let availableTemplates = ITEM_TEMPLATES;
 
   if (type && rarity) {
-    // 指定类型和稀有度
+    // Specify type and rarity
     availableTemplates = getItemTemplatesByTypeAndRarity(type, rarity);
   } else if (type) {
-    // 只指定类型
+    // Only specify type
     availableTemplates = getItemTemplatesByType(type);
   } else if (rarity) {
-    // 只指定稀有度
+    // Only specify rarity
     availableTemplates = getItemTemplatesByRarity(rarity);
   }
 
-  // 如果没有找到模板，返回空数组
+  // If no template found, return empty array
   if (availableTemplates.length === 0) {
     return [];
   }
 
   const generatedItems: Item[] = [];
   const usedIds = new Set<string>();
-  const maxAttempts = count * 10; // 防止无限循环
+  const maxAttempts = count * 10; // Prevent infinite loop
   let attempts = 0;
 
   while (generatedItems.length < count && attempts < maxAttempts) {
     attempts++;
 
-    // 随机选择一个模板
+    // Randomly select a template
     const template = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
 
-    // 如果不允许重复，检查是否已经使用过
+    // If duplicates not allowed, check if already used
     if (!allowDuplicates && usedIds.has(template.id)) {
       continue;
     }
 
-    // 深拷贝模板
+    // Deep copy template
     const item: Item = JSON.parse(JSON.stringify(template));
 
-    // 生成新的唯一ID（使用 uid 函数确保唯一性，不依赖模板的 id）
+    // Generate new unique ID (use uid function to ensure uniqueness, not dependent on template id)
     item.id = uid();
 
-    // 如果没有指定稀有度，根据权重随机选择
+    // If rarity not specified, randomly select based on weight
     if (!rarity) {
       item.rarity = randomRarityByWeight();
     }
 
-    // 根据境界调整数值
+    // Adjust stats based on realm
     if (realm) {
       const adjusted = adjustStatsByRealm(item.effect, item.permanentEffect, realm, realmLevel);
       item.effect = adjusted.effect;
@@ -192,9 +188,9 @@ export function generateItems(options: GenerateItemsOptions): Item[] {
 }
 
 /**
- * 生成单个物品
- * @param options 生成配置
- * @returns 生成的物品，如果失败则返回null
+ * Generate single item
+ * @param options Generation config
+ * @returns Generated item, or null if failed
  */
 export function generateItem(options: Omit<GenerateItemsOptions, 'count'>): Item | null {
   const items = generateItems({ ...options, count: 1 });
@@ -202,9 +198,9 @@ export function generateItem(options: Omit<GenerateItemsOptions, 'count'>): Item
 }
 
 /**
- * 生成抽奖奖品
- * @param options 生成配置
- * @returns 生成的抽奖奖品数组
+ * Generate lottery prizes
+ * @param options Generation config
+ * @returns Generated lottery prizes array
  */
 export function generateLotteryPrizes(options: Omit<GenerateItemsOptions, 'count'>): LotteryPrize[] {
   const item = generateItem(options);
@@ -228,11 +224,11 @@ export function generateLotteryPrizes(options: Omit<GenerateItemsOptions, 'count
 }
 
 /**
- * 生成指定数量的物品，每种类型各生成指定数量
- * @param types 物品类型数组
- * @param rarity 稀有度
- * @param count 每种类型的数量
- * @returns 生成的物品数组
+ * Generate specified number of items for each type
+ * @param types Item types array
+ * @param rarity Rarity
+ * @param count Count per type
+ * @returns Generated items array
  */
 export function generateItemsByTypes(
   types: ItemType[],
@@ -255,12 +251,12 @@ export function generateItemsByTypes(
 }
 
 /**
- * 生成所有品级的装备
- * @param count 每种品级的数量
- * @returns 生成的装备数组
+ * Generate all rarity equipments
+ * @param count Count per rarity
+ * @returns Generated equipments array
  */
 export function generateAllRarityEquipments(count: number = 10): Item[] {
-  const rarities: ItemRarity[] = ['普通', '稀有', '传说', '仙品'];
+  const rarities: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
   const types: ItemType[] = [ItemType.Weapon, ItemType.Armor, ItemType.Accessory, ItemType.Ring, ItemType.Artifact];
 
   const items: Item[] = [];
@@ -281,12 +277,12 @@ export function generateAllRarityEquipments(count: number = 10): Item[] {
 }
 
 /**
- * 生成所有品级的丹药
- * @param count 每种品级的数量
- * @returns 生成的丹药数组
+ * Generate all rarity pills
+ * @param count Count per rarity
+ * @returns Generated pills array
  */
 export function generateAllRarityPills(count: number = 10): Item[] {
-  const rarities: ItemRarity[] = ['普通', '稀有', '传说', '仙品'];
+  const rarities: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
 
   const items: Item[] = [];
 
@@ -304,12 +300,12 @@ export function generateAllRarityPills(count: number = 10): Item[] {
 }
 
 /**
- * 生成所有品级的草药
- * @param count 每种品级的数量
- * @returns 生成的草药数组
+ * Generate all rarity herbs
+ * @param count Count per rarity
+ * @returns Generated herbs array
  */
 export function generateAllRarityHerbs(count: number = 10): Item[] {
-  const rarities: ItemRarity[] = ['普通', '稀有', '传说', '仙品'];
+  const rarities: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
 
   const items: Item[] = [];
 
@@ -327,12 +323,12 @@ export function generateAllRarityHerbs(count: number = 10): Item[] {
 }
 
 /**
- * 生成所有品级的材料
- * @param count 每种品级的数量
- * @returns 生成的材料数组
+ * Generate all rarity materials
+ * @param count Count per rarity
+ * @returns Generated materials array
  */
 export function generateAllRarityMaterials(count: number = 10): Item[] {
-  const rarities: ItemRarity[] = ['普通', '稀有', '传说', '仙品'];
+  const rarities: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
 
   const items: Item[] = [];
 
@@ -350,9 +346,9 @@ export function generateAllRarityMaterials(count: number = 10): Item[] {
 }
 
 /**
- * 生成所有类型的物品（装备、丹药、草药、材料）
- * @param count 每种类型每个品级的数量
- * @returns 生成的物品数组
+ * Generate all types of items (Equipment, Pills, Herbs, Materials)
+ * @param count Count per type and rarity
+ * @returns Generated items array
  */
 export function generateAllItems(count: number = 10): Item[] {
   return [

@@ -9,10 +9,6 @@ export const RARITY_MULTIPLIERS: Record<ItemRarity, number> = {
   Rare: 1.5,
   Legendary: 2.5,
   Mythic: 6.0,
-  普通: 1,
-  稀有: 1.5,
-  传说: 2.5,
-  仙品: 6.0,
 };
 
 // Initial survival kit
@@ -36,11 +32,99 @@ export const INITIAL_ITEMS: Item[] = [
   },
   {
     id: 'spirit-gathering-grass',
-    name: 'Energy Bloom',
+    name: 'Glowing Fungus',
     type: ItemType.Herb,
-    description: 'A biological plant that synthesizes energy from the air. Essential for various tech blueprints.',
+    description: 'A neon-green mushroom. Essential for synthesizing RadAway.',
     quantity: 5,
     rarity: 'Common',
+  },
+  {
+    id: 'mutfruit',
+    name: 'Mutfruit',
+    type: ItemType.Herb,
+    description: 'A sweet, mutated fruit. A staple of the wasteland diet.',
+    quantity: 1,
+    rarity: 'Common',
+  },
+  {
+    id: 'bloodleaf',
+    name: 'Bloodleaf',
+    type: ItemType.Herb,
+    description: 'Red leaves found near water. Used in healing salves.',
+    quantity: 1,
+    rarity: 'Common',
+  },
+  {
+    id: 'hubflower',
+    name: 'Hubflower',
+    type: ItemType.Herb,
+    description: 'A purple flower used to synthesize psychoactive chems.',
+    quantity: 1,
+    rarity: 'Common',
+  },
+  {
+    id: 'brain-fungus',
+    name: 'Brain Fungus',
+    type: ItemType.Herb,
+    description: 'A fungus that resembles a human brain. Increases intelligence when consumed.',
+    quantity: 1,
+    rarity: 'Common',
+  },
+  {
+    id: 'mutated-fern',
+    name: 'Mutated Fern',
+    type: ItemType.Herb,
+    description: 'A hardy fern that has adapted to high radiation levels.',
+    quantity: 1,
+    rarity: 'Rare',
+  },
+  {
+    id: 'glowing-blood',
+    name: 'Glowing Blood',
+    type: ItemType.Material,
+    description: 'Radioactive blood from a glowing creature.',
+    quantity: 1,
+    rarity: 'Rare',
+  },
+  {
+    id: 'xander-root',
+    name: 'Xander Root',
+    type: ItemType.Herb,
+    description: 'A root vegetable found in the wasteland. Used in various remedies.',
+    quantity: 1,
+    rarity: 'Common',
+  },
+  {
+    id: 'ash-rose',
+    name: 'Ash Rose',
+    type: ItemType.Herb,
+    description: 'A resilient flower that grows in volcanic ash.',
+    quantity: 1,
+    rarity: 'Rare',
+  },
+  {
+    id: 'thistle',
+    name: 'Thistle',
+    type: ItemType.Herb,
+    description: 'A spiky plant that can survive in harsh conditions.',
+    quantity: 1,
+    rarity: 'Rare',
+  },
+  {
+    id: 'quantum-leaf',
+    name: 'Quantum Leaf',
+    type: ItemType.Herb,
+    description: 'A leaf that shimmers with quantum energy.',
+    quantity: 1,
+    rarity: 'Legendary',
+  },
+  {
+    id: 'cave-fungus',
+    name: 'Cave Fungus',
+    type: ItemType.Herb,
+    description: 'Fungus found in deep, damp caves. Potent medicinal properties.',
+    quantity: 1,
+    rarity: 'Legendary',
   },
   {
     id: 'iron-sword',
@@ -72,7 +156,7 @@ export const PILL_RECIPES: Recipe[] = [
   {
     name: 'Mentats',
     cost: 10,
-    ingredients: [{ name: 'Energy Bloom', qty: 3 }],
+    ingredients: [{ name: 'Glowing Fungus', qty: 3 }],
     result: {
       name: 'Mentats',
       type: ItemType.Pill,
@@ -85,8 +169,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Stimpak',
     cost: 20,
     ingredients: [
-      { name: 'Heal Root', qty: 3 },
-      { name: 'Energy Bloom', qty: 1 },
+      { name: 'Bloodleaf', qty: 3 },
+      { name: 'Glowing Fungus', qty: 1 },
     ],
     result: {
       name: 'Stimpak',
@@ -100,8 +184,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Buffout',
     cost: 100,
     ingredients: [
-      { name: 'Neural Bloom', qty: 2 },
-      { name: 'Vault Fruit', qty: 1 },
+      { name: 'Brain Fungus', qty: 2 },
+      { name: 'Mutfruit', qty: 1 },
     ],
     result: {
       name: 'Buffout',
@@ -115,8 +199,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Psycho',
     cost: 500,
     ingredients: [
-      { name: 'Primal Root', qty: 2 },
-      { name: 'Mutant Core', qty: 1 },
+      { name: 'Xander Root', qty: 2 },
+      { name: 'Nuclear Material', qty: 1 },
     ],
     result: {
       name: 'Psycho',
@@ -131,8 +215,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Titan Blood Serum',
     cost: 2000,
     ingredients: [
-      { name: 'Drake Scale Fruit', qty: 3 },
-      { name: 'Apex Mutant Core', qty: 2 },
+      { name: 'Thistle', qty: 3 },
+      { name: 'Refined Nuclear Material', qty: 2 },
     ],
     result: {
       name: 'Titan Blood Serum',
@@ -146,8 +230,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Apex Fusion Shot',
     cost: 5000,
     ingredients: [
-      { name: 'Genesis Fluid', qty: 1 },
-      { name: 'Chronos Fern', qty: 1 },
+      { name: 'FEV Sample', qty: 1 },
+      { name: 'Quantum Leaf', qty: 1 },
     ],
     result: {
       name: 'Apex Fusion Shot',
@@ -162,7 +246,7 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Life Extender',
     cost: 300,
     ingredients: [
-      { name: 'Primal Root', qty: 2 },
+      { name: 'Xander Root', qty: 2 },
       { name: 'Bio-Ginseng', qty: 3 },
     ],
     result: {
@@ -177,8 +261,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Eternity Serum',
     cost: 1500,
     ingredients: [
-      { name: 'Eternal Bloom', qty: 1 },
-      { name: 'Primal Fungus', qty: 2 },
+      { name: 'Nirvana Root', qty: 1 },
+      { name: 'Cave Fungus', qty: 2 },
     ],
     result: {
       name: 'Eternity Serum',
@@ -192,9 +276,9 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Immortal Compound',
     cost: 8000,
     ingredients: [
-      { name: 'Genesis Fluid', qty: 2 },
-      { name: 'Chronos Fern', qty: 2 },
-      { name: 'Drake Scale Fruit', qty: 3 },
+      { name: 'FEV Sample', qty: 2 },
+      { name: 'Quantum Leaf', qty: 2 },
+      { name: 'Thistle', qty: 3 },
     ],
     result: {
       name: 'Immortal Compound',
@@ -209,8 +293,8 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Purification Shot',
     cost: 400,
     ingredients: [
-      { name: 'Vault Fruit', qty: 3 },
-      { name: 'Neural Bloom', qty: 2 },
+      { name: 'Mutfruit', qty: 3 },
+      { name: 'Brain Fungus', qty: 2 },
     ],
     result: {
       name: 'Purification Shot',
@@ -232,9 +316,9 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Elemental Balance Shot',
     cost: 2500,
     ingredients: [
-      { name: 'Ancient Root', qty: 3 },
+      { name: 'Ash Rose', qty: 3 },
       { name: 'Bio-Fruit', qty: 3 },
-      { name: 'Apex Mutant Core', qty: 2 },
+      { name: 'Refined Nuclear Material', qty: 2 },
     ],
     result: {
       name: 'Elemental Balance Shot',
@@ -256,9 +340,9 @@ export const PILL_RECIPES: Recipe[] = [
     name: 'Nova Core Serum',
     cost: 10000,
     ingredients: [
-      { name: 'Primal Ichor', qty: 3 },
-      { name: 'Nine-Leaf Flora', qty: 3 },
-      { name: 'Pristine Flora', qty: 2 },
+      { name: 'Glowing Blood', qty: 3 },
+      { name: 'Mutated Fern', qty: 3 },
+      { name: 'Hubflower', qty: 2 },
     ],
     result: {
       name: 'Nova Core Serum',
@@ -278,14 +362,30 @@ export const PILL_RECIPES: Recipe[] = [
   },
 ];
 
-// 可通过历练获得的额外丹方（这些不会在初始炼丹面板中显示，需要通过使用丹方物品解锁）
+// Additional pill recipes obtainable through experience (these will not be displayed in the initial alchemy panel and need to be unlocked by using recipe items)
 export const DISCOVERABLE_RECIPES: Recipe[] = [
+  {
+    name: 'Survival Protocol',
+    cost: 1500,
+    ingredients: [
+      { name: 'Cave Fungus', qty: 2 },
+      { name: 'Brain Fungus', qty: 3 },
+    ],
+    result: {
+      name: 'Survival Protocol',
+      type: ItemType.Pill,
+      description: 'Greatly increases survival odds. Grants massive experience.',
+      rarity: 'Legendary',
+      effect: { exp: 5000 },
+      permanentEffect: { maxHp: 100, defense: 20 },
+    },
+  },
   {
     name: 'Clarity Shot',
     cost: 150,
     ingredients: [
-      { name: 'Neural Bloom', qty: 3 },
-      { name: 'Energy Bloom', qty: 2 },
+      { name: 'Brain Fungus', qty: 3 },
+      { name: 'Glowing Fungus', qty: 2 },
     ],
     result: {
       name: 'Clarity Shot',
@@ -300,7 +400,7 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     cost: 200,
     ingredients: [
       { name: 'Bio-Ginseng', qty: 2 },
-      { name: 'Heal Root', qty: 3 },
+      { name: 'Bloodleaf', qty: 3 },
     ],
     result: {
       name: 'Hardening Serum',
@@ -314,8 +414,8 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     name: 'Breakthrough Cocktail',
     cost: 800,
     ingredients: [
-      { name: 'Primal Fungus', qty: 1 },
-      { name: 'Mutant Core', qty: 2 },
+      { name: 'Cave Fungus', qty: 1 },
+      { name: 'Nuclear Material', qty: 2 },
     ],
     result: {
       name: 'Breakthrough Cocktail',
@@ -330,8 +430,8 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     name: 'Apex Serum',
     cost: 3000,
     ingredients: [
-      { name: 'Eternal Bloom', qty: 1 },
-      { name: 'Apex Mutant Core', qty: 3 },
+      { name: 'Nirvana Root', qty: 1 },
+      { name: 'Refined Nuclear Material', qty: 3 },
     ],
     result: {
       name: 'Apex Serum',
@@ -346,9 +446,9 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     name: 'T-Cell Serum',
     cost: 10000,
     ingredients: [
-      { name: 'Genesis Fluid', qty: 2 },
-      { name: 'Chronos Fern', qty: 2 },
-      { name: 'Drake Scale Fruit', qty: 5 },
+      { name: 'FEV Sample', qty: 2 },
+      { name: 'Quantum Leaf', qty: 2 },
+      { name: 'Thistle', qty: 5 },
     ],
     result: {
       name: 'T-Cell Serum',
@@ -365,8 +465,8 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     name: 'Concentrated Core',
     cost: 3000,
     ingredients: [
-      { name: 'Primal Fungus', qty: 2 },
-      { name: 'Mutant Core', qty: 3 },
+      { name: 'Cave Fungus', qty: 2 },
+      { name: 'Nuclear Material', qty: 3 },
     ],
     result: {
       name: 'Concentrated Core',
@@ -381,9 +481,9 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     name: 'Soul Link Serum',
     cost: 4000,
     ingredients: [
-      { name: 'Eternal Bloom', qty: 1 },
-      { name: 'Primal Fungus', qty: 2 },
-      { name: 'Apex Mutant Core', qty: 2 },
+      { name: 'Nirvana Root', qty: 1 },
+      { name: 'Cave Fungus', qty: 2 },
+      { name: 'Refined Nuclear Material', qty: 2 },
     ],
     result: {
       name: 'Soul Link Serum',
@@ -398,10 +498,10 @@ export const DISCOVERABLE_RECIPES: Recipe[] = [
     name: 'Phoenix Protocol',
     cost: 6000,
     ingredients: [
-      { name: 'Genesis Fluid', qty: 1 },
-      { name: 'Chronos Fern', qty: 2 },
-      { name: 'Drake Scale Fruit', qty: 3 },
-      { name: 'Apex Mutant Core', qty: 3 },
+      { name: 'FEV Sample', qty: 1 },
+      { name: 'Quantum Leaf', qty: 2 },
+      { name: 'Thistle', qty: 3 },
+      { name: 'Refined Nuclear Material', qty: 3 },
     ],
     result: {
       name: 'Phoenix Protocol',
@@ -450,7 +550,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   // Note: Energy Bloom is already defined in INITIAL_ITEMS as an herb
   {
     id: 'monster-core',
-    name: 'Mutant Core',
+    name: 'Nuclear Material',
     type: ItemType.Material,
     description: 'A core found within mutant creatures, containing raw power.',
     quantity: 1,
@@ -466,7 +566,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'moonlight-stone',
-    name: 'Glow Stone',
+    name: 'Irradiated Ore',
     type: ItemType.Material,
     description: 'A stone that glows with an eerie light, helpful for evolution.',
     quantity: 1,
@@ -474,7 +574,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'star-fragment',
-    name: 'Meteor Fragment',
+    name: 'Meteorite Chunk',
     type: ItemType.Material,
     description: 'A fragment of a fallen star, vibrating with mysterious energy.',
     quantity: 1,
@@ -482,7 +582,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'dragon-scale',
-    name: 'Tough Scale',
+    name: 'Deathclaw Hide',
     type: ItemType.Material,
     description: 'A thick, near-indestructible scale from a prime mutant.',
     quantity: 1,
@@ -490,31 +590,31 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'phoenix-feather',
-    name: 'Fiery Feather',
+    name: 'Scorchbeast Wing',
     type: ItemType.Material,
-    description: 'A feather that never stops smoldering.',
+    description: 'A wing membrane that never stops smoldering.',
     quantity: 1,
     rarity: 'Legendary',
   },
   {
     id: 'qilin-horn',
-    name: 'Mythic Horn',
+    name: 'Behemoth Bone',
     type: ItemType.Material,
-    description: 'A horn from a legendary wasteland beast.',
+    description: 'A bone from a legendary wasteland beast.',
     quantity: 1,
     rarity: 'Legendary',
   },
   {
     id: 'fairy-fruit',
-    name: 'Mutant Fruit',
+    name: 'Nirvana Root',
     type: ItemType.Material,
-    description: 'A rare fruit that grew in a high-radiation zone.',
+    description: 'A rare root that grew in a high-radiation zone.',
     quantity: 1,
     rarity: 'Rare',
   },
   {
     id: 'heaven-earth-treasure',
-    name: 'Rare Relic',
+    name: 'G.E.C.K. Component',
     type: ItemType.Material,
     description: 'A pre-war relic of immense value and power.',
     quantity: 1,
@@ -522,7 +622,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'divine-beast-essence',
-    name: 'Essence of Power',
+    name: 'Cryptid Essence',
     type: ItemType.Material,
     description: 'Concentrated power from an apex mutant.',
     quantity: 1,
@@ -530,7 +630,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'chaos-stone',
-    name: 'Chaos Core',
+    name: 'Plasma Core',
     type: ItemType.Material,
     description: 'A glowing core from the heart of the chaos zone.',
     quantity: 1,
@@ -538,7 +638,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'dao-fragment',
-    name: 'Code Fragment',
+    name: 'Encrypted Holotape',
     type: ItemType.Material,
     description: 'A piece of a master control unit, containing advanced logic.',
     quantity: 1,
@@ -546,7 +646,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'fairy-essence',
-    name: 'Pure Essence',
+    name: 'Pure Isotope',
     type: ItemType.Material,
     description: 'The purest form of energy found in the wasteland.',
     quantity: 1,
@@ -554,7 +654,7 @@ export const PET_EVOLUTION_MATERIALS_ITEMS: Item[] = [
   },
   {
     id: 'creation-liquid',
-    name: 'Origin Fluid',
+    name: 'FEV Sample',
     type: ItemType.Material,
     description: 'A mysterious fluid that can reshape organic matter.',
     quantity: 1,

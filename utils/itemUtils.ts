@@ -2,17 +2,13 @@ import { Item, ItemType, ItemRarity, EquipmentSlot, RealmType } from '../types';
 import { RARITY_MULTIPLIERS, REALM_ORDER, REALM_DATA } from '../constants/index';
 import { getItemFromConstants } from './itemConstantsUtils';
 
-// 共享的装备数值配置（统一管理，避免重复定义）
-// 调整属性浮动范围，缩小差距，使装备属性更稳定
+// Shared equipment stats configuration (unified management to avoid duplication)
+// Adjust attribute fluctuation range, narrow the gap, make equipment attributes more stable
 export const EQUIPMENT_RARITY_PERCENTAGES: Record<ItemRarity, { min: number; max: number }> = {
   Common: { min: 0.25, max: 0.40 },
   Rare: { min: 0.50, max: 0.80 },
   Legendary: { min: 0.90, max: 1.40 },
   Mythic: { min: 1.50, max: 2.20 },
-  普通: { min: 0.25, max: 0.40 },
-  稀有: { min: 0.50, max: 0.80 },
-  传说: { min: 0.90, max: 1.40 },
-  仙品: { min: 1.50, max: 2.20 },
 };
 
 export const EQUIPMENT_MIN_STATS: Record<ItemRarity, { attack: number; defense: number; hp: number; spirit: number; physique: number; speed: number }> = {
@@ -20,13 +16,14 @@ export const EQUIPMENT_MIN_STATS: Record<ItemRarity, { attack: number; defense: 
   Rare: { attack: 200, defense: 200, hp: 200, spirit: 200, physique: 200, speed: 200 },
   Legendary: { attack: 400, defense: 400, hp: 400, spirit: 400, physique: 400, speed: 400 },
   Mythic: { attack: 1000, defense: 1000, hp: 1000, spirit: 1000, physique: 1000, speed: 1000 },
+  // Compatibility with Chinese keys
   普通: { attack: 50, defense: 50, hp: 50, spirit: 50, physique: 50, speed: 50 },
   稀有: { attack: 200, defense: 200, hp: 200, spirit: 200, physique: 200, speed: 200 },
   传说: { attack: 400, defense: 400, hp: 400, spirit: 400, physique: 400, speed: 400 },
   仙品: { attack: 1000, defense: 1000, hp: 1000, spirit: 1000, physique: 1000, speed: 1000 },
 };
 
-// 定义物品效果类型（与 Item 接口中的类型保持一致）
+// Define item effect type (keep consistent with Item interface)
 type ItemEffect = NonNullable<Item['effect']>;
 type ItemPermanentEffect = NonNullable<Item['permanentEffect']>;
 
@@ -126,14 +123,14 @@ export const normalizeTypeLabel = (type: ItemType | string, item?: {
   return map[t] || (type as string);
 };
 
-// 稳定的槽位选择：同名物品在任意流程都会落在同一个槽位
+// Stable slot selection: Items with the same name will always fall into the same slot in any process
 const stablePickSlot = (name: string, slots: EquipmentSlot[]) => {
   const hash = Array.from(name).reduce((acc, ch) => ((acc * 31 + ch.charCodeAt(0)) >>> 0) & 0xffffffff, 0);
   return slots[hash % slots.length];
 };
 
-// 已知物品的效果映射表（与常量池保持一致）
-// 注意：这些值必须与 constants.ts 中的定义完全一致
+// Known item effect mapping table (consistent with constant pool)
+// Note: These values must be exactly consistent with definitions in constants.ts
 export const KNOWN_ITEM_EFFECTS: Record<
   string,
   { effect?: ItemEffect; permanentEffect?: ItemPermanentEffect }
@@ -172,8 +169,8 @@ export const KNOWN_ITEM_EFFECTS: Record<
 };
 
 /**
- * 根据稀有度调整丹药效果
- * 确保不同稀有度的丹药效果差异明显
+ * Adjust pill effects based on rarity
+ * Ensure significant differences in pill effects for different rarities
  */
 export const adjustPillEffectByRarity = (
   effect: ItemEffect | undefined,
@@ -182,7 +179,7 @@ export const adjustPillEffectByRarity = (
 ): { effect?: ItemEffect; permanentEffect?: ItemPermanentEffect } => {
   const multiplier = RARITY_MULTIPLIERS[rarity] || 1;
 
-  // 如果稀有度是普通，直接返回
+  // If rarity is Common, return directly
   if (rarity === 'Common' || multiplier === 1) {
     return { effect, permanentEffect };
   }
@@ -190,7 +187,7 @@ export const adjustPillEffectByRarity = (
   const adjustedEffect: ItemEffect = {};
   const adjustedPermanentEffect: ItemPermanentEffect = {};
 
-  // 调整临时效果（effect）
+  // Adjust temporary effects (effect)
   if (effect) {
     if (effect.exp !== undefined) {
       adjustedEffect.exp = Math.floor(effect.exp * multiplier);
@@ -218,7 +215,7 @@ export const adjustPillEffectByRarity = (
     }
   }
 
-  // 调整永久效果（permanentEffect）
+  // Adjust permanent effects (permanentEffect)
   if (permanentEffect) {
     if (permanentEffect.attack !== undefined) {
       adjustedPermanentEffect.attack = Math.floor(permanentEffect.attack * multiplier);
@@ -258,8 +255,8 @@ export const adjustPillEffectByRarity = (
   };
 };
 
-// 规范化物品效果，确保已知物品的效果与描述一致
-// 完全使用常量池中的原始属性，不做任何调整
+// Normalize item effects to ensure known items' effects match descriptions
+// Use original properties from constant pool completely, without any adjustment
 export const normalizeItemEffect = (
   itemName: string,
   aiEffect?: ItemEffect,
@@ -267,21 +264,21 @@ export const normalizeItemEffect = (
   itemType?: ItemType,
   rarity?: ItemRarity
 ) => {
-  // 优先从常量池获取物品定义（如果常量池中有，直接使用，不再调整）
+  // Prioritize getting item definition from constant pool (if exists, use directly, no adjustment)
   const itemFromConstants = getItemFromConstants(itemName);
   if (itemFromConstants) {
-    // 如果常量池中有该物品的定义，优先使用常量池中的效果
-    // 如果常量池中的 effect 或 permanentEffect 是 undefined 或空对象，则使用传入的值
-    // 如果传入的值也是 undefined，则返回 undefined（不返回空对象）
+    // If item definition exists in constant pool, prioritize using effects from constant pool
+    // If effect or permanentEffect in constant pool is undefined or empty object, use passed value
+    // If passed value is also undefined, return undefined (do not return empty object)
     const constantsEffect = itemFromConstants.effect;
     const constantsPermanentEffect = itemFromConstants.permanentEffect;
 
-    // 检查常量池中的 effect 是否有效（不是 undefined 且不是空对象）
+    // Check if effect in constant pool is valid (not undefined and not empty object)
     const hasValidConstantsEffect = constantsEffect !== undefined &&
       constantsEffect !== null &&
       Object.keys(constantsEffect || {}).length > 0;
 
-    // 检查常量池中的 permanentEffect 是否有效（不是 undefined 且不是空对象）
+    // Check if permanentEffect in constant pool is valid (not undefined and not empty object)
     const hasValidConstantsPermanentEffect = constantsPermanentEffect !== undefined &&
       constantsPermanentEffect !== null &&
       Object.keys(constantsPermanentEffect || {}).length > 0;
@@ -298,8 +295,8 @@ export const normalizeItemEffect = (
 
   const knownItem = KNOWN_ITEM_EFFECTS[itemName];
   if (knownItem) {
-    // 如果物品在已知列表中，使用预定义的效果
-    // 如果已知列表中没有定义，则使用传入的值
+    // If item is in known list, use predefined effects
+    // If not defined in known list, use passed value
     return {
       effect: knownItem.effect !== undefined
         ? knownItem.effect
@@ -310,14 +307,14 @@ export const normalizeItemEffect = (
     };
   }
 
-  // 直接使用提供的效果，不做任何调整
+  // Use provided effects directly without any adjustment
   return {
     effect: aiEffect,
     permanentEffect: aiPermanentEffect,
   };
 };
 
-// 根据物品名称和描述推断物品类型和装备槽位
+// Infer item type and equipment slot based on item name and description
 export const inferItemTypeAndSlot = (
   name: string,
   currentType: ItemType,
@@ -425,7 +422,7 @@ export const inferItemTypeAndSlot = (
       },
     ];
 
-  // 如果当前类型已经是明确的装备类型，优先保持类型，只推断槽位
+  // If current type is already a clear equipment type, prioritize keeping type, only infer slot
   const normalized = normalizeTypeHint(currentType) || currentType;
   const isKnownEquipmentType = [
     ItemType.Weapon,
@@ -435,14 +432,14 @@ export const inferItemTypeAndSlot = (
     ItemType.Accessory,
   ].includes(normalized as ItemType);
 
-  // 如果当前类型是明确的装备类型，且isEquippable为true，优先保持类型
+  // If current type is clear equipment type, and isEquippable is true, prioritize keeping type
   if (isKnownEquipmentType && (currentIsEquippable || normalized === ItemType.Artifact || normalized === ItemType.Weapon || normalized === ItemType.Armor || normalized === ItemType.Ring || normalized === ItemType.Accessory)) {
-    // 只推断槽位，不改变类型
+    // Only infer slot, do not change type
     switch (normalized) {
       case ItemType.Weapon:
         return { type: ItemType.Weapon, isEquippable: true, equipmentSlot: EquipmentSlot.Weapon };
       case ItemType.Armor:
-        // 尝试推断具体部位
+        // Try to infer specific part
         for (const rule of rules) {
           if (rule.type === ItemType.Armor && rule.slot && rule.match.test(combined)) {
             if (!rule.exclude || !rule.exclude.test(combined)) {
@@ -473,7 +470,7 @@ export const inferItemTypeAndSlot = (
     }
   }
 
-  // 规则化的优先级匹配（仅在类型不明确时使用）
+  // Prioritized matching rules (only used when type is unclear)
   for (const rule of rules) {
     if (rule.exclude && rule.exclude.test(combined)) continue;
     if (rule.match.test(combined)) {
@@ -486,7 +483,7 @@ export const inferItemTypeAndSlot = (
     }
   }
 
-  // 使用规范化的类型提示作兜底（如果上面的逻辑都没有匹配到）
+  // Use normalized type hint as fallback (if none of the above logic matched)
   if (currentIsEquippable || isKnownEquipmentType) {
     switch (normalized) {
       case ItemType.Weapon:
@@ -525,27 +522,27 @@ export const inferItemTypeAndSlot = (
 };
 
 /**
- * 根据境界获取装备数值的基础倍数
- * 用于平衡不同境界的装备数值，确保装备与玩家境界匹配
+ * Get equipment stat base multiplier based on realm
+ * Used to balance equipment stats across different realms, ensuring equipment matches player realm
  */
 export const getRealmEquipmentMultiplier = (realm: RealmType, realmLevel: number): number => {
   const realmIndex = REALM_ORDER.indexOf(realm);
-  // 如果境界索引无效，使用默认值（炼气期，索引0）
+  // If realm index is invalid, use default (QiRefining, index 0)
   const validRealmIndex = realmIndex >= 0 ? realmIndex : 0;
-  // 优化后的基础倍数：降低增长幅度，防止数值膨胀
-  // 从 [1, 2, 4, 6, 10, 16, 32] 改为 [1, 1.5, 2.5, 4, 6, 10, 16]
-  // 这样最高倍数从32倍降低到16倍，与境界属性增长（5倍）更匹配
+  // Optimized base multipliers: reduce growth rate, prevent stat inflation
+  // Changed from [1, 2, 4, 6, 10, 16, 32] to [1, 1.5, 2.5, 4, 6, 10, 16]
+  // Max multiplier reduced from 32x to 16x, better matching realm attribute growth (5x)
   const realmBaseMultipliers = [1, 1.5, 2.5, 4, 6, 10, 16];
   const realmBaseMultiplier = realmBaseMultipliers[validRealmIndex] || 1;
-  // 境界等级加成：每级增加8%（进一步降低增长）
+  // Realm level bonus: 8% per level (further reduced growth)
   const levelMultiplier = 1 + (realmLevel - 1) * 0.08;
   return realmBaseMultiplier * levelMultiplier;
 };
 
 /**
- * 根据境界调整装备数值
- * 确保装备数值与玩家当前境界匹配，避免数值过高或过低
- * 根据稀有度和境界基础属性计算合理的装备数值范围
+ * Adjust equipment stats based on realm
+ * Ensure equipment stats match player's current realm, avoiding too high or too low stats
+ * Calculate reasonable equipment stat range based on rarity and realm base stats
  */
 export const adjustEquipmentStatsByRealm = (
   effect: Item['effect'],
@@ -556,13 +553,13 @@ export const adjustEquipmentStatsByRealm = (
   if (!effect) return effect;
 
   const realmIndex = REALM_ORDER.indexOf(realm);
-  // 获取当前境界的基础属性值作为参考
+  // Get current realm base stats as reference
   const realmData = REALM_DATA[realm];
-  // 如果境界数据不存在，使用炼气期作为默认值
+  // If realm data doesn't exist, use QiRefining as default
   if (!realmData) {
     const defaultRealmData = REALM_DATA[RealmType.QiRefining];
     if (!defaultRealmData) {
-      // 如果连默认值都没有，直接返回原效果（防止崩溃）
+      // If even default is missing, return original effect (prevent crash)
       return effect;
     }
     return adjustEquipmentStatsByRealm(effect, RealmType.QiRefining, realmLevel, rarity);
@@ -574,23 +571,23 @@ export const adjustEquipmentStatsByRealm = (
   const basePhysique = realmData.basePhysique;
   const baseSpeed = realmData.baseSpeed;
 
-  // 使用共享的装备数值配置
+  // Use shared equipment stats config
   const percentage = EQUIPMENT_RARITY_PERCENTAGES[rarity] || EQUIPMENT_RARITY_PERCENTAGES['Common'];
-  // 使用中值作为基准
+  // Use median as baseline
   const targetPercentage = (percentage.min + percentage.max) / 2;
 
-  // 境界等级加成：每级增加5%
+  // Realm level bonus: 5% per level
   const levelMultiplier = 1 + (realmLevel - 1) * 0.05;
 
-  // 优化后的境界指数增长倍数：与装备倍数函数保持一致，防止数值膨胀
-  // 从 [1, 2, 4, 8, 16, 32, 64] 改为 [1, 1.5, 2.5, 4, 6, 10, 16]
-  // 这样最高倍数从64倍降低到16倍，与境界属性增长（5倍）更匹配
+  // Optimized realm exponential growth multiplier: consistent with equipment multiplier function, prevent stat inflation
+  // Changed from [1, 2, 4, 8, 16, 32, 64] to [1, 1.5, 2.5, 4, 6, 10, 16]
+  // Max multiplier reduced from 64x to 16x, better matching realm attribute growth (5x)
   const realmBaseMultipliers = [1, 1.5, 2.5, 4, 6, 10, 16];
   const realmMultiplier = realmBaseMultipliers[realmIndex] || 1;
 
   const adjusted: Item['effect'] = {};
 
-  // 属性映射表，减少重复代码
+  // Attribute mapping table, reduce duplicate code
   const attributeMap: Array<{
     key: keyof Item['effect'];
     baseValue: number;
@@ -603,48 +600,48 @@ export const adjustEquipmentStatsByRealm = (
       { key: 'speed', baseValue: baseSpeed },
     ];
 
-  // 获取该稀有度的最小属性保底值
+  // Get minimum stat guarantee for this rarity
   const minStats = EQUIPMENT_MIN_STATS[rarity] || EQUIPMENT_MIN_STATS['Common'];
 
-  // 统一处理所有属性
+  // Process all attributes uniformly
   attributeMap.forEach(({ key, baseValue }) => {
     const value = effect[key];
     if (value !== undefined && typeof value === 'number') {
-      // 目标值 = 基础属性 × 稀有度百分比 × 境界等级加成 × 境界倍数
+      // Target value = Base Stat * Rarity % * Realm Level Bonus * Realm Multiplier
       const targetValue = Math.floor(baseValue * targetPercentage * levelMultiplier * realmMultiplier);
       const maxValue = Math.floor(baseValue * percentage.max * levelMultiplier * realmMultiplier);
 
-      // 计算调整后的属性值
+      // Calculate adjusted stat value
       let adjustedValue = value * realmMultiplier;
 
-      // 确保装备属性至少达到目标值的80%
+      // Ensure equipment stat reaches at least 80% of target value
       adjustedValue = Math.max(adjustedValue, targetValue * 0.8);
 
-      // 应用稀有度保底值：确保高品质装备至少有对应的最小属性值
-      // 这对于低境界玩家获得高品质装备时特别重要
+      // Apply rarity guarantee: ensure high quality equipment has corresponding minimum stats
+      // This is especially important when low realm players get high quality equipment
       const minStatValue = minStats[key as keyof typeof minStats];
       if (minStatValue !== undefined) {
         adjustedValue = Math.max(adjustedValue, minStatValue);
       }
 
-      // 最高不超过最大值
+      // Max not exceeding max value
       adjusted[key] = Math.min(adjustedValue, maxValue);
     }
   });
   if (effect.exp !== undefined) {
-    adjusted.exp = effect.exp; // exp不受境界调整影响
+    adjusted.exp = effect.exp; // exp not affected by realm adjustment
   }
   if (effect.lifespan !== undefined) {
-    adjusted.lifespan = effect.lifespan; // 寿命不受境界调整影响
+    adjusted.lifespan = effect.lifespan; // Lifespan not affected by realm adjustment
   }
 
   return adjusted;
 };
 
 /**
- * 根据境界调整物品效果（通用函数，适用于所有物品类型）
- * 对于装备，使用专门的 adjustEquipmentStatsByRealm
- * 对于其他物品（丹药、草药等），根据境界进行倍数调整
+ * Adjust item stats based on realm (generic function, applies to all item types)
+ * For equipment, use specialized adjustEquipmentStatsByRealm
+ * For other items (Pills, Herbs, etc.), adjust by multiplier based on realm
  */
 export const adjustItemStatsByRealm = (
   effect: Item['effect'],
@@ -654,7 +651,7 @@ export const adjustItemStatsByRealm = (
   itemType: ItemType,
   rarity: ItemRarity = 'Common'
 ): { effect?: Item['effect']; permanentEffect?: Item['permanentEffect'] } => {
-  // 装备类型使用专门的调整函数
+  // Equipment types use specialized adjustment function
   const isEquipment = itemType === ItemType.Weapon ||
     itemType === ItemType.Armor ||
     itemType === ItemType.Accessory ||
@@ -666,20 +663,20 @@ export const adjustItemStatsByRealm = (
     return { effect: adjustedEffect, permanentEffect: undefined };
   }
 
-  // 非装备物品：根据境界进行倍数调整
+  // Non-equipment items: adjust by multiplier based on realm
   const realmIndex = REALM_ORDER.indexOf(realm);
-  // 优化后的境界倍数：与装备调整函数保持一致，防止数值膨胀
-  // 从 [1, 2, 4, 8, 16, 20, 25] 改为 [1, 1.5, 2.5, 4, 6, 10, 16]
+  // Optimized realm multipliers: consistent with equipment adjustment, prevent stat inflation
+  // Changed from [1, 2, 4, 8, 16, 20, 25] to [1, 1.5, 2.5, 4, 6, 10, 16]
   const realmBaseMultipliers = [1, 1.5, 2.5, 4, 6, 10, 16];
   const realmMultiplier = realmBaseMultipliers[realmIndex] || 1;
-  // 降低层数加成：从10%降低到8%，与装备调整保持一致
+  // Reduce level bonus: from 10% to 8%, consistent with equipment adjustment
   const levelMultiplier = 1 + (realmLevel - 1) * 0.08;
   const totalMultiplier = realmMultiplier * levelMultiplier;
 
   const adjustedEffect: Item['effect'] = {};
   const adjustedPermanentEffect: Item['permanentEffect'] = {};
 
-  // 调整临时效果
+  // Adjust temporary effects
   if (effect) {
     if (effect.attack !== undefined) adjustedEffect.attack = Math.floor(effect.attack * totalMultiplier);
     if (effect.defense !== undefined) adjustedEffect.defense = Math.floor(effect.defense * totalMultiplier);
@@ -688,11 +685,11 @@ export const adjustItemStatsByRealm = (
     if (effect.physique !== undefined) adjustedEffect.physique = Math.floor(effect.physique * totalMultiplier);
     if (effect.speed !== undefined) adjustedEffect.speed = Math.floor(effect.speed * totalMultiplier);
     if (effect.exp !== undefined) adjustedEffect.exp = Math.floor(effect.exp * totalMultiplier);
-    // 寿命不受境界调整影响
+    // Lifespan not affected by realm adjustment
     if (effect.lifespan !== undefined) adjustedEffect.lifespan = effect.lifespan;
   }
 
-  // 调整永久效果
+  // Adjust permanent effects
   if (permanentEffect) {
     if (permanentEffect.attack !== undefined) adjustedPermanentEffect.attack = Math.floor(permanentEffect.attack * totalMultiplier);
     if (permanentEffect.defense !== undefined) adjustedPermanentEffect.defense = Math.floor(permanentEffect.defense * totalMultiplier);
@@ -700,7 +697,7 @@ export const adjustItemStatsByRealm = (
     if (permanentEffect.physique !== undefined) adjustedPermanentEffect.physique = Math.floor(permanentEffect.physique * totalMultiplier);
     if (permanentEffect.speed !== undefined) adjustedPermanentEffect.speed = Math.floor(permanentEffect.speed * totalMultiplier);
     if (permanentEffect.maxHp !== undefined) adjustedPermanentEffect.maxHp = Math.floor(permanentEffect.maxHp * totalMultiplier);
-    // 最大寿命不受境界调整影响
+    // Max lifespan not affected by realm adjustment
     if (permanentEffect.maxLifespan !== undefined) adjustedPermanentEffect.maxLifespan = permanentEffect.maxLifespan;
 
     if (permanentEffect.spiritualRoots) {
@@ -722,11 +719,11 @@ export const adjustItemStatsByRealm = (
 
 /**
  * Helper to calculate item stats
- * 注意：装备数值已经考虑了稀有度，这里不再应用RARITY_MULTIPLIERS
- * 只应用本命法宝的额外加成
+ * Note: Equipment stats already consider rarity, so RARITY_MULTIPLIERS is not applied here
+ * Only applies Natal Artifact extra bonus
  */
 export const getItemStats = (item: Item, isNatal: boolean = false) => {
-  // 本命法宝额外50%加成
+  // Natal Artifact extra 50% bonus
   const natalMultiplier = isNatal ? 1.5 : 1;
 
   return {
@@ -739,7 +736,7 @@ export const getItemStats = (item: Item, isNatal: boolean = false) => {
     hp: item.effect?.hp
       ? Math.floor(item.effect.hp * natalMultiplier)
       : 0,
-    exp: item.effect?.exp || 0, // exp 不受倍率影响
+    exp: item.effect?.exp || 0, // exp not affected by multiplier
     spirit: item.effect?.spirit
       ? Math.floor(item.effect.spirit * natalMultiplier)
       : 0,
@@ -753,7 +750,7 @@ export const getItemStats = (item: Item, isNatal: boolean = false) => {
 };
 
 
-// 生成属性预览文本
+// Generate attribute preview text
 export const generateAttributePreview = (effect: Item['effect']): string => {
   if (!effect) return '';
   const attrs: string[] = [];
@@ -768,12 +765,12 @@ export const generateAttributePreview = (effect: Item['effect']): string => {
   return attrs.length > 0 ? ` [${attrs.join(' ')}]` : '';
 };
 
-// 计算物品出售价格
+// Calculate item sell price
 export const calculateItemSellPrice = (item: Item): number => {
   const rarity = item.rarity || 'Common';
   const level = item.level || 0;
 
-  // 基础价格（根据稀有度）
+  // Base price (based on rarity)
   const basePrices: Record<ItemRarity, number> = {
     Common: 10,
     Rare: 50,
@@ -784,78 +781,78 @@ export const calculateItemSellPrice = (item: Item): number => {
     传说: 300,
     仙品: 2000,
   };
-  // 确保 basePrice 有默认值，防止 undefined
+  // Ensure basePrice has default value, prevent undefined
   let basePrice = basePrices[rarity] || 10;
 
-  // 计算属性价值
+  // Calculate attribute value
   let attributeValue = 0;
-  // 确保 rarityMultiplier 有默认值，防止 undefined
+  // Ensure rarityMultiplier has default value, prevent undefined
   const rarityMultiplier = RARITY_MULTIPLIERS[rarity] || 1;
 
-  // 临时效果价值（effect）
+  // Temporary effect value (effect)
   if (item.effect) {
     const effect = item.effect;
-    attributeValue += (effect.attack || 0) * 2; // 攻击力每点值2灵石
-    attributeValue += (effect.defense || 0) * 1.5; // 防御力每点值1.5灵石
-    attributeValue += (effect.hp || 0) * 0.5; // 气血每点值0.5灵石
-    attributeValue += (effect.spirit || 0) * 1.5; // 神识每点值1.5灵石
-    attributeValue += (effect.physique || 0) * 1.5; // 体魄每点值1.5灵石
-    attributeValue += (effect.speed || 0) * 2; // 速度每点值2灵石
-    attributeValue += (effect.exp || 0) * 0.1; // 修为每点值0.1灵石（临时效果）
+    attributeValue += (effect.attack || 0) * 2; // Attack worth 2 spirit stones per point
+    attributeValue += (effect.defense || 0) * 1.5; // Defense worth 1.5 spirit stones per point
+    attributeValue += (effect.hp || 0) * 0.5; // HP worth 0.5 spirit stones per point
+    attributeValue += (effect.spirit || 0) * 1.5; // Spirit worth 1.5 spirit stones per point
+    attributeValue += (effect.physique || 0) * 1.5; // Physique worth 1.5 spirit stones per point
+    attributeValue += (effect.speed || 0) * 2; // Speed worth 2 spirit stones per point
+    attributeValue += (effect.exp || 0) * 0.1; // EXP worth 0.1 spirit stones per point (temporary effect)
   }
 
-  // 永久效果价值（permanentEffect，更值钱）
+  // Permanent effect value (permanentEffect, more valuable)
   if (item.permanentEffect) {
     const permEffect = item.permanentEffect;
-    attributeValue += (permEffect.attack || 0) * 10; // 永久攻击每点值10灵石
-    attributeValue += (permEffect.defense || 0) * 8; // 永久防御每点值8灵石
-    attributeValue += (permEffect.maxHp || 0) * 3; // 永久气血上限每点值3灵石
-    attributeValue += (permEffect.spirit || 0) * 8; // 永久神识每点值8灵石
-    attributeValue += (permEffect.physique || 0) * 8; // 永久体魄每点值8灵石
-    attributeValue += (permEffect.speed || 0) * 10; // 永久速度每点值10灵石
+    attributeValue += (permEffect.attack || 0) * 10; // Permanent Attack worth 10 spirit stones per point
+    attributeValue += (permEffect.defense || 0) * 8; // Permanent Defense worth 8 spirit stones per point
+    attributeValue += (permEffect.maxHp || 0) * 3; // Permanent Max HP worth 3 spirit stones per point
+    attributeValue += (permEffect.spirit || 0) * 8; // Permanent Spirit worth 8 spirit stones per point
+    attributeValue += (permEffect.physique || 0) * 8; // Permanent Physique worth 8 spirit stones per point
+    attributeValue += (permEffect.speed || 0) * 10; // Permanent Speed worth 10 spirit stones per point
   }
 
-  // 应用稀有度倍率到属性价值（确保不是 NaN）
+  // Apply rarity multiplier to attribute value (ensure not NaN)
   attributeValue = Math.floor((attributeValue || 0) * (rarityMultiplier || 1));
 
-  // 装备类物品额外价值加成
+  // Equipment type item extra value bonus
   let equipmentBonus = 0;
   if (item.isEquippable) {
-    // 装备类物品根据类型有不同的基础价值
+    // Equipment items have different base values based on type
     switch (item.type) {
       case ItemType.Weapon:
-        equipmentBonus = (basePrice || 0) * 1.5; // 武器额外50%价值
+        equipmentBonus = (basePrice || 0) * 1.5; // Weapon extra 50% value
         break;
       case ItemType.Armor:
-        equipmentBonus = (basePrice || 0) * 1.2; // 护甲额外20%价值
+        equipmentBonus = (basePrice || 0) * 1.2; // Armor extra 20% value
         break;
       case ItemType.Artifact:
-        equipmentBonus = (basePrice || 0) * 2; // 法宝额外100%价值
+        equipmentBonus = (basePrice || 0) * 2; // Artifact extra 100% value
         break;
       case ItemType.Ring:
       case ItemType.Accessory:
-        equipmentBonus = (basePrice || 0) * 1.3; // 戒指和首饰额外30%价值
+        equipmentBonus = (basePrice || 0) * 1.3; // Ring and Accessory extra 30% value
         break;
     }
   }
 
-  // 强化等级加成（每级增加20%价值）
+  // Enhancement level bonus (20% value per level)
   const levelMultiplier = 1 + (level || 0) * 0.2;
 
-  // 计算最终价格（确保所有值都是数字）
+  // Calculate final price (ensure all values are numbers)
   const totalValue =
     ((basePrice || 0) + (attributeValue || 0) + (equipmentBonus || 0)) * (levelMultiplier || 1);
 
-  // 根据物品类型调整（消耗品价值较低）
+  // Adjust based on item type (Consumables have lower value)
   let typeMultiplier = 1;
   if (item.type === ItemType.Herb || item.type === ItemType.Pill) {
-    typeMultiplier = 0.5; // 消耗品价值减半
+    typeMultiplier = 0.5; // Consumables value halved
   } else if (item.type === ItemType.Material) {
-    typeMultiplier = 0.3; // 材料价值更低
+    typeMultiplier = 0.3; // Materials value lower
   }
 
-  // 最终价格（取整，最低为1，确保不是 NaN）
+  // Final price (integer, minimum 1, ensure not NaN)
   const finalPrice = Math.max(1, Math.floor((totalValue || 0) * (typeMultiplier || 1)));
-  // 如果计算结果仍然是 NaN，返回默认值
+  // If calculation result is still NaN, return default value
   return isNaN(finalPrice) ? 1 : finalPrice;
 };

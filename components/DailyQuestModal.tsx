@@ -55,19 +55,15 @@ const DailyQuestModal: React.FC<Props> = ({
         if (a.completed !== b.completed) return a.completed ? 1 : -1;
         return b.progress - a.progress;
       case 'rarity': {
-        // Sort by rarity
-        const rarityOrder: Record<ItemRarity, number> = {
-          Common: 1,
-          Rare: 2,
-          Legendary: 3,
-          Mythic: 4,
-          普通: 1,
-          稀有: 2,
-          传说: 3,
-          仙品: 4,
-        };
-        return rarityOrder[b.rarity] - rarityOrder[a.rarity];
-      }
+      // Sort by rarity
+      const rarityOrder: Record<ItemRarity, number> = {
+        Common: 1,
+        Rare: 2,
+        Legendary: 3,
+        Mythic: 4,
+      };
+      return rarityOrder[b.rarity] - rarityOrder[a.rarity];
+    }
       case 'reward': {
         // Sort by reward value
         const rewardA =
@@ -101,7 +97,7 @@ const DailyQuestModal: React.FC<Props> = ({
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-ink-950 md:rounded-none border border-stone-800 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col relative">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 扫描线效果 */}
+        {/* CRT Effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
 
         {/* Header */}
@@ -134,7 +130,7 @@ const DailyQuestModal: React.FC<Props> = ({
               {claimableQuests.length > 0 && (
                 <button
                   onClick={handleClaimAll}
-                  className="px-3 py-1.5 bg-mystic-jade hover:bg-mystic-jade/80 text-stone-900 font-bold rounded text-sm transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-500/80 text-stone-900 font-bold rounded text-sm transition-colors flex items-center gap-1.5"
                 >
                   <Download size={14} />
                   Claim All ({claimableQuests.length})
@@ -144,7 +140,7 @@ const DailyQuestModal: React.FC<Props> = ({
           </div>
           <div className="h-3 bg-stone-950 rounded-full overflow-hidden border border-stone-800">
             <div
-              className="h-full bg-gradient-to-r from-mystic-jade to-amber-500 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 transition-all duration-500"
               style={{ width: `${completionRate}%` }}
             />
           </div>
@@ -188,7 +184,7 @@ const DailyQuestModal: React.FC<Props> = ({
               type="checkbox"
               checked={showCompleted}
               onChange={(e) => setShowCompleted(e.target.checked)}
-              className="w-4 h-4 rounded border-stone-800 bg-stone-900 text-mystic-jade focus:ring-mystic-jade"
+              className="w-4 h-4 rounded border-stone-800 bg-stone-900 text-emerald-500 focus:ring-emerald-500"
             />
             <span className="text-stone-300 text-sm">Show Completed</span>
           </label>
@@ -241,7 +237,7 @@ const QuestItem: React.FC<QuestItemProps> = ({
       className={`bg-ink-800 rounded-lg border-2 p-4 transition-all ${quest.completed && isClaimed
         ? 'border-stone-600 bg-stone-800/50'
         : quest.completed
-          ? 'border-mystic-jade bg-mystic-jade/10'
+          ? 'border-emerald-500 bg-emerald-500/10'
           : 'border-stone-700 hover:border-stone-600'
         }`}
     >
@@ -249,7 +245,7 @@ const QuestItem: React.FC<QuestItemProps> = ({
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             {quest.completed ? (
-              <CheckCircle2 className="text-mystic-jade w-5 h-5 flex-shrink-0" />
+              <CheckCircle2 className="text-emerald-500 w-5 h-5 flex-shrink-0" />
             ) : (
               <Circle className="text-stone-500 w-5 h-5 flex-shrink-0" />
             )}
@@ -275,8 +271,8 @@ const QuestItem: React.FC<QuestItemProps> = ({
         <div className="h-2 bg-stone-900 rounded-full overflow-hidden border border-stone-700">
           <div
             className={`h-full transition-all duration-300 ${quest.completed
-              ? 'bg-mystic-jade'
-              : 'bg-gradient-to-r from-mystic-jade to-amber-500'
+              ? 'bg-emerald-500'
+              : 'bg-gradient-to-r from-emerald-500 to-amber-500'
               }`}
             style={{ width: `${progressPercentage}%` }}
           />
@@ -287,7 +283,7 @@ const QuestItem: React.FC<QuestItemProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-sm">
           {!!quest.reward.exp && (
-            <div className="flex items-center gap-1 text-mystic-jade">
+            <div className="flex items-center gap-1 text-emerald-500">
               <Sparkles size={14} />
               <span>{quest.reward.exp} Data</span>
             </div>
@@ -308,7 +304,7 @@ const QuestItem: React.FC<QuestItemProps> = ({
         {quest.completed && !isClaimed && (
           <button
             onClick={() => onClaimReward(quest.id)}
-            className="px-3 py-1.5 bg-mystic-jade hover:bg-mystic-jade/80 text-stone-900 font-bold rounded text-sm transition-colors"
+            className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-500/80 text-stone-900 font-bold rounded text-sm transition-colors"
           >
             Claim Reward
           </button>

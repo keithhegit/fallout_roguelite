@@ -59,15 +59,11 @@ export const TRIBULATION_CONFIG: Record<RealmType, {
 };
 
 // Equipment Rarity Bonus (for storm calculations)
-export const TRIBULATION_RARITY_BONUS: Record<ItemRarity, number> = {
-  'Common': 0,
-  'Rare': 0.03,
-  'Legendary': 0.06,
-  'Mythic': 0.12,
-  '普通': 0,
-  '稀有': 0.03,
-  '传说': 0.06,
-  '仙品': 0.12,
+export const TRIBULATION_RARITY_BONUS: Record<string, number> = {
+  Common: 0,
+  Rare: 0.03,
+  Legendary: 0.06,
+  Mythic: 0.12,
 };
 
 // Natal Relic Extra Bonus

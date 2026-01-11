@@ -34,7 +34,7 @@ export const EQUIPMENT_TEMPLATES: EquipmentTemplate[] = ITEM_TEMPLATES.filter(
   (item) => item.isEquippable && item.equipmentSlot
 ).map((item) => ({
   name: item.name,
-  type: item.type === '材料' ? ItemType.Material : item.type,
+  type: item.type === 'Material' ? ItemType.Material : item.type,
   rarity: item.rarity || 'Common',
   slot: item.equipmentSlot!,
   effect: item.effect,

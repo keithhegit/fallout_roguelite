@@ -136,7 +136,7 @@ function GameView({
   }, [modals]);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-ink-950 text-stone-200 overflow-hidden relative crt-screen">
+    <div className="flex flex-col md:flex-row h-screen bg-stone-950 text-stone-200 overflow-hidden relative crt-screen">
       {/* CRT Visual Layers */}
       <div className="crt-noise"></div>
       <div className="crt-vignette"></div>
@@ -167,7 +167,7 @@ function GameView({
         />
 
         {mobileTab === 'status' ? (
-          <div className="flex-1 bg-ink-950 overflow-y-auto md:hidden animate-fade-in">
+          <div className="flex-1 bg-stone-950 overflow-y-auto md:hidden animate-fade-in">
             <StatsPanel player={player} />
           </div>
         ) : (
@@ -197,7 +197,7 @@ function GameView({
           />
         </div>
 
-        <nav className="md:hidden bg-ink-950 border-t border-stone-800 grid grid-cols-5 safe-area-footer shrink-0 relative overflow-hidden">
+        <nav className="md:hidden bg-stone-950 border-t border-stone-700 grid grid-cols-5 safe-area-footer shrink-0 relative overflow-hidden">
           {/* Scanline Effect */}
           <div className="scanline-overlay opacity-50"></div>
           
@@ -319,9 +319,9 @@ function GameView({
             className="bg-ink-950 w-full h-[80vh] border border-stone-800 shadow-2xl overflow-y-auto relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 背景纹理层 */}
+            {/* Background texture layer */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-            {/* CRT 扫描线效果 */}
+            {/* CRT scanline effect */}
             <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
             
             <div className="relative z-10">

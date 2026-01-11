@@ -48,7 +48,7 @@ const SHOP_ITEM_TEMPLATES: Record<ShopType, Array<Omit<ShopItem, 'id'>>> = {
   ],
   [ShopType.City]: [
     // Only add items existing in constants
-    ...(getItemFromConstants('Energy Bloom') ? [createShopItemFromConstants('Energy Bloom', 80, 25)] : []),
+    ...(getItemFromConstants('Mutfruit') ? [createShopItemFromConstants('Mutfruit', 80, 25)] : []),
     ...(getItemFromConstants('Buffout') ? [createShopItemFromConstants('Buffout', 150, 50)] : []),
     // Hardened Sword might not be in constants if not generated, skip if missing
     ...(getItemFromConstants('Hardened Sword') ? [createShopItemFromConstants('Hardened Sword', 200, 60)] : []),
@@ -59,25 +59,25 @@ const SHOP_ITEM_TEMPLATES: Record<ShopType, Array<Omit<ShopItem, 'id'>>> = {
   ],
   [ShopType.Sect]: [
     ...(getItemFromConstants('Concentrated Core') ? [createShopItemFromConstants('Concentrated Core', 1000, 300)] : []),
-    // Mutant Core
-    ...(getItemFromConstants('Mutant Core') ? [createShopItemFromConstants('Mutant Core', 500, 150)] : []),
+    // Nuclear Material
+    ...(getItemFromConstants('Nuclear Material') ? [createShopItemFromConstants('Nuclear Material', 500, 150)] : []),
     ...(getItemFromConstants('Clarity Shot') ? [createShopItemFromConstants('Clarity Shot', 200, 60)] : []),
     ...(getItemFromConstants('Hardening Serum') ? [createShopItemFromConstants('Hardening Serum', 200, 60)] : []),
   ],
-  [ShopType.BlackMarket]: [], // 黑市物品从高级物品池中随机生成
-  [ShopType.LimitedTime]: [], // 限时商店物品从所有物品池中随机生成，带折扣
-  [ShopType.Reputation]: [], // 声望商店物品需要声望值解锁
+  [ShopType.BlackMarket]: [], // Black Market items are randomly generated from the premium item pool
+  [ShopType.LimitedTime]: [], // Limited Time Shop items are randomly generated from all item pools, with discounts
+  [ShopType.Reputation]: [], // Reputation Shop items require reputation to unlock
 };
 
 // Premium Item Templates (small chance to appear on refresh, also used by Black Market)
 // Only contains items present in constants, special items (like "Overseer's Peacekeeper") can remain hardcoded
 const PREMIUM_ITEM_TEMPLATES: Array<Omit<ShopItem, 'id'>> = [
   // Get items from constants
-  ...(getItemFromConstants('Bio-Ginseng') ? [createShopItemFromConstants('Bio-Ginseng', 2000, 600)] : []),
+  ...(getItemFromConstants('Xander Root') ? [createShopItemFromConstants('Xander Root', 2000, 600)] : []),
   ...(getItemFromConstants('Plasma Sword') ? [createShopItemFromConstants('Plasma Sword', 5000, 1500, RealmType.QiRefining)] : []),
   ...(getItemFromConstants('Apex Fusion Shot') ? [createShopItemFromConstants('Apex Fusion Shot', 3000, 900)] : []),
   ...(getItemFromConstants('Titan Armor') ? [createShopItemFromConstants('Titan Armor', 4000, 1200, RealmType.QiRefining)] : []),
-  ...(getItemFromConstants('Pristine Flora') ? [createShopItemFromConstants('Pristine Flora', 10000, 3000)] : []),
+  ...(getItemFromConstants('Hubflower') ? [createShopItemFromConstants('Hubflower', 10000, 3000)] : []),
   ...(getItemFromConstants('Nova Core Serum') ? [createShopItemFromConstants('Nova Core Serum', 15000, 4500)] : []),
   // Special Items (Hardcoded)
   {
@@ -98,14 +98,14 @@ const PREMIUM_ITEM_TEMPLATES: Array<Omit<ShopItem, 'id'>> = [
 // Reputation Shop Templates
 // Only include items from constants
 const REPUTATION_SHOP_TEMPLATES: Array<Omit<ShopItem, 'id'>> = [
-  ...(getItemFromConstants('Code Fragment') ? [createShopItemFromConstants('Code Fragment', 50000, 50000)] : []),
-  ...(getItemFromConstants('Origin Fluid') ? [createShopItemFromConstants('Origin Fluid', 20000, 6000)] : []),
+  ...(getItemFromConstants('Encrypted Holotape') ? [createShopItemFromConstants('Encrypted Holotape', 50000, 50000)] : []),
+  ...(getItemFromConstants('FEV Sample') ? [createShopItemFromConstants('FEV Sample', 20000, 6000)] : []),
   ...(getItemFromConstants('Titan Blood Serum') ? [createShopItemFromConstants('Titan Blood Serum', 30000, 9000)] : []),
-  ...(getItemFromConstants('Fiery Feather') ? [createShopItemFromConstants('Fiery Feather', 30000, 9000)] : []),
-  ...(getItemFromConstants('Chaos Core') ? [createShopItemFromConstants('Chaos Core', 30000, 9000)] : []),
+  ...(getItemFromConstants('Scorchbeast Wing') ? [createShopItemFromConstants('Scorchbeast Wing', 30000, 9000)] : []),
+  ...(getItemFromConstants('Plasma Core') ? [createShopItemFromConstants('Plasma Core', 30000, 9000)] : []),
 ].filter(Boolean); // Filter out undefined
 
-// 从 ITEM_TEMPLATES 生成商店物品模板
+// Generate shop item templates from ITEM_TEMPLATES
 const GENERATED_SHOP_ITEMS: Array<Omit<ShopItem, 'id'>> = [];
 const itemTypes: ItemType[] = [ItemType.Weapon, ItemType.Armor, ItemType.Accessory, ItemType.Ring, ItemType.Artifact, ItemType.Pill, ItemType.Herb, ItemType.Material];
 const rarities: ItemRarity[] = ['Common', 'Rare', 'Legendary', 'Mythic'];
@@ -197,7 +197,7 @@ export function generateShopItems(
       return items; // Return empty array if no templates available
     }
 
-    const itemCount = 3 + Math.floor(Math.random() * 3); // 3-5个
+    const itemCount = 3 + Math.floor(Math.random() * 3); // 3-5 items
     let advancedItemAdded = false; // Prevent duplicate advanced items
 
     // 70% chance for premium items, 30% chance for Legendary/Mythic items

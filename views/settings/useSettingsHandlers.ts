@@ -6,10 +6,10 @@ interface UseSettingsHandlersProps {
 }
 
 /**
- * 设置处理函数
- * 包含更新设置
- * @param setSettings 设置游戏设置
- * @returns handleUpdateSettings 更新设置
+ * Settings Handler Functions
+ * Includes update settings
+ * @param setSettings Set game settings
+ * @returns handleUpdateSettings Update settings
  */
 
 export function useSettingsHandlers({ setSettings }: UseSettingsHandlersProps) {

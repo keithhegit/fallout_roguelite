@@ -100,7 +100,7 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-ink-950 flex items-center justify-center z-50 overflow-hidden touch-manipulation crt-screen">
+    <div className="fixed inset-0 bg-stone-950 flex items-center justify-center z-50 overflow-hidden touch-manipulation crt-screen">
       {/* Background Image */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
@@ -135,7 +135,7 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
           </div>
         </div>
 
-        {/* 游戏标题 */}
+        {/* Game Title */}
         <div
           className="text-center mb-10 sm:mb-16 px-4 animate-fade-in"
           style={{ animationDelay: '0.2s' }}
@@ -171,7 +171,7 @@ const WelcomeScreen: React.FC<Props> = ({ hasSave, onStart, onContinue }) => {
             <>
               <button
                 onClick={onContinue}
-                className="group relative px-8 py-4 bg-emerald-500 text-ink-950 font-bold text-base sm:text-lg rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 min-h-[60px] touch-manipulation uppercase tracking-[0.2em] border-2 border-emerald-500 overflow-hidden"
+                className="group relative px-8 py-4 bg-emerald-500 text-stone-950 font-bold text-base sm:text-lg rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 min-h-[60px] touch-manipulation uppercase tracking-[0.2em] border-2 border-emerald-500 overflow-hidden"
               >
                 <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.05] transition-opacity"
                   style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }} />

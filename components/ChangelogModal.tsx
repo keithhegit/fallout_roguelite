@@ -179,7 +179,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
         className="bg-ink-950 w-full max-w-4xl rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background texture layer */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
           style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
@@ -190,7 +190,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
         <div className="crt-noise"></div>
         <div className="crt-vignette"></div>
 
-        {/* 头部 */}
+        {/* Header */}
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-stone-800 bg-stone-950/50 relative z-10">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-stone-900 border border-stone-800 flex items-center justify-center text-emerald-500/80 shadow-inner relative group overflow-hidden">
@@ -220,16 +220,16 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* 内容区域 */}
+        {/* Content area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10 max-h-[80vh]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-              <div className="w-12 h-12 border-2 border-emerald-900 border-t-emerald-500 animate-spin"></div>
-              <div className="text-emerald-500 font-bold uppercase tracking-[0.2em] text-xs animate-pulse">SYNCHRONIZING_DATA...</div>
+            <div className="flex items-center justify-center py-12 text-stone-500">
+              <div className="animate-spin text-2xl mr-3">☢</div>
+              <span className="tracking-widest uppercase text-sm">Loading Data...</span>
             </div>
           ) : (
             <div className="space-y-8">
-              {/* 当前版本状态 */}
+              {/* Current version status */}
               {isLatest && latestVersion && (
                 <div className="bg-emerald-900/10 border border-emerald-800/50 rounded-none p-4 flex items-center gap-4">
                   <div className="w-10 h-10 flex items-center justify-center bg-emerald-900/20 border border-emerald-800/50 text-emerald-500">
@@ -246,7 +246,7 @@ const ChangelogModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              {/* 前往仓库按钮 */}
+              {/* Go to repo button */}
               <a
                 href="https://github.com/JeasonLoop/react-xiuxian-game"
                 target="_blank"

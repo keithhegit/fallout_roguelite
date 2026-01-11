@@ -424,7 +424,7 @@ export const PET_TEMPLATES: PetTemplate[] = [
     stageSkills: {
       stage1: [
         {
-          id: 'skill-mystic-defense',
+          id: 'skill-iron-defense',
           name: 'Iron Guard',
           description: 'Absolute defense, reflects some damage',
           type: 'defense',

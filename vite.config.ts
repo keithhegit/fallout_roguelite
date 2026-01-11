@@ -4,20 +4,20 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
 
-// 从环境变量获取代理目标，默认使用 SiliconFlow
+// Get proxy target from env vars, default to SiliconFlow
 const getProxyTarget = () => {
   const customUrl = process.env.VITE_AI_API_URL;
   if (customUrl) {
-    // 从完整 URL 中提取基础 URL
+    // Extract base URL from full URL
     try {
       const url = new URL(customUrl);
       return url.origin;
     } catch {
-      // 如果解析失败，使用默认值
+      // If parsing fails, use default
     }
   }
 
-  // 根据提供商选择目标
+  // Select target based on provider
   const provider = process.env.VITE_AI_PROVIDER || 'glm';
   switch (provider) {
     case 'openai':
@@ -35,7 +35,7 @@ export default defineConfig(({ command, mode }) => {
   const isDev = command === 'serve' || mode === 'development';
 
   return {
-    base: '/', // Vercel 部署使用根路径
+    base: '/', // Vercel deployment uses root path
     server: {
       proxy: {
         '/api': {
@@ -44,7 +44,7 @@ export default defineConfig(({ command, mode }) => {
           rewrite: (path) => path.replace(/^\/api/, ''),
           configure: (proxy) => {
             proxy.on('error', (err) => {
-              console.error('代理错误:', err);
+              console.error('Proxy error:', err);
             });
           },
         },

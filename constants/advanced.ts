@@ -1,13 +1,13 @@
 /**
- * 进阶物品系统相关常量
- * 包含筑基奇物、天地精华、天地之髓、规则之力等进阶物品定义
+ * Advanced Item System Constants
+ * Contains definitions for Foundation Treasures, Heaven Earth Essences, Heaven Earth Marrows, and Laws of Longevity.
  */
 
 import { FoundationTreasure, HeavenEarthEssence, HeavenEarthMarrow, LongevityRule } from '../types';
 
-// 筑基奇物系统
+// Foundation Treasure System
 export const FOUNDATION_TREASURES: Record<string, FoundationTreasure> = {
-  // 普通筑基奇物 (10种)
+  // Common Foundation Treasures (10 types)
   'ft_001': {
     id: 'ft_001',
     name: 'Green-Bio Graft',
@@ -182,7 +182,7 @@ export const FOUNDATION_TREASURES: Record<string, FoundationTreasure> = {
     }
   },
 
-  // 稀有筑基奇物 (10种)
+  // Rare Foundation Treasures (10 types)
   'ft_011': {
     id: 'ft_011',
     name: 'Nano-Pulse Shot',
@@ -358,7 +358,7 @@ export const FOUNDATION_TREASURES: Record<string, FoundationTreasure> = {
     }
   },
 
-  // 传说筑基奇物 (10种)
+  // Legendary Foundation Treasures (10 types)
   'ft_021': {
     id: 'ft_021',
     name: 'Primal Bio-Womb',
@@ -534,7 +534,7 @@ export const FOUNDATION_TREASURES: Record<string, FoundationTreasure> = {
     }
   },
 
-  // 传说筑基奇物 (10种)
+  // Mythic Foundation Treasures (10 types)
   'ft_031': {
     id: 'ft_031',
     name: 'God-Mode Shard',
@@ -751,9 +751,9 @@ export const GOLDEN_CORE_METHOD_CONFIG = {
   }
 };
 
-// 天地精华系统（40种）
+// Heaven Earth Essence System (40 types)
 export const HEAVEN_EARTH_ESSENCES: Record<string, HeavenEarthEssence> = {
-  // 普通天地精华 (10种)
+  // Common Heaven Earth Essences (10 types)
   'hee_001': {
     id: 'hee_001',
     name: 'Radioactive Bloom',
@@ -941,7 +941,7 @@ export const HEAVEN_EARTH_ESSENCES: Record<string, HeavenEarthEssence> = {
     }
   },
 
-  // 稀有天地精华 (10种)
+  // Rare Heaven Earth Essences (10 types)
   'hee_011': {
     id: 'hee_011',
     name: 'Neural Oracle Eye',
@@ -1127,7 +1127,7 @@ export const HEAVEN_EARTH_ESSENCES: Record<string, HeavenEarthEssence> = {
     }
   },
 
-  // 传说天地精华 (10种)
+  // Legendary Heaven Earth Essences (10 types)
   'hee_021': {
     id: 'hee_021',
     name: 'Genesis Stone Extract',
@@ -1313,7 +1313,7 @@ export const HEAVEN_EARTH_ESSENCES: Record<string, HeavenEarthEssence> = {
     }
   },
 
-  // 传说天地精华 (10种)
+  // Mythic Heaven Earth Essences (10 types)
   'hee_031': {
     id: 'hee_031',
     name: 'Primordial Vapor Cloud',
@@ -1499,9 +1499,9 @@ export const HEAVEN_EARTH_ESSENCES: Record<string, HeavenEarthEssence> = {
   },
 };
 
-// 天地之髓系统（40种）
+// Heaven Earth Marrow System (40 types)
 export const HEAVEN_EARTH_MARROWS: Record<string, HeavenEarthMarrow> = {
-  // 普通天地之髓 (10种)
+  // Common Heaven Earth Marrows (10 types)
   'hem_001': {
     id: 'hem_001',
     name: 'Starlight Marrow',
@@ -1697,7 +1697,7 @@ export const HEAVEN_EARTH_MARROWS: Record<string, HeavenEarthMarrow> = {
     }
   },
 
-  // 稀有天地之髓 (10种)
+  // Rare Heaven Earth Marrows (10 types)
   'hem_011': {
     id: 'hem_011',
     name: 'Phase Marrow',
@@ -1891,7 +1891,7 @@ export const HEAVEN_EARTH_MARROWS: Record<string, HeavenEarthMarrow> = {
     }
   },
 
-  // 传说天地之髓 (10种)
+  // Legendary Heaven Earth Marrows (10 types)
   'hem_021': {
     id: 'hem_021',
     name: 'Zenith Marrow',
@@ -1983,7 +1983,7 @@ export const HEAVEN_EARTH_MARROWS: Record<string, HeavenEarthMarrow> = {
     effects: { hpBonus: 8000, spiritBonus: 3000, specialEffect: 'Ultimate vitality and spirit mastery.' }
   },
 
-  // 传说天地之髓 (10种)
+  // Mythic Heaven Earth Marrows (10 types)
   'hem_031': {
     id: 'hem_031',
     name: 'Primordial Marrow',

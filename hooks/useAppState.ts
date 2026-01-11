@@ -1,6 +1,6 @@
 /**
- * App 状态管理 Hook
- * 统一管理所有模态框状态、商店状态、通知状态等
+ * App State Management Hook
+ * Unified management of all modal states, shop states, notification states, etc.
  */
 
 import { useState, useCallback } from 'react';
@@ -10,6 +10,7 @@ import {
   AdventureType,
   RealmType,
   AdventureResult,
+  RiskLevel,
 } from '../types';
 import { BattleReplay } from '../services/battleService';
 import { AutoAdventureConfig } from '../components/AutoAdventureConfigModal';
@@ -95,13 +96,13 @@ export interface AppState {
   turnBasedBattle: {
     params: {
       adventureType: AdventureType;
-      riskLevel?: '低' | '中' | '高' | '极度危险';
+      riskLevel?: RiskLevel;
       realmMinRealm?: RealmType;
       bossId?: string;
     } | null;
     setParams: (params: {
       adventureType: AdventureType;
-      riskLevel?: '低' | '中' | '高' | '极度危险';
+      riskLevel?: RiskLevel;
       realmMinRealm?: RealmType;
       bossId?: string;
     } | null) => void;
@@ -140,7 +141,7 @@ export interface AppState {
     closeCurrentModal: () => void;
     openTurnBasedBattle: (params: {
       adventureType: AdventureType;
-      riskLevel?: '低' | '中' | '高' | '极度危险';
+      riskLevel?: RiskLevel;
       realmMinRealm?: RealmType;
       bossId?: string;
     }) => void;
@@ -148,10 +149,10 @@ export interface AppState {
 }
 
 /**
- * 统一管理 App 的所有状态
+ * Unified management of all App states
  */
 export function useAppState(): AppState {
-  // 模态框状态
+  // Modal states
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const [isCultivationOpen, setIsCultivationOpen] = useState(false);
   const [isAlchemyOpen, setIsAlchemyOpen] = useState(false);
@@ -176,13 +177,13 @@ export function useAppState(): AppState {
   const [isTreasureVaultOpen, setIsTreasureVaultOpen] = useState(false);
   const [isAutoAdventureConfigOpen, setIsAutoAdventureConfigOpen] = useState(false);
 
-  // 商店状态
+  // Shop states
   const [currentShop, setCurrentShop] = useState<Shop | null>(null);
 
-  // 升级状态
+  // Upgrade states
   const [itemToUpgrade, setItemToUpgrade] = useState<Item | null>(null);
 
-  // 通知状态
+  // Notification states
   const [purchaseSuccess, setPurchaseSuccess] = useState<{
     item: string;
     quantity: number;
@@ -191,47 +192,47 @@ export function useAppState(): AppState {
     Array<{ type: string; name: string; quantity?: number }>
   >([]);
 
-  // 战斗状态
+  // Battle states
   const [battleReplay, setBattleReplay] = useState<BattleReplay | null>(null);
   const [revealedBattleRounds, setRevealedBattleRounds] = useState(0);
   const [lastBattleReplay, setLastBattleReplay] = useState<BattleReplay | null>(null);
 
-  // 回合制战斗状态
+  // Turn-based battle states
   const [turnBasedBattleParams, setTurnBasedBattleParams] = useState<{
     adventureType: AdventureType;
-    riskLevel?: '低' | '中' | '高' | '极度危险';
+    riskLevel?: RiskLevel;
     realmMinRealm?: RealmType;
     bossId?: string;
   } | null>(null);
 
-  // 物品操作日志
+  // Item Action Log
   const [itemActionLog, setItemActionLog] = useState<ItemActionLog | null>(null);
 
-  // 声望事件
+  // Reputation Event
   const [reputationEvent, setEvent] = useState<AdventureResult['reputationEvent'] | null>(null);
 
-  // 自动功能状态
+  // Auto Features State
   const [autoMeditate, setAutoMeditate] = useState(false);
   const [autoAdventure, setAutoAdventure] = useState(false);
   const [autoAdventureConfig, setAutoAdventureConfig] = useState({
     skipBattle: true,
     fleeOnBattle: false,
-    skipShop: true, // 默认跳过商店
+    skipShop: true, // Default skip shop
     skipReputationEvent: true,
-    minHpThreshold: 20, // 默认不限制
+    minHpThreshold: 20, // Default no limit (low threshold)
   });
   const [pausedByShop, setPausedByShop] = useState(false);
   const [pausedByBattle, setPausedByBattle] = useState(false);
   const [pausedByReputationEvent, setPausedByReputationEvent] = useState(false);
   const [pausedByHeavenEarthSoul, setPausedByHeavenEarthSoul] = useState(false);
 
-  // 全局加载和冷却状态
+  // Global loading and cooldown states
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
-  // 关闭当前打开的弹窗
+  // Close currently open modal
   const closeCurrentModal = useCallback(() => {
-    // 在自动历练模式下，不允许通过快捷键关闭回合制战斗弹窗
+    // In auto-adventure mode, do not allow closing turn-based battle modal via shortcut
     if (isTurnBasedBattleOpen && autoAdventure) {
       return;
     }
@@ -277,14 +278,14 @@ export function useAppState(): AppState {
     autoAdventure, pausedByBattle
   ]);
 
-  // 统一处理回合制战斗打开逻辑
+  // Unified handling of turn-based battle open logic
   const openTurnBasedBattle = useCallback((params: {
     adventureType: AdventureType;
-    riskLevel?: '低' | '中' | '高' | '极度危险';
+    riskLevel?: RiskLevel;
     realmMinRealm?: RealmType;
     bossId?: string;
   }) => {
-    // 如果正在自动历练，暂停自动历练但保存状态
+    // If auto-adventuring, pause but save state
     if (autoAdventure) {
       setAutoAdventure(false);
       setPausedByBattle(true);
@@ -406,4 +407,3 @@ export function useAppState(): AppState {
     },
   };
 }
-

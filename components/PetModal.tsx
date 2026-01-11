@@ -107,7 +107,7 @@ const PetModal: React.FC<Props> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 扫描线效果 */}
+        {/* CRT Scanline Effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
         
         <div className="p-3 md:p-4 border-b border-stone-800 flex justify-between items-center bg-stone-950 z-10">

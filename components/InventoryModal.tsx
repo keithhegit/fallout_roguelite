@@ -167,7 +167,7 @@ const InventoryItem = memo<InventoryItemProps>(
       <div
         className={`p-3 rounded-none border flex flex-col justify-between relative transition-all duration-300 group overflow-hidden font-mono ${
           isEquipped 
-            ? 'bg-ink-950 border-yellow-600/50 shadow-[0_0_15px_rgba(202,138,4,0.1)]' 
+            ? 'bg-stone-950 border-yellow-600/50 shadow-[0_0_15px_rgba(202,138,4,0.1)]' 
             : `bg-stone-950/90 hover:bg-stone-900 ${getRarityBorder(rarity)}`
         }`}
         onMouseEnter={() => onHover(item)}
@@ -185,7 +185,7 @@ const InventoryItem = memo<InventoryItemProps>(
         <div className="relative z-10">
           <div className="flex gap-3 mb-3">
             {/* Item Icon Container */}
-            <div className={`w-12 h-12 rounded-none border flex items-center justify-center shrink-0 ${getRarityBorder(rarity)} bg-ink-950 ${getRarityTextColor(rarity)} shadow-inner`}>
+            <div className={`w-12 h-12 rounded-none border flex items-center justify-center shrink-0 ${getRarityBorder(rarity)} bg-stone-950 ${getRarityTextColor(rarity)} shadow-inner`}>
               {getTypeIcon()}
             </div>
             
@@ -199,7 +199,7 @@ const InventoryItem = memo<InventoryItemProps>(
                     </span>
                   )}
                 </h4>
-                <span className="text-[10px] bg-ink-950 text-stone-500 px-1.5 py-0.5 rounded-none border border-stone-900 ml-2">
+                <span className="text-[10px] bg-stone-950 text-stone-500 px-1.5 py-0.5 rounded-none border border-stone-900 ml-2">
                   x{item.quantity}
                 </span>
               </div>
@@ -396,14 +396,14 @@ const InventoryItem = memo<InventoryItemProps>(
               {isEquipped ? (
                 <button
                   onClick={() => onUnequipItem(item)}
-                  className="flex-1 bg-ink-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
+                  className="flex-1 bg-stone-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
                 >
                   DE-EQUIP
                 </button>
               ) : (
                 <button
                   onClick={() => onEquipItem(item)}
-                  className="flex-1 bg-ink-950 hover:bg-blue-950/20 text-blue-400 text-[10px] py-2 rounded-none transition-all border border-blue-900/50 hover:border-blue-400 uppercase tracking-widest min-h-[36px]"
+                  className="flex-1 bg-stone-950 hover:bg-blue-950/20 text-blue-400 text-[10px] py-2 rounded-none transition-all border border-blue-900/50 hover:border-blue-400 uppercase tracking-widest min-h-[36px]"
                 >
                   INITIALIZE
                 </button>
@@ -424,8 +424,8 @@ const InventoryItem = memo<InventoryItemProps>(
                     className={`px-3 text-[10px] py-2 rounded-none transition-all border uppercase tracking-widest min-h-[36px] ${isNatal
                       ? 'bg-bunker-900 hover:bg-amber-500/10 text-amber-400 border-amber-500/50'
                       : isDisabled
-                        ? 'bg-ink-950 text-stone-700 border-stone-900 cursor-not-allowed opacity-50'
-                        : 'bg-ink-950 hover:bg-purple-950/20 text-purple-400 border-purple-900/50'
+                        ? 'bg-stone-950 text-stone-700 border-stone-900 cursor-not-allowed opacity-50'
+                        : 'bg-stone-950 hover:bg-purple-950/20 text-purple-400 border-purple-900/50'
                       }`}
                     title={
                       isNatal
@@ -441,14 +441,14 @@ const InventoryItem = memo<InventoryItemProps>(
               })()}
               <button
                 onClick={() => onUpgradeItem(item)}
-                className="px-3 bg-ink-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
+                className="px-3 bg-stone-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
                 title="CALIBRATE"
               >
                 <Hammer size={14} />
               </button>
               <button
                 onClick={() => onDiscardItem(item)}
-                className="px-3 bg-ink-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none transition-all border border-red-900/50 hover:border-red-500 uppercase tracking-widest min-h-[36px]"
+                className="px-3 bg-stone-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none transition-all border border-red-900/50 hover:border-red-500 uppercase tracking-widest min-h-[36px]"
                 title="PURGE"
               >
                 <Trash2 size={14} />
@@ -458,8 +458,8 @@ const InventoryItem = memo<InventoryItemProps>(
             <>
               {(() => {
                 // Determine if the item is usable
-                const isMaterialPack = (item.name.includes('Material Pack') || item.name.includes('材料包')) && item.type === ItemType.Material;
-                const isTreasureVaultKey = (item.name === 'Faction Vault Key' || item.name === '宗门宝库钥匙') && item.type === ItemType.Material;
+                const isMaterialPack = (item.name.includes('Material Pack')) && item.type === ItemType.Material;
+                const isTreasureVaultKey = (item.name === 'Faction Vault Key') && item.type === ItemType.Material;
                 const hasEffect = item.effect || item.permanentEffect;
                 const isRecipe = item.type === ItemType.Recipe;
                 const isUsable = isMaterialPack || isTreasureVaultKey || (hasEffect && item.type !== ItemType.Material) || isRecipe;
@@ -497,7 +497,7 @@ const InventoryItem = memo<InventoryItemProps>(
                   warningMessage = `Neural Link for Wasteland Laws requires ${requiredRealmName} rank\nCurrent rank: ${playerRealm}`;
                 }
 
-                // 检查是否已经拥有
+                // Check if already owned
                 let alreadyOwned = false;
                 let alreadyOwnedMessage = '';
                 if (item.advancedItemType === 'foundationTreasure' && foundationTreasure) {
@@ -514,7 +514,7 @@ const InventoryItem = memo<InventoryItemProps>(
                     alreadyOwned = true;
                     alreadyOwnedMessage = 'Law already mastered.';
                   } else {
-                    // 检查是否达到最大数量
+                    // Check if max limit reached
                     const maxRules = maxLongevityRules || 3;
                     if ((longevityRules || []).length >= maxRules) {
                       alreadyOwned = true;
@@ -523,7 +523,7 @@ const InventoryItem = memo<InventoryItemProps>(
                   }
                 }
 
-                // 生成完整的提示信息
+                // Generate complete tooltip message
                 const tooltipMessage = alreadyOwned
                   ? alreadyOwnedMessage
                   : !canRefineItem
@@ -571,7 +571,7 @@ const InventoryItem = memo<InventoryItemProps>(
               })()}
               <button
                 onClick={() => onDiscardItem(item)}
-                className="px-3 bg-ink-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none border border-red-900/50 hover:border-red-500 transition-all uppercase tracking-widest min-h-[36px]"
+                className="px-3 bg-stone-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none border border-red-900/50 hover:border-red-500 transition-all uppercase tracking-widest min-h-[36px]"
                 title="PURGE"
               >
                 <Trash2 size={14} />
@@ -721,7 +721,7 @@ const InventoryModal: React.FC<Props> = ({
       if (item.type === ItemType.Recipe || typeKey === 'recipe') {
         return 'recipe'; // Recipes have their own category
       }
-      if (item.type === ItemType.AdvancedItem || typeKey === 'advanceditem' || typeKey === '进阶物品') {
+      if (item.type === ItemType.AdvancedItem || typeKey === 'advanceditem') {
         return 'advancedItem'; // Advanced items have their own category
       }
       if (
@@ -1115,7 +1115,7 @@ const InventoryModal: React.FC<Props> = ({
                 </div>
               )}
 
-              {/* 分类标签 */}
+              {/* Category Tabs */}
               <div className="flex gap-1 flex-wrap font-mono">
                 {[
                   { id: 'all', label: 'ALL', icon: <Package size={14} /> },
@@ -1140,7 +1140,7 @@ const InventoryModal: React.FC<Props> = ({
                 ))}
               </div>
 
-              {/* 装备部位细分（仅在装备分类时显示） */}
+              {/* Equipment Slot Subdivision (Show only when Equipment category selected) */}
               {selectedCategory === 'equipment' && (
                 <div className="flex gap-1 flex-wrap font-mono mt-2 p-3 bg-ink-950 border border-stone-800 relative overflow-hidden">
                   <div className="absolute inset-0 opacity-[0.01] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
@@ -1186,7 +1186,7 @@ const InventoryModal: React.FC<Props> = ({
                 </div>
               )}
               
-              {/* 排序与统计 */}
+              {/* Sorting and Stats */}
               <div className="flex items-center gap-3 font-mono">
                 <div className="flex-1 h-px bg-stone-800/30"></div>
                 <span className="text-[10px] text-stone-600 uppercase tracking-[0.2em]">
@@ -1196,7 +1196,7 @@ const InventoryModal: React.FC<Props> = ({
               </div>
             </div>
 
-            {/* 物品网格 */}
+            {/* Item Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 overflow-y-auto custom-scrollbar pr-1">
               {filteredAndSortedInventory.length === 0 ? (
                 <div className="col-span-full text-center text-stone-600 py-20 font-mono border border-dashed border-stone-800/20 uppercase tracking-[0.3em] flex flex-col items-center gap-4">
@@ -1243,35 +1243,55 @@ const InventoryModal: React.FC<Props> = ({
           <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
           <div className="relative z-10 flex items-center justify-center gap-6 min-h-[3rem]">
             {comparison ? (
-              <div className="flex items-center gap-6">
-                <span className="text-[10px] text-stone-500 uppercase tracking-widest">Neural Link Preview:</span>
-                {comparison.attack !== 0 && (
-                  <div className="flex flex-col items-center">
+              <div className="flex items-center gap-4 bg-stone-900/50 p-2 border border-stone-800 rounded-none shadow-lg">
+                <span className="text-[10px] text-stone-500 uppercase tracking-widest px-2 border-r border-stone-700">LINK PREVIEW</span>
+                
+                <div className="grid grid-cols-3 gap-6 px-2">
+                  <div className="flex flex-col items-center min-w-[60px]">
                     <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">FP_FIREPOWER</span>
-                    <span className={`text-xs ${comparison.attack > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {formatValueChange(calculateTotalEquippedStats.attack, calculateTotalEquippedStats.attack + comparison.attack)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-stone-400">{formatNumber(calculateTotalEquippedStats.attack)}</span>
+                      {comparison.attack !== 0 && (
+                        <>
+                          <span className="text-[9px] text-stone-700">→</span>
+                          <span className={`text-xs font-bold ${comparison.attack > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {comparison.attack > 0 ? '+' : ''}{formatNumber(comparison.attack)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                )}
-                {comparison.defense !== 0 && (
-                  <div className="flex flex-col items-center">
+
+                  <div className="flex flex-col items-center min-w-[60px] border-l border-stone-800/50 pl-6">
                     <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">DR_REDUCTION</span>
-                    <span className={`text-xs ${comparison.defense > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {formatValueChange(calculateTotalEquippedStats.defense, calculateTotalEquippedStats.defense + comparison.defense)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-stone-400">{formatNumber(calculateTotalEquippedStats.defense)}</span>
+                      {comparison.defense !== 0 && (
+                        <>
+                          <span className="text-[9px] text-stone-700">→</span>
+                          <span className={`text-xs font-bold ${comparison.defense > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {comparison.defense > 0 ? '+' : ''}{formatNumber(comparison.defense)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                )}
-                {comparison.hp !== 0 && (
-                  <div className="flex flex-col items-center">
+
+                  <div className="flex flex-col items-center min-w-[60px] border-l border-stone-800/50 pl-6">
                     <span className="text-[9px] text-stone-600 uppercase tracking-tighter mb-1">HP_VITALITY</span>
-                    <span className={`text-xs ${comparison.hp > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {formatValueChange(calculateTotalEquippedStats.hp, calculateTotalEquippedStats.hp + comparison.hp)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-stone-400">{formatNumber(calculateTotalEquippedStats.hp)}</span>
+                      {comparison.hp !== 0 && (
+                        <>
+                          <span className="text-[9px] text-stone-700">→</span>
+                          <span className={`text-xs font-bold ${comparison.hp > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {comparison.hp > 0 ? '+' : ''}{formatNumber(comparison.hp)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                )}
-                {comparison.attack === 0 && comparison.defense === 0 && comparison.hp === 0 && (
-                  <span className="text-[10px] text-stone-700 uppercase tracking-widest">No variance detected</span>
-                )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-6">

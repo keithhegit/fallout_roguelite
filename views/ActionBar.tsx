@@ -41,7 +41,7 @@ function ActionBar({
   onToggleAutoAdventure,
 }: ActionBarProps) {
   return (
-    <div className="bg-ink-950 p-3 md:p-4 border-t border-stone-800 grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 shrink-0 relative z-20 shadow-lg md:shadow-none">
+    <div className="bg-stone-950 p-3 md:p-4 border-t border-amber-500/30 grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 shrink-0 relative z-20 shadow-lg md:shadow-none">
       <div className="relative">
         <button
           onClick={onMeditate}
@@ -49,10 +49,10 @@ function ActionBar({
           className={`
             flex flex-col items-center justify-center p-4 md:p-4 rounded-none border-2 transition-all duration-200 touch-manipulation min-h-[90px] md:min-h-[100px] w-full
             ${loading || cooldown > 0
-              ? 'bg-stone-800 border-stone-800 text-stone-500 cursor-not-allowed'
-              : 'bg-ink-800 border-stone-800 active:border-mystic-jade active:bg-ink-700 text-stone-200'
+              ? 'bg-stone-950/50 border-stone-800 text-stone-500 cursor-not-allowed'
+              : 'bg-stone-900 border-stone-700 active:border-emerald-500 active:bg-stone-800 text-stone-200'
             }
-            ${autoMeditate ? 'border-mystic-jade border-2' : ''}
+            ${autoMeditate ? 'border-emerald-500 border-2' : ''}
           `}
         >
           <img
@@ -75,7 +75,7 @@ function ActionBar({
           className={`
             absolute top-1 right-1 p-1 rounded-none transition-all duration-200
             ${autoMeditate
-              ? 'bg-mystic-jade/80 text-stone-900 hover:bg-mystic-jade'
+              ? 'bg-emerald-500/80 text-stone-900 hover:bg-emerald-500'
               : 'bg-stone-700/80 text-stone-400 hover:bg-stone-600'
             }
           `}
@@ -92,8 +92,8 @@ function ActionBar({
           className={`
             flex flex-col items-center justify-center p-4 md:p-4 rounded-none border-2 transition-all duration-200 group touch-manipulation min-h-[90px] md:min-h-[100px] w-full
             ${loading || cooldown > 0
-              ? 'bg-stone-800 border-stone-800 text-stone-500 cursor-not-allowed'
-              : 'bg-ink-800 border-stone-800 active:border-amber-500 active:bg-ink-700 text-stone-200'
+              ? 'bg-stone-950/50 border-stone-800 text-stone-500 cursor-not-allowed'
+              : 'bg-stone-900 border-stone-700 active:border-amber-500 active:bg-stone-800 text-stone-200'
             }
             ${autoAdventure ? 'border-amber-500 border-2' : ''}
           `}
@@ -137,8 +137,8 @@ function ActionBar({
         className={`
           flex flex-col items-center justify-center p-4 md:p-4 rounded-none border-2 transition-all duration-200 touch-manipulation min-h-[90px] md:min-h-[100px]
           ${loading
-            ? 'bg-stone-800 border-stone-800 text-stone-500 cursor-not-allowed'
-            : 'bg-ink-800 border-stone-800 active:border-purple-500 active:bg-ink-700 text-stone-200'
+            ? 'bg-stone-950/50 border-stone-800 text-stone-500 cursor-not-allowed'
+            : 'bg-stone-900 border-stone-700 active:border-purple-500 active:bg-stone-800 text-stone-200'
           }
         `}
       >
@@ -161,8 +161,8 @@ function ActionBar({
         className={`
           flex flex-col items-center justify-center p-4 md:p-4 rounded-none border-2 transition-all duration-200 touch-manipulation min-h-[90px] md:min-h-[100px]
           ${loading
-            ? 'bg-stone-800 border-stone-800 text-stone-500 cursor-not-allowed'
-            : 'bg-ink-800 border-stone-800 active:border-cyan-500 active:bg-ink-700 text-stone-200'
+            ? 'bg-stone-950/50 border-stone-800 text-stone-500 cursor-not-allowed'
+            : 'bg-stone-900 border-stone-700 active:border-cyan-500 active:bg-stone-800 text-stone-200'
           }
         `}
       >
@@ -184,8 +184,8 @@ function ActionBar({
         className={`
           flex flex-col items-center justify-center p-4 md:p-4 rounded-none border-2 transition-all duration-200 touch-manipulation min-h-[90px] md:min-h-[100px]
           ${loading
-            ? 'bg-stone-800 border-stone-800 text-stone-500 cursor-not-allowed'
-            : 'bg-ink-800 border-stone-800 active:border-blue-400 active:bg-ink-700 text-stone-200'
+            ? 'bg-stone-950/50 border-stone-800 text-stone-500 cursor-not-allowed'
+            : 'bg-stone-900 border-stone-700 active:border-blue-400 active:bg-stone-800 text-stone-200'
           }
         `}
       >

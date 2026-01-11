@@ -119,29 +119,29 @@ export const GROTTO_CONFIGS: GrottoConfig[] = [
 // Plantable Biological Samples Configuration
 export const PLANTABLE_HERBS = [
   // Common Quality - Level 1 Shelter Required
-  { id: 'spirit-grass', name: 'Energy Bloom', growthTime: 30 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
-  { id: 'healing-herb', name: 'Heal Root', growthTime: 30 * 60 * 1000, harvestQuantity: { min: 3, max: 6 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
-  { id: 'qi-restoring-herb', name: 'Stim Leaf', growthTime: 45 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
-  { id: 'green-grass', name: 'Green Moss', growthTime: 20 * 60 * 1000, harvestQuantity: { min: 3, max: 7 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
-  { id: 'white-flower', name: 'White Glow', growthTime: 25 * 60 * 1000, harvestQuantity: { min: 2, max: 6 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
-  { id: 'yellow-essence', name: 'Yellow Essence', growthTime: 40 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
+  { id: 'spirit-grass', name: 'Glowing Fungus', growthTime: 30 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
+  { id: 'healing-herb', name: 'Bloodleaf', growthTime: 30 * 60 * 1000, harvestQuantity: { min: 3, max: 6 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
+  { id: 'qi-restoring-herb', name: 'Hubflower', growthTime: 45 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
+  { id: 'green-grass', name: 'Brain Fungus', growthTime: 20 * 60 * 1000, harvestQuantity: { min: 3, max: 7 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
+  { id: 'white-flower', name: 'Glow Pod', growthTime: 25 * 60 * 1000, harvestQuantity: { min: 2, max: 6 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
+  { id: 'yellow-essence', name: 'Tarberry', growthTime: 40 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, rarity: 'Common' as ItemRarity, grottoLevelRequirement: 1 },
   // Rare Quality - Level 3 Shelter Required
-  { id: 'spirit-concentrating-flower', name: 'Neural Bloom', growthTime: 2 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
-  { id: 'blood-ginseng', name: 'Bio-Ginseng', growthTime: 2.5 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
-  { id: 'purple-monkey-flower', name: 'Purple Dusk', growthTime: 3 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
-  { id: 'spirit-fruit', name: 'Vault Fruit', growthTime: 3 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
-  { id: 'dragon-scale-fruit', name: 'Drake Scale Fruit', growthTime: 4 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
-  { id: 'millennium-ginseng', name: 'Primal Root', growthTime: 4 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
+  { id: 'spirit-concentrating-flower', name: 'Firecracker Berry', growthTime: 2 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
+  { id: 'blood-ginseng', name: 'Xander Root', growthTime: 2.5 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
+  { id: 'purple-monkey-flower', name: 'Mutated Fern', growthTime: 3 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
+  { id: 'spirit-fruit', name: 'Mutfruit', growthTime: 3 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
+  { id: 'dragon-scale-fruit', name: 'Thistle', growthTime: 4 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
+  { id: 'millennium-ginseng', name: 'Ash Rose', growthTime: 4 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Rare' as ItemRarity, grottoLevelRequirement: 3 },
   // Legendary Quality - Level 5 Shelter Required
-  { id: 'millennium-lingzhi', name: 'Primal Fungus', growthTime: 6 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Legendary' as ItemRarity, grottoLevelRequirement: 5 },
-  { id: 'nine-leaf-grass', name: 'Chronos Fern', growthTime: 8 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Legendary' as ItemRarity, grottoLevelRequirement: 5 },
-  { id: 'ten-thousand-year-spirit-milk', name: 'Genesis Fluid', growthTime: 10 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Legendary' as ItemRarity, grottoLevelRequirement: 5 },
+  { id: 'millennium-lingzhi', name: 'Cave Fungus', growthTime: 6 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Legendary' as ItemRarity, grottoLevelRequirement: 5 },
+  { id: 'nine-leaf-grass', name: 'Quantum Leaf', growthTime: 8 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Legendary' as ItemRarity, grottoLevelRequirement: 5 },
+  { id: 'ten-thousand-year-spirit-milk', name: 'FEV Sample', growthTime: 10 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Legendary' as ItemRarity, grottoLevelRequirement: 5 },
   // Mythic Quality - Level 6 Shelter Required
-  { id: 'ten-thousand-year-immortal-grass', name: 'Eternal Bloom', growthTime: 12 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
-  { id: 'nine-returning-soul-grass', name: 'Phoenix Leaf', growthTime: 15 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
-  { id: 'void-immortal-grass', name: 'Void Lotus', growthTime: 18 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
-  { id: 'chaos-green-lotus', name: 'Primal Singularity', growthTime: 24 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
-  { id: 'creation-immortal-grass', name: 'Genesis Petal', growthTime: 20 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
+  { id: 'ten-thousand-year-immortal-grass', name: 'Nirvana Root', growthTime: 12 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
+  { id: 'nine-returning-soul-grass', name: 'Cranberry', growthTime: 15 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
+  { id: 'void-immortal-grass', name: 'Flux Blossom', growthTime: 18 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
+  { id: 'chaos-green-lotus', name: 'Digested Goo', growthTime: 24 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
+  { id: 'creation-immortal-grass', name: 'Eden Fruit', growthTime: 20 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, rarity: 'Mythic' as ItemRarity, grottoLevelRequirement: 6 },
 ];
 
 // Energy Array Enhancement Configuration
@@ -161,7 +161,7 @@ export const SPIRIT_ARRAY_ENHANCEMENTS: SpiritArrayEnhancementConfig[] = [
     name: 'Basic Energy Tuning',
     description: 'Use basic materials to stabilize the energy flow, increasing progression speed.',
     materials: [
-      { name: 'Energy Bloom', quantity: 10 },
+      { name: 'Glowing Fungus', quantity: 10 },
       { name: 'Scrap Metal', quantity: 5 },
     ],
     expRateBonus: 0.05,
@@ -172,8 +172,8 @@ export const SPIRIT_ARRAY_ENHANCEMENTS: SpiritArrayEnhancementConfig[] = [
     name: 'Advanced Fusion Link',
     description: 'Use rare materials to boost the energy core, significantly increasing progression speed.',
     materials: [
-      { name: 'Purple Dusk', quantity: 5 },
-      { name: 'Vault Fruit', quantity: 3 },
+      { name: 'Mutated Fern', quantity: 5 },
+      { name: 'Mutfruit', quantity: 3 },
       { name: 'Steel Plate', quantity: 10 },
     ],
     expRateBonus: 0.10,
@@ -184,8 +184,8 @@ export const SPIRIT_ARRAY_ENHANCEMENTS: SpiritArrayEnhancementConfig[] = [
     name: 'Legendary Bio-Sync',
     description: 'Use legendary biological samples to synchronize with the energy core.',
     materials: [
-      { name: 'Chronos Fern', quantity: 3 },
-      { name: 'Genesis Fluid', quantity: 2 },
+      { name: 'Quantum Leaf', quantity: 3 },
+      { name: 'FEV Sample', quantity: 2 },
       { name: 'Advanced Alloy', quantity: 20 },
     ],
     expRateBonus: 0.15,
@@ -196,8 +196,8 @@ export const SPIRIT_ARRAY_ENHANCEMENTS: SpiritArrayEnhancementConfig[] = [
     name: 'Mythic Singularity Bridge',
     description: 'Use mythic samples to bridge the shelter with a singularity, reaching extreme energy levels.',
     materials: [
-      { name: 'Primal Singularity', quantity: 2 },
-      { name: 'Eternal Bloom', quantity: 2 },
+      { name: 'Digested Goo', quantity: 2 },
+      { name: 'Nirvana Root', quantity: 2 },
       { name: 'Relic Core', quantity: 30 },
     ],
     expRateBonus: 0.20,

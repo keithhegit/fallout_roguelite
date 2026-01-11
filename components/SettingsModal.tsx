@@ -76,7 +76,7 @@ const SettingsModal: React.FC<Props> = ({
     }
   );
 
-  // 处理快捷键更新
+  // Handle shortcut updates
   const handleUpdateShortcuts = (newShortcuts: Record<string, KeyboardShortcutConfig>) => {
     onUpdateSettings({ keyboardShortcuts: newShortcuts });
   };
@@ -89,7 +89,7 @@ const SettingsModal: React.FC<Props> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // 支持 .json 和 .txt 文件
+    // Support .json and .txt files
     const fileName = file.name.toLowerCase();
     if (!fileName.endsWith('.json') && !fileName.endsWith('.txt')) {
       showError('Please select a .json or .txt save file!');
@@ -98,7 +98,7 @@ const SettingsModal: React.FC<Props> = ({
 
     try {
       const text = await file.text();
-      // 使用 importSave 函数处理存档（支持 Base64 编码）
+      // Process save using importSave function (supports Base64 encoding)
       const saveData = importSave(text);
 
       if (!saveData) {
@@ -106,23 +106,23 @@ const SettingsModal: React.FC<Props> = ({
         return;
       }
 
-      // 显示存档信息预览
+      // Display save preview
       const playerName = saveData.player.name || 'Unknown';
       const realm = saveData.player.realm || 'Unknown';
       const timestamp = saveData.timestamp
         ? new Date(saveData.timestamp).toLocaleString('en-US')
         : 'Unknown';
 
-      // 确认导入
+      // Confirm import
       showConfirm(
         `Are you sure you want to import this save?\n\nPlayer: ${playerName}\nRank: ${realm}\nSaved: ${timestamp}\n\nCurrent save will be replaced and the page will refresh.`,
         'Confirm Import',
         () => {
           try {
-            // 获取当前存档槽位ID，如果没有则使用槽位1
+            // Get current slot ID, default to slot 1
             const currentSlotId = getCurrentSlotId();
 
-            // 使用新的存档系统保存到当前槽位
+            // Save to current slot using new save system
             const success = saveToSlot(
               currentSlotId,
               ensurePlayerStatsCompatibility(saveData.player),
@@ -134,25 +134,25 @@ const SettingsModal: React.FC<Props> = ({
               return;
             }
 
-            // 直接刷新页面，不需要再次确认
-            // 延迟一小段时间让用户看到操作完成
+            // Refresh page directly
+            // Delay slightly to let user see completion
             setTimeout(() => {
               window.location.reload();
             }, 100);
           } catch (error) {
-            console.error('保存存档失败:', error);
+            console.error('Save failed:', error);
             showError('Failed to save, please try again!');
           }
         }
       );
     } catch (error) {
-      console.error('导入存档失败:', error);
+      console.error('Import failed:', error);
       showError(
         `Import failed! Error: ${error instanceof Error ? error.message : 'Unknown error'}, please check file format.`
       );
     }
 
-    // 清空文件输入，以便可以重复选择同一文件
+    // Clear file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -160,10 +160,10 @@ const SettingsModal: React.FC<Props> = ({
 
   const handleExportSave = () => {
     try {
-      // 获取当前存档槽位ID
+      // Get current slot ID
       const currentSlotId = getCurrentSlotId();
 
-      // 从当前槽位加载存档
+      // Load save from current slot
       const saveData = loadFromSlot(currentSlotId);
 
       if (!saveData) {
@@ -171,14 +171,14 @@ const SettingsModal: React.FC<Props> = ({
         return;
       }
 
-      // 使用 exportSave 函数导出（支持 Base64 编码）
+      // Export using exportSave function (supports Base64 encoding)
       const jsonString = exportSave(saveData);
 
-      // 创建文件名
+      // Create filename
       const playerName = saveData.player?.name || 'player';
       const fileName = `xiuxian-save-${playerName}-${dayjs().format('YYYY-MM-DD HH:mm:ss')}.json`;
 
-      // 创建下载链接
+      // Create download link
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -192,7 +192,7 @@ const SettingsModal: React.FC<Props> = ({
       // Show success message
       showSuccess('Save exported successfully!');
     } catch (error) {
-      console.error('导出存档失败:', error);
+      console.error('Export failed:', error);
       showError(
         `Export failed! Error: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -208,7 +208,7 @@ const SettingsModal: React.FC<Props> = ({
         className="bg-ink-950 w-full max-w-md rounded-none border border-stone-800 shadow-2xl relative overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background texture layer */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
           style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}
@@ -247,7 +247,7 @@ const SettingsModal: React.FC<Props> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-8 relative z-10 max-h-[70vh]">
-          {/* 游戏设置 */}
+          {/* Game Settings */}
           <div>
             <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
               <Save size={18} className="text-emerald-500" />
@@ -313,7 +313,7 @@ const SettingsModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 存档管理 */}
+          {/* Save Management */}
           <div>
             <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
               <FolderOpen size={18} className="text-emerald-500" />
@@ -387,7 +387,7 @@ const SettingsModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 语言设置 */}
+          {/* Language Settings */}
           <div>
             <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
               <Globe size={18} className="text-emerald-500" />
@@ -407,7 +407,7 @@ const SettingsModal: React.FC<Props> = ({
             </select>
           </div>
 
-          {/* 快捷键 */}
+          {/* Shortcuts */}
           <div>
             <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
               <Keyboard size={18} className="text-emerald-500" />
@@ -422,24 +422,13 @@ const SettingsModal: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* 关于与更新 */}
+          {/* About and Updates */}
           <div>
             <div className="flex items-center gap-2 mb-4 border-b border-stone-800 pb-2">
               <MessageCircle size={18} className="text-emerald-500" />
               <h3 className="font-bold uppercase tracking-widest text-sm text-stone-100">VAULT_COMMUNICATIONS</h3>
             </div>
             <div className="space-y-4">
-              <div className="bg-stone-900/40 border border-stone-800 rounded-none p-4 flex flex-col items-center">
-                <img
-                  src="/assets/images/group.jpg"
-                  alt="Wasteland Survivor Community"
-                  className="w-full max-w-xs rounded-none border border-stone-800 shadow-lg grayscale"
-                />
-                <p className="text-[10px] text-stone-500 mt-3 text-center uppercase tracking-widest font-bold">
-                  SCAN_TO_JOIN_SURVIVOR_NETWORK
-                </p>
-              </div>
-
               <div className="bg-stone-950 border border-stone-800 rounded-none px-4 py-3">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-[10px] text-stone-500 uppercase font-bold">FIRMWARE_VERSION</span>
@@ -476,13 +465,13 @@ const SettingsModal: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 更新日志弹窗 */}
+      {/* Changelog Modal */}
       <ChangelogModal
         isOpen={isChangelogOpen}
         onClose={() => setIsChangelogOpen(false)}
       />
 
-      {/* 快捷键说明弹窗 */}
+      {/* Shortcuts Modal */}
       <ShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}

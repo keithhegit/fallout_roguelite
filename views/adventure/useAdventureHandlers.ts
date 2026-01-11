@@ -16,20 +16,20 @@ import { showConfirm } from '../../utils/toastUtils';
 import { getPlayerTotalStats } from '../../utils/statUtils';
 
 /**
- * 历练处理函数
- * 包含历练、历练核心逻辑
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @param triggerVisual 触发视觉效果
- * @param setLoading 设置加载状态
- * @param setCooldown 设置冷却时间
- * @param loading 加载状态
- * @param cooldown 冷却时间
- * @param onOpenShop 打开商店
- * @param onOpenBattleModal 打开战斗模态框
- * @returns handleAdventure 历练
- * @returns executeAdventure 历练核心逻辑
+ * Adventure Handler
+ * Includes adventure and adventure core logic
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @param triggerVisual Trigger visual effect
+ * @param setLoading Set loading state
+ * @param setCooldown Set cooldown
+ * @param loading Loading state
+ * @param cooldown Cooldown
+ * @param onOpenShop Open shop
+ * @param onOpenBattleModal Open battle modal
+ * @returns handleAdventure Handle adventure
+ * @returns executeAdventure Execute adventure core logic
  */
 
 interface UseAdventureHandlersProps {
@@ -47,17 +47,17 @@ interface UseAdventureHandlersProps {
     adventureType: AdventureType;
     riskLevel?: RiskLevel;
     realmMinRealm?: RealmType;
-    bossId?: string; // 指定的天地之魄BOSS ID（用于事件模板）
-  }) => void; // 打开回合制战斗
-  skipBattle?: boolean; // 是否跳过战斗（自动模式下）
-  fleeOnBattle?: boolean; // 遇到战斗是否逃跑
-  skipShop?: boolean; // 是否跳过商店
-  skipReputationEvent?: boolean; // 是否跳过声望事件
-  useTurnBasedBattle?: boolean; // 是否使用回合制战斗系统
-  onReputationEvent?: (event: AdventureResult['reputationEvent']) => void; // 声望事件回调
-  autoAdventure?: boolean; // 是否正在自动历练
-  setAutoAdventurePausedByHeavenEarthSoul?: (paused: boolean) => void; // 设置天地之魄暂停状态
-  setAutoAdventure?: (value: boolean) => void; // 设置自动历练状态
+    bossId?: string; // Specified Heaven Earth Soul BOSS ID (for event template)
+  }) => void; // Open turn-based battle
+  skipBattle?: boolean; // Whether to skip battle (in auto mode)
+  fleeOnBattle?: boolean; // Whether to flee on battle
+  skipShop?: boolean; // Whether to skip shop
+  skipReputationEvent?: boolean; // Whether to skip reputation event
+  useTurnBasedBattle?: boolean; // Whether to use turn-based battle system
+  onReputationEvent?: (event: AdventureResult['reputationEvent']) => void; // Reputation event callback
+  autoAdventure?: boolean; // Whether auto adventure is active
+  setAutoAdventurePausedByHeavenEarthSoul?: (paused: boolean) => void; // Set Heaven Earth Soul pause state
+  setAutoAdventure?: (value: boolean) => void; // Set auto adventure state
 }
 
 export function useAdventureHandlers({
@@ -76,19 +76,19 @@ export function useAdventureHandlers({
   fleeOnBattle = false,
   skipShop = false,
   skipReputationEvent = false,
-  useTurnBasedBattle = true, // 默认使用新的回合制战斗系统
+  useTurnBasedBattle = true, // Default to use new turn-based battle system
   onReputationEvent,
   autoAdventure = false,
   setAutoAdventurePausedByHeavenEarthSoul,
   setAutoAdventure,
 }: UseAdventureHandlersProps) {
-  // 确保只有在自动历练模式下才应用跳过配置
+  // Ensure skip config is applied only in auto adventure mode
   const effectiveSkipBattle = autoAdventure && skipBattle;
   const effectiveFleeOnBattle = autoAdventure && fleeOnBattle;
   const effectiveSkipShop = autoAdventure && skipShop;
   const effectiveSkipReputationEvent = autoAdventure && skipReputationEvent;
 
-  // 暂停自动历练的处理函数
+  // Handler for pausing auto adventure
   const handlePauseAutoAdventure = () => {
     if (autoAdventure && setAutoAdventurePausedByHeavenEarthSoul && setAutoAdventure) {
       setAutoAdventurePausedByHeavenEarthSoul(true);
@@ -97,8 +97,8 @@ export function useAdventureHandlers({
   };
 
   /**
-   * 处理战斗的公共函数
-   * 根据配置决定是跳过战斗、打开回合制战斗界面，还是使用自动战斗系统
+   * Common function to handle battle
+   * Decide whether to skip battle, open turn-based battle interface, or use auto battle system based on config
    */
   const handleBattle = async (
     battleType: AdventureType,
@@ -113,15 +113,15 @@ export function useAdventureHandlers({
     petSkillCooldowns?: Record<string, number>;
     shouldReturn: boolean;
   }> => {
-    // 如果配置了逃跑，直接跳过战斗
+    // If flee is configured, skip battle directly
     if (effectiveFleeOnBattle) {
-      addLog('你选择避开战斗，继续历练...', 'normal');
+      addLog('You chose to avoid the battle and continue your journey...', 'normal');
       setLoading(false);
       setCooldown(1);
       return { result: {} as AdventureResult, battleContext: null, shouldReturn: true };
     }
 
-    // 自动历练模式下，如果配置了跳过战斗，直接使用自动战斗系统并展示结果
+    // In auto adventure mode, if skip battle is configured, use auto battle system directly and show result
     if (effectiveSkipBattle) {
       const battleResolution = await resolveBattleEncounter(
         player,
@@ -136,7 +136,7 @@ export function useAdventureHandlers({
       const battleResult = battleResolution.adventureResult;
       const battleCtx = battleResolution.replay;
       const petSkillCooldowns = battleResolution.petSkillCooldowns;
-      // 自动历练时跳过战斗，不打开战斗弹窗，直接返回结果
+      // Skip battle in auto adventure, do not open battle modal, return result directly
       return {
         result: battleResult,
         battleContext: battleCtx,
@@ -144,7 +144,7 @@ export function useAdventureHandlers({
         shouldReturn: false
       };
     } else if (useTurnBasedBattle && onOpenTurnBasedBattle && !effectiveSkipBattle) {
-      // 如果使用回合制战斗系统，打开回合制战斗界面
+      // If using turn-based battle system, open turn-based battle interface
       setTimeout(() => {
         onOpenTurnBasedBattle({
           adventureType: battleType,
@@ -157,7 +157,7 @@ export function useAdventureHandlers({
       setCooldown(2);
       return { result: {} as AdventureResult, battleContext: null, shouldReturn: true };
     } else {
-      // 否则使用旧的自动战斗系统
+      // Otherwise use old auto battle system
       const battleResolution = await resolveBattleEncounter(
         player,
         battleType,
@@ -189,16 +189,16 @@ export function useAdventureHandlers({
     }
     setLoading(true);
     if (realmName) {
-      addLog(`你进入了【${realmName}】，只觉灵气逼人，杀机四伏...`, 'special');
-      // 添加探索中的提示，避免用户感觉卡住
-      // 使用 setTimeout 确保提示在日志中显示
+      addLog(`You entered [${realmName}]. The air is thick with radiation and danger...`, 'special');
+      // Add exploring hint to avoid user feeling stuck
+      // Use setTimeout to ensure hint shows in log
       setTimeout(() => {
-        addLog('正在探索秘境，寻找机缘...', 'normal');
+        addLog('Exploring the secret realm, searching for opportunities...', 'normal');
       }, 100);
     } else if (adventureType === 'dao_combining_challenge') {
-      addLog('你前往挑战天地之魄，这是合道期的终极考验...', 'special');
+      addLog('You challenge the Heaven Earth Soul, the ultimate test of the Wasteland...', 'special');
     } else {
-      addLog('你走出洞府，前往荒野历练...', 'normal');
+      addLog('You leave your shelter and head into the wasteland...', 'normal');
     }
 
     try {
@@ -206,16 +206,16 @@ export function useAdventureHandlers({
       let battleContext: BattleReplay | null = null;
       let petSkillCooldowns: Record<string, number> | undefined;
 
-      // 检查是否被追杀
+      // Check if being hunted
       const isHunted = player.sectHuntEndTime && player.sectHuntEndTime > Date.now();
       const huntSectId = player.sectHuntSectId;
       const huntLevel = player.sectHuntLevel || 0;
 
-      // 如果被追杀，强制触发追杀战斗（30%概率）
+      // If being hunted, force trigger hunt battle (11% chance)
       if (isHunted && huntSectId && Math.random() < 0.11) {
-        addLog('⚠️ 你感受到了一股强烈的杀意！宗门追杀者出现了！', 'danger');
+        addLog('⚠️ You feel a strong murderous intent! A faction assassin has appeared!', 'danger');
 
-        // 使用公共函数处理战斗
+        // Use common function to handle battle
         const huntRiskLevel = huntLevel >= 3 ? 'Extreme' : huntLevel >= 2 ? 'High' : huntLevel >= 1 ? 'Medium' : 'Low';
         const battleRes = await handleBattle(
           'sect_challenge',
@@ -232,16 +232,16 @@ export function useAdventureHandlers({
         battleContext = battleRes.battleContext;
         petSkillCooldowns = battleRes.petSkillCooldowns;
       } else if (shouldTriggerBattle(player, adventureType)) {
-        // 如果配置了逃跑，直接跳过战斗
+        // If flee is configured, skip battle directly
         if (effectiveFleeOnBattle) {
-          addLog('你选择避开战斗，继续历练...', 'normal');
+          addLog('You chose to avoid the battle and continue your journey...', 'normal');
           setLoading(false);
           setCooldown(1);
           return;
         }
 
-        // 使用公共函数处理战斗
-        const battleRes = await handleBattle(adventureType, riskLevel || '低', realmMinRealm || player.realm);
+        // Use common function to handle battle
+        const battleRes = await handleBattle(adventureType, riskLevel || 'Low', realmMinRealm || player.realm);
         if (battleRes.shouldReturn) {
           return;
         }
@@ -249,12 +249,12 @@ export function useAdventureHandlers({
         battleContext = battleRes.battleContext;
         petSkillCooldowns = battleRes.petSkillCooldowns;
       } else {
-        // 100%使用模板库
+        // 100% use template library
         initializeEventTemplateLibrary();
         const template = getRandomEventTemplate(adventureType, riskLevel, player.realm, player.realmLevel);
 
         if (template) {
-          // 使用实际最大血量（包含金丹法数加成等）
+          // Use actual max HP (including Golden Core Method bonuses etc.)
           const totalStats = getPlayerTotalStats(player);
           result = templateToAdventureResult(template, {
             realm: player.realm,
@@ -262,20 +262,20 @@ export function useAdventureHandlers({
             maxHp: totalStats.maxHp,
           });
 
-          // 天地之魄：化神期及以上有额外概率遭遇
+          // Heaven Earth Soul: Extra chance to encounter at Spirit Severing and above
           const currentRealmIndex = REALM_ORDER.indexOf(player.realm);
           const spiritSeveringIndex = REALM_ORDER.indexOf(RealmType.SpiritSevering);
 
           if (currentRealmIndex >= spiritSeveringIndex && !result.heavenEarthSoulEncounter) {
             const isSecretRealm = adventureType === 'secret_realm';
-            // 化神期及以上：根据境界和事件类型计算概率
+            // Spirit Severing and above: Calculate chance based on realm and event type
             const isSpiritSevering = currentRealmIndex === spiritSeveringIndex;
             const soulChance = isSpiritSevering
-              ? (isSecretRealm ? 0.08 : (adventureType === 'lucky' ? 0.10 : 0.05)) // 化神期：普通5%，机缘10%，秘境8%
-              : (isSecretRealm ? 0.12 : (adventureType === 'lucky' ? 0.15 : 0.08)); // 化神期以上：普通8%，机缘15%，秘境12%
+              ? (isSecretRealm ? 0.08 : (adventureType === 'lucky' ? 0.10 : 0.05)) // Spirit Severing: Normal 5%, Lucky 10%, Secret Realm 8%
+              : (isSecretRealm ? 0.12 : (adventureType === 'lucky' ? 0.15 : 0.08)); // Above Spirit Severing: Normal 8%, Lucky 15%, Secret Realm 12%
 
             if (Math.random() < soulChance) {
-              // 随机选择一个天地之魄BOSS
+              // Randomly select a Heaven Earth Soul BOSS
               const bosses = Object.values(HEAVEN_EARTH_SOUL_BOSSES);
               if (bosses.length > 0) {
                 const selectedBoss = bosses[Math.floor(Math.random() * bosses.length)];
@@ -286,65 +286,65 @@ export function useAdventureHandlers({
           }
 
 
-          // 如果事件模板返回的是天地之魄事件，需要触发战斗
+          // If event template returns Heaven Earth Soul event, trigger battle
           if (result.adventureType === 'dao_combining_challenge' || result.heavenEarthSoulEncounter) {
             const actualAdventureType = result.adventureType || 'dao_combining_challenge';
             const bossId = result.heavenEarthSoulEncounter;
 
-            // 获取天地之魄BOSS信息
+            // Get Heaven Earth Soul BOSS info
             const boss = bossId ? HEAVEN_EARTH_SOUL_BOSSES[bossId] : null;
             if (boss) {
-              // 计算玩家实力
+              // Calculate player power
               const playerStats = getPlayerTotalStats(player);
               const playerPower = playerStats.attack + playerStats.defense + playerStats.maxHp / 10 + playerStats.speed;
 
-              // 计算BOSS实力（应用强度倍率）
+              // Calculate BOSS power (apply strength multiplier)
               const bossStats = boss.baseStats;
               const bossPower = (bossStats.attack + bossStats.defense + bossStats.hp / 10 + bossStats.speed) * (boss.strengthMultiplier || 1);
 
-              // 计算实力对比
+              // Calculate power comparison
               const powerRatio = playerPower / bossPower;
               let strengthComparison = '';
               if (powerRatio >= 1.2) {
-                strengthComparison = '你的实力明显强于对方';
+                strengthComparison = 'Your power is significantly higher.';
               } else if (powerRatio >= 1.0) {
-                strengthComparison = '你的实力略强于对方';
+                strengthComparison = 'Your power is slightly higher.';
               } else if (powerRatio >= 0.8) {
-                strengthComparison = '你的实力与对方相当';
+                strengthComparison = 'Your power is comparable.';
               } else if (powerRatio >= 0.6) {
-                strengthComparison = '你的实力略弱于对方';
+                strengthComparison = 'Your power is slightly lower.';
               } else {
-                strengthComparison = '你的实力明显弱于对方，建议谨慎挑战';
+                strengthComparison = 'Your power is significantly lower. Proceed with caution.';
               }
 
-              // 如果是自动历练模式，需要暂停自动历练
+              // If in auto adventure mode, pause auto adventure
               if (autoAdventure && setAutoAdventurePausedByHeavenEarthSoul && setAutoAdventure) {
                 setAutoAdventurePausedByHeavenEarthSoul(true);
                 setAutoAdventure(false);
               }
 
-              // 构建提示信息
-              const message = `你遭遇了天地之魄【${boss.name}】！\n\n` +
-                `描述：${boss.description}\n\n` +
-                `境界：${boss.realm}\n` +
-                `难度：${boss.difficulty === 'easy' ? '简单' : boss.difficulty === 'normal' ? '普通' : boss.difficulty === 'hard' ? '困难' : '极难'}\n\n` +
-                `实力对比：\n` +
-                `  攻击：${playerStats.attack.toLocaleString()} vs ${Math.floor(bossStats.attack * (boss.strengthMultiplier || 1)).toLocaleString()}\n` +
-                `  防御：${playerStats.defense.toLocaleString()} vs ${Math.floor(bossStats.defense * (boss.strengthMultiplier || 1)).toLocaleString()}\n` +
-                `  气血：${playerStats.maxHp.toLocaleString()} vs ${Math.floor(bossStats.hp * (boss.strengthMultiplier || 1)).toLocaleString()}\n` +
-                `  速度：${playerStats.speed.toLocaleString()} vs ${Math.floor(bossStats.speed * (boss.strengthMultiplier || 1)).toLocaleString()}\n\n` +
+              // Build prompt message
+              const message = `You encountered the Heaven Earth Soul [${boss.name}]!\n\n` +
+                `Description: ${boss.description}\n\n` +
+                `Realm: ${boss.realm}\n` +
+                `Difficulty: ${boss.difficulty === 'easy' ? 'Easy' : boss.difficulty === 'normal' ? 'Normal' : boss.difficulty === 'hard' ? 'Hard' : 'Extreme'}\n\n` +
+                `Power Comparison:\n` +
+                `  Attack: ${playerStats.attack.toLocaleString()} vs ${Math.floor(bossStats.attack * (boss.strengthMultiplier || 1)).toLocaleString()}\n` +
+                `  Defense: ${playerStats.defense.toLocaleString()} vs ${Math.floor(bossStats.defense * (boss.strengthMultiplier || 1)).toLocaleString()}\n` +
+                `  HP: ${playerStats.maxHp.toLocaleString()} vs ${Math.floor(bossStats.hp * (boss.strengthMultiplier || 1)).toLocaleString()}\n` +
+                `  Speed: ${playerStats.speed.toLocaleString()} vs ${Math.floor(bossStats.speed * (boss.strengthMultiplier || 1)).toLocaleString()}\n\n` +
                 `${strengthComparison}\n\n` +
-                `是否挑战？`;
+                `Challenge?`;
 
-              // 显示确认对话框
+              // Show confirm dialog
               showConfirm(
                 message,
-                `遭遇天地之魄：${boss.name}`,
+                `Encounter: ${boss.name}`,
                 () => {
-                  // 玩家选择挑战
-                  addLog(`你决定挑战${boss.name}！`, 'warning');
+                  // Player chose to challenge
+                  addLog(`You decided to challenge ${boss.name}!`, 'warning');
 
-                  // 自动历练模式下，如果配置了跳过战斗，直接使用自动战斗系统并展示结果
+                  // In auto adventure mode, if skip battle is configured, use auto battle system directly and show result
                   if (effectiveSkipBattle) {
                     resolveBattleEncounter(
                       player,
@@ -358,7 +358,7 @@ export function useAdventureHandlers({
                     ).then((battleResolution) => {
                       const battleResult = battleResolution.adventureResult;
                       const battleCtx = battleResolution.replay;
-                      // 自动历练时跳过战斗，不打开战斗弹窗
+                      // Skip battle in auto adventure, do not open battle modal
                       executeAdventureCore({
                         result: battleResult,
                         battleContext: battleCtx,
@@ -371,7 +371,7 @@ export function useAdventureHandlers({
                         adventureType: actualAdventureType,
                         realmName,
                         skipReputationEvent: effectiveSkipReputationEvent,
-                        skipBattle: effectiveSkipBattle, // 传递skipBattle参数，确保不打开战斗弹窗
+                        skipBattle: effectiveSkipBattle, // Pass skipBattle param, ensure not to open battle modal
                         onPauseAutoAdventure: handlePauseAutoAdventure,
                       });
                       setLoading(false);
@@ -379,7 +379,7 @@ export function useAdventureHandlers({
                     });
                     return;
                   } else if (useTurnBasedBattle && onOpenTurnBasedBattle && !effectiveSkipBattle) {
-                    // 如果使用回合制战斗系统，打开回合制战斗界面
+                    // If using turn-based battle system, open turn-based battle interface
                     setTimeout(() => {
                       onOpenTurnBasedBattle({
                         adventureType: actualAdventureType,
@@ -393,7 +393,7 @@ export function useAdventureHandlers({
                     return;
                   }
 
-                  // 否则使用旧的自动战斗系统
+                  // Otherwise use old auto battle system
                   resolveBattleEncounter(
                     player,
                     actualAdventureType,
@@ -418,7 +418,7 @@ export function useAdventureHandlers({
                       adventureType: actualAdventureType,
                       realmName,
                       skipReputationEvent: effectiveSkipReputationEvent,
-                      skipBattle: false, // 手动挑战时，不跳过战斗，会显示战斗弹窗
+                      skipBattle: false, // Manual challenge, do not skip battle, show battle modal
                       onPauseAutoAdventure: handlePauseAutoAdventure,
                     });
                     setLoading(false);
@@ -426,27 +426,27 @@ export function useAdventureHandlers({
                   });
                 },
                 () => {
-                  // 玩家选择放弃
-                  addLog(`你选择暂时避开${boss.name}，继续探索...`, 'normal');
+                  // Player chose to give up
+                  addLog(`You chose to avoid ${boss.name} for now and continue exploring...`, 'normal');
                   setLoading(false);
                   setCooldown(1);
-                  // 如果之前是自动历练模式，恢复自动历练
+                  // If previously in auto adventure mode, resume auto adventure
                   if (setAutoAdventurePausedByHeavenEarthSoul && setAutoAdventure) {
                     setAutoAdventurePausedByHeavenEarthSoul(false);
-                    // 注意：这里不自动恢复 autoAdventure，让用户手动决定是否继续自动历练
+                    // Note: do not auto resume autoAdventure here, let user manually decide whether to continue auto adventure
                   }
                 }
               );
 
               setLoading(false);
-              return; // 等待玩家选择
+              return; // Wait for player choice
             }
 
-            // 如果没有BOSS信息，使用默认流程
-            // 使用公共函数处理战斗
+            // If no BOSS info, use default flow
+            // Use common function to handle battle
             const battleResult = await handleBattle(
               actualAdventureType,
-              riskLevel || '低',
+              riskLevel || 'Low',
               player.realm,
               bossId
             );
@@ -457,9 +457,9 @@ export function useAdventureHandlers({
             battleContext = battleResult.battleContext;
           }
         } else {
-          // 如果模板库为空，使用默认事件
+          // If template library is empty, use default event
           result = {
-            story: '你在历练途中没有遇到什么特别的事情。',
+            story: 'You encountered nothing special during your adventure.',
             hpChange: 0,
             expChange: Math.floor(10 * (1 + REALM_ORDER.indexOf(player.realm) * 0.3)),
             spiritStonesChange: 0,
@@ -468,14 +468,14 @@ export function useAdventureHandlers({
         }
       }
 
-      // 等待2秒后再处理结果
+      // Wait 2 seconds before processing result
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       if(import.meta.env.DEV) {
         console.log('result', result);
       }
 
-      // 3秒后执行结果处理
+      // Execute result processing after 3 seconds
       await executeAdventureCore({
         result,
         battleContext,
@@ -494,7 +494,7 @@ export function useAdventureHandlers({
         onPauseAutoAdventure: handlePauseAutoAdventure,
       });
     } catch (e) {
-      addLog('历练途中突发异变，你神识受损，不得不返回。', 'danger');
+      addLog('A sudden anomaly occurred during adventure, damaging your consciousness, forcing you to return.', 'danger');
     } finally {
       setLoading(false);
       setCooldown(2);
@@ -503,18 +503,18 @@ export function useAdventureHandlers({
 
   const handleAdventure = async () => {
     if (loading || cooldown > 0) return;
-    // 使用实际最大血量（包含金丹法数加成等）来判断重伤状态
+    // Use actual max HP (including Golden Core Method bonuses etc.) to determine heavy injury state
     const totalStats = getPlayerTotalStats(player);
     if (player.hp < totalStats.maxHp * 0.2) {
-      addLog('你身受重伤，仍然强撑着继续历练...', 'danger');
+      addLog('You are heavily injured, but you struggle to continue exploring...', 'danger');
     }
 
-    // 根据境界计算机缘概率
+    // Calculate lucky chance based on realm
     const realmIndex = REALM_ORDER.indexOf(player.realm);
-    const baseLuckyChance = 0.05; // 基础5%概率
-    const realmBonus = realmIndex * 0.02; // 每提升一个境界增加2%
-    const levelBonus = (player.realmLevel - 1) * 0.01; // 每提升一层增加1%
-    const luckBonus = player.luck * 0.001; // 幸运值加成
+    const baseLuckyChance = 0.05; // Base 5% chance
+    const realmBonus = realmIndex * 0.02; // +2% per realm
+    const levelBonus = (player.realmLevel - 1) * 0.01; // +1% per level
+    const luckBonus = player.luck * 0.001; // Luck bonus
     const luckyChance = Math.min(
       0.3,
       baseLuckyChance + realmBonus + levelBonus + luckBonus
@@ -524,18 +524,18 @@ export function useAdventureHandlers({
     const shopChance = Math.random();
     if (shopChance < 0.15) {
       setLoading(true);
-      addLog('你在路上发现了一处商铺...', 'normal');
+      addLog('You found a trading post on the road...', 'normal');
 
-      // 等待3秒后再打开商店
+      // Wait 3 seconds before opening shop
       setTimeout(() => {
         const shopTypes = [ShopType.Village, ShopType.City, ShopType.Sect, ShopType.LimitedTime, ShopType.BlackMarket, ShopType.Reputation];
         const randomShopType =
           shopTypes[Math.floor(Math.random() * shopTypes.length)];
-        // 如果配置了跳过商店，且处于自动历练模式，不打开商店
+        // If skip shop configured, and in auto adventure mode, do not open shop
         if (!effectiveSkipShop) {
           onOpenShop(randomShopType);
         } else {
-          addLog('你选择跳过商店，继续历练...', 'normal');
+          addLog('You chose to skip the shop and continue...', 'normal');
         }
         setLoading(false);
         setCooldown(2);
@@ -543,7 +543,7 @@ export function useAdventureHandlers({
       return;
     }
 
-    // 根据境界计算机缘概率
+    // Calculate lucky chance based on realm
     const isLucky = Math.random() < luckyChance;
     await executeAdventure(isLucky ? 'lucky' : 'normal');
   };

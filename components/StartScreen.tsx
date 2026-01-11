@@ -24,7 +24,7 @@ interface Props {
 const StartScreen: React.FC<Props> = ({ onStart }) => {
   const [playerName, setPlayerName] = useState('');
   const [selectedTalentId, setSelectedTalentId] = useState<string | null>(null);
-  // 从 localStorage 读取保存的难度选择，如果没有则默认为 'normal'
+  // Read saved difficulty from localStorage, default to 'normal' if not found
   const [difficulty, setDifficulty] = useState<DifficultyMode>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
@@ -35,21 +35,21 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
         }
       }
     } catch (error) {
-      console.error('读取难度设置失败:', error);
+      console.error('Failed to read difficulty settings:', error);
     }
     return 'normal';
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 只在组件首次加载时随机生成一个天赋（使用useMemo确保只执行一次）
+  // Generate a random talent only on first component load (use useMemo to ensure execution only once)
   const initialRandomTalentId = useMemo(() => {
     const availableTalents = TALENTS;
     const randomTalent =
       availableTalents[Math.floor(Math.random() * availableTalents.length)];
     return randomTalent.id;
-  }, []); // 空依赖数组，确保只执行一次
+  }, []); // Empty dependency array, ensure execution only once
 
-  // 如果没有选择天赋，使用初始随机天赋
+  // If no talent selected, use initial random talent
   const finalTalentId = selectedTalentId || initialRandomTalentId;
   const selectedTalent = TALENTS.find((t) => t.id === finalTalentId);
 
@@ -67,7 +67,7 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // 支持 .json 和 .txt 文件
+    // Support .json and .txt files
     const fileName = file.name.toLowerCase();
     if (!fileName.endsWith('.json') && !fileName.endsWith('.txt')) {
       showError('Please select a .json or .txt save file!');
@@ -76,22 +76,22 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
 
     try {
       const text = await file.text();
-      // 使用 importSave 函数处理存档（支持 Base64 编码）
+      // Use importSave function to process save (supports Base64 encoding)
       const saveData = importSave(text);
 
       if (!saveData) {
         showError('Save file format error! Please ensure the content is valid JSON.');
-        // 清空文件输入
+        // Clear file input
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
         return;
       }
 
-      // 验证存档数据格式
+      // Validate save data format
       if (!saveData.player || !Array.isArray(saveData.logs)) {
         showError('Save data format error! Missing required fields.');
-        // 清空文件输入
+        // Clear file input
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -175,12 +175,12 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
       case '仙品':
         return `${baseColor} border-emerald-500/50`;
       default:
-        return `${baseColor} border-stone-800`;
+        return `${baseColor} border-stone-700`;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-ink-950 flex items-center justify-center z-50 p-4 overflow-y-auto touch-manipulation crt-screen">
+    <div className="fixed inset-0 bg-stone-950 flex items-center justify-center z-50 p-4 overflow-y-auto touch-manipulation crt-screen">
       {/* 背景纹理层 */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
@@ -192,7 +192,7 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
       <div className="crt-vignette"></div>
       <div className="scanline-overlay opacity-[0.04]"></div>
 
-      <div className="bg-ink-950/90 border-2 border-stone-800 rounded-none p-6 md:p-10 max-w-2xl w-full shadow-[0_0_30px_rgba(0,0,0,0.5)] my-auto relative z-30 backdrop-blur-md overflow-hidden">
+      <div className="bg-stone-950/90 border-2 border-stone-700 rounded-none p-6 md:p-10 max-w-2xl w-full shadow-[0_0_30px_rgba(0,0,0,0.5)] my-auto relative z-30 backdrop-blur-md overflow-hidden">
         {/* 内置背景纹理 */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.02] z-0"

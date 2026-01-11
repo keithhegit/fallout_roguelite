@@ -22,29 +22,29 @@ const CultivationModal: React.FC<Props> = ({
   const [gradeFilter, setGradeFilter] = useState<ArtGrade | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | 'mental' | 'body'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'learned' | 'obtained' | 'unobtained'>('all');
-  const [learningArtId, setLearningArtId] = useState<string | null>(null); // 防止重复点击
-  const learningArtIdRef = useRef<string | null>(null); // 同步检查用
-  const [searchQuery, setSearchQuery] = useState(''); // 搜索关键词
-  const scrollContainerRef = useRef<HTMLDivElement>(null); // 滚动容器引用
+  const [learningArtId, setLearningArtId] = useState<string | null>(null); // Prevent duplicate clicks
+  const learningArtIdRef = useRef<string | null>(null); // For synchronous check
+  const [searchQuery, setSearchQuery] = useState(''); // Search query
+  const scrollContainerRef = useRef<HTMLDivElement>(null); // Scroll container ref
 
   const getRealmIndex = (r: RealmType) => REALM_ORDER.indexOf(r);
 
-  // 处理学习功法的点击，确保传递正确的 art 对象
+  // Handle learn art click, ensure correct art object is passed
   const handleLearnClick = (art: CultivationArt, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // 防止重复点击（双重检查）
+    // Prevent duplicate clicks (double check)
     if (learningArtIdRef.current === art.id || learningArtId === art.id) {
       return;
     }
 
-    // 检查是否已经学习过
+    // Check if already learned
     if (player.cultivationArts.includes(art.id)) {
       return;
     }
 
-    // 保存当前滚动位置
+    // Save current scroll position
     const scrollContainer = scrollContainerRef.current;
     const scrollTop = scrollContainer?.scrollTop || 0;
 
@@ -52,7 +52,7 @@ const CultivationModal: React.FC<Props> = ({
     setLearningArtId(art.id);
     onLearnArt(art);
 
-    // 恢复滚动位置（使用 requestAnimationFrame 确保在 DOM 更新后恢复）
+    // Restore scroll position (use requestAnimationFrame to ensure restore after DOM update)
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         if (scrollContainer) {
@@ -61,38 +61,39 @@ const CultivationModal: React.FC<Props> = ({
       });
     });
 
-    // 1000ms 后重置，允许再次点击（给状态更新足够的时间）
+    // Reset after 1000ms, allow click again (give enough time for state update)
     setTimeout(() => {
       learningArtIdRef.current = null;
       setLearningArtId(null);
     }, 1000);
   };
 
-  // 传承技能系统尚未实现，暂时返回空数组
+  // Inheritance skill system not implemented yet, return empty array for now
   const inheritanceArts = useMemo(() => {
     return [];
   }, []);
 
-  // 合并普通功法和传承功法
+  // Merge normal arts and inheritance arts
   const allArts = useMemo(() => {
     return [...CULTIVATION_ARTS, ...inheritanceArts];
   }, [inheritanceArts]);
 
-  // 使用 useMemo 直接计算并排序功法列表（包含未解锁的功法，用于"未获得"筛选）
+  // Use useMemo to calculate and sort art list (including unlocked arts, for "unobtained" filter)
   const sortedArts = useMemo(() => {
     if (!isOpen) return [];
 
     const learnedSet = new Set(player.cultivationArts || []);
     const unlockedSet = new Set(player.unlockedArts || []);
-    // 传承技能自动解锁和学习
+    // Inheritance arts auto unlock and learn
     inheritanceArts.forEach(art => {
       learnedSet.add(art.id);
       unlockedSet.add(art.id);
     });
 
-    const gradeOrder = { 天: 4, 地: 3, 玄: 2, 黄: 1 };
+    // Map grades: S, A, B, C
+    const gradeOrder: Record<string, number> = { S: 4, A: 3, B: 2, C: 1 };
 
-    // 排序权重：已激活 < 已学习 < 已解锁未学 < 未解锁
+    // Sort weight: Active < Installed < Unlocked < Locked
     const statusWeight = (artId: string) => {
       if (player.activeArtId === artId) return 0;
       if (learnedSet.has(artId)) return 1;
@@ -106,44 +107,45 @@ const CultivationModal: React.FC<Props> = ({
         const wb = statusWeight(b.art.id);
         if (wa !== wb) return wa - wb;
 
-        // 同状态下，如果都是已学习，按品级排序；否则保持原顺序
+        // If same status, sort by grade
         if (wa <= 1) {
           const ga = gradeOrder[a.art.grade] || 0;
           const gb = gradeOrder[b.art.grade] || 0;
-          if (ga !== gb) return gb - ga; // 高品级在前
+          if (ga !== gb) return gb - ga; // Higher grade first
         }
 
-        return a.idx - b.idx; // 保持原有次序
+        return a.idx - b.idx; // Keep original order
       })
       .map((item) => item.art);
   }, [isOpen, player.unlockedArts, player.cultivationArts, player.activeArtId, allArts, inheritanceArts]);
 
-  // 过滤功法 - 基于已排序的列表进行过滤
+  // Filter arts
   const filteredArts = useMemo(() => {
     const learnedSet = new Set(player.cultivationArts);
     const unlockedSet = new Set(player.unlockedArts || []);
-    // 传承技能自动解锁和学习
+    // Inheritance arts auto-unlock/learn
     inheritanceArts.forEach(art => {
       learnedSet.add(art.id);
       unlockedSet.add(art.id);
     });
 
     return sortedArts.filter((art) => {
-      // 兼容性处理：如果功法没有 grade 字段，默认显示
-      const artGrade = art.grade || '黄';
+      // Compatibility: default to 'C' if missing
+      const artGrade = art.grade || 'C';
+      
       if (gradeFilter !== 'all' && artGrade !== gradeFilter) return false;
       if (typeFilter !== 'all' && art.type !== typeFilter) return false;
 
-      // 状态筛选：已学习、已获得（已解锁但未学习）、未获得（未解锁）
+      // Status filter: Learned, Obtained (Unlocked but not learned), Unobtained (Locked)
       if (statusFilter !== 'all') {
         const isLearned = learnedSet.has(art.id);
         const isUnlocked = unlockedSet.has(art.id);
-        if (statusFilter === 'learned' && !isLearned) return false; // 已学习：已学习的功法
-        if (statusFilter === 'obtained' && (!isUnlocked || isLearned)) return false; // 已获得：已解锁但未学习的功法
-        if (statusFilter === 'unobtained' && (isUnlocked || isLearned)) return false; // 未获得：未解锁的功法（已学习也应排除）
+        if (statusFilter === 'learned' && !isLearned) return false; // Learned: Arts already learned
+        if (statusFilter === 'obtained' && (!isUnlocked || isLearned)) return false; // Obtained: Arts unlocked but not learned
+        if (statusFilter === 'unobtained' && (isUnlocked || isLearned)) return false; // Unobtained: Arts locked (exclude learned)
       }
 
-      // 搜索过滤（按名称和描述）
+      // Search filter (by name and description)
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         const nameMatch = art.name.toLowerCase().includes(query);
@@ -155,7 +157,7 @@ const CultivationModal: React.FC<Props> = ({
     });
   }, [gradeFilter, typeFilter, statusFilter, sortedArts, player.cultivationArts, player.unlockedArts, searchQuery]);
 
-  // 必须在所有 hooks 之后才能有条件返回
+  // Must return conditionally after all hooks
   if (!isOpen) return null;
 
   return (
@@ -168,7 +170,7 @@ const CultivationModal: React.FC<Props> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 效果层 */}
+        {/* CRT Effect Layer */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
         <div className="crt-noise"></div>
         <div className="crt-vignette"></div>
@@ -191,7 +193,7 @@ const CultivationModal: React.FC<Props> = ({
             <p>• BODY ART: Secondary protocols. Permanently enhances physical attributes.</p>
           </div>
 
-          {/* 搜索框 */}
+          {/* Search Box */}
           <div className="mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-600" size={18} />
@@ -213,7 +215,7 @@ const CultivationModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 筛选器 */}
+          {/* Filters */}
           <div className="mb-4 space-y-3">
             <div className="flex flex-wrap gap-2">
               <span className="text-[10px] text-stone-600 self-center uppercase tracking-widest min-w-[60px]">Tier:</span>
@@ -290,8 +292,8 @@ const CultivationModal: React.FC<Props> = ({
               </div>
             ) : (
               filteredArts.map((art) => {
-                if (!art) return null; // 安全处理
-                // 传承技能自动视为已学习和已解锁
+                if (!art) return null; // Safety check
+                // Inheritance arts treated as learned and unlocked
                 const isInheritanceArt = inheritanceArts.some(ia => ia.id === art.id);
                 const isLearned = player.cultivationArts.includes(art.id) || isInheritanceArt;
                 const isActive = player.activeArtId === art.id;
@@ -299,7 +301,7 @@ const CultivationModal: React.FC<Props> = ({
                 const isUnlocked = unlockedArts.includes(art.id) || isInheritanceArt;
                 const canLearn =
                   !isLearned &&
-                  isUnlocked && // 必须已解锁
+                  isUnlocked && // Must be unlocked
                   player.spiritStones >= art.cost &&
                   getRealmIndex(player.realm) >=
                     getRealmIndex(art.realmRequirement);
@@ -324,16 +326,16 @@ const CultivationModal: React.FC<Props> = ({
                       </h4>
                       <span
                         className={`text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-none border font-bold uppercase tracking-tighter ${
-                          (art.grade || '黄') === '天'
-                            ? 'border-yellow-700/50 text-yellow-500 bg-yellow-900/10'
-                            : (art.grade || '黄') === '地'
-                            ? 'border-purple-700/50 text-purple-500 bg-purple-900/10'
-                            : (art.grade || '黄') === '玄'
-                            ? 'border-blue-700/50 text-blue-500 bg-blue-900/10'
-                            : 'border-stone-700/50 text-stone-500 bg-stone-800/10'
+                          art.grade === 'S'
+                            ? 'border-yellow-700/50 text-yellow-500 bg-yellow-950/40'
+                            : art.grade === 'A'
+                            ? 'border-purple-700/50 text-purple-500 bg-purple-950/40'
+                            : art.grade === 'B'
+                            ? 'border-blue-700/50 text-blue-500 bg-blue-950/40'
+                            : 'border-stone-700/50 text-stone-500 bg-stone-900/40'
                         }`}
                       >
-                        {art.grade || '黄'} GRADE
+                        {art.grade} TIER
                       </span>
                       <span
                         className={`text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-none border uppercase tracking-tighter ${art.type === 'mental' ? 'border-blue-800/50 text-blue-500 bg-blue-900/10' : 'border-red-800/50 text-red-500 bg-red-900/10'}`}

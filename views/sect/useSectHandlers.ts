@@ -33,18 +33,18 @@ interface UseSectHandlersProps {
 }
 
 /**
- * 宗门处理函数
- * 包含加入宗门、离开宗门、完成宗门任务、晋升宗门、购买宗门物品
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @param setIsSectOpen 设置宗门是否打开
- * @param setPurchaseSuccess 设置购买成功
- * @returns handleJoinSect 加入宗门
- * @returns handleLeaveSect 离开宗门
- * @returns handleSectTask 完成宗门任务
- * @returns handleSectPromote 晋升宗门
- * @returns handleSectBuy 购买宗门物品
+ * Sect Handlers
+ * Includes joining sect, leaving sect, completing sect tasks, promoting sect rank, purchasing sect items
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @param setIsSectOpen Set sect modal open state
+ * @param setPurchaseSuccess Set purchase success state
+ * @returns handleJoinSect Join sect
+ * @returns handleLeaveSect Leave sect
+ * @returns handleSectTask Complete sect task
+ * @returns handleSectPromote Promote sect rank
+ * @returns handleSectBuy Buy sect items
  */
 
 export function useSectHandlers({
@@ -66,7 +66,7 @@ export function useSectHandlers({
   };
 
   const handleJoinSect = (sectId: string, sectName?: string, sectInfo?: { exitCost?: { spiritStones?: number; items?: { name: string; quantity: number }[] } }) => {
-    // 先尝试从 SECTS 中查找
+    // Try to find in SECTS first
     let sect = SECTS.find((s) => s.id === sectId);
 
     // If not found, it's a generated sect, use passed name or create temp object
@@ -81,7 +81,7 @@ export function useSectHandlers({
           grade: 'C', // Default grade
           exitCost: sectInfo?.exitCost || {
             spiritStones: 300,
-            items: [{ name: '聚灵草', quantity: 5 }],
+            items: [{ name: 'Glowing Fungus', quantity: 5 }],
           },
         };
       } else {
@@ -107,7 +107,7 @@ export function useSectHandlers({
   };
 
   const handleLeaveSect = () => {
-    // 直接背叛，会被追杀
+    // Betray directly, will be hunted
     setPlayer((prev) => {
       if (!prev.sectId) return prev;
 
@@ -116,19 +116,19 @@ export function useSectHandlers({
         betrayedSects.push(prev.sectId);
       }
 
-      // 获取宗门名称
+      // Get sect name
       let sectName: string | null = null;
-      // 优先从保存的宗门信息中获取
+      // Prioritize getting from saved sect info
       if (prev.currentSectInfo) {
         sectName = prev.currentSectInfo.name;
       } else {
-        // 从SECTS常量中查找
+        // Find in SECTS constants
         const sect = SECTS.find((s) => s.id === prev.sectId);
         sectName = sect ? sect.name : null;
       }
 
-      // 设置追杀时间（7天）
-      const huntDuration = 7 * 24 * 60 * 60 * 1000; // 7天
+      // Set hunt duration (7 days)
+      const huntDuration = 7 * 24 * 60 * 60 * 1000; // 7 days
       const huntEndTime = Date.now() + huntDuration;
 
       return {
@@ -136,12 +136,12 @@ export function useSectHandlers({
         sectId: null,
         sectRank: SectRank.Outer,
         sectContribution: 0,
-        currentSectInfo: undefined, // 清除保存的宗门信息
+        currentSectInfo: undefined, // Clear saved sect info
         betrayedSects,
         sectHuntEndTime: huntEndTime,
-        sectHuntLevel: 0, // 初始追杀强度为0（普通弟子）
-        sectHuntSectId: prev.sectId, // 记录正在追杀玩家的宗门ID
-        sectHuntSectName: sectName, // 记录正在追杀玩家的宗门名称
+        sectHuntLevel: 0, // Initial hunt intensity is 0 (Initiate)
+        sectHuntSectId: prev.sectId, // Record the sect ID hunting the player
+        sectHuntSectName: sectName, // Record the sect name hunting the player
       };
     });
     logMessage(`You betrayed the faction! You are now a Wasteland Drifter. A kill order has been issued!`, 'danger');
@@ -149,17 +149,17 @@ export function useSectHandlers({
   };
 
   const handleSafeLeaveSect = () => {
-    // 安全退出，需要支付代价
+    // Leave safely, need to pay price
     setPlayer((prev) => {
       if (!prev.sectId) {
         logMessage('You are not currently in any faction.', 'danger');
         return prev;
       }
 
-      // 先尝试从 SECTS 中查找
+      // Try to find in SECTS first
       let sect = SECTS.find((s) => s.id === prev.sectId);
 
-      // 如果找不到，尝试从保存的宗门信息中获取
+      // If not found, try to get from saved sect info
       if (!sect && prev.currentSectInfo) {
         sect = {
           id: prev.currentSectInfo.id,
@@ -171,17 +171,17 @@ export function useSectHandlers({
         };
       }
 
-      // 如果还是找不到，使用默认退出代价
+      // If still not found, use default exit cost
       if (!sect) {
         sect = {
           id: prev.sectId,
-          name: '该宗门', // 无法获取名称，使用占位符
+          name: 'This Sect', // Unable to get name, use placeholder
           description: '',
           reqRealm: RealmType.QiRefining,
           grade: 'C',
           exitCost: {
             spiritStones: 300,
-            items: [{ name: '聚灵草', quantity: 5 }],
+            items: [{ name: 'Glowing Fungus', quantity: 5 }],
           },
         };
       }
@@ -191,7 +191,7 @@ export function useSectHandlers({
         return prev;
       }
 
-      // 检查是否有足够的资源
+      // Check if resources are sufficient
       let updatedInventory = [...prev.inventory];
       let stoneCost = sect.exitCost.spiritStones || 0;
       const missingItems: string[] = [];
@@ -211,7 +211,7 @@ export function useSectHandlers({
             updatedInventory[itemIdx].quantity < itemReq.quantity
           ) {
             const currentQuantity = itemIdx >= 0 ? updatedInventory[itemIdx].quantity : 0;
-            missingItems.push(`${itemReq.name}（需要 ${itemReq.quantity} 个，当前拥有 ${currentQuantity} 个）`);
+            missingItems.push(`${itemReq.name} (Need ${itemReq.quantity}, Have ${currentQuantity})`);
           }
         }
 
@@ -220,7 +220,7 @@ export function useSectHandlers({
           return prev;
         }
 
-        // 扣除物品
+        // Deduct items
         for (const itemReq of sect.exitCost.items) {
           const itemIdx = updatedInventory.findIndex(
             (i) => i.name === itemReq.name
@@ -241,7 +241,7 @@ export function useSectHandlers({
         sectId: null,
         sectRank: SectRank.Outer,
         sectContribution: 0,
-        currentSectInfo: undefined, // 清除保存的宗门信息
+        currentSectInfo: undefined, // Clear saved sect info
         spiritStones: prev.spiritStones - stoneCost,
         inventory: updatedInventory,
       };
@@ -254,19 +254,19 @@ export function useSectHandlers({
     isPerfectCompletion?: boolean
   ) => {
     setPlayer((prev) => {
-      // 1. 每日任务限制逻辑
+      // 1. Daily task limit logic
       const { limitReached, updatedCount, resetDate } = sectTaskUtils.checkDailyLimit(prev, task.id);
       if (limitReached) {
-        logMessage(`今日已完成3次【${task.name}】任务，请明日再来。`, 'danger');
+        logMessage(`You have completed [${task.name}] 3 times today. Please come back tomorrow.`, 'danger');
         return prev;
       }
 
-      // 2. 消耗检查与扣除
+      // 2. Cost check and deduction
       let updatedInventory = [...prev.inventory];
       let stoneCost = task.cost?.spiritStones || 0;
 
       if (prev.spiritStones < stoneCost) {
-        logMessage(`灵石不足，需要 ${stoneCost} 灵石。`, 'danger');
+        logMessage(`Insufficient Spirit Stones! Need ${stoneCost}.`, 'danger');
         return prev;
       }
 
@@ -274,7 +274,7 @@ export function useSectHandlers({
         for (const itemReq of task.cost.items) {
           const itemIdx = updatedInventory.findIndex((i) => i.name === itemReq.name);
           if (itemIdx === -1 || updatedInventory[itemIdx].quantity < itemReq.quantity) {
-            logMessage(`物品不足，需要 ${itemReq.quantity} 个【${itemReq.name}】。`, 'danger');
+            logMessage(`Insufficient Items! Need ${itemReq.quantity} x [${itemReq.name}].`, 'danger');
             return prev;
           }
           updatedInventory[itemIdx] = {
@@ -285,26 +285,26 @@ export function useSectHandlers({
         updatedInventory = updatedInventory.filter((i) => i.quantity > 0);
       }
 
-      // 3. 奖励计算
+      // 3. Reward calculation
       const { contribGain, expGain, stoneGain } = sectTaskUtils.calculateRewards(prev, task, !!isPerfectCompletion, encounterResult);
 
       if (prev.lastCompletedTaskType === task.type && task.typeBonus) {
-        logMessage(`连续完成${task.type}任务，获得${task.typeBonus}%奖励加成！`, 'special');
+        logMessage(`Consecutive ${task.type} tasks completed! Reward +${task.typeBonus}%!`, 'special');
       }
 
-      // 4. 发放奖励
-      // 普通奖励物品
+      // 4. Issue rewards
+      // Normal reward items
       if (task.reward.items) {
         task.reward.items.forEach((ri) => {
           updatedInventory = addItemToInventory(
             updatedInventory,
-            { name: ri.name, type: ItemType.Material, rarity: '普通' },
+            { name: ri.name, type: ItemType.Material, rarity: 'Common' },
             ri.quantity
           );
         });
       }
 
-      // 特殊随机奖励 (10% 概率)
+      // Special random reward (10% chance)
       let specialMsg = '';
       if (task.specialReward && Math.random() < 0.1) {
         const si = task.specialReward.item;
@@ -314,31 +314,31 @@ export function useSectHandlers({
             {
               name: si.name,
               type: ItemType.Material,
-              rarity: task.quality === 'Mythic' ? '仙品' : '传说',
+              rarity: task.quality === 'Mythic' ? 'Mythic' : 'Legendary',
             },
             si.quantity || 1
           );
-          specialMsg = ` 额外获得特殊奖励：${si.name}！`;
+          specialMsg = ` Bonus Special Reward: ${si.name}!`;
         }
       }
 
-      // 进阶物品奖励
+      // Advanced item reward
       const { item: advItem, message: advMsg } = sectTaskUtils.tryGetAdvancedItem(prev, task);
       if (advItem) {
         updatedInventory.push(advItem);
         specialMsg += advMsg;
       }
 
-      // 5. 日志与状态更新
+      // 5. Log and status update
       const rewardParts = [
-        `${contribGain} 贡献`,
-        expGain > 0 ? `${expGain} 修为` : '',
-        stoneGain > 0 ? `${stoneGain} 灵石` : '',
+        `${contribGain} Contrib`,
+        expGain > 0 ? `${expGain} Exp` : '',
+        stoneGain > 0 ? `${stoneGain} Stones` : '',
       ].filter(Boolean);
 
-      const completionText = isPerfectCompletion ? '（完美完成）' : '';
+      const completionText = isPerfectCompletion ? '(Perfect Completion)' : '';
       logMessage(
-        `你完成了任务【${task.name}】${completionText}，获得了 ${rewardParts.join('、')}。${specialMsg}`,
+        `Completed task [${task.name}]${completionText}! Gained ${rewardParts.join(', ')}.${specialMsg}`,
         isPerfectCompletion ? 'special' : 'gain'
       );
 
@@ -370,16 +370,16 @@ export function useSectHandlers({
 
       if (!nextRank) return prev;
 
-      // 宗主只能通过挑战获得
+      // Leader can only be obtained through challenge
       if (nextRank === SectRank.Leader) {
-        logMessage('宗主之位需通过挑战禁地并战胜上代宗主方可继任。', 'danger');
+        logMessage('The position of Sect Leader must be obtained by challenging the Forbidden Area and defeating the previous Leader.', 'danger');
         return prev;
       }
 
       const req = SECT_RANK_REQUIREMENTS[nextRank];
       if (prev.sectContribution < req.contribution) return prev;
 
-      // 从常量中获取奖励
+      // Get rewards from constants
       const baseReward = SECT_PROMOTION_BASE_REWARDS[nextRank];
       const specialReward = SECT_SPECIAL_REWARDS[prev.sectId || '']?.[nextRank] || { items: [] };
 
@@ -390,7 +390,7 @@ export function useSectHandlers({
 
       let updatedInventory = [...prev.inventory];
 
-      // 添加奖励物品
+      // Add reward items
       if (reward.items) {
         reward.items.forEach((rewardItem) => {
           updatedInventory = addItemToInventory(
@@ -398,8 +398,8 @@ export function useSectHandlers({
             {
               name: rewardItem.name,
               type: ItemType.Material,
-              description: `晋升奖励：${rewardItem.name}`,
-              rarity: '普通',
+              description: `Promotion Reward: ${rewardItem.name}`,
+              rarity: 'Common',
             },
             rewardItem.quantity || 1
           );
@@ -407,18 +407,18 @@ export function useSectHandlers({
       }
 
       const rewardText = [
-        `${reward.contribution} 贡献`,
-        `${reward.exp} 修为`,
-        `${reward.spiritStones} 灵石`,
+        `${reward.contribution} Contrib`,
+        `${reward.exp} Exp`,
+        `${reward.spiritStones} Stones`,
         reward.items
-          ? reward.items.map((i) => `${i.quantity} ${i.name}`).join('、')
+          ? reward.items.map((i) => `${i.quantity} ${i.name}`).join(', ')
           : '',
       ]
         .filter(Boolean)
-        .join('、');
+        .join(', ');
 
       logMessage(
-        `恭喜！你晋升为【${nextRank}】，地位大增。获得奖励：${rewardText}。`,
+        `Congratulations! You have been promoted to [${nextRank}]. Status increased! Gained: ${rewardText}.`,
         'special'
       );
 
@@ -442,18 +442,18 @@ export function useSectHandlers({
     setPlayer((prev) => {
       const totalCost = cost * quantity;
       if (prev.sectContribution < totalCost) {
-        logMessage('贡献不足！', 'danger');
+        logMessage('Insufficient Contribution!', 'danger');
         return prev;
       }
 
       const newInv = addItemToInventory(prev.inventory, itemTemplate, quantity);
 
       logMessage(
-        `你消耗了 ${totalCost} 贡献，兑换了 ${itemTemplate.name} x${quantity}。`,
+        `Spent ${totalCost} Contribution to exchange for ${itemTemplate.name} x${quantity}.`,
         'gain'
       );
-      // 显示购买成功弹窗
-      setPurchaseSuccess({ item: itemTemplate.name || '未知物品', quantity });
+      // Show purchase success popup
+      setPurchaseSuccess({ item: itemTemplate.name || 'Unknown Item', quantity });
       setTimeout(() => setPurchaseSuccess(null), 2000);
 
       return {
@@ -477,18 +477,18 @@ export function useSectHandlers({
           updatedInventory = addItemToInventory(updatedInventory, {
             name: item.name,
             type: ItemType.Material,
-            rarity: '仙品',
+            rarity: 'Mythic',
           }, item.quantity);
         });
       }
 
-      logMessage(`恭喜！你通过了考验，正式接管宗门，成为新一代【宗主】！`, 'special');
-      logMessage(`获得接任奖励：${baseReward.exp} 修为、${baseReward.spiritStones} 灵石、${baseReward.contribution} 宗门贡献。`, 'gain');
+      logMessage(`Congratulations! You passed the trial and officially took over the sect, becoming the new [Leader]!`, 'special');
+      logMessage(`Inauguration Reward: ${baseReward.exp} Exp, ${baseReward.spiritStones} Stones, ${baseReward.contribution} Sect Contribution.`, 'gain');
 
       return {
         ...prev,
         sectRank: SectRank.Leader,
-        sectMasterId: prev.id || 'player-leader', // 设置为玩家自己的ID
+        sectMasterId: prev.id || 'player-leader', // Set to player's own ID
         exp: prev.exp + baseReward.exp,
         spiritStones: prev.spiritStones + baseReward.spiritStones,
         sectContribution: prev.sectContribution + baseReward.contribution,
@@ -498,40 +498,40 @@ export function useSectHandlers({
   };
 
   const handleChallengeLeader = () => {
-    // 1. 身份检查
+    // 1. Identity check
     if (player.sectRank !== SectRank.Elder) {
-      logMessage('只有长老才能挑战宗主。', 'danger');
+      logMessage('Only Elders can challenge the Sect Leader.', 'danger');
       return;
     }
 
-    // 2. 境界检查
+    // 2. Realm check
     const currentRealmIdx = REALM_ORDER.indexOf(player.realm);
     const minRealmIdx = REALM_ORDER.indexOf(SECT_MASTER_CHALLENGE_REQUIREMENTS.minRealm);
     if (currentRealmIdx < minRealmIdx) {
-      logMessage(`挑战宗主需要达到【${SECT_MASTER_CHALLENGE_REQUIREMENTS.minRealm}】境界。`, 'danger');
+      logMessage(`Challenge requires [${SECT_MASTER_CHALLENGE_REQUIREMENTS.minRealm}] realm.`, 'danger');
       return;
     }
 
-    // 3. 贡献检查
+    // 3. Contribution check
     if (player.sectContribution < SECT_MASTER_CHALLENGE_REQUIREMENTS.minContribution) {
-      logMessage(`贡献不足，需要 ${SECT_MASTER_CHALLENGE_REQUIREMENTS.minContribution} 宗门贡献。`, 'danger');
+      logMessage(`Insufficient Contribution. Need ${SECT_MASTER_CHALLENGE_REQUIREMENTS.minContribution} Sect Contribution.`, 'danger');
       return;
     }
 
-    // 4. 灵石检查
+    // 4. Spirit Stones check
     if (player.spiritStones < SECT_MASTER_CHALLENGE_REQUIREMENTS.challengeCost.spiritStones) {
-      logMessage(`灵石不足，开启挑战禁地需要 ${SECT_MASTER_CHALLENGE_REQUIREMENTS.challengeCost.spiritStones} 灵石。`, 'danger');
+      logMessage(`Insufficient Spirit Stones. Opening the Forbidden Area requires ${SECT_MASTER_CHALLENGE_REQUIREMENTS.challengeCost.spiritStones} Stones.`, 'danger');
       return;
     }
 
     if (onChallengeLeader) {
-      // 扣除开启成本（灵石）
+      // Deduct opening cost (Spirit Stones)
       setPlayer(prev => ({
         ...prev,
         spiritStones: prev.spiritStones - SECT_MASTER_CHALLENGE_REQUIREMENTS.challengeCost.spiritStones
       }));
 
-      logMessage('你向宗主发起了挑战，进入挑战禁地...', 'special');
+      logMessage('You challenged the Sect Leader and entered the Forbidden Area...', 'special');
       onChallengeLeader({ adventureType: 'sect_challenge' });
     }
   };

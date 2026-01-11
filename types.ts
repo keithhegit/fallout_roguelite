@@ -65,21 +65,13 @@ export type ItemRarity =
   | 'Common'
   | 'Rare'
   | 'Legendary'
-  | 'Mythic'
-  | '普通'
-  | '稀有'
-  | '传说'
-  | '仙品';
+  | 'Mythic';
 
 export type RiskLevel =
   | 'Low'
   | 'Medium'
   | 'High'
-  | 'Extreme'
-  | '低'
-  | '中'
-  | '高'
-  | '极度危险';
+  | 'Extreme';
 
 // Equipment Slot Enum
 export enum EquipmentSlot {
@@ -103,7 +95,7 @@ export enum EquipmentSlot {
 export interface Item {
   id: string;
   name: string;
-  type: ItemType | '材料';
+  type: ItemType | 'Material';
   description: string;
   quantity: number;
   rarity?: ItemRarity; // Defaults to 'Common' if undefined
@@ -112,10 +104,10 @@ export interface Item {
   equipmentSlot?: EquipmentSlot; // Equipment Slot
   isNatal?: boolean; // Is Natal Artifact
   recipeData?: Recipe; // Recipe data (only used when type is Recipe)
-  reviveChances?: number; // 保命机会次数（1-3次），仅传说和仙品装备可能有
+  reviveChances?: number; // Revive chances (1-3), only available for Legendary/Mythic gear
   battleSkills?: BattleSkill[]; // Combat skills (Artifact/Weapon)
   advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule'; // Advanced item type (only used when type is AdvancedItem)
-  advancedItemId?: string; // 进阶物品ID（用于炼化）
+  advancedItemId?: string; // Advanced item ID (for refining)
   effect?: {
     hp?: number;
     exp?: number;
@@ -124,19 +116,19 @@ export interface Item {
     spirit?: number;
     physique?: number;
     speed?: number;
-    lifespan?: number; // 增加寿命
+    lifespan?: number; // Increase lifespan
   };
   permanentEffect?: {
-    // 永久提升的属性（使用物品后永久增加）
+    // Permanently increased stats (permanently added after using item)
     attack?: number;
     defense?: number;
     spirit?: number;
     physique?: number;
     speed?: number;
     maxHp?: number;
-    maxLifespan?: number; // 增加最大寿命
+    maxLifespan?: number; // Increase max lifespan
     spiritualRoots?: {
-      // 提升灵根
+      // Improve spiritual roots
       metal?: number;
       wood?: number;
       water?: number;
@@ -163,9 +155,11 @@ export interface SecretRealm {
   cost: number; // Spirit stones to enter
   riskLevel: RiskLevel;
   drops: string[]; // Description of potential drops
+  banner?: string; // Banner image URL
+  thumbnail?: string; // Thumbnail image URL
 }
 
-// 角色系统扩展
+// Character system extension
 export interface Talent {
   id: string;
   name: string;
@@ -179,7 +173,7 @@ export interface Talent {
     physique?: number;
     speed?: number;
     expRate?: number;
-    luck?: number; // 幸运值，影响奇遇和掉落
+    luck?: number; // Luck value, affects random encounters and drops
   };
 }
 
@@ -188,9 +182,9 @@ export interface Title {
   name: string;
   description: string;
   requirement: string;
-  category?: 'cultivation' | 'combat' | 'exploration' | 'collection' | 'special'; // 称号分类
-  rarity?: ItemRarity; // 称号稀有度
-  setGroup?: string; // 套装组名（如 "warrior", "scholar" 等），同组称号可触发套装效果
+  category?: 'cultivation' | 'combat' | 'exploration' | 'collection' | 'special'; // Title category
+  rarity?: ItemRarity; // Title rarity
+  setGroup?: string; // Set group name (e.g., "warrior", "scholar", etc.), titles in the same group can trigger set effects
   effects: {
     attack?: number;
     defense?: number;
@@ -203,10 +197,10 @@ export interface Title {
   };
 }
 
-// 称号套装效果
+// Title Set Effect
 export interface TitleSetEffect {
-  setName: string; // 套装名称
-  titles: string[]; // 需要佩戴的称号ID列表
+  setName: string; // Set name
+  titles: string[]; // List of title IDs to wear
   effects: {
     attack?: number;
     defense?: number;
@@ -217,7 +211,7 @@ export interface TitleSetEffect {
     expRate?: number;
     luck?: number;
   };
-  description: string; // 套装效果描述
+  description: string; // Set effect description
 }
 
 export interface PlayerStats {
@@ -229,22 +223,22 @@ export interface PlayerStats {
   maxExp: number;
   hp: number;
   maxHp: number;
-  attack: number; // 攻击力
-  defense: number; // 防御力
-  spirit: number; // 神识（影响法术威力和感知能力）
-  physique: number; // 体魄（影响气血上限和物理抗性）
-  speed: number; // 速度（影响行动顺序和闪避）
+  attack: number; // Attack
+  defense: number; // Defense
+  spirit: number; // Spirit (Affects spell power and perception)
+  physique: number; // Physique (Affects HP max and physical resistance)
+  speed: number; // Speed (Affects turn order and dodge)
   spiritStones: number;
   inventory: Item[];
   cultivationArts: string[]; // IDs of learned arts
   unlockedArts: string[]; // IDs of unlocked arts (obtained through adventures, can be learned)
   activeArtId: string | null; // ID of the currently active Mental Art
-  equippedItems: Partial<Record<EquipmentSlot, string>>; // 装备栏位 -> 物品ID的映射
+  equippedItems: Partial<Record<EquipmentSlot, string>>; // Mapping: Slot -> Item ID
   sectId: string | null;
   sectRank: SectRank;
   sectContribution: number;
   currentSectInfo?: {
-    // 当前宗门的完整信息（用于随机生成的宗门）
+    // Current faction info (for randomly generated factions)
     id: string;
     name: string;
     exitCost?: {
@@ -252,114 +246,114 @@ export interface PlayerStats {
       items?: { name: string; quantity: number }[];
     };
   };
-  betrayedSects: string[]; // 背叛过的宗门ID列表
-  sectHuntEndTime: number | null; // 宗门追杀结束时间戳（毫秒），null表示未被追杀
-  sectHuntLevel: number; // 追杀强度等级（0=普通弟子，1=精英弟子，2=长老，3=宗主），击杀敌人后递增
-  sectHuntSectId: string | null; // 正在追杀玩家的宗门ID
-  sectHuntSectName: string | null; // 正在追杀玩家的宗门名称
-  sectMasterId: string | null; // 当前宗门的宗主ID (如果玩家是宗主，则为玩家自己的ID)
-  // 角色系统扩展
-  talentId: string | null; // 天赋ID（游戏开始时随机生成，之后不可修改）
-  titleId: string | null; // 当前装备的称号ID
-  unlockedTitles: string[]; // 已解锁的称号ID列表
-  attributePoints: number; // 可分配属性点
-  luck: number; // 幸运值
-  // 成就系统
-  achievements: string[]; // 已完成的成就ID
-  // 灵宠系统
-  pets: Pet[]; // 拥有的灵宠
-  activePetId: string | null; // 当前激活的灵宠ID
-  // 抽奖系统
-  lotteryTickets: number; // 抽奖券
-  lotteryCount: number; // 累计抽奖次数（用于保底）
-  // 传承系统（仅保留突破境界功能）
-  inheritanceLevel: number; // 传承等级（0-4，每次传承可突破1-4个境界）
-  // 每日任务系统
-  dailyTaskCount: Record<string, number>; // 按任务ID记录每日完成次数，每个任务每天最多3次
-  lastTaskResetDate: string; // 上次重置任务计数的日期（YYYY-MM-DD格式）
-  lastCompletedTaskType?: string; // 最后完成的任务类型（用于连续完成加成）
-  // 成就系统扩展
-  viewedAchievements: string[]; // 已查看过的成就ID（用于角标显示）
-  // 本命法宝系统
-  natalArtifactId: string | null; // 本命法宝ID
-  // 丹方系统
-  unlockedRecipes: string[]; // 已解锁的丹方名称列表
-  // 打坐回血速度加成
-  meditationHpRegenMultiplier: number; // 打坐回血速度加成倍数（默认1.0，打坐时增加）
-  meditationBoostEndTime: number | null; // 打坐回血加成结束时间戳（毫秒）
-  // 成就统计系统
+  betrayedSects: string[]; // List of betrayed faction IDs
+  sectHuntEndTime: number | null; // Faction hunt end timestamp (ms), null means not hunted
+  sectHuntLevel: number; // Hunt intensity level (0=Candidate, 1=Member, 2=Elite, 3=Leader), increases after killing enemy
+  sectHuntSectId: string | null; // ID of the faction hunting the player
+  sectHuntSectName: string | null; // Name of the faction hunting the player
+  sectMasterId: string | null; // Current faction leader ID (if player is leader, it's player's ID)
+  // Character system extensions
+  talentId: string | null; // Talent ID (randomly generated at start, cannot be modified later)
+  titleId: string | null; // Current equipped title ID
+  unlockedTitles: string[]; // List of unlocked title IDs
+  attributePoints: number; // Allocatable attribute points
+  luck: number; // Luck value
+  // Achievement system
+  achievements: string[]; // Completed achievement IDs
+  // Pet system
+  pets: Pet[]; // Owned pets
+  activePetId: string | null; // Current active pet ID
+  // Lottery system
+  lotteryTickets: number; // Lottery tickets
+  lotteryCount: number; // Cumulative lottery count (for pity)
+  // Inheritance system (Only boundary breakthrough function kept)
+  inheritanceLevel: number; // Inheritance level (0-4, each inheritance can break through 1-4 realms)
+  // Daily task system
+  dailyTaskCount: Record<string, number>; // Record daily completion count by task ID, max 3 times per task per day
+  lastTaskResetDate: string; // Date of last task reset (YYYY-MM-DD)
+  lastCompletedTaskType?: string; // Last completed task type (for streak bonus)
+  // Achievement system extension
+  viewedAchievements: string[]; // Viewed achievement IDs (for badge display)
+  // Natal Artifact system
+  natalArtifactId: string | null; // Natal Artifact ID
+  // Recipe system
+  unlockedRecipes: string[]; // List of unlocked recipe names
+  // Meditation HP regen boost
+  meditationHpRegenMultiplier: number; // Meditation HP regen multiplier (default 1.0, increases during meditation)
+  meditationBoostEndTime: number | null; // Meditation boost end timestamp (ms)
+  // Achievement stats system
   statistics: {
-    killCount: number; // 击杀敌人数量
-    meditateCount: number; // 打坐次数
-    adventureCount: number; // 历练次数
-    equipCount: number; // 装备物品数量
-    petCount: number; // 获得灵宠数量
-    recipeCount: number; // 解锁丹方数量
-    artCount: number; // 学习功法数量
-    breakthroughCount: number; // 突破次数
-    secretRealmCount: number; // 进入秘境次数
-    alchemyCount?: number; // 炼丹次数
+    killCount: number; // Kill count
+    meditateCount: number; // Meditation count
+    adventureCount: number; // Adventure count
+    equipCount: number; // Equipment count
+    petCount: number; // Pet count
+    recipeCount: number; // Recipe count
+    artCount: number; // Protocol count
+    breakthroughCount: number; // Breakthrough count
+    secretRealmCount: number; // Secret realm entry count
+    alchemyCount?: number; // Chem synthesis count
   };
-  // 寿命系统
-  lifespan: number; // 当前寿命
-  maxLifespan: number; // 最大寿命
-  // 灵根系统
+  // Lifespan system
+  lifespan: number; // Current lifespan
+  maxLifespan: number; // Max lifespan
+  // Spiritual Root system
   spiritualRoots: {
-    metal: number; // 金灵根 (0-100)
-    wood: number; // 木灵根 (0-100)
-    water: number; // 水灵根 (0-100)
-    fire: number; // 火灵根 (0-100)
-    earth: number; // 土灵根 (0-100)
+    metal: number; // Metal (0-100)
+    wood: number; // Wood (0-100)
+    water: number; // Water (0-100)
+    fire: number; // Fire (0-100)
+    earth: number; // Earth (0-100)
   };
-  // 日常任务系统
-  dailyQuests: DailyQuest[]; // 当前日常任务列表
-  dailyQuestProgress: Record<string, number>; // 任务ID -> 完成进度
-  dailyQuestCompleted: string[]; // 今日已完成的任务ID
-  lastDailyQuestResetDate: string; // 上次重置日常任务的日期（YYYY-MM-DD格式）
-  gameDays: number; // 游戏内天数（从开始游戏起计算）
-  playTime: number; // 游戏时长（毫秒），从开始游戏起累计
+  // Daily Quest system
+  dailyQuests: DailyQuest[]; // Current daily quests
+  dailyQuestProgress: Record<string, number>; // Task ID -> Progress
+  dailyQuestCompleted: string[]; // Today's completed task IDs
+  lastDailyQuestResetDate: string; // Last daily quest reset date (YYYY-MM-DD)
+  gameDays: number; // In-game days
+  playTime: number; // Total play time (ms)
 
-  // 新增修炼系统字段
-  foundationTreasure?: string; // 筑基奇物ID
-  goldenCoreMethodCount?: number; // 金丹法数（几法金丹）
-  heavenEarthEssence?: string; // 天地精华ID
-  heavenEarthMarrow?: string; // 天地之髓ID
-  marrowRefiningProgress?: number; // 天地之髓炼化进度 (0-100)
-  marrowRefiningSpeed?: number; // 炼化速度（每日进度）
-  daoCombiningChallenged?: boolean; // 是否挑战过天地之魄
-  longevityRules?: string[]; // 长生境规则之力列表
-  maxLongevityRules?: number; // 最大规则之力数量（默认3）
-  // 声望系统
-  reputation: number; // 声望值（用于解锁声望商店等）
-  // 洞府系统
+  // New Cultivation system fields
+  foundationTreasure?: string; // Foundation treasure ID
+  goldenCoreMethodCount?: number; // Golden Core methods
+  heavenEarthEssence?: string; // Heaven Earth Essence ID
+  heavenEarthMarrow?: string; // Heaven Earth Marrow ID
+  marrowRefiningProgress?: number; // Refining progress (0-100)
+  marrowRefiningSpeed?: number; // Refining speed (per day)
+  daoCombiningChallenged?: boolean; // Whether Heaven Earth Soul boss challenged
+  longevityRules?: string[]; // Longevity rules list
+  maxLongevityRules?: number; // Max longevity rules (default 3)
+  // Reputation system
+  reputation: number; // Reputation (for unlocking shops, etc.)
+  // Grotto system
   grotto: {
-    level: number; // 洞府等级 (0表示未拥有，1-10级)
-    expRateBonus: number; // 聚灵阵提供的修炼速度加成 (0-1之间的小数，例如0.2表示20%加成)
-    autoHarvest: boolean; // 自动收获开关（成熟后自动收获到背包）
-    growthSpeedBonus: number; // 灵草生长速度加成 (0-0.5之间的小数，例如0.2表示减少20%生长时间)
+    level: number; // Base level (0 means not owned, 1-10)
+    expRateBonus: number; // Reactor XP bonus (0-1, e.g., 0.2 for 20%)
+    autoHarvest: boolean; // Auto-gather toggle
+    growthSpeedBonus: number; // Growth rate bonus (0-0.5, e.g., 0.2 for 20% reduction)
     plantedHerbs: Array<{
-      herbId: string; // 灵草ID
-      herbName: string; // 灵草名称
-      plantTime: number; // 种植时间戳
-      harvestTime: number; // 收获时间戳
-      quantity: number; // 收获数量
-      isMutated?: boolean; // 是否为变异灵草
-      mutationBonus?: number; // 变异加成倍数（1.5-3.0）
-    }>; // 种植的灵草列表
-    lastHarvestTime: number | null; // 上次收获时间（用于计算自动收获）
-    spiritArrayEnhancement: number; // 聚灵阵改造加成（额外提升的修炼速度，0-1之间的小数）
-    herbarium: string[]; // 已收集的灵草图鉴（灵草名称列表）
-    dailySpeedupCount: number; // 今日已使用加速次数
-    lastSpeedupResetDate: string; // 上次重置加速次数的日期（YYYY-MM-DD格式）
+      herbId: string; // Plant ID
+      herbName: string; // Plant Name
+      plantTime: number; // Plant timestamp
+      harvestTime: number; // Gather timestamp
+      quantity: number; // Gather quantity
+      isMutated?: boolean; // Is mutated
+      mutationBonus?: number; // Mutation bonus (1.5-3.0)
+    }>; // Planted supplies list
+    lastHarvestTime: number | null; // Last gather time (for auto-gather calculation)
+    spiritArrayEnhancement: number; // Reactor spec bonus (extra XP rate, 0-1)
+    herbarium: string[]; // Collected supply index (names)
+    dailySpeedupCount: number; // Daily speedup count
+    lastSpeedupResetDate: string; // Last speedup reset date (YYYY-MM-DD)
   };
-  // 宗门宝库系统
+  // Faction Vault system
   sectTreasureVault?: {
-    items: Item[]; // 宝库中的物品列表
-    takenItemIds: string[]; // 已拿取的物品ID列表
+    items: Item[]; // Items in vault
+    takenItemIds: string[]; // Taken item IDs
   };
 }
 
-// 筑基奇物接口
+// Foundation Treasure interface
 export interface FoundationTreasure {
   id: string;
   name: string;
@@ -375,16 +369,16 @@ export interface FoundationTreasure {
     specialEffect?: string;
   };
   requiredLevel?: number;
-  battleEffect?: AdvancedItemBattleEffect; // 战斗效果
+  battleEffect?: AdvancedItemBattleEffect; // Combat effect
 }
 
-// 天地精华接口
+// Heaven Earth Essence interface
 export interface HeavenEarthEssence {
   id: string;
   name: string;
   description: string;
   rarity: ItemRarity;
-  quality: number; // 品质 (1-100)
+  quality: number; // Quality (1-100)
   effects: {
     hpBonus?: number;
     attackBonus?: number;
@@ -394,17 +388,17 @@ export interface HeavenEarthEssence {
     speedBonus?: number;
     specialEffect?: string;
   };
-  battleEffect?: AdvancedItemBattleEffect; // 战斗效果
+  battleEffect?: AdvancedItemBattleEffect; // Combat effect
 }
 
-// 天地之髓接口
+// Heaven Earth Marrow interface
 export interface HeavenEarthMarrow {
   id: string;
   name: string;
   description: string;
   rarity: ItemRarity;
-  quality: number; // 品质 (1-100)
-  refiningTime: number; // 基础炼化时间（天）
+  quality: number; // Quality (1-100)
+  refiningTime: number; // Base refining time (days)
   effects: {
     hpBonus?: number;
     attackBonus?: number;
@@ -414,15 +408,15 @@ export interface HeavenEarthMarrow {
     speedBonus?: number;
     specialEffect?: string;
   };
-  battleEffect?: AdvancedItemBattleEffect; // 战斗效果
+  battleEffect?: AdvancedItemBattleEffect; // Combat effect
 }
 
-// 规则之力接口
+// Longevity Rule interface
 export interface LongevityRule {
   id: string;
   name: string;
   description: string;
-  power: number; // 规则之力强度 (1-100)
+  power: number; // Rule power (1-100)
   effects: {
     hpPercent?: number;
     attackPercent?: number;
@@ -432,75 +426,75 @@ export interface LongevityRule {
     speedPercent?: number;
     specialEffect?: string;
   };
-  battleEffect?: AdvancedItemBattleEffect; // 战斗效果
+  battleEffect?: AdvancedItemBattleEffect; // Combat effect
 }
 
-// 进阶物品战斗效果类型
+// Advanced item battle effect type
 export interface AdvancedItemBattleEffect {
   type: 'damage' | 'heal' | 'buff' | 'debuff' | 'special';
-  name: string; // 效果名称
-  description: string; // 效果描述
+  name: string; // Effect name
+  description: string; // Effect description
   cost: {
-    lifespan?: number; // 消耗寿命（年）
-    maxHp?: number; // 消耗气血上限
-    hp?: number; // 消耗当前气血
-    spirit?: number; // 消耗神识
+    lifespan?: number; // Consumes lifespan (years)
+    maxHp?: number; // Consumes max HP
+    hp?: number; // Consumes current HP
+    spirit?: number; // Consumes spirit
   };
   effect: {
-    // 伤害效果
+    // Damage effect
     damage?: {
-      base?: number; // 基础伤害
-      multiplier?: number; // 伤害倍率（基于攻击力）
-      percentOfMaxHp?: number; // 基于最大气血的百分比伤害
-      percentOfLifespan?: number; // 基于寿命的百分比伤害
-      ignoreDefense?: number | boolean; // 无视防御比例（0-1之间的数字，或true表示完全无视）
-      guaranteedCrit?: boolean; // 必定暴击
-      guaranteedHit?: boolean; // 必定命中（无视闪避）
-      demonMultiplier?: number; // 对邪魔的伤害倍率
+      base?: number; // Base damage
+      multiplier?: number; // Damage multiplier (based on attack)
+      percentOfMaxHp?: number; // Percentage damage based on max HP
+      percentOfLifespan?: number; // Percentage damage based on lifespan
+      ignoreDefense?: number | boolean; // Ignore defense ratio (0-1, or true for total ignore)
+      guaranteedCrit?: boolean; // Guaranteed critical hit
+      guaranteedHit?: boolean; // Guaranteed hit (ignore dodge)
+      demonMultiplier?: number; // Damage multiplier against demons
     };
-    // 治疗效果
+    // Healing effect
     heal?: {
-      base?: number; // 基础治疗
-      percentOfMaxHp?: number; // 基于最大气血的百分比治疗
+      base?: number; // Base healing
+      percentOfMaxHp?: number; // Percentage healing based on max HP
     };
-    // Buff效果
+    // Buff effect
     buff?: {
-      attack?: number; // 攻击力加成
-      defense?: number; // 防御力加成
-      speed?: number; // 速度加成
-      critChance?: number; // 暴击率加成
-      critDamage?: number; // 暴击伤害加成
-      reflectDamage?: number; // 反弹伤害比例
-      spirit?: number; // 神识加成
-      physique?: number; // 体魄加成
-      maxHp?: number; // 最大气血加成（百分比）
-      revive?: number; // 复活标记（1表示有复活）
-      dodge?: number; // 闪避率加成
-      ignoreDefense?: boolean; // 攻击无视防御
-      regen?: number; // 每回合恢复最大气血的百分比
-      damageReduction?: number; // 受到伤害减少比例
-      immunity?: boolean; // 免疫所有负面状态
-      cleanse?: boolean; // 清除所有负面状态
-      magicDefense?: number; // 法术防御加成
-      duration?: number; // 持续回合数
+      attack?: number; // Attack bonus
+      defense?: number; // Defense bonus
+      speed?: number; // Speed bonus
+      critChance?: number; // Critical hit chance bonus
+      critDamage?: number; // Critical hit damage bonus
+      reflectDamage?: number; // Reflected damage ratio
+      spirit?: number; // Spirit bonus
+      physique?: number; // Physique bonus
+      maxHp?: number; // Max HP bonus (percentage)
+      revive?: number; // Revive marker (1 means has revive)
+      dodge?: number; // Dodge rate bonus
+      ignoreDefense?: boolean; // Attack ignores defense
+      regen?: number; // Percentage of max HP restored per turn
+      damageReduction?: number; // Damage reduction ratio
+      immunity?: boolean; // Immune to all negative statuses
+      cleanse?: boolean; // Cleanse all negative statuses
+      magicDefense?: number; // Magic defense bonus
+      duration?: number; // Duration in turns
     };
-    // Debuff效果（对敌人）
+    // Debuff effect (on enemy)
     debuff?: {
-      attack?: number; // 降低攻击力（负数表示降低）
-      defense?: number; // 降低防御力（负数表示降低）
-      speed?: number; // 降低速度（负数表示降低）
-      spirit?: number; // 降低神识（负数表示降低）
-      hp?: number; // 每回合损失最大气血的百分比（负数表示损失）
-      duration?: number; // 持续回合数
+      attack?: number; // Reduce attack (negative value indicates reduction)
+      defense?: number; // Reduce defense (negative value indicates reduction)
+      speed?: number; // Reduce speed (negative value indicates reduction)
+      spirit?: number; // Reduce spirit (negative value indicates reduction)
+      hp?: number; // Percentage of max HP lost per turn (negative value indicates loss)
+      duration?: number; // Duration in turns
     };
-    // 特殊效果
+    // Special effects
     special?: {
       type: 'instant_kill' | 'stun' | 'silence' | 'reflect' | 'absorb';
-      value?: number; // 效果数值
-      chance?: number; // 触发概率（0-1）
+      value?: number; // Effect value
+      chance?: number; // Trigger chance (0-1)
     };
   };
-  cooldown?: number; // 冷却回合数（战斗内）
+  cooldown?: number; // Cooldown turns (in-battle)
 }
 
 export interface LogEntry {
@@ -517,26 +511,26 @@ export interface AdventureResult {
   hpChange: number;
   expChange: number;
   spiritStonesChange: number;
-  lotteryTicketsChange?: number; // 抽奖券变化
-  inheritanceLevelChange?: number; // 传承等级变化（1-4，表示可以突破的境界数）
-  lifespanChange?: number; // 寿命变化（正数为增加，负数为减少）
-  reputationChange?: number; // 声望变化（正数为增加，负数为减少）
+  lotteryTicketsChange?: number; // Lottery tickets change
+  inheritanceLevelChange?: number; // Inheritance level change (1-4, indicates the number of realms that can be broken through)
+  lifespanChange?: number; // Lifespan change (positive for increase, negative for decrease)
+  reputationChange?: number; // Reputation change (positive for increase, negative for decrease)
   reputationEvent?: {
-    // 声望事件（需要玩家选择）
-    title: string; // 事件标题
-    description: string; // 事件描述
-    text?: string; // 兼容性字段：AI 偶尔会返回 text 而不是 title/description
+    // Reputation event (requires player choice)
+    title: string; // Event title
+    description: string; // Event description
+    text?: string; // Compatibility field: AI occasionally returns text instead of title/description
     choices: Array<{
-      text: string; // 选择文本
-      reputationChange: number; // 声望变化
-      description?: string; // 选择后的描述
-      hpChange?: number; // 可能的气血变化
-      expChange?: number; // 可能的修为变化
-      spiritStonesChange?: number; // 可能的灵石变化
+      text: string; // Choice text
+      reputationChange: number; // Reputation change
+      description?: string; // Description after choice
+      hpChange?: number; // Potential HP change
+      expChange?: number; // Potential EXP change
+      spiritStonesChange?: number; // Potential spirit stones change
     }>;
   };
   attributeReduction?: {
-    // 属性降低（遭遇陷阱、邪修等危险事件时）
+    // Attribute reduction (when encountering traps, evil cultivators, or other dangerous events)
     attack?: number;
     defense?: number;
     spirit?: number;
@@ -545,17 +539,17 @@ export interface AdventureResult {
     maxHp?: number;
   };
   spiritualRootsChange?: {
-    // 灵根变化
+    // Spiritual roots change
     metal?: number;
     wood?: number;
     water?: number;
     fire?: number;
     earth?: number;
   };
-  triggerSecretRealm?: boolean; // 是否触发随机秘境
-  longevityRuleObtained?: string; // 获得的规则之力ID
-  heavenEarthSoulEncounter?: string; // 遇到的天地之魄BOSS ID
-  adventureType?: AdventureType; // 历练类型（用于判断是否需要触发战斗等）
+  triggerSecretRealm?: boolean; // Whether to trigger a random secret realm
+  longevityRuleObtained?: string; // Obtained rule power ID
+  heavenEarthSoulEncounter?: string; // Encountered Heaven Earth Soul BOSS ID
+  adventureType?: AdventureType; // Adventure type (used to determine if combat needs to be triggered, etc.)
   itemObtained?: {
     name: string;
     type: string; // "Herb" | "Material" | "Magic Treasure" | "Weapon" | "Armor" | "Accessory" | "Ring" | "Advanced Item"
@@ -679,14 +673,14 @@ export interface Recipe {
   };
 }
 
-// 奇遇系统
+// Encounter system
 export interface EncounterEvent {
   id: string;
   name: string;
   description: string;
   rarity: ItemRarity;
-  triggerChance: number; // 触发概率 (0-1)
-  minRealm?: RealmType; // 最低境界要求
+  triggerChance: number; // Trigger chance (0-1)
+  minRealm?: RealmType; // Minimum realm requirement
   rewards: {
     exp?: number;
     spiritStones?: number;
@@ -699,19 +693,19 @@ export interface EncounterEvent {
   };
 }
 
-// 探索系统
+// Exploration system
 export interface ExplorationLocation {
   id: string;
   name: string;
   description: string;
   minRealm: RealmType;
-  cost: number; // 进入消耗
+  cost: number; // Entry cost
   riskLevel: RiskLevel;
   eventTypes: AdventureType[];
-  specialEncounters?: string[]; // 特殊奇遇ID列表
+  specialEncounters?: string[]; // List of special encounter IDs
 }
 
-// 成就系统
+// Achievement system
 export interface Achievement {
   id: string;
   name: string;
@@ -720,7 +714,7 @@ export interface Achievement {
   requirement: {
     type: string; // 'realm' | 'level' | 'kill' | 'collect' | 'custom'
     value: number;
-    target?: string; // 目标名称（如物品名、境界名等）
+    target?: string; // Target name (e.g., item name, realm name, etc.)
   };
   reward: {
     exp?: number;
@@ -731,26 +725,26 @@ export interface Achievement {
   rarity: ItemRarity;
 }
 
-// 灵宠系统
+// Pet system
 export interface Pet {
   id: string;
   name: string;
-  species: string; // 种类
+  species: string; // Species
   level: number;
   exp: number;
   maxExp: number;
   rarity: ItemRarity;
-  image?: string; // 灵宠图片 (Emoji)
+  image?: string; // Pet image (Emoji)
   stats: {
     attack: number;
     defense: number;
     hp: number;
-    speed: number; // 速度，影响战斗中的行动顺序
+    speed: number; // Speed, affects turn order in combat
   };
   skills: PetSkill[];
-  evolutionStage: number; // 进化阶段 0-2 (0=幼年期, 1=成熟期, 2=完全体)
-  affection: number; // 亲密度 0-100
-  skillCooldowns?: Record<string, number>; // 技能冷却时间追踪
+  evolutionStage: number; // Evolution stage 0-2 (0=Juvenile, 1=Mature, 2=Complete)
+  affection: number; // Affection 0-100
+  skillCooldowns?: Record<string, number>; // Skill cooldown tracking
 }
 
 export interface PetSkill {
@@ -769,14 +763,14 @@ export interface PetSkill {
 export interface PetTemplate {
   id: string;
   name: string;
-  nameVariants?: string[]; // 名字变体，用于随机生成多样化名字
+  nameVariants?: string[]; // Name variants, used to generate diverse random names
   species: string;
   description: string;
   rarity: ItemRarity;
-  image: string; // 初始形态 (幼年期)
+  image: string; // Initial form (Juvenile)
   stageImages?: {
-    stage1?: string; // 成熟期图片
-    stage2?: string; // 完全体图片
+    stage1?: string; // Mature form image
+    stage2?: string; // Complete form image
   };
   baseStats: {
     attack: number;
@@ -784,40 +778,40 @@ export interface PetTemplate {
     hp: number;
     speed: number;
   };
-  skills: PetSkill[]; // 初始技能 (幼年期)
+  skills: PetSkill[]; // Initial skills (Juvenile)
   stageSkills?: {
-    stage1?: PetSkill[]; // 成熟期新增技能组
-    stage2?: PetSkill[]; // 完全体新增技能组
+    stage1?: PetSkill[]; // New skill set for Mature form
+    stage2?: PetSkill[]; // New skill set for Complete form
   };
   evolutionRequirements?: {
-    // 幼年期 -> 成熟期 (evolutionStage 0 -> 1)
+    // Juvenile -> Mature (evolutionStage 0 -> 1)
     stage1?: {
       level: number;
       items?: { name: string; quantity: number }[];
     };
-    // 成熟期 -> 完全体 (evolutionStage 1 -> 2)
+    // Mature -> Complete (evolutionStage 1 -> 2)
     stage2?: {
       level: number;
       items?: { name: string; quantity: number }[];
     };
-    // 兼容旧版本（如果没有stage1/stage2，使用这个）
+    // Compatibility (use this if stage1/stage2 not provided)
     level?: number;
     items?: { name: string; quantity: number }[];
   };
-  // 进化后的名称（可选，如果不提供则使用原名称）
+  // Evolved names (optional, uses original name if not provided)
   evolutionNames?: {
-    stage1?: string; // 成熟期名称
-    stage2?: string; // 完全体名称
+    stage1?: string; // Mature name
+    stage2?: string; // Complete name
   };
 }
 
-// 抽奖系统
+// Lottery system
 export interface LotteryPrize {
   id: string;
   name: string;
   type: 'item' | 'spiritStones' | 'exp' | 'pet' | 'ticket';
   rarity: ItemRarity;
-  weight: number; // 权重，越高越容易抽到
+  weight: number; // Weight, higher is easier to pull
   value: {
     item?: Partial<Item>;
     spiritStones?: number;
@@ -827,10 +821,10 @@ export interface LotteryPrize {
   };
 }
 
-// 难度模式
+// Difficulty Mode
 export type DifficultyMode = 'easy' | 'normal' | 'hard';
 
-// 设置系统
+// Settings system
 export interface KeyboardShortcutConfig {
   key: string;
   ctrl?: boolean;
@@ -847,18 +841,18 @@ export interface GameSettings {
   autoSave: boolean;
   animationSpeed: 'slow' | 'normal' | 'fast';
   language: 'zh' | 'en';
-  difficulty: DifficultyMode; // 游戏难度模式
-  keyboardShortcuts?: Record<string, KeyboardShortcutConfig>; // 自定义快捷键配置，key 为 actionId
+  difficulty: DifficultyMode; // Game difficulty mode
+  keyboardShortcuts?: Record<string, KeyboardShortcutConfig>; // Custom keyboard shortcuts, key is actionId
 }
 
-// 商店系统
+// Shop system
 export enum ShopType {
-  Village = '村庄',
-  City = '城市',
-  Sect = '仙门',
-  BlackMarket = '黑市', // 黑市商店
-  LimitedTime = '限时商店', // 限时商店（每日特价）
-  Reputation = '声望商店', // 声望商店
+  Village = 'Village',
+  City = 'City',
+  Sect = 'Faction',
+  BlackMarket = 'Black Market', // Black market shop
+  LimitedTime = 'Daily Special', // Limited time shop (daily deals)
+  Reputation = 'Reputation Shop', // Reputation shop
 }
 
 export interface ShopItem {
@@ -867,8 +861,8 @@ export interface ShopItem {
   type: ItemType;
   description: string;
   rarity: ItemRarity;
-  price: number; // 购买价格
-  sellPrice: number; // 出售价格（通常是购买价格的30-50%）
+  price: number; // Purchase price
+  sellPrice: number; // Sell price (usually 30-50% of purchase price)
   effect?: {
     hp?: number;
     exp?: number;
@@ -888,10 +882,10 @@ export interface ShopItem {
   };
   equipmentSlot?: EquipmentSlot;
   isEquippable?: boolean;
-  minRealm?: RealmType; // 最低境界要求
-  reviveChances?: number; // 保命机会次数（1-3次），仅传说和仙品装备可能有
-  isAdvancedItem?: boolean; // 标记为进阶物品
-  advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule'; // 进阶物品类型
+  minRealm?: RealmType; // Minimum realm requirement
+  reviveChances?: number; // Revive chances (1-3), only available for Legendary/Mythic gear
+  isAdvancedItem?: boolean; // Marked as advanced item
+  advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule'; // Advanced item type
 }
 
 export interface Shop {
@@ -900,33 +894,33 @@ export interface Shop {
   type: ShopType;
   description: string;
   items: ShopItem[];
-  refreshCost?: number; // 刷新费用（黑市等特殊商店）
-  refreshCooldown?: number; // 刷新冷却时间（毫秒）
-  lastRefreshTime?: number; // 上次刷新时间戳
-  discount?: number; // 折扣（0-1，限时商店用）
-  reputationRequired?: number; // 所需声望值（声望商店用）
+  refreshCost?: number; // Refresh cost (for special shops like Black Market)
+  refreshCooldown?: number; // Refresh cooldown (ms)
+  lastRefreshTime?: number; // Last refresh timestamp
+  discount?: number; // Discount (0-1, for limited time shops)
+  reputationRequired?: number; // Required reputation (for reputation shops)
 }
 
-// ==================== 回合制战斗系统类型定义 ====================
+// ==================== Turn-Based Battle System Types ====================
 
-// 状态效果
+// Status effects
 export interface Buff {
   id: string;
   name: string;
   type: 'attack' | 'defense' | 'speed' | 'heal' | 'crit' | 'shield' | 'custom';
-  value: number; // 数值加成或百分比加成
-  duration: number; // 剩余回合数，-1表示永久（战斗期间）
-  source: string; // 来源（功法、丹药、技能等）
+  value: number; // Numeric or percentage bonus
+  duration: number; // Remaining turns, -1 for permanent (during battle)
+  source: string; // Source (Protocol, Chem, Skill, etc.)
   description?: string;
-  reflectDamage?: number; // 反弹伤害比例（0-1之间）
-  critDamage?: number; // 暴击伤害加成
-  revive?: number; // 复活标记（1表示有复活）
-  dodge?: number; // 闪避率加成（0-1之间）
-  ignoreDefense?: boolean; // 攻击无视防御
-  regen?: number; // 每回合恢复最大气血的百分比
-  damageReduction?: number; // 受到伤害减少比例（0-1之间）
-  immunity?: boolean; // 免疫所有负面状态
-  magicDefense?: number; // 法术防御加成
+  reflectDamage?: number; // Reflected damage ratio (0-1)
+  critDamage?: number; // Critical damage bonus
+  revive?: number; // Revive marker (1 means has revive)
+  dodge?: number; // Dodge rate bonus (0-1)
+  ignoreDefense?: boolean; // Attack ignores defense
+  regen?: number; // Percentage of max HP restored per turn
+  damageReduction?: number; // Damage reduction ratio (0-1)
+  immunity?: boolean; // Immune to all negative statuses
+  magicDefense?: number; // Magic defense bonus
 }
 
 export interface Debuff {
@@ -939,7 +933,7 @@ export interface Debuff {
   description?: string;
 }
 
-// 技能效果
+// Skill Effect
 export interface SkillEffect {
   type: 'damage' | 'heal' | 'buff' | 'debuff' | 'status';
   target: 'self' | 'enemy' | 'both';
@@ -951,42 +945,42 @@ export interface SkillEffect {
   debuff?: Debuff;
 }
 
-// 战斗技能
+// Battle Skills
 export interface BattleSkill {
   id: string;
   name: string;
   description: string;
   type: 'attack' | 'defense' | 'heal' | 'buff' | 'debuff' | 'special';
   source: 'cultivation_art' | 'artifact' | 'weapon' | 'potion' | 'innate';
-  sourceId: string; // 来源ID（功法ID、法宝ID等）
+  sourceId: string; // Source ID (Protocol ID, Relic ID, etc.)
   effects: SkillEffect[];
   cost: {
-    mana?: number; // 灵力消耗
-    energy?: number; // 能量消耗
-    hp?: number; // 气血消耗（自残技能）
+    mana?: number; // Spirit cost
+    energy?: number; // Energy cost
+    hp?: number; // HP cost (self-harm skills)
   };
-  cooldown: number; // 当前冷却回合数
-  maxCooldown: number; // 最大冷却回合数
+  cooldown: number; // Current cooldown turns
+  maxCooldown: number; // Max cooldown turns
   conditions?: {
-    minHp?: number; // 最低气血百分比（0-1）
-    requireBuff?: string; // 需要特定Buff ID
-    requireDebuff?: string; // 需要特定Debuff ID
+    minHp?: number; // Minimum HP percentage (0-1)
+    requireBuff?: string; // Requires specific Buff ID
+    requireDebuff?: string; // Requires specific Debuff ID
   };
   target: 'self' | 'enemy' | 'both';
   damage?: {
-    base: number; // 基础伤害
-    multiplier: number; // 伤害倍率（基于攻击力或神识）
-    type: 'physical' | 'magical'; // 物理/法术伤害
-    critChance?: number; // 暴击概率（0-1）
-    critMultiplier?: number; // 暴击倍率
+    base: number; // Base damage
+    multiplier: number; // Damage multiplier (based on attack or spirit)
+    type: 'physical' | 'magical'; // Physical/Magical damage
+    critChance?: number; // Critical hit chance (0-1)
+    critMultiplier?: number; // Critical hit multiplier
   };
   heal?: {
-    base: number; // 基础治疗
-    multiplier: number; // 治疗倍率（基于最大气血的百分比）
+    base: number; // Base healing
+    multiplier: number; // Healing multiplier (percentage of max HP)
   };
 }
 
-// 战斗单位
+// Battle Unit
 export interface BattleUnit {
   id: string;
   name: string;
@@ -996,28 +990,28 @@ export interface BattleUnit {
   attack: number;
   defense: number;
   speed: number;
-  spirit: number; // 神识（影响法术伤害）
+  spirit: number; // Spirit (affects magical damage)
   buffs: Buff[];
   debuffs: Debuff[];
-  skills: BattleSkill[]; // 可用技能列表
-  cooldowns: Record<string, number>; // 技能冷却时间（技能ID -> 剩余冷却回合）
-  mana?: number; // 灵力值（可选，用于技能消耗）
-  maxMana?: number; // 最大灵力值
-  energy?: number; // 能量值（可选，用于特殊技能）
-  maxEnergy?: number; // 最大能量值
-  isDefending?: boolean; // 是否处于防御状态
+  skills: BattleSkill[]; // Available skills list
+  cooldowns: Record<string, number>; // Skill cooldowns (Skill ID -> Remaining turns)
+  mana?: number; // Spirit (optional, for skill costs)
+  maxMana?: number; // Max spirit
+  energy?: number; // Energy (optional, for special skills)
+  maxEnergy?: number; // Max energy
+  isDefending?: boolean; // Whether in defending state
 }
 
-// 战斗行动
+// Battle Action
 export interface BattleAction {
   id: string;
   round: number;
   turn: 'player' | 'enemy';
-  actor: string; // 行动者ID
+  actor: string; // Actor ID
   actionType: 'attack' | 'skill' | 'item' | 'defend' | 'flee';
-  skillId?: string; // 使用的技能ID
-  itemId?: string; // 使用的物品ID
-  target?: string; // 目标ID
+  skillId?: string; // Used skill ID
+  itemId?: string; // Used item ID
+  target?: string; // Target ID
   result: {
     damage?: number;
     heal?: number;
@@ -1027,12 +1021,12 @@ export interface BattleAction {
     miss?: boolean;
     blocked?: boolean;
     manaCost?: number;
-    reflectedDamage?: number; // 反弹伤害值
+    reflectedDamage?: number; // Reflected damage value
   };
-  description: string; // 行动描述文本
+  description: string; // Action description text
 }
 
-// 战斗结果
+// Battle Result
 export interface BattleResult {
   victory: boolean;
   hpLoss: number;
@@ -1041,36 +1035,36 @@ export interface BattleResult {
   expChange: number;
   spiritChange: number;
   summary: string;
-  adventureType?: AdventureType; // 添加历练类型
+  adventureType?: AdventureType; // Added adventure type
 }
 
-// 战斗状态
+// Battle State
 export interface BattleState {
   id: string;
-  round: number; // 当前回合数
-  turn: 'player' | 'enemy'; // 当前行动方
+  round: number; // Current round number
+  turn: 'player' | 'enemy'; // Current turn side
   player: BattleUnit;
   enemy: BattleUnit;
-  history: BattleAction[]; // 战斗历史
-  result?: BattleResult; // 战斗结果
-  isPlayerTurn: boolean; // 是否玩家回合（用于UI控制）
-  waitingForPlayerAction: boolean; // 是否等待玩家行动
-  playerInventory: Item[]; // 玩家背包（用于使用物品）
-  // 行动次数系统
-  playerActionsRemaining: number; // 玩家剩余行动次数
-  enemyActionsRemaining: number; // 敌人剩余行动次数
-  playerMaxActions: number; // 玩家本回合最大行动次数
-  enemyMaxActions: number; // 敌人本回合最大行动次数
-  // 战斗信息
-  enemyStrengthMultiplier?: number; // 敌人强度倍数（用于奖励计算）
-  adventureType: AdventureType; // 历练类型
-  riskLevel?: RiskLevel; // 风险等级
-  // 灵宠系统
-  activePet?: Pet | null; // 激活的灵宠
-  petSkillCooldowns?: Record<string, number>; // 灵宠技能冷却
+  history: BattleAction[]; // Battle history
+  result?: BattleResult; // Battle result
+  isPlayerTurn: boolean; // Is player turn (for UI control)
+  waitingForPlayerAction: boolean; // Waiting for player action
+  playerInventory: Item[]; // Player inventory (for using items)
+  // Action count system
+  playerActionsRemaining: number; // Player actions remaining
+  enemyActionsRemaining: number; // Enemy actions remaining
+  playerMaxActions: number; // Player max actions this round
+  enemyMaxActions: number; // Enemy max actions this round
+  // Battle information
+  enemyStrengthMultiplier?: number; // Enemy strength multiplier (for reward calculation)
+  adventureType: AdventureType; // Adventure type
+  riskLevel?: RiskLevel; // Risk level
+  // Pet system
+  activePet?: Pet | null; // Active pet
+  petSkillCooldowns?: Record<string, number>; // Pet skill cooldowns
 }
 
-// 玩家行动选择
+// Player Action Selection
 export type PlayerAction =
   | { type: 'attack' }
   | { type: 'skill'; skillId: string }
@@ -1079,7 +1073,7 @@ export type PlayerAction =
   | { type: 'defend' }
   | { type: 'flee' };
 
-// 战斗可用丹药
+// Available Battle Chems
 export interface BattlePotion {
   itemId: string;
   name: string;
@@ -1087,75 +1081,81 @@ export interface BattlePotion {
   effect: {
     heal?: number;
     buffs?: Buff[];
-    removeDebuffs?: string[]; // 移除的Debuff ID列表
+    removeDebuffs?: string[]; // List of removed Debuff IDs
   };
-  cooldown?: number; // 使用后冷却（防止无限使用）
-  itemType: ItemType; // 物品类型
+  cooldown?: number; // Cooldown after use (prevent spam)
+  itemType: ItemType; // Item Type
 }
 
-// 日常任务类型
+// Daily Quest Type
 export type DailyQuestType =
-  | 'meditate' // 打坐
-  | 'adventure' // 历练
-  | 'breakthrough' // 突破
-  | 'alchemy' // 炼丹
-  | 'equip' // 装备
-  | 'pet' // 灵宠
-  | 'sect' // 宗门
-  | 'realm' // 秘境
-  | 'kill' // 击败敌人（AI生成）
-  | 'collect' // 收集物品（AI生成）
-  | 'learn' // 学习功法（AI生成）
-  | 'other'; // 其他创意任务（AI生成）
+  | 'meditate' // Meditate
+  | 'adventure' // Adventure
+  | 'breakthrough' // Breakthrough
+  | 'alchemy' // Alchemy
+  | 'equip' // Equip
+  | 'pet' // Pet
+  | 'sect' // Faction
+  | 'realm' // Secret Realm
+  | 'kill' // Defeat Enemy (AI Generated)
+  | 'collect' // Collect Item (AI Generated)
+  | 'learn' // Learn Protocol (AI Generated)
+  | 'other'; // Other Creative Quest (AI Generated)
 
-// 日常任务
+// Daily Quest
 export interface DailyQuest {
   id: string;
   type: DailyQuestType;
   name: string;
   description: string;
-  target: number; // 目标数量
-  progress: number; // 当前进度
+  target: number; // Target Quantity
+  progress: number; // Current Progress
   reward: {
-    exp?: number; // 修为奖励
-    spiritStones?: number; // 灵石奖励
-    lotteryTickets?: number; // 抽奖券奖励
-    items?: Array<{ name: string; quantity: number }>; // 物品奖励
+    exp?: number; // Exp Reward
+    spiritStones?: number; // Spirit Stone Reward
+    lotteryTickets?: number; // Lottery Ticket Reward
+    items?: Array<{ name: string; quantity: number }>; // Item Reward
   };
-  rarity: ItemRarity; // 任务稀有度（影响奖励）
-  completed: boolean; // 是否已完成
+  rarity: ItemRarity; // Quest Rarity (Affects Rewards)
+  completed: boolean; // Is Completed
 }
 
-// 洞府配置
+// Grotto Configuration
 export interface GrottoConfig {
-  level: number; // 洞府等级
-  name: string; // 洞府名称
-  cost: number; // 购买/升级成本（灵石）
-  expRateBonus: number; // 聚灵阵提供的修炼速度加成
-  autoHarvest: boolean; // 是否支持自动收获（高级洞府才支持）
-  growthSpeedBonus: number; // 灵草生长速度加成（减少生长时间，0-0.5）
-  maxHerbSlots: number; // 最大灵草种植槽位
-  realmRequirement?: RealmType; // 境界要求（可选）
-  description: string; // 描述
+  level: number; // Grotto Level
+  name: string; // Grotto Name
+  cost: number; // Purchase/Upgrade Cost (Spirit Stones)
+  expRateBonus: number; // Reactor XP Rate Bonus
+  autoHarvest: boolean; // Supports Auto-Harvest (High level grotto only)
+  growthSpeedBonus: number; // Growth Speed Bonus (Reduces growth time, 0-0.5)
+  maxHerbSlots: number; // Max Planting Slots
+  realmRequirement?: RealmType; // Realm Requirement (Optional)
+  description: string; // Description
 }
 
-// ==================== 天劫系统类型定义 ====================
+// ==================== Tribulation System Types ====================
 
-// 天劫等级
+// Tribulation Level
 export type TribulationLevel = 'Elite Storm' | 'Master Storm' | 'Grandmaster Storm' | 'Fusion Storm' | 'Eternal Storm';
 
-// 天劫阶段
-export type TribulationStage = '准备中' | '第一道雷劫' | '第二道雷劫' | '第三道雷劫' | '渡劫完成' | '渡劫失败';
+// Tribulation Stage
+export type TribulationStage =
+  | 'Stabilizing'
+  | 'First Wave'
+  | 'Second Wave'
+  | 'The Final Surge'
+  | 'Breakthrough Success'
+  | 'Breakthrough Failure';
 
-// 天劫状态
+// Tribulation State
 export interface TribulationState {
-  isOpen: boolean; // 是否触发天劫弹窗
-  targetRealm: RealmType; // 目标境界（突破后的境界）
-  tribulationLevel: TribulationLevel; // 天劫等级
-  stage: TribulationStage; // 当前阶段
-  deathProbability: number; // 死亡概率（0-1）
-  attributeBonus: number; // 属性修正值（降低死亡概率）
-  equipmentBonus: number; // 装备修正值（降低死亡概率）
+  isOpen: boolean; // Is Tribulation Modal Open
+  targetRealm: RealmType; // Target Realm (Realm after breakthrough)
+  tribulationLevel: TribulationLevel; // Tribulation Level
+  stage: TribulationStage; // Current Stage
+  deathProbability: number; // Death Probability (0-1)
+  attributeBonus: number; // Attribute Bonus (Reduces death probability)
+  equipmentBonus: number; // Equipment Bonus (Reduces death probability)
   totalStats: {
     attack: number;
     defense: number;
@@ -1163,23 +1163,23 @@ export interface TribulationState {
     physique: number;
     speed: number;
     maxHp: number;
-  }; // 综合属性（用于显示）
-  equipmentQualityScore: number; // 装备品质评分
-  isCleared: boolean; // 是否已成功度过天劫
+  }; // Total Stats (For display)
+  equipmentQualityScore: number; // Equipment Quality Score
+  isCleared: boolean; // Is Cleared
 }
 
-// 天劫结果
+// Tribulation Result
 export interface TribulationResult {
-  success: boolean; // 是否成功
-  deathProbability: number; // 最终死亡概率
-  roll: number; // 随机值
-  hpLoss?: number; // 如果成功，可能损耗气血
-  description: string; // 渡劫描述
+  success: boolean; // Success
+  deathProbability: number; // Final Death Probability
+  roll: number; // Random Value
+  hpLoss?: number; // HP Loss (If success)
+  description: string; // Description
 }
 
-// ==================== 合道期挑战系统类型定义 ====================
+// ==================== Dao Combining Challenge System Types ====================
 
-// 天地之魄BOSS接口
+// Heaven Earth Soul Boss Interface
 export interface HeavenEarthSoulBoss {
   id: string;
   name: string;
@@ -1193,21 +1193,21 @@ export interface HeavenEarthSoulBoss {
     physique: number;
     speed: number;
   };
-  difficulty: 'easy' | 'normal' | 'hard' | 'extreme'; // 难度等级
-  strengthMultiplier: number; // 战斗力浮动倍数 (0.9-3.0)
-  specialSkills: BattleSkill[]; // 特殊技能
+  difficulty: 'easy' | 'normal' | 'hard' | 'extreme'; // Difficulty Level
+  strengthMultiplier: number; // Strength Multiplier (0.9-3.0)
+  specialSkills: BattleSkill[]; // Special Skills
   rewards: {
     exp: number;
     spiritStones: number;
-    items?: string[]; // 奖励物品ID列表
-    daoCombiningUnlocked?: boolean; // 是否解锁合道期
+    items?: string[]; // Reward Item IDs
+    daoCombiningUnlocked?: boolean; // Unlocks Dao Combining
   };
 }
 
-// 合道期挑战状态
+// Dao Combining Challenge State
 export interface DaoCombiningChallengeState {
-  isOpen: boolean; // 是否打开挑战界面
-  bossId: string | null; // 当前挑战的BOSS ID
-  bossStrengthMultiplier: number; // BOSS强度倍数
-  battleResult: BattleResult | null; // 战斗结果
+  isOpen: boolean; // Is Challenge Open
+  bossId: string | null; // Current Boss ID
+  bossStrengthMultiplier: number; // Boss Strength Multiplier
+  battleResult: BattleResult | null; // Battle Result
 }

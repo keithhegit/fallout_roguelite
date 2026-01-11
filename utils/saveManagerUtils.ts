@@ -1,6 +1,6 @@
 /**
- * 存档管理工具函数
- * 支持多存档槽位、备份和对比功能
+ * Save Manager Utility Functions
+ * Supports multiple save slots, backups, and comparison
  */
 
 import { PlayerStats, LogEntry } from '../types';
@@ -11,7 +11,7 @@ import {
 } from '../constants/storageKeys';
 
 /**
- * 确保玩家数据兼容性，填充缺失的字段
+ * Ensure player data compatibility, fill missing fields
  */
 export const ensurePlayerStatsCompatibility = (loadedPlayer: any): PlayerStats => {
   return {
@@ -57,7 +57,7 @@ export const ensurePlayerStatsCompatibility = (loadedPlayer: any): PlayerStats =
     },
     unlockedTitles: loadedPlayer.unlockedTitles || (loadedPlayer.titleId ? [loadedPlayer.titleId] : ['title-novice']),
     reputation: loadedPlayer.reputation || 0,
-    // 宗门追杀系统
+    // Sect Hunt System
     betrayedSects: loadedPlayer.betrayedSects || [],
     sectHuntEndTime: loadedPlayer.sectHuntEndTime || null,
     sectHuntLevel: loadedPlayer.sectHuntLevel || 0,
@@ -92,13 +92,13 @@ export const ensurePlayerStatsCompatibility = (loadedPlayer: any): PlayerStats =
 };
 
 export interface SaveSlot {
-  id: number; // 存档槽位ID (1-10)
-  name: string; // 存档名称（用户自定义）
-  playerName: string; // 玩家名称
-  realm: string; // 境界
-  realmLevel: number; // 境界等级
-  timestamp: number; // 保存时间戳
-  data: SaveData | null; // 存档数据（null表示空槽位）
+  id: number; // Save Slot ID (1-10)
+  name: string; // Save Name (User Defined)
+  playerName: string; // Player Name
+  realm: string; // Realm
+  realmLevel: number; // Realm Level
+  timestamp: number; // Save Timestamp
+  data: SaveData | null; // Save Data (null indicates empty slot)
 }
 
 export interface SaveData {
@@ -108,44 +108,44 @@ export interface SaveData {
 }
 
 /**
- * 获取存档槽位的localStorage键名
+ * Get localStorage key for save slot
  */
 const getSlotKey = (slotId: number): string => {
   return getSlotKeyConstant(slotId);
 };
 
 /**
- * 获取备份的localStorage键名
+ * Get localStorage key for backup
  */
 const getBackupKey = (slotId: number, backupIndex: number): string => {
   return getBackupKeyConstant(slotId, backupIndex);
 };
 
 /**
- * 获取当前使用的存档槽位ID
+ * Get current save slot ID
  */
 export const getCurrentSlotId = (): number => {
   try {
     const slotId = localStorage.getItem(SAVE_SLOT_KEYS.CURRENT_SLOT);
-    return slotId ? parseInt(slotId, 10) : 1; // 默认使用槽位1
+    return slotId ? parseInt(slotId, 10) : 1; // Default to slot 1
   } catch {
     return 1;
   }
 };
 
 /**
- * 设置当前使用的存档槽位ID
+ * Set current save slot ID
  */
 export const setCurrentSlotId = (slotId: number): void => {
   try {
     localStorage.setItem(SAVE_SLOT_KEYS.CURRENT_SLOT, slotId.toString());
   } catch (error) {
-    console.error('设置当前存档槽位失败:', error);
+    console.error('Failed to set current save slot:', error);
   }
 };
 
 /**
- * 保存存档到指定槽位
+ * Save to specific slot
  */
 export const saveToSlot = (
   slotId: number,
@@ -155,7 +155,7 @@ export const saveToSlot = (
 ): boolean => {
   try {
     if (slotId < 1 || slotId > SAVE_SLOT_KEYS.MAX_SLOTS) {
-      console.error(`存档槽位ID必须在1-${SAVE_SLOT_KEYS.MAX_SLOTS}之间`);
+      console.error(`Save slot ID must be between 1-${SAVE_SLOT_KEYS.MAX_SLOTS}`);
       return false;
     }
 
@@ -168,26 +168,26 @@ export const saveToSlot = (
     const slotKey = getSlotKey(slotId);
     localStorage.setItem(slotKey, JSON.stringify(saveData));
 
-    // 更新当前槽位
+    // Update current slot
     setCurrentSlotId(slotId);
 
-    // 自动创建备份
+    // Automatically create backup
     createBackup(slotId, saveData);
 
     return true;
   } catch (error) {
-    console.error('保存存档失败:', error);
+    console.error('Failed to save game:', error);
     return false;
   }
 };
 
 /**
- * 从指定槽位加载存档
+ * Load from specific slot
  */
 export const loadFromSlot = (slotId: number): SaveData | null => {
   try {
     if (slotId < 1 || slotId > SAVE_SLOT_KEYS.MAX_SLOTS) {
-      console.error(`存档槽位ID必须在1-${SAVE_SLOT_KEYS.MAX_SLOTS}之间`);
+      console.error(`Save slot ID must be between 1-${SAVE_SLOT_KEYS.MAX_SLOTS}`);
       return null;
     }
 
@@ -202,13 +202,13 @@ export const loadFromSlot = (slotId: number): SaveData | null => {
     setCurrentSlotId(slotId);
     return saveData;
   } catch (error) {
-    console.error('加载存档失败:', error);
+    console.error('Failed to load game:', error);
     return null;
   }
 };
 
 /**
- * 获取所有存档槽位信息
+ * Get all save slots info
  */
 export const getAllSlots = (): SaveSlot[] => {
   const slots: SaveSlot[] = [];
@@ -222,21 +222,21 @@ export const getAllSlots = (): SaveSlot[] => {
         const saveData: SaveData = JSON.parse(saved);
         slots.push({
           id: i,
-          name: `存档${i}`, // 默认名称，可以扩展支持自定义名称
-          playerName: saveData.player.name || '未知',
-          realm: saveData.player.realm || '未知',
+          name: `Save ${i}`, // Default name, can be extended to support custom names
+          playerName: saveData.player.name || 'Unknown',
+          realm: saveData.player.realm || 'Unknown',
           realmLevel: saveData.player.realmLevel || 1,
           timestamp: saveData.timestamp || Date.now(),
           data: saveData,
         });
       } catch (error) {
-        console.error(`解析存档槽位${i}失败:`, error);
+        console.error(`Failed to parse save slot ${i}:`, error);
       }
     } else {
-      // 空槽位
+      // Empty Slot
       slots.push({
         id: i,
-        name: `存档${i}`,
+        name: `Save ${i}`,
         playerName: '',
         realm: '',
         realmLevel: 0,
@@ -250,7 +250,7 @@ export const getAllSlots = (): SaveSlot[] => {
 };
 
 /**
- * 删除指定槽位的存档
+ * Delete specific slot save
  */
 export const deleteSlot = (slotId: number): boolean => {
   try {
@@ -261,7 +261,7 @@ export const deleteSlot = (slotId: number): boolean => {
     const slotKey = getSlotKey(slotId);
     localStorage.removeItem(slotKey);
 
-    // 删除该槽位的所有备份
+    // Delete all backups for this slot
     for (let i = 0; i < SAVE_SLOT_KEYS.MAX_BACKUPS; i++) {
       const backupKey = getBackupKey(slotId, i);
       localStorage.removeItem(backupKey);
@@ -269,38 +269,38 @@ export const deleteSlot = (slotId: number): boolean => {
 
     return true;
   } catch (error) {
-    console.error('删除存档失败:', error);
+    console.error('Failed to delete save:', error);
     return false;
   }
 };
 
 /**
- * 清除所有存档槽位（包括所有槽位和备份）
- * 用于困难模式死亡时清空所有存档
+ * Clear all save slots (including all slots and backups)
+ * Used to clear all saves on death in Hard Mode
  */
 export const clearAllSlots = (): void => {
   try {
-    // 清除所有存档槽位
+    // Clear all save slots
     for (let i = 1; i <= SAVE_SLOT_KEYS.MAX_SLOTS; i++) {
       const slotKey = getSlotKey(i);
       localStorage.removeItem(slotKey);
 
-      // 清除该槽位的所有备份
+      // Clear all backups for this slot
       for (let j = 0; j < SAVE_SLOT_KEYS.MAX_BACKUPS; j++) {
         const backupKey = getBackupKey(i, j);
         localStorage.removeItem(backupKey);
       }
     }
 
-    // 清除当前槽位标记（可选，因为下次会自动设为1）
+    // Clear current slot flag (optional, as it will default to 1 next time)
     localStorage.removeItem(SAVE_SLOT_KEYS.CURRENT_SLOT);
   } catch (error) {
-    console.error('清除所有存档失败:', error);
+    console.error('Failed to clear all saves:', error);
   }
 };
 
 /**
- * 创建备份
+ * Create Backup
  */
 export const createBackup = (slotId: number, saveData?: SaveData): boolean => {
   try {
@@ -308,7 +308,7 @@ export const createBackup = (slotId: number, saveData?: SaveData): boolean => {
       return false;
     }
 
-    // 如果没有提供数据，从当前槽位加载
+    // If no data provided, load from current slot
     if (!saveData) {
       saveData = loadFromSlot(slotId);
       if (!saveData) {
@@ -316,25 +316,25 @@ export const createBackup = (slotId: number, saveData?: SaveData): boolean => {
       }
     }
 
-    // 获取现有备份列表
+    // Get existing backup list
     const backups = getBackups(slotId);
 
-    // 添加新备份
+    // Add new backup
     backups.unshift({
       ...saveData,
       timestamp: Date.now(),
     });
 
-    // 只保留最新的MAX_BACKUPS个备份
+    // Keep only the latest MAX_BACKUPS backups
     const backupsToKeep = backups.slice(0, SAVE_SLOT_KEYS.MAX_BACKUPS);
 
-    // 保存备份
+    // Save backup
     backupsToKeep.forEach((backup, index) => {
       const backupKey = getBackupKey(slotId, index);
       localStorage.setItem(backupKey, JSON.stringify(backup));
     });
 
-    // 删除多余的备份
+    // Delete excess backups
     for (let i = SAVE_SLOT_KEYS.MAX_BACKUPS; i < backups.length; i++) {
       const backupKey = getBackupKey(slotId, i);
       localStorage.removeItem(backupKey);
@@ -342,13 +342,13 @@ export const createBackup = (slotId: number, saveData?: SaveData): boolean => {
 
     return true;
   } catch (error) {
-    console.error('创建备份失败:', error);
+    console.error('Failed to create backup:', error);
     return false;
   }
 };
 
 /**
- * 获取指定槽位的所有备份
+ * Get all backups for specific slot
  */
 export const getBackups = (slotId: number): SaveData[] => {
   const backups: SaveData[] = [];
@@ -362,7 +362,7 @@ export const getBackups = (slotId: number): SaveData[] => {
         const backup: SaveData = JSON.parse(saved);
         backups.push(backup);
       } catch (error) {
-        console.error(`解析备份${i}失败:`, error);
+        console.error(`Failed to parse backup ${i}:`, error);
       }
     }
   }
@@ -371,7 +371,7 @@ export const getBackups = (slotId: number): SaveData[] => {
 };
 
 /**
- * 从备份恢复存档
+ * Restore save from backup
  */
 export const restoreFromBackup = (
   slotId: number,
@@ -388,13 +388,13 @@ export const restoreFromBackup = (
     const backup: SaveData = JSON.parse(saved);
     return saveToSlot(slotId, backup.player, backup.logs);
   } catch (error) {
-    console.error('恢复备份失败:', error);
+    console.error('Failed to restore backup:', error);
     return false;
   }
 };
 
 /**
- * 对比两个存档的差异
+ * Compare differences between two saves
  */
 export interface SaveComparison {
   playerName: { old: string; new: string };
@@ -449,48 +449,48 @@ export const compareSaves = (
 };
 
 /**
- * 导出存档为加密/编码后的字符串
+ * Export save data as encrypted/encoded string
  */
 export const exportSave = (saveData: SaveData): string => {
   const json = JSON.stringify(saveData);
-  // 简单的 Base64 编码，增加一点点修改难度
+  // Simple Base64 encoding to add a little difficulty to modification
   try {
     return btoa(encodeURIComponent(json));
   } catch (e) {
-    return json; // 回退到普通 JSON
+    return json; // Fallback to normal JSON
   }
 };
 
 /**
- * 导入存档（处理加密/编码）
+ * Import save data (handle encryption/encoding)
  */
 export const importSave = (encodedString: string): SaveData | null => {
   try {
     let jsonString = encodedString;
-    // 尝试解码 Base64
+    // Try to decode Base64
     try {
       if (!encodedString.startsWith('{')) {
         jsonString = decodeURIComponent(atob(encodedString));
       }
     } catch (e) {
-      // 如果不是 Base64，则按原样处理
+      // If not Base64, treat as is
     }
 
     const saveData: SaveData = JSON.parse(jsonString);
 
-    // 验证数据结构
+    // Validate data structure
     if (!saveData.player || !Array.isArray(saveData.logs)) {
       return null;
     }
 
-    // 确保有timestamp
+    // Ensure timestamp exists
     if (!saveData.timestamp) {
       saveData.timestamp = Date.now();
     }
 
     return saveData;
   } catch (error) {
-    console.error('导入存档失败:', error);
+    console.error('Import save failed:', error);
     return null;
   }
 };

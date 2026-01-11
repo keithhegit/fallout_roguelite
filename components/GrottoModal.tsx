@@ -21,7 +21,7 @@ interface Props {
 }
 
 /**
- * 计算进度百分比（0-100）
+ * Calculate progress percentage (0-100)
  */
 const calculateProgress = (plantTime: number, harvestTime: number): number => {
   const now = Date.now();
@@ -48,7 +48,7 @@ const GrottoModal: React.FC<Props> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'upgrade' | 'plant' | 'enhancement' | 'herbarium'>('overview');
   const [timeUpdateKey, setTimeUpdateKey] = useState(0);
 
-  // 安全的 grotto 对象，如果不存在则使用默认值
+  // Safe grotto object, use default values if it doesn't exist
   const grotto = useMemo(() => {
     return player.grotto || {
       level: 0,
@@ -69,24 +69,24 @@ const GrottoModal: React.FC<Props> = ({
     return GROTTO_CONFIGS.find((c) => c.level === grotto.level);
   }, [grotto.level]);
 
-  // 计算可收获的灵草数量
+  // Calculate the number of harvestable herbs
   const matureHerbsCount = useMemo(() => {
     const now = Date.now();
-    return grotto.plantedHerbs.filter((herb) => now >= herb.harvestTime).length;
+    return grotto.plantedHerbs.filter((herb) => herb && herb.harvestTime && now >= herb.harvestTime).length;
   }, [grotto.plantedHerbs, timeUpdateKey]);
 
-  // 定时更新显示时间（每分钟更新一次）
+  // Regularly update display time (once per minute)
   useEffect(() => {
     if (!isOpen || activeTab !== 'overview' && activeTab !== 'plant') return;
 
     const interval = setInterval(() => {
       setTimeUpdateKey((prev) => prev + 1);
-    }, 60000); // 每分钟更新一次
+    }, 60000); // Update once per minute
 
     return () => clearInterval(interval);
   }, [isOpen, activeTab]);
 
-  // 获取可升级的洞府列表
+  // Get list of upgradable bases
   const availableUpgrades = useMemo(() => {
     const currentLevel = grotto.level;
     const playerRealmIndex = REALM_ORDER.indexOf(player.realm);
@@ -100,34 +100,34 @@ const GrottoModal: React.FC<Props> = ({
     });
   }, [grotto.level, player.realm]);
 
-  // 获取可种植的灵草（显示所有可能的草药，包括背包中没有的）
+  // Get plantable herbs (show all possible herbs, including those not in the inventory)
   const availableHerbs = useMemo(() => {
-    // 获取背包中所有草药（包括数量为0的，用于显示曾经获得过的草药）
-    // 严格过滤：只包含草药类型，排除丹药等其他类型
+    // Get all herbs in inventory (including those with quantity 0, for showing previously obtained herbs)
+    // Strict filtering: only include herb type, exclude pills and other types
     const allInventoryHerbs = player.inventory.filter(
       (item) => item.type === ItemType.Herb
     );
 
-    // 创建草药列表，优先使用 PLANTABLE_HERBS 中的配置，否则使用默认配置
+    // Create herb list, priority use configurations in PLANTABLE_HERBS, otherwise use default configuration
     const herbMap = new Map<string, typeof PLANTABLE_HERBS[0]>();
 
-    // 先添加 PLANTABLE_HERBS 中定义的所有草药（显示所有可种植的草药）
+    // Add all herbs defined in PLANTABLE_HERBS first (show all plantable herbs)
     PLANTABLE_HERBS.forEach((herb) => {
       herbMap.set(herb.name, herb);
     });
 
-    // 添加背包中其他未定义的草药（使用默认配置，包括数量为0的）
+    // Add other undefined herbs in inventory (use default configuration, including those with quantity 0)
     allInventoryHerbs.forEach((item) => {
       if (!herbMap.has(item.name)) {
-        // 根据稀有度设置默认配置
-        const rarity = item.rarity || '普通';
+        // Set default configuration based on rarity
+        const rarity = item.rarity || 'Common';
         const rarityConfigs: Record<string, { growthTime: number; harvestQuantity: { min: number; max: number }; grottoLevelRequirement: number }> = {
-          '普通': { growthTime: 30 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, grottoLevelRequirement: 1 },
-          '稀有': { growthTime: 3 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, grottoLevelRequirement: 3 },
-          '传说': { growthTime: 8 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, grottoLevelRequirement: 5 },
-          '仙品': { growthTime: 18 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, grottoLevelRequirement: 6 },
+          'Common': { growthTime: 30 * 60 * 1000, harvestQuantity: { min: 2, max: 5 }, grottoLevelRequirement: 1 },
+          'Rare': { growthTime: 3 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 3 }, grottoLevelRequirement: 3 },
+          'Legendary': { growthTime: 8 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, grottoLevelRequirement: 5 },
+          'Mythic': { growthTime: 18 * 60 * 60 * 1000, harvestQuantity: { min: 1, max: 2 }, grottoLevelRequirement: 6 },
         };
-        const config = rarityConfigs[rarity];
+        const config = rarityConfigs[rarity] || rarityConfigs['Common'];
         herbMap.set(item.name, {
           id: `herb-${item.name.toLowerCase().replace(/\s+/g, '-')}`,
           name: item.name,
@@ -139,10 +139,10 @@ const GrottoModal: React.FC<Props> = ({
       }
     });
 
-    // 返回所有草药（包括背包中没有的），并按照可种植状态排序
+    // Return all herbs (including those not in inventory), and sort by plantable status
     const allHerbs = Array.from(herbMap.values());
 
-    // 获取当前洞府信息用于排序
+    // Get current base info for sorting
     const grotto = player.grotto || {
       level: 0,
       expRateBonus: 0,
@@ -156,9 +156,9 @@ const GrottoModal: React.FC<Props> = ({
     const maxHerbSlots = currentConfig?.maxHerbSlots || 0;
     const isFull = grotto.plantedHerbs.length >= maxHerbSlots;
 
-    // 排序：可种植的排在前面
+    // Sort: plantable ones first
     return allHerbs.sort((a, b) => {
-      // 获取每个草药的种子信息
+      // Get seed info for each herb
       const seedItemA = player.inventory.find(
         (item) => item.name === a.name && item.type === ItemType.Herb
       );
@@ -166,7 +166,7 @@ const GrottoModal: React.FC<Props> = ({
         (item) => item.name === b.name && item.type === ItemType.Herb
       );
 
-      // 计算每个草药的可种植状态
+      // Calculate plantable status for each herb
       const levelMetA = grotto.level >= (a.grottoLevelRequirement || 1);
       const levelMetB = grotto.level >= (b.grottoLevelRequirement || 1);
       const hasSeedA = seedItemA && seedItemA.quantity > 0;
@@ -174,20 +174,20 @@ const GrottoModal: React.FC<Props> = ({
       const canPlantA = !isFull && hasSeedA && levelMetA;
       const canPlantB = !isFull && hasSeedB && levelMetB;
 
-      // 优先级排序：
-      // 1. 可以种植的（canPlant = true）
-      // 2. 有种子但等级不够的（hasSeed && !levelMet）
-      // 3. 有种子但槽位已满的（hasSeed && isFull）
-      // 4. 没有种子的（!hasSeed）
+      // Priority sort:
+      // 1. Plantable (canPlant = true)
+      // 2. Has seed but level not met (hasSeed && !levelMet)
+      // 3. Has seed but slot is full (hasSeed && isFull)
+      // 4. No seed (!hasSeed)
 
       if (canPlantA && !canPlantB) return -1;
       if (!canPlantA && canPlantB) return 1;
 
-      // 如果都是可种植或都不可种植，继续比较其他条件
+      // If both are plantable or both are not, continue to compare other conditions
       if (hasSeedA && !hasSeedB) return -1;
       if (!hasSeedA && hasSeedB) return 1;
 
-      // 如果都有种子或都没有种子，比较等级要求
+      // If both have seeds or neither have seeds, compare level requirement
       if (levelMetA && !levelMetB) return -1;
       if (!levelMetA && levelMetB) return 1;
 
@@ -207,9 +207,9 @@ const GrottoModal: React.FC<Props> = ({
         className="bg-ink-950 border border-stone-800 md:rounded-none shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 背景纹理层 */}
+        {/* Background Texture Layer */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
-        {/* CRT 扫描线效果 */}
+        {/* CRT Scanline Effect */}
         <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none z-50"></div>
 
         {/* Header */}
@@ -316,7 +316,7 @@ const GrottoModal: React.FC<Props> = ({
                 </div>
               ) : (
                 <>
-                  {/* 洞府信息卡片 */}
+                  {/* Base Info Card */}
                   <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
                     <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
                     <div className="relative z-10">
@@ -385,7 +385,7 @@ const GrottoModal: React.FC<Props> = ({
                     </div>
                   </div>
 
-                  {/* 自动收获开关 */}
+                  {/* Auto-Gather Toggle */}
                   {currentConfig?.autoHarvest && (
                     <div className="bg-stone-900/40 p-4 rounded-none border border-stone-800 shadow-lg relative overflow-hidden group">
                       <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
@@ -419,7 +419,7 @@ const GrottoModal: React.FC<Props> = ({
                     </div>
                   )}
 
-                  {/* 种植的灵草 */}
+                  {/* Active Production */}
                   {grotto.plantedHerbs.length > 0 && (
                     <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 shadow-lg relative overflow-hidden">
                       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
@@ -446,6 +446,7 @@ const GrottoModal: React.FC<Props> = ({
                         </div>
                         <div className="space-y-3">
                           {grotto.plantedHerbs.map((herb, index) => {
+                            if (!herb) return null;
                             const now = Date.now();
                             const isMature = now >= herb.harvestTime;
                             const remaining = Math.max(0, herb.harvestTime - now);
@@ -680,7 +681,7 @@ const GrottoModal: React.FC<Props> = ({
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {availableHerbs.map((herb) => {
-                    // 严格查找：名称和类型都必须匹配，必须是草药类型，排除丹药
+                    // Strict match: name and type must match; herbs only (exclude pills and others)
                     const seedItem = player.inventory.find(
                       (item) => item.name === herb.name && item.type === ItemType.Herb
                     );
@@ -926,7 +927,7 @@ const GrottoModal: React.FC<Props> = ({
                   </div>
                 </div>
 
-                {/* 图鉴奖励进度 */}
+                {/* Index Reward Progress */}
                 <div className="space-y-2 relative z-10">
                   {HERBARIUM_REWARDS.map((reward) => {
                     const isClaimed = player.achievements.includes(`herbarium-${reward.herbCount}`);
@@ -965,7 +966,7 @@ const GrottoModal: React.FC<Props> = ({
                 </div>
               </div>
 
-              {/* 灵草列表 */}
+              {/* Logged Supplies List */}
               <div className="bg-stone-900/40 p-5 rounded-none border border-stone-800 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url(${ASSETS.TEXTURES.PANEL_FRAME})`, backgroundSize: 'cover' }}></div>
                 <h4 className="text-stone-200 font-bold mb-4 uppercase tracking-widest text-sm relative z-10">Logged Supplies</h4>

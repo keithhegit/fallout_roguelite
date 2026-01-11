@@ -27,17 +27,17 @@ interface UseEquipmentHandlersProps {
 }
 
 /**
- * 装备处理函数
- * 包含装备物品、卸下物品、祭炼本命法宝、解除祭炼本命法宝、打开升级界面、升级物品
- * @param player 玩家数据
- * @param setPlayer 设置玩家数据
- * @param addLog 添加日志
- * @returns handleEquipItem 装备物品
- * @returns handleUnequipItem 卸下物品
- * @returns handleRefineNatalArtifact 祭炼本命法宝
- * @returns handleUnrefineNatalArtifact 解除祭炼本命法宝
- * @returns handleOpenUpgrade 打开升级界面
- * @returns handleUpgradeItem 升级物品
+ * Equipment Handlers
+ * Includes equipping, unequipping, refining natal artifact, unrefining natal artifact, opening upgrade UI, upgrading item
+ * @param player Player data
+ * @param setPlayer Set player data
+ * @param addLog Add log
+ * @returns handleEquipItem Equip item
+ * @returns handleUnequipItem Unequip item
+ * @returns handleRefineNatalArtifact Refine natal artifact
+ * @returns handleUnrefineNatalArtifact Unrefine natal artifact
+ * @returns handleOpenUpgrade Open upgrade UI
+ * @returns handleUpgradeItem Upgrade item
  */
 export function useEquipmentHandlers({
   player,
@@ -46,47 +46,47 @@ export function useEquipmentHandlers({
   setItemActionLog,
 }: UseEquipmentHandlersProps) {
   const handleEquipItem = (item: Item, slot: EquipmentSlot) => {
-    // 防御性检查：确保slot不为null或undefined
+    // Defensive check: Ensure slot is not null or undefined
     if (!slot) {
-      addLog('装备槽位无效！', 'danger');
+      addLog('Invalid equipment slot!', 'danger');
       return;
     }
 
-    // 对于戒指、首饰、法宝，即使没有equipmentSlot也可以装备（根据type确定槽位）
+    // Rings, accessories, and artifacts can be equipped without equipmentSlot (slot determined by type)
     const isRing = item.type === ItemType.Ring;
     const isAccessory = item.type === ItemType.Accessory;
     const isArtifact = item.type === ItemType.Artifact;
 
-    // 对于其他装备类型，需要equipmentSlot
+    // Other equipment types require equipmentSlot
     if (!isRing && !isAccessory && !isArtifact && !item.equipmentSlot) {
-      addLog('该物品无法装备！', 'danger');
+      addLog('This item cannot be equipped!', 'danger');
       return;
     }
 
     setPlayer((prev) => {
-      // 检查物品是否在背包中
+      // Check if item is in inventory
       const itemInInventory = prev.inventory.find((i) => i.id === item.id);
       if (!itemInInventory) {
-        addLog('该物品不在背包中！', 'danger');
+        addLog('This item is not in your inventory!', 'danger');
         return prev;
       }
 
-      // 对于戒指、首饰、法宝，先查找空槽位
-      // 只有当所有槽位都满时，才使用传入的槽位进行替换
+      // For rings, accessories, artifacts, find empty slot first
+      // Only replace using passed slot if all slots are full
       let targetSlot = slot;
       if (isRing || isAccessory || isArtifact) {
         const emptySlot = findEmptyEquipmentSlot(item, prev.equippedItems);
         if (emptySlot) {
-          // 检查找到的槽位是否真的是空的
+          // Check if found slot is truly empty
           const equippedItemId = prev.equippedItems[emptySlot];
           if (equippedItemId === undefined || equippedItemId === null || equippedItemId === '') {
-            // 找到了空槽位，使用空槽位
+            // Found empty slot, use it
             targetSlot = emptySlot;
           }
-          // 如果槽位已被占用，说明所有槽位都满了，使用传入的 slot 进行替换
-          // targetSlot 已经是 slot，不需要修改
+          // If slot occupied, all slots are full, replace using passed slot
+          // targetSlot is already slot, no modification needed
         }
-        // 如果 emptySlot 为 null，说明该物品类型无法装备，但这种情况应该在前面的检查中已经被过滤了
+        // If emptySlot is null, item type cannot be equipped, but this should have been filtered
       }
 
       if (isRing) {
@@ -97,7 +97,7 @@ export function useEquipmentHandlers({
           EquipmentSlot.Ring4,
         ];
         if (!ringSlots.includes(targetSlot)) {
-          addLog('戒指只能装备到戒指槽位！', 'danger');
+          addLog('Rings can only be equipped in ring slots!', 'danger');
           return prev;
         }
       } else if (isAccessory) {
@@ -106,7 +106,7 @@ export function useEquipmentHandlers({
           EquipmentSlot.Accessory2,
         ];
         if (!accessorySlots.includes(targetSlot)) {
-          addLog('首饰只能装备到首饰槽位！', 'danger');
+          addLog('Accessories can only be equipped in accessory slots!', 'danger');
           return prev;
         }
       } else if (isArtifact) {
@@ -115,13 +115,13 @@ export function useEquipmentHandlers({
           EquipmentSlot.Artifact2,
         ];
         if (!artifactSlots.includes(targetSlot)) {
-          addLog('法宝只能装备到法宝槽位！', 'danger');
+          addLog('Artifacts can only be equipped in artifact slots!', 'danger');
           return prev;
         }
       } else {
-        // 其他装备类型需要精确匹配
+        // Other equipment types require exact match
         if (item.equipmentSlot !== targetSlot) {
-          addLog('装备部位不匹配！', 'danger');
+          addLog('Equipment slot mismatch!', 'danger');
           return prev;
         }
       }
@@ -134,24 +134,24 @@ export function useEquipmentHandlers({
       let newSpeed = prev.speed;
       const newEquippedItems = { ...prev.equippedItems };
 
-      // 检查当前槽位的装备（使用 targetSlot 而不是 slot）
+      // Check equipment in current slot (use targetSlot instead of slot)
       const currentEquippedId = prev.equippedItems[targetSlot];
 
-      // 如果物品已经在同一槽位装备，不需要做任何操作
+      // If item already equipped in same slot, do nothing
       if (currentEquippedId === item.id) {
         return prev;
       }
 
-      // 0. 如果该物品已经在其他槽位装备，先卸下旧槽位的装备
+      // 0. If item already equipped in another slot, unequip from old slot first
       let oldSlot: EquipmentSlot | null = null;
       for (const [equippedSlot, equippedItemId] of Object.entries(
         prev.equippedItems
       )) {
         if (equippedItemId === item.id && equippedSlot !== targetSlot) {
           oldSlot = equippedSlot as EquipmentSlot;
-          // 移除旧槽位的装备ID
+          // Remove equipment ID from old slot
           delete newEquippedItems[oldSlot];
-          // 减去旧槽位的属性（如果物品已经在某个槽位，属性已经被计算过了，所以需要先减去）
+          // Subtract stats from old slot (if item equipped, stats already added, so subtract first)
           const isNatal = item.id === prev.natalArtifactId;
           const oldStats = getItemStats(item, isNatal);
           newAttack -= oldStats.attack;
@@ -165,7 +165,7 @@ export function useEquipmentHandlers({
       }
 
       // 1. Remove stats from currently equipped item in this slot if any
-      // 只有当当前槽位有不同物品，且不是从其他槽位移过来的情况，才需要减去旧装备属性
+      // Only subtract old stats if current slot has different item and it's not moved from another slot
       if (currentEquippedId && currentEquippedId !== item.id && !oldSlot) {
         const currentEquipped = prev.inventory.find(
           (i) => i.id === currentEquippedId
@@ -183,8 +183,8 @@ export function useEquipmentHandlers({
       }
 
       // 2. Add stats from new item
-      // 如果物品是从其他槽位移过来的，已经减去了旧槽位的属性，现在只需要在新槽位加上属性
-      // 如果槽位原本是空的或有其他物品，需要加上新物品的属性
+      // If item moved from another slot, old stats subtracted, now add stats to new slot
+      // If slot was empty or had other item, add new item stats
       const isNatal = item.id === prev.natalArtifactId;
       const newStats = getItemStats(item, isNatal);
       newAttack += newStats.attack;
@@ -194,30 +194,30 @@ export function useEquipmentHandlers({
       newPhysique += newStats.physique;
       newSpeed += newStats.speed;
 
-      // 3. Update equipped items（使用 targetSlot）
+      // 3. Update equipped items (use targetSlot)
       newEquippedItems[targetSlot] = item.id;
 
       if (oldSlot) {
         const oldSlotLabel = getEquipmentSlotLabel(oldSlot);
         const targetSlotLabel = getEquipmentSlotLabel(targetSlot);
-        const logMessage = `你将 ${item.name} 从${oldSlotLabel}移动到${targetSlotLabel}。`;
+        const logMessage = `You moved ${item.name} from ${oldSlotLabel} to ${targetSlotLabel}.`;
         addLog(logMessage, 'normal');
         if (setItemActionLog) {
           setItemActionLog({ text: logMessage, type: 'normal' });
-          // 延迟清除由 App.tsx 中的 useDelayedState 自动处理
+          // Delayed clearing handled automatically by useDelayedState in App.tsx
         }
       } else {
         const targetSlotLabel = getEquipmentSlotLabel(targetSlot);
-        const logMessage = `你装备了 ${item.name} 到${targetSlotLabel}，实力有所提升。`;
+        const logMessage = `You equipped ${item.name} to ${targetSlotLabel}. Power increased.`;
         addLog(logMessage, 'normal');
         if (setItemActionLog) {
           setItemActionLog({ text: logMessage, type: 'normal' });
-          // 延迟清除由 App.tsx 中的 useDelayedState 自动处理
+          // Delayed clearing handled automatically by useDelayedState in App.tsx
         }
       }
 
 
-      // 更新统计（只有新装备时才增加计数）
+      // Update statistics (only increment for new equipment)
       const playerStats = prev.statistics || {
         killCount: 0,
         meditateCount: 0,
@@ -230,17 +230,17 @@ export function useEquipmentHandlers({
         secretRealmCount: 0,
       };
       let updatedStatistics = { ...playerStats };
-      // 如果之前没有装备在这个槽位，或者是从其他槽位移过来的，增加计数
-      // 使用 targetSlot 检查
+      // If not previously equipped in this slot, or moved from another slot, increment count
+      // Check using targetSlot
       const wasEquippedInTargetSlot = prev.equippedItems[targetSlot] === item.id;
       if (!wasEquippedInTargetSlot) {
         if (!oldSlot) {
-          // 新装备，不是移动
+          // New equipment, not moved
           updatedStatistics.equipCount += 1;
         }
       }
 
-      // 计算实际最大血量（包含功法加成等）作为上限
+      // Calculate actual max HP (including cultivation art bonus, etc.) as limit
       const tempPlayer = { ...prev, maxHp: newMaxHp };
       const totalStats = getPlayerTotalStats(tempPlayer);
       const actualMaxHp = totalStats.maxHp;
@@ -251,7 +251,7 @@ export function useEquipmentHandlers({
         attack: newAttack,
         defense: newDefense,
         maxHp: newMaxHp,
-        hp: Math.min(prev.hp, actualMaxHp), // 使用实际最大血量作为上限
+        hp: Math.min(prev.hp, actualMaxHp), // Use actual max HP as limit
         spirit: newSpirit,
         physique: newPhysique,
         speed: Math.max(0, newSpeed),
@@ -264,7 +264,7 @@ export function useEquipmentHandlers({
     setPlayer((prev) => {
       const currentEquippedId = prev.equippedItems[slot];
       if (!currentEquippedId) {
-        addLog('该栏位没有装备！', 'danger');
+        addLog('No equipment in this slot!', 'danger');
         return prev;
       }
 
@@ -290,20 +290,20 @@ export function useEquipmentHandlers({
       const newEquippedItems = { ...prev.equippedItems };
       delete newEquippedItems[slot];
 
-      // 确保最大血量至少为1
+      // Ensure max HP is at least 1
       const finalMaxHp = Math.max(1, newMaxHp);
 
-      // 计算实际最大血量（包含功法加成等）作为上限
-      // 使用更新后的equippedItems来计算，确保计算结果准确
+      // Calculate actual max HP (including cultivation art bonus, etc.) as limit
+      // Use updated equippedItems for calculation to ensure accuracy
       const tempPlayer = { ...prev, maxHp: finalMaxHp, equippedItems: newEquippedItems };
       const totalStats = getPlayerTotalStats(tempPlayer);
-      const actualMaxHp = Math.max(1, totalStats.maxHp); // 确保实际最大血量至少为1
+      const actualMaxHp = Math.max(1, totalStats.maxHp); // Ensure actual max HP is at least 1
 
-      addLog(`你卸下了 ${item.name}。`, 'normal');
+      addLog(`You unequipped ${item.name}.`, 'normal');
 
-      // 计算新血量：不能超过新的最大血量，同时确保至少为1（避免死亡）
-      // 如果当前血量大于新的最大血量，则限制为新的最大血量
-      // 如果当前血量可能导致死亡（<=0），则至少保持1点血量
+      // Calculate new HP: Cannot exceed new max HP, ensure at least 1 (avoid death)
+      // If current HP > new max HP, limit to new max HP
+      // If current HP might cause death (<=0), keep at least 1 HP
       const newHp = Math.max(1, Math.min(actualMaxHp, prev.hp));
 
       return {
@@ -322,20 +322,20 @@ export function useEquipmentHandlers({
 
   const handleRefineNatalArtifact = (item: Item) => {
     if (item.type !== ItemType.Artifact) {
-      addLog('只有法宝才能祭炼为本命法宝！', 'danger');
+      addLog('Only Artifacts can be refined into a Natal Artifact!', 'danger');
       return;
     }
 
     if (item.isNatal) {
-      addLog('该法宝已经是本命法宝！', 'normal');
+      addLog('This Artifact is already your Natal Artifact!', 'normal');
       return;
     }
 
-    // 检查境界要求：必须达到金丹期才能祭炼本命法宝
+    // Check realm requirement: must be Golden Core or higher
     const realmIndex = REALM_ORDER.indexOf(player.realm);
     const goldenCoreIndex = REALM_ORDER.indexOf(RealmType.GoldenCore);
     if (realmIndex < goldenCoreIndex) {
-      addLog('祭炼本命法宝需要达到金丹期境界！', 'danger');
+      addLog('Refining a Natal Artifact requires Golden Core realm!', 'danger');
       return;
     }
 
@@ -346,20 +346,16 @@ export function useEquipmentHandlers({
         );
         if (currentNatal) {
           addLog(
-            `你已经拥有本命法宝【${currentNatal.name}】，需要先解除祭炼才能祭炼新的法宝。`,
+            `You already have a Natal Artifact [${currentNatal.name}]. Unrefine it first.`,
             'danger'
           );
           return prev;
         }
       }
 
-      // 消耗气血上限
-      const rarity = (item.rarity as ItemRarity) || '普通';
+      // Consume Max HP
+      const rarity = (item.rarity as ItemRarity) || 'Common';
       const hpCostMap: Record<ItemRarity, number> = {
-        普通: 50,
-        稀有: 100,
-        传说: 200,
-        仙品: 500,
         Common: 50,
         Rare: 100,
         Legendary: 200,
@@ -368,11 +364,11 @@ export function useEquipmentHandlers({
       const hpCost = hpCostMap[rarity];
 
       if (prev.maxHp <= hpCost) {
-        addLog(`气血上限不足！祭炼需要消耗 ${hpCost} 点气血上限。`, 'danger');
+        addLog(`Insufficient Max HP! Refining requires ${hpCost} Max HP.`, 'danger');
         return prev;
       }
 
-      // 更新物品，标记为本命
+      // Update item, mark as Natal
       const newInventory = prev.inventory.map((i) => {
         if (i.id === item.id) {
           return { ...i, isNatal: true };
@@ -385,13 +381,13 @@ export function useEquipmentHandlers({
 
       const newMaxHp = prev.maxHp - hpCost;
 
-      // 计算实际最大血量（包含功法加成等）作为上限
+      // Calculate actual max HP
       const tempPlayer = { ...prev, maxHp: newMaxHp };
       const totalStats = getPlayerTotalStats(tempPlayer);
       const actualMaxHp = totalStats.maxHp;
       const newHp = Math.min(prev.hp, actualMaxHp);
 
-      // 如果本命法宝已装备，需要重新计算属性
+      // If Natal Artifact is equipped, recalculate stats
       let newAttack = prev.attack;
       let newDefense = prev.defense;
       let newSpirit = prev.spirit;
@@ -410,10 +406,10 @@ export function useEquipmentHandlers({
       }
 
       addLog(
-        `你消耗了 ${hpCost} 点气血上限，将【${item.name}】祭炼为本命法宝！`,
+        `You sacrificed ${hpCost} Max HP to refine [${item.name}] as your Natal Artifact!`,
         'special'
       );
-      addLog(`本命法宝与你的生命相连，属性加成提升50%！`, 'special');
+      addLog(`The Natal Artifact is bound to your life. Stats bonus increased by 50%!`, 'special');
 
       return {
         ...prev,
@@ -433,7 +429,7 @@ export function useEquipmentHandlers({
   const handleUnrefineNatalArtifact = () => {
     setPlayer((prev) => {
       if (!prev.natalArtifactId) {
-        addLog('你没有本命法宝！', 'danger');
+        addLog('You do not have a Natal Artifact!', 'danger');
         return prev;
       }
 
@@ -441,7 +437,7 @@ export function useEquipmentHandlers({
         (i) => i.id === prev.natalArtifactId
       );
       if (!natalItem) {
-        addLog('本命法宝不存在！', 'danger');
+        addLog('Natal Artifact not found!', 'danger');
         return prev;
       }
 
@@ -452,7 +448,7 @@ export function useEquipmentHandlers({
         return i;
       });
 
-      // 如果本命法宝已装备，需要重新计算属性（移除本命加成）
+      // If Natal Artifact is equipped, recalculate stats (remove bonus)
       let newAttack = prev.attack;
       let newDefense = prev.defense;
       let newSpirit = prev.spirit;
@@ -472,7 +468,7 @@ export function useEquipmentHandlers({
         newSpeed = newSpeed - oldStats.speed + newStats.speed;
       }
 
-      addLog('你解除了本命法宝的祭炼。', 'normal');
+      addLog('You have unrefined your Natal Artifact.', 'normal');
 
       return {
         ...prev,
@@ -488,7 +484,7 @@ export function useEquipmentHandlers({
   };
 
   const handleOpenUpgrade = (item: Item) => {
-    return item; // 这个函数主要用于设置状态，实际逻辑在调用处
+    return item; // This function is mainly for setting state, actual logic is in the caller
   };
 
   const handleUpgradeItem = async (
@@ -506,7 +502,7 @@ export function useEquipmentHandlers({
         (i) => i.name === UPGRADE_STONE_NAME
       );
 
-      // 检查灵石和材料
+      // Check Spirit Stones and materials
       if (
         prev.spiritStones < costStones ||
         !matsItem ||
@@ -516,7 +512,7 @@ export function useEquipmentHandlers({
         return prev;
       }
 
-      // 只有当使用强化石时才检查强化石
+      // Check Upgrade Stones only if used
       if (
         upgradeStones > 0 &&
         (!upgradeStoneItem || upgradeStoneItem.quantity < upgradeStones)
@@ -525,9 +521,9 @@ export function useEquipmentHandlers({
         return prev;
       }
 
-      // 计算成功率
+      // Calculate success rate
       const currentLevel = item.level || 0;
-      const rarity = item.rarity || '普通';
+      const rarity = item.rarity || 'Common';
       const rarityMult = RARITY_MULTIPLIERS[rarity];
       const baseSuccessRate = Math.max(
         0.1,
@@ -538,10 +534,10 @@ export function useEquipmentHandlers({
         baseSuccessRate + upgradeStones * UPGRADE_STONE_SUCCESS_BONUS
       );
 
-      // 判断是否成功
+      // Determine success
       const isSuccess = Math.random() < successRate;
 
-      // 消耗材料
+      // Consume materials
       const newInventory = prev.inventory
         .map((i) => {
           if (i.name === UPGRADE_MATERIAL_NAME) {
@@ -554,11 +550,11 @@ export function useEquipmentHandlers({
         })
         .filter((i) => i.quantity > 0);
 
-      // 消耗灵石（无论成功失败都消耗）
+      // Consume spirit stones (consumed regardless of success/failure)
       const newSpiritStones = prev.spiritStones - costStones;
 
       if (!isSuccess) {
-        addLog(`祭炼失败！${item.name} 未能提升品质，材料已消耗。`, 'danger');
+        addLog(`Refinement failed! ${item.name} quality did not improve, materials consumed.`, 'danger');
         resolve('failure');
         return {
           ...prev,
@@ -567,7 +563,7 @@ export function useEquipmentHandlers({
         };
       }
 
-      // 成功：提升属性
+      // Success: Improve stats
       const growthRate = getUpgradeMultiplier(rarity);
       const getNextStat = (val: number) => Math.floor(val * (1 + growthRate));
 
@@ -636,7 +632,7 @@ export function useEquipmentHandlers({
         newSpeed += newStats.speed;
       }
 
-      addLog(`祭炼成功！${item.name} 品质提升了。`, 'gain');
+      addLog(`Refinement successful! ${item.name} quality has improved.`, 'gain');
       resolve('success');
 
       return {

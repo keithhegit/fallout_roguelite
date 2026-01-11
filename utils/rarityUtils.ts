@@ -1,162 +1,152 @@
 /**
- * 稀有度相关的工具函数
- * 统一管理所有稀有度相关的样式和工具函数，避免在多个组件中重复定义
+ * Rarity Utility Functions
+ * Manage all rarity-related styles and utility functions centrally to avoid duplication across components
  */
 
 import { ItemRarity } from '../types';
 
 /**
- * 获取稀有度的颜色类名（用于文本）
+ * Get rarity text color class
  */
 export const getRarityTextColor = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
-    case '稀有':
-      return 'text-blue-400';
-    case '传说':
-      return 'text-purple-400';
-    case '仙品':
+    case 'Rare':
+      return 'text-emerald-400';
+    case 'Legendary':
       return 'text-amber-400';
+    case 'Mythic':
+      return 'text-red-500';
     default:
-      return 'text-steel-400';
+      return 'text-stone-400';
   }
 };
 
 /**
- * 获取稀有度的名称样式类名（用于物品名称，包含 hover 效果）
+ * Get rarity name style class (for item names, includes hover effect)
  */
 export const getRarityNameClasses = (rarity: ItemRarity | undefined): string => {
   const base = 'font-bold transition-colors duration-300 cursor-default ';
   switch (rarity) {
-    case '稀有':
-      return base + 'text-steel-400 hover:text-blue-400';
-    case '传说':
-      return base + 'text-steel-400 hover:text-purple-400';
-    case '仙品':
+    case 'Rare':
+      return base + 'text-stone-400 hover:text-emerald-400 hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.45)]';
+    case 'Legendary':
+      return base + 'text-stone-400 hover:text-amber-400 hover:drop-shadow-[0_0_8px_rgba(251,191,36,0.45)]';
+    case 'Mythic':
       return (
         base +
-        'text-steel-400 hover:text-amber-400 hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.45)]'
+        'text-stone-400 hover:text-red-500 hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.45)]'
       );
     default:
-      return base + 'text-steel-400 hover:text-stone-100';
+      return base + 'text-stone-400 hover:text-stone-200';
   }
 };
 
 /**
- * 获取稀有度的边框样式类名
+ * Get rarity border style class
  */
 export const getRarityBorder = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
-    case '稀有':
-      return 'border-blue-500';
-    case '传说':
-      return 'border-purple-500';
-    case '仙品':
+    case 'Rare':
+      return 'border-emerald-500';
+    case 'Legendary':
       return 'border-amber-500';
+    case 'Mythic':
+      return 'border-red-600';
     default:
-      return 'border-steel-500';
+      return 'border-stone-600';
   }
 };
 
 /**
- * 获取稀有度的背景和边框样式类名（用于卡片/面板）
+ * Get rarity background and border style class (for cards/panels)
  */
 export const getRarityColor = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
-    case '稀有':
-      return 'border-blue-500 bg-blue-950/20';
-    case '传说':
-      return 'border-purple-500 bg-purple-950/20';
-    case '仙品':
+    case 'Rare':
+      return 'border-emerald-500 bg-emerald-950/20';
+    case 'Legendary':
       return 'border-amber-500 bg-amber-950/20';
+    case 'Mythic':
+      return 'border-red-600 bg-red-950/20';
     default:
-      return 'border-steel-500 bg-stone-900/40';
+      return 'border-stone-600 bg-stone-900/40';
   }
 };
 
 /**
- * 获取稀有度的徽章样式类名（用于标签）
+ * Get rarity badge style class (for tags)
  */
 export const getRarityBadge = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
-    case '稀有':
-      return 'bg-blue-950/30 text-blue-400 border-blue-500/50';
-    case '传说':
-      return 'bg-purple-950/30 text-purple-400 border-purple-500/50';
-    case '仙品':
+    case 'Rare':
+      return 'bg-emerald-950/30 text-emerald-400 border-emerald-500/50';
+    case 'Legendary':
       return 'bg-amber-950/30 text-amber-400 border-amber-500/50';
+    case 'Mythic':
+      return 'bg-red-950/30 text-red-500 border-red-600/50';
     default:
-      return 'bg-stone-950/40 text-steel-400 border-steel-500/50';
+      return 'bg-stone-950/40 text-stone-400 border-stone-600/50';
   }
 };
 
 /**
- * 获取稀有度的发光样式类名
+ * Get rarity glow style class
  */
 export const getRarityGlow = (rarity: ItemRarity | undefined): string => {
   switch (rarity) {
-    case '稀有':
-      return 'shadow-[0_0_10px_rgba(59,130,246,0.2)]';
-    case '传说':
-      return 'shadow-[0_0_15px_rgba(168,85,247,0.2)]';
-    case '仙品':
-      return 'shadow-[0_0_20px_rgba(245,158,11,0.3)]';
+    case 'Rare':
+      return 'shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+    case 'Legendary':
+      return 'shadow-[0_0_15px_rgba(245,158,11,0.2)]';
+    case 'Mythic':
+      return 'shadow-[0_0_20px_rgba(239,68,68,0.3)]';
     default:
       return 'shadow-none';
   }
 };
 
 /**
- * 获取稀有度的排序权重（用于排序）
+ * Get rarity sort weight
  */
 export const getRarityOrder = (rarity: ItemRarity | undefined): number => {
   const rarityOrder: Record<ItemRarity, number> = {
-    仙品: 5,
-    传说: 4,
-    稀有: 3,
-    普通: 2,
     Mythic: 5,
     Legendary: 4,
     Rare: 3,
     Common: 2,
   };
-  return rarityOrder[rarity || '普通'];
+  return rarityOrder[rarity || 'Common'];
 };
 
 /**
- * 获取稀有度的显示名称
+ * Get rarity display name
  */
 export const getRarityDisplayName = (rarity: ItemRarity | undefined): string => {
-  switch (rarity) {
-    case '稀有':
-      return 'Rare';
-    case '传说':
-      return 'Legendary';
-    case '仙品':
-      return 'Mythic';
-    default:
-      return 'Common';
-  }
+  return rarity || 'Common';
 };
 
 /**
- * 稀有度别名映射（兼容英文和别称）
+ * Rarity alias map (compatible with English and aliases)
  */
 const rarityAliasMap: Record<string, ItemRarity> = {
-  rare: '稀有',
-  common: '普通',
-  normal: '普通',
-  legend: '传说',
-  legendary: '传说',
-  mythic: '仙品',
-  immortal: '仙品',
+  rare: 'Rare',
+  common: 'Common',
+  normal: 'Common',
+  legend: 'Legendary',
+  legendary: 'Legendary',
+  mythic: 'Mythic',
+  immortal: 'Mythic',
 };
 
 /**
- * 规范化稀有度值（将英文/别称转换为标准中文）
- * 用于统一显示，兼容AI可能返回的英文稀有度
+ * Normalize rarity value (convert English/alias to standard English)
+ * Used for unified display, compatible with potential English rarity returns
  */
 export const normalizeRarityValue = (rarity?: ItemRarity | string): ItemRarity => {
-  if (!rarity) return '普通';
+  if (!rarity) return 'Common';
   const key = String(rarity).toLowerCase();
-  return rarityAliasMap[key] || (rarity as ItemRarity);
+  // Check if it's one of the English keys (case insensitive)
+  if (rarityAliasMap[key]) return rarityAliasMap[key];
+
+  return rarity as ItemRarity;
 };
