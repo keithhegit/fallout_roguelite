@@ -67,73 +67,73 @@ const getRealmAssets = (name: string, riskLevel: string): { banner: string; thum
 
   // 2. Keyword Matching
   const lowerName = name.toLowerCase();
-  const useAsset = (key: string) => REALM_ASSETS[key];
+  const resolveAsset = (key: string) => REALM_ASSETS[key];
 
   // Vault / Underground
   if (lowerName.includes('vault') || lowerName.includes('bunker') || lowerName.includes('silo') || lowerName.includes('shelter') || lowerName.includes('tunnel') || lowerName.includes('cave') || lowerName.includes('underground') || lowerName.includes('subway') || lowerName.includes('sewer')) {
-    return useAsset('Vault 111 Surroundings');
+    return resolveAsset('Vault 111 Surroundings');
   }
 
   // Industrial / Factory
   if (lowerName.includes('plant') || lowerName.includes('factory') || lowerName.includes('assembly') || lowerName.includes('works') || lowerName.includes('yard') || lowerName.includes('industrial') || lowerName.includes('brewery') || lowerName.includes('hardware') || lowerName.includes('mining') || lowerName.includes('borers')) {
-    return useAsset('Corvega Assembly Plant');
+    return resolveAsset('Corvega Assembly Plant');
   }
 
   // Science / Tech / Medical
   if (lowerName.includes('lab') || lowerName.includes('research') || lowerName.includes('facility') || lowerName.includes('tech') || lowerName.includes('science') || lowerName.includes('hospital') || lowerName.includes('clinic') || lowerName.includes('med') || lowerName.includes('hallucigen') || lowerName.includes('sales') || lowerName.includes('robot') || lowerName.includes('general atomics')) {
-    return useAsset('West-Tek Research Facility');
+    return resolveAsset('West-Tek Research Facility');
   }
 
   // Commercial / Retail
   if (lowerName.includes('mart') || lowerName.includes('shop') || lowerName.includes('store') || lowerName.includes('galleria') || lowerName.includes('market') || lowerName.includes('diner') || lowerName.includes('motel') || lowerName.includes('theater') || lowerName.includes('comics')) {
-    return useAsset('Super-Duper Mart');
+    return resolveAsset('Super-Duper Mart');
   }
 
   // Urban / City / Ruins
   if (lowerName.includes('city') || lowerName.includes('town') || lowerName.includes('plaza') || lowerName.includes('tower') || lowerName.includes('building') || lowerName.includes('ruins') || lowerName.includes('street') || lowerName.includes('library') || lowerName.includes('hall') || lowerName.includes('hub') || lowerName.includes('lexington') || lowerName.includes('quincy') || lowerName.includes('boston') || lowerName.includes('faneuil')) {
-    return useAsset('Diamond City Outskirts');
+    return resolveAsset('Diamond City Outskirts');
   }
 
   // Military / Fort
   if (lowerName.includes('fort') || lowerName.includes('base') || lowerName.includes('outpost') || lowerName.includes('checkpoint') || lowerName.includes('armory') || lowerName.includes('airport') || lowerName.includes('prydwen') || lowerName.includes('castle') || lowerName.includes('battery')) {
-    return useAsset('The Prydwen');
+    return resolveAsset('The Prydwen');
   }
 
   // Radiation / Glowing Sea
   if (lowerName.includes('glowing') || lowerName.includes('sea') || lowerName.includes('rad') || lowerName.includes('crater') || lowerName.includes('toxic') || lowerName.includes('waste') || lowerName.includes('bog') || lowerName.includes('marsh') || lowerName.includes('reactor') || lowerName.includes('ground zero')) {
-    return useAsset('The Glowing Sea');
+    return resolveAsset('The Glowing Sea');
   }
 
   // Enclave / High Tech / Ocean
   if (lowerName.includes('enclave') || lowerName.includes('rig') || lowerName.includes('oil') || lowerName.includes('island') || lowerName.includes('coast') || lowerName.includes('libertalia') || lowerName.includes('spectacle')) {
-    return useAsset('Enclave Oil Rig');
+    return resolveAsset('Enclave Oil Rig');
   }
 
   // Institute / Advanced
   if (lowerName.includes('institute') || lowerName.includes('synth') || lowerName.includes('citadel') || lowerName.includes('mothership') || lowerName.includes('zeta') || lowerName.includes('alien')) {
-    return useAsset('The Institute');
+    return resolveAsset('The Institute');
   }
 
   // Big MT / Desert
   if (lowerName.includes('big mt') || lowerName.includes('desert') || lowerName.includes('canyon') || lowerName.includes('divide') || lowerName.includes('sierra') || lowerName.includes('lonesome') || lowerName.includes('vegas')) {
-    return useAsset('Big MT Research Center');
+    return resolveAsset('Big MT Research Center');
   }
 
   // Residential / Rural (Default for Low/Medium)
   if (lowerName.includes('shack') || lowerName.includes('farm') || lowerName.includes('cabin') || lowerName.includes('house') || lowerName.includes('home') || lowerName.includes('hills') || lowerName.includes('park') || lowerName.includes('field') || lowerName.includes('riverbed') || lowerName.includes('bridge') || lowerName.includes('reservoir')) {
-    return useAsset('Sanctuary Hills');
+    return resolveAsset('Sanctuary Hills');
   }
 
   // 3. Fallback by Risk Level
   switch (riskLevel) {
     case 'Extreme':
     case 'High':
-      return useAsset('The Glowing Sea');
+      return resolveAsset('The Glowing Sea');
     case 'Medium':
-      return useAsset('Concord Ruins');
+      return resolveAsset('Concord Ruins');
     case 'Low':
     default:
-      return useAsset('Sanctuary Hills');
+      return resolveAsset('Sanctuary Hills');
   }
 };
 

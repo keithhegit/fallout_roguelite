@@ -31,7 +31,7 @@ export function useCharacterHandlers({
   addLog,
   setItemActionLog,
 }: UseCharacterHandlersProps) {
-  const handleSelectTalent = (talentId: string) => {
+  const handleSelectTalent = (_talentId: string) => {
     // Talents are randomly generated at the start of the game and cannot be changed
     addLog('Talents are determined at the start of the game and cannot be changed!', 'danger');
     return;
@@ -68,17 +68,16 @@ export function useCharacterHandlers({
       const spiritDiff = newEffects.spirit - oldEffects.spirit;
       const physiqueDiff = newEffects.physique - oldEffects.physique;
       const speedDiff = newEffects.speed - oldEffects.speed;
-      const expRateDiff = newEffects.expRate - oldEffects.expRate;
       const luckDiff = newEffects.luck - oldEffects.luck;
 
-      let newAttack = prev.attack + attackDiff;
-      let newDefense = prev.defense + defenseDiff;
-      let newMaxHp = prev.maxHp + hpDiff;
-      let newHp = prev.hp + hpDiff;
-      let newSpirit = prev.spirit + spiritDiff;
-      let newPhysique = prev.physique + physiqueDiff;
-      let newSpeed = prev.speed + speedDiff;
-      let newLuck = prev.luck + luckDiff;
+      const newAttack = prev.attack + attackDiff;
+      const newDefense = prev.defense + defenseDiff;
+      const newMaxHp = prev.maxHp + hpDiff;
+      const newHp = prev.hp + hpDiff;
+      const newSpirit = prev.spirit + spiritDiff;
+      const newPhysique = prev.physique + physiqueDiff;
+      const newSpeed = prev.speed + speedDiff;
+      const newLuck = prev.luck + luckDiff;
 
       // Calculate actual max HP (including cultivation art bonuses etc.)
       const tempPlayer = { ...prev, maxHp: newMaxHp };

@@ -239,7 +239,7 @@ export function useDailyQuestHandlers({
       // Advanced item reward (chance to get for high quality quests) - Add to inventory
       const currentRealmIndex = REALM_ORDER.indexOf(prev.realm);
       let advancedItemMsg = '';
-      let newInventory = [...prev.inventory];
+      const newInventory = [...prev.inventory];
 
       // Only Legendary or Mythic quests have chance to get advanced items
       if ((quest.rarity === 'Legendary' || quest.rarity === 'Mythic') && Math.random() < 0.05) {

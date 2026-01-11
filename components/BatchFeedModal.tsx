@@ -63,7 +63,7 @@ const BatchFeedModal: React.FC<Props> = ({
 
   // Filter items
   const filteredItems = useMemo(() => {
-    let filtered = allFeedableItems.filter((item) => {
+    const filtered = allFeedableItems.filter((item) => {
       // Filter by category
       if (selectedCategory !== 'all') {
         const category = getItemCategory(item);

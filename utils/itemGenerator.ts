@@ -3,7 +3,7 @@
  * Support generating items based on type, rarity, and count
  */
 
-import { Item, ItemType, ItemRarity, EquipmentSlot, LotteryPrize } from '../types';
+import { Item, ItemType, ItemRarity, LotteryPrize } from '../types';
 import { ITEM_TEMPLATES, getItemTemplatesByType, getItemTemplatesByRarity, getItemTemplatesByTypeAndRarity } from '../constants/itemTemplates';
 import { uid } from './gameUtils';
 

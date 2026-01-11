@@ -229,7 +229,7 @@ export function useEquipmentHandlers({
         breakthroughCount: 0,
         secretRealmCount: 0,
       };
-      let updatedStatistics = { ...playerStats };
+      const updatedStatistics = { ...playerStats };
       // If not previously equipped in this slot, or moved from another slot, increment count
       // Check using targetSlot
       const wasEquippedInTargetSlot = prev.equippedItems[targetSlot] === item.id;

@@ -1,8 +1,5 @@
 import { ShopItem, ShopType, ItemType, ItemRarity, EquipmentSlot, RealmType } from '../types';
-import { REALM_ORDER, getPillDefinition, FOUNDATION_TREASURES, HEAVEN_EARTH_ESSENCES, HEAVEN_EARTH_MARROWS } from '../constants/index';
-import { uid } from '../utils/gameUtils';
 import { getItemFromConstants } from '../utils/itemConstantsUtils';
-import { ITEM_TEMPLATES } from '../constants/itemTemplates';
 import { generateItems } from '../utils/itemGenerator';
 
 /**

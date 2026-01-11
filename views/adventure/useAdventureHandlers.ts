@@ -493,7 +493,7 @@ export function useAdventureHandlers({
         onReputationEvent,
         onPauseAutoAdventure: handlePauseAutoAdventure,
       });
-    } catch (e) {
+    } catch (_e) {
       addLog('A sudden anomaly occurred during adventure, damaging your consciousness, forcing you to return.', 'danger');
     } finally {
       setLoading(false);

@@ -16,6 +16,9 @@ import {
 export const ensurePlayerStatsCompatibility = (loadedPlayer: any): PlayerStats => {
   return {
     ...loadedPlayer,
+    inventory: loadedPlayer.inventory || [],
+    equippedItems: loadedPlayer.equippedItems || {},
+    spiritStones: loadedPlayer.spiritStones || 0,
     dailyTaskCount:
       loadedPlayer.dailyTaskCount &&
       typeof loadedPlayer.dailyTaskCount === 'object' &&
@@ -456,7 +459,7 @@ export const exportSave = (saveData: SaveData): string => {
   // Simple Base64 encoding to add a little difficulty to modification
   try {
     return btoa(encodeURIComponent(json));
-  } catch (e) {
+  } catch (_e) {
     return json; // Fallback to normal JSON
   }
 };
@@ -472,7 +475,7 @@ export const importSave = (encodedString: string): SaveData | null => {
       if (!encodedString.startsWith('{')) {
         jsonString = decodeURIComponent(atob(encodedString));
       }
-    } catch (e) {
+    } catch (_e) {
       // If not Base64, treat as is
     }
 

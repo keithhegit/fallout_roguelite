@@ -15,9 +15,13 @@ import {
   Buff,
   Debuff,
   Item,
-  Pet,
   PetSkill,
   SectRank,
+  CultivationArt,
+  FoundationTreasure,
+  HeavenEarthEssence,
+  HeavenEarthMarrow,
+  LongevityRule,
 } from '../types';
 import {
   REALM_ORDER,
@@ -38,7 +42,7 @@ import {
 import { getPlayerTotalStats } from '../utils/statUtils';
 import { getRandomEnemyName } from './templateService';
 import { logger } from '../utils/logger';
-import { getItemsByType, getItemFromConstants } from '../utils/itemConstantsUtils';
+import { getItemsByType } from '../utils/itemConstantsUtils';
 
 
 const randomId = () => Math.random().toString(36).slice(2, 9);
@@ -332,7 +336,7 @@ const generateLoot = (
   };
 
   // Max attempts to avoid infinite loop
-  let maxAttempts = numItems * 10;
+  const maxAttempts = numItems * 10;
   let attempts = 0;
 
   while (lootItems.length < numItems && attempts < maxAttempts) {
@@ -341,11 +345,11 @@ const generateLoot = (
 
     let itemPool: Array<{
       name: string;
-      type: ItemType;
+      type: ItemType | string;
       rarity: ItemRarity;
-      effect?: any;
-      permanentEffect?: any;
-      slot?: EquipmentSlot;
+      effect?: Item['effect'];
+      permanentEffect?: Item['permanentEffect'];
+      equipmentSlot?: EquipmentSlot | string;
     }>;
     let itemType: string;
 
@@ -392,22 +396,22 @@ const generateLoot = (
       let pool = [...LOOT_ITEMS.herbs];
       pool = shuffle(pool);
       pool = shuffle(pool); // Second shuffle
-      itemPool = pool as any;
+      itemPool = pool;
     } else if (selectedType.type === 'pills') {
       let pool = [...LOOT_ITEMS.pills];
       pool = shuffle(pool);
       pool = shuffle(pool);
-      itemPool = pool as any;
+      itemPool = pool;
     } else if (selectedType.type === 'materials') {
       let pool = [...LOOT_ITEMS.materials];
       pool = shuffle(pool);
       pool = shuffle(pool);
-      itemPool = pool as any;
+      itemPool = pool;
     } else if (selectedType.type === 'weapons') {
       let pool = [...LOOT_ITEMS.weapons];
       pool = shuffle(pool);
       pool = shuffle(pool);
-      itemPool = pool as any;
+      itemPool = pool;
     } else if (selectedType.type === 'armors') {
       // Armor: shuffle all armors first, then randomly select slot
       let allArmors = [...LOOT_ITEMS.armors];
@@ -424,23 +428,23 @@ const generateLoot = (
       // Shuffle slot order
       const shuffledSlots = shuffle(armorSlots);
       const selectedSlot = shuffledSlots[Math.floor(Math.random() * shuffledSlots.length)];
-      const slotFilteredArmors = allArmors.filter((item: any) => item.equipmentSlot === selectedSlot);
+      const slotFilteredArmors = allArmors.filter((item) => item.equipmentSlot === selectedSlot);
       itemPool = slotFilteredArmors.length > 0 ? slotFilteredArmors : allArmors;
     } else if (selectedType.type === 'accessories') {
       let pool = [...LOOT_ITEMS.accessories];
       pool = shuffle(pool);
       pool = shuffle(pool);
-      itemPool = pool as any;
+      itemPool = pool;
     } else if (selectedType.type === 'rings') {
       let pool = [...LOOT_ITEMS.rings];
       pool = shuffle(pool);
       pool = shuffle(pool);
-      itemPool = pool as any;
+      itemPool = pool;
     } else if (selectedType.type === 'artifacts') {
       let pool = [...LOOT_ITEMS.artifacts];
       pool = shuffle(pool);
       pool = shuffle(pool);
-      itemPool = pool as any;
+      itemPool = pool;
     } else {
       // Recipe
       itemType = ItemType.Recipe;
@@ -488,8 +492,8 @@ const generateLoot = (
     let availableItems = itemPool.filter((item) => {
       if (item.rarity !== targetRarity) return false;
       // For equippable items, check if already selected (deduplicate by name + rarity + slot)
-      if (item.slot !== undefined) {
-        const itemKey = `${item.name}-${item.rarity}-${item.slot}`;
+      if (item.equipmentSlot !== undefined) {
+        const itemKey = `${item.name}-${item.rarity}-${item.equipmentSlot}`;
         return !selectedItems.has(itemKey);
       }
       // For non-equippable items, deduplicate by name + rarity only
@@ -505,8 +509,8 @@ const generateLoot = (
         if (itemIndex > targetIndex) return false;
 
         // Also check if already selected
-        if (item.slot !== undefined) {
-          const itemKey = `${item.name}-${item.rarity}-${item.slot}`;
+        if (item.equipmentSlot !== undefined) {
+          const itemKey = `${item.name}-${item.rarity}-${item.equipmentSlot}`;
           return !selectedItems.has(itemKey);
         }
         const itemKey = `${item.name}-${item.rarity}`;
@@ -525,8 +529,8 @@ const generateLoot = (
       const selected = shuffledItems[randomIndex];
 
       // Mark as selected
-      if (selected.slot !== undefined) {
-        const itemKey = `${selected.name}-${selected.rarity}-${selected.slot}`;
+      if (selected.equipmentSlot !== undefined) {
+        const itemKey = `${selected.name}-${selected.rarity}-${selected.equipmentSlot}`;
         selectedItems.add(itemKey);
       } else {
         const itemKey = `${selected.name}-${selected.rarity}`;
@@ -557,10 +561,10 @@ const generateLoot = (
       {
         name: selected.name,
         type: itemType,
-        description: `${selected.name}, looted from the enemy.`,
+        description: selected.description || `${selected.name}, looted from the enemy.`,
         rarity: selected.rarity,
-        isEquippable: selected.slot !== undefined,
-        equipmentSlot: selected.slot as string | undefined,
+        isEquippable: selected.equipmentSlot !== undefined,
+        equipmentSlot: selected.equipmentSlot as string | undefined,
         effect: selected.effect, // Stats adjusted in executeAdventureCore based on realm
         permanentEffect: selected.permanentEffect,
         reviveChances: reviveChances,
@@ -1604,7 +1608,7 @@ export const calculateBattleRewards = (
   const baseSpiritStones = Math.round(realmBaseMultiplier * (15 + player.realmLevel * 5) * levelMultiplier);
   const rewardStones = Math.max(
     10,
-    Math.round(baseStones * totalRewardMultiplier)
+    Math.round(baseSpiritStones * totalRewardMultiplier)
   );
 
   // Sect Challenge Special Reward (Only for defeating Sect Master)
@@ -1789,7 +1793,7 @@ export const initializeTurnBasedBattle = async (
 /**
  * Generate default skill for Arts without configured skills
  */
-function generateDefaultSkillForArt(art: { id: string; name: string; type: string; grade: string; effects: any }): BattleSkill | null {
+function generateDefaultSkillForArt(art: CultivationArt): BattleSkill | null {
   // Generate different skills based on Art type and grade
   const gradeMultipliers: Record<string, number> = {
     'C': 1.0,
@@ -1895,10 +1899,10 @@ export function createPlayerUnit(player: PlayerStats): BattleUnit {
   const totalStats = getPlayerTotalStats(player);
 
   const equippedItems = getEquippedItems(player);
-  let totalAttack = totalStats.attack;
-  let totalDefense = totalStats.defense;
-  let totalSpirit = totalStats.spirit;
-  let totalSpeed = totalStats.speed;
+  const totalAttack = totalStats.attack;
+  const totalDefense = totalStats.defense;
+  const totalSpirit = totalStats.spirit;
+  const totalSpeed = totalStats.speed;
 
   // Note: player.attack etc. already include equipment bonuses
   // getPlayerTotalStats also includes Mental Art bonuses
@@ -2143,8 +2147,7 @@ export function executeEnemyTurn(battleState: BattleState): BattleState {
 
   let newState = { ...battleState };
   const enemy = newState.enemy;
-  const player = newState.player;
-
+  
   // Simple AI: 70% Normal Attack, 20% Skill (if available), 10% Defend
   const actionRoll = Math.random();
   let actionResult: BattleAction | null = null;
@@ -2432,7 +2435,7 @@ function executeSkill(
     const targetDefense = skill.damage.type === 'magical' ? target.spirit : target.defense;
 
     // Use unified damage calculation function
-    let baseDamage = calcDamage(skillAttack, targetDefense);
+    const baseDamage = calcDamage(skillAttack, targetDefense);
 
     // Calculate Crit
     let critChance = skill.damage.critChance || 0;
@@ -2545,7 +2548,7 @@ function executeSkill(
       damage = Math.round(damage * (1 - defenseReduction));
     } else if (hasIgnoreDefense) {
       // Ignore Defense, deal full damage
-      damage = damage;
+      // damage = damage;
     }
 
     // Apply Damage Reduction Buff
@@ -2641,7 +2644,7 @@ function executeAdvancedItem(
   const enemy = battleState.enemy;
 
   // Get Advanced Item by Type
-  let advancedItem: any = null;
+  let advancedItem: FoundationTreasure | HeavenEarthEssence | HeavenEarthMarrow | LongevityRule | null = null;
   switch (itemType) {
     case 'foundationTreasure':
       advancedItem = FOUNDATION_TREASURES[itemId];
@@ -2927,8 +2930,7 @@ function executeItem(battleState: BattleState, itemId: string): BattleAction {
   }
 
   let heal = 0;
-  const buffs: Buff[] = [];
-
+  
   if (potionConfig.type === 'heal' && potionConfig.effect.heal) {
     heal = Math.floor(potionConfig.effect.heal);
     player.hp = Math.min(player.maxHp, Math.floor(player.hp + heal));
@@ -3017,7 +3019,7 @@ function executeFlee(battleState: BattleState): BattleAction {
  */
 function updateBattleStateAfterAction(
   battleState: BattleState,
-  action: BattleAction
+  _action: BattleAction
 ): BattleState {
   // Deep copy player and enemy state to ensure immutability
   const newState: BattleState = {

@@ -53,7 +53,7 @@ const BatchUseModal: React.FC<Props> = ({
 
   // Filter items
   const filteredItems = useMemo(() => {
-    let filtered = inventory.filter((item) => {
+    const filtered = inventory.filter((item) => {
       // Only show usable items
       if (!isUsable(item)) return false;
 

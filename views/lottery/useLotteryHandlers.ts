@@ -186,7 +186,7 @@ export function useLotteryHandlers({
       let newInv = [...prev.inventory];
       let newStones = prev.spiritStones;
       let newExp = prev.exp;
-      let newPets = [...prev.pets];
+      const newPets = [...prev.pets];
       let newTickets = prev.lotteryTickets;
 
       for (const prize of results) {

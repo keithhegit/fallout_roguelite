@@ -2,12 +2,9 @@ import React from 'react';
 import {
   PlayerStats,
   Recipe,
-  Item,
   ItemType,
-  EquipmentSlot,
   ItemRarity,
 } from '../../types';
-import { uid } from '../../utils/gameUtils';
 import { addItemToInventory } from '../../utils/inventoryUtils';
 import { showSuccess } from '../../utils/toastUtils';
 

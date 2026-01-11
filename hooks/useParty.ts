@@ -19,7 +19,7 @@ const PARTYKIT_HOST = getPartyKitHost();
 
 // Global state management
 let globalSocket: PartySocket | null = null;
-let messageListeners: ((data: any) => void)[] = [];
+let messageListeners: ((data: unknown) => void)[] = [];
 let onlineCountListeners: ((count: number) => void)[] = [];
 let currentOnlineCount = 0;
 
@@ -37,23 +37,25 @@ function setupGlobalConnection(roomName: string) {
       const data = JSON.parse(event.data);
 
       // Handle online count update
-      if (data.type === 'onlineCountUpdate') {
-        currentOnlineCount = data.onlineCount;
-        onlineCountListeners.forEach((listener) =>
-          listener(currentOnlineCount)
-        );
-      } else if (data.type === 'welcome') {
-        // Welcome message contains initial online count
-        currentOnlineCount = data.onlineCount || 0;
-        onlineCountListeners.forEach((listener) =>
-          listener(currentOnlineCount)
-        );
+      if (data && typeof data === 'object' && 'type' in data) {
+        if (data.type === 'onlineCountUpdate' && 'onlineCount' in data) {
+          currentOnlineCount = Number(data.onlineCount);
+          onlineCountListeners.forEach((listener) =>
+            listener(currentOnlineCount)
+          );
+        } else if (data.type === 'welcome') {
+          // Welcome message contains initial online count
+          currentOnlineCount = 'onlineCount' in data ? Number(data.onlineCount) : 0;
+          onlineCountListeners.forEach((listener) =>
+            listener(currentOnlineCount)
+          );
 
-        // Trigger message listeners as well
-        messageListeners.forEach((listener) => listener(data));
-      } else {
-        // Normal message
-        messageListeners.forEach((listener) => listener(data));
+          // Trigger message listeners as well
+          messageListeners.forEach((listener) => listener(data));
+        } else {
+          // Normal message
+          messageListeners.forEach((listener) => listener(data));
+        }
       }
     } catch (e) {
       // Non-JSON message
@@ -67,20 +69,22 @@ function setupGlobalConnection(roomName: string) {
 
 export function useParty(roomName: string = 'main', limit: number = 150) {
   const [socket, setSocket] = useState<PartySocket | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<unknown[]>([]);
   const [onlineCount, setOnlineCount] = useState<number>(0);
 
   useEffect(() => {
     const s = setupGlobalConnection(roomName);
     if (!s) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSocket(null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOnlineCount(0);
       return;
     }
     setSocket(s);
 
     // Add message listener
-    const messageListener = (data: any) => {
+    const messageListener = (data: unknown) => {
       setMessages((prev) => {
         const newMessages = [...prev, data];
         return newMessages.slice(-limit);

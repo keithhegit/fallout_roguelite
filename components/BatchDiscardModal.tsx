@@ -48,7 +48,7 @@ const BatchDiscardModal: React.FC<Props> = ({
 
   // 过滤物品
   const filteredItems = useMemo(() => {
-    let filtered = inventory.filter((item) => {
+    const filtered = inventory.filter((item) => {
       // 排除已装备的物品
       const isEquipped = Object.values(equippedItems).includes(item.id);
       if (isEquipped) return false;

@@ -7,6 +7,9 @@ import {
   ShopItem,
   CultivationArt,
   Recipe,
+  EquipmentSlot,
+  SecretRealm,
+  AdventureResult,
 } from '../../types';
 import { useUI } from '../../context/UIContext';
 
@@ -150,7 +153,7 @@ interface ModalsContainerProps {
     handleToggleAutoHarvest: () => void;
     handleSpeedupHerb: (index: number) => void;
     // Shop
-    handleBuyItem: (shopItem: any, quantity?: number) => void;
+    handleBuyItem: (shopItem: ShopItem, quantity?: number) => void;
     handleSellItem: (item: Item, quantity?: number) => void;
     handleRefreshShop?: (newItems: ShopItem[]) => void;
     // Turn-based battle
@@ -167,7 +170,9 @@ interface ModalsContainerProps {
         rarity?: string;
         isEquippable?: boolean;
         equipmentSlot?: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         effect?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         permanentEffect?: any;
       }>;
       petSkillCooldowns?: Record<string, number>; // 灵宠技能冷却状态

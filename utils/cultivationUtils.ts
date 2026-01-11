@@ -395,13 +395,13 @@ export function generateLongevityPuzzle(ruleCount: number): {
   challenges: Array<{
     type: 'Octagram Array' | 'Celestial Grid' | 'Rune Sequence' | 'Inner Demon Trial' | 'System Inquiry';
     difficulty: number;
-    data: any;
+    data: unknown;
   }>;
 } {
   const challenges: Array<{
     type: 'Octagram Array' | 'Celestial Grid' | 'Rune Sequence' | 'Inner Demon Trial' | 'System Inquiry';
     difficulty: number;
-    data: any;
+    data: unknown;
   }> = [
       {
         type: 'Octagram Array' as const,

@@ -69,7 +69,7 @@ export const sectTaskUtils = {
   /**
    * Try to get advanced item reward
    */
-  tryGetAdvancedItem: (player: PlayerStats, task: RandomSectTask): { item: any | null; message: string } => {
+  tryGetAdvancedItem: (player: PlayerStats, task: RandomSectTask): { item: Partial<Item> | null; message: string } => {
     if (task.difficulty !== 'Extreme' || task.quality !== 'Mythic') {
       return { item: null, message: '' };
     }

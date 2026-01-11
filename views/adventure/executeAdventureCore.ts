@@ -10,6 +10,7 @@ import {
   Pet,
   RealmType,
   RiskLevel,
+  AdventureItemData,
 } from '../../types';
 import {
   REALM_ORDER,
@@ -34,7 +35,7 @@ import {
   getRandomEventTemplate,
   templateToAdventureResult,
 } from '../../services/adventureTemplateService';
-import { getAllArtifacts, getItemFromConstants } from '../../utils/itemConstantsUtils';
+import { getAllArtifacts, getItemFromConstants, ItemConstantData } from '../../utils/itemConstantsUtils';
 import {
   normalizeItemEffect,
   inferItemTypeAndSlot,
@@ -86,8 +87,8 @@ const applyResultToPlayer = (
   const realmIndex = REALM_ORDER.indexOf(prev.realm);
   const realmMultiplier = 1 + realmIndex * 0.3 + (prev.realmLevel - 1) * 0.1;
 
-  let newInv = [...prev.inventory];
-  let newArts = [...prev.cultivationArts];
+  const newInv = [...prev.inventory];
+  const newArts = [...prev.cultivationArts];
   // Use Set to ensure uniqueness, then convert back to array
   // Fix: Include prev.unlockedArts when initializing Set to ensure previously unlocked arts are not lost
   const unlockedArtsSet = new Set([...(prev.unlockedArts || []), ...prev.cultivationArts]);
@@ -101,7 +102,7 @@ const applyResultToPlayer = (
   let newLuck = prev.luck;
   let newLotteryTickets = prev.lotteryTickets;
   let newInheritanceLevel = prev.inheritanceLevel;
-  let newPets = [...prev.pets];
+  const newPets = [...prev.pets];
   let newReputation = prev.reputation || 0;
   let newSpirit = prev.spirit;
   let newPhysique = prev.physique;
@@ -135,7 +136,7 @@ const applyResultToPlayer = (
   if (result.itemObtained) itemsToProcess.push(result.itemObtained);
 
   const currentBatchNames = new Set<string>();
-  itemsToProcess.forEach(itemData => {
+  itemsToProcess.forEach((itemData: AdventureItemData) => {
     // Fix: Check if itemData is valid early to avoid processing failure due to invalid data
     if (!itemData || !itemData.name) {
       console.error('Item data is null/undefined or has no name, skipping:', itemData);
@@ -158,9 +159,12 @@ const applyResultToPlayer = (
       equipmentSlot = itemData.equipmentSlot as EquipmentSlot | undefined;
 
       // Fix: Mystery Artifact logic only applies to basic items to avoid replacing advanced items
-      const isBasicItem = !(itemData as any).advancedItemType &&
-        !(itemData as any).advancedItemId &&
-        !(itemData as any).recipeData;
+      // Check for existence of advanced properties safely
+      const hasAdvancedType = !!itemData.advancedItemType;
+      const hasAdvancedId = !!itemData.advancedItemId;
+      const hasRecipeData = !!itemData.recipeName;
+      
+      const isBasicItem = !hasAdvancedType && !hasAdvancedId && !hasRecipeData;
 
       if (isBasicItem && (itemName.includes('Relic') || itemName.includes('Artifact'))) {
         // Get random artifact from constant pool
@@ -212,11 +216,11 @@ const applyResultToPlayer = (
           itemData.description = itemFromConstants.description;
         }
         // If advanced item info is in the constant pool, use it (prioritize constant pool data)
-        if ((itemFromConstants as any).advancedItemType && !(itemData as any).advancedItemType) {
-          (itemData as any).advancedItemType = (itemFromConstants as any).advancedItemType;
+        if (itemFromConstants.advancedItemType && !itemData.advancedItemType) {
+          itemData.advancedItemType = itemFromConstants.advancedItemType;
         }
-        if ((itemFromConstants as any).advancedItemId && !(itemData as any).advancedItemId) {
-          (itemData as any).advancedItemId = (itemFromConstants as any).advancedItemId;
+        if (itemFromConstants.advancedItemId && !itemData.advancedItemId) {
+          itemData.advancedItemId = itemFromConstants.advancedItemId;
         }
 
         // Validate equipment slot: even if a slot is in the constant pool, infer to verify correctness
@@ -293,7 +297,7 @@ const applyResultToPlayer = (
 
       // Handle duplicate equipment names
       if (isEquippable && equipmentSlot) {
-        let baseName = itemName;
+        const baseName = itemName;
         const suffixes = [' (Mod)', ' (Alt)', ' (Ver 2)', ' (New)', ' (Alpha)', ' (Beta)', ' (Gamma)'];
         let attempts = 0;
         while (attempts < suffixes.length && (newInv.some(i => i.name === itemName) || currentBatchNames.has(itemName))) {
@@ -309,7 +313,7 @@ const applyResultToPlayer = (
       // Recipe handling
       let recipeData = undefined;
       if (itemType === ItemType.Recipe) {
-        let recipeName = (itemData as any).recipeName || itemName.replace(/Recipe$/, '');
+        const recipeName = itemData.recipeName || itemName.replace(/Recipe$/, '');
         recipeData = DISCOVERABLE_RECIPES.find(r => r.name === recipeName);
       }
 
@@ -317,37 +321,37 @@ const applyResultToPlayer = (
       if (existingIdx >= 0 && !isEquippable && itemType !== ItemType.Recipe) {
         newInv[existingIdx] = { ...newInv[existingIdx], quantity: newInv[existingIdx].quantity + 1 };
       } else {
-        let reviveChances = (itemData as any).reviveChances;
+        let reviveChances = itemData.reviveChances;
         if (reviveChances === undefined && (itemRarity === 'Legendary' || itemRarity === 'Mythic') && (itemType === ItemType.Weapon || itemType === ItemType.Artifact)) {
           if (Math.random() < (itemRarity === 'Legendary' ? 0.3 : 0.6)) reviveChances = Math.floor(Math.random() * 3) + 1;
         }
         // Ensure equipment does not have permanentEffect
         const equipmentPermanentEffect = isEquippable ? undefined : finalPermanentEffect;
         // Pass advanced item related fields
-        const advancedItemType = (itemData as any).advancedItemType;
-        const advancedItemId = (itemData as any).advancedItemId;
+        const advancedItemType = itemData.advancedItemType;
+        const advancedItemId = itemData.advancedItemId;
         newInv.push({ id: uid(), name: itemName, type: itemType, description: itemData.description, quantity: 1, rarity: itemRarity, level: 0, isEquippable, equipmentSlot, effect: finalEffect, permanentEffect: equipmentPermanentEffect, recipeData, reviveChances, advancedItemType, advancedItemId });
       }
     } catch (e) {
       console.error('Item processing error:', e);
       // Ensure item is added even if an error occurs (using default values)
-      const fallbackItem = {
+      const fallbackItem: Item = {
         id: uid(),
         name: itemName,
         type: itemType,
         description: itemData?.description || 'Undescribed Item',
         quantity: 1,
         rarity: itemRarity,
-        level: (itemData as any)?.level || 0,
+        level: itemData.level || 0,
         isEquippable: false,
         effect: finalEffect || {},
         permanentEffect: undefined,
         // Add missing equipment properties
         equipmentSlot: equipmentSlot || undefined,
-        recipeData: (itemData as any)?.recipeData,
-        reviveChances: (itemData as any)?.reviveChances,
-        advancedItemType: (itemData as any)?.advancedItemType,
-        advancedItemId: (itemData as any)?.advancedItemId
+        recipeData: recipeData, // Use the recipeData calculated above
+        reviveChances: itemData.reviveChances,
+        advancedItemType: itemData.advancedItemType,
+        advancedItemId: itemData.advancedItemId
       };
       newInv.push(fallbackItem);
     }
@@ -789,6 +793,7 @@ const applyResultToPlayer = (
   // Cultivation and Spirit Stones settlement
   newExp = Math.max(0, newExp + (result.expChange || 0));
   newStones = Math.max(0, newStones + (result.spiritStonesChange || 0));
+  newReputation = Math.max(0, newReputation + (result.reputationChange || 0));
 
   // Calculate actual max HP (including art bonuses etc.)
   // First build updated player state to calculate actual max HP

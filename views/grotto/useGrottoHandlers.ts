@@ -20,7 +20,6 @@ interface UseGrottoHandlersProps {
  * - Automatically handle edge cases
  */
 export function useGrottoHandlers({
-  player,
   setPlayer,
   addLog,
   setItemActionLog,
@@ -100,19 +99,15 @@ export function useGrottoHandlers({
         return prev;
       }
 
-      // Get target level config
-      const targetConfig = GROTTO_CONFIGS.find((c) => c.level === targetLevel);
+      const targetConfig = getCurrentGrottoConfig(targetLevel);
       if (!targetConfig) {
-        addLog('Error: Grotto configuration for this level not found.', 'danger');
+        addLog('Target Grotto configuration not found!', 'danger');
         return prev;
       }
 
       // Check realm requirement
       if (!checkRealmRequirement(targetConfig.realmRequirement, prev.realm)) {
-        addLog(
-          `Requires [${targetConfig.realmRequirement}] realm to purchase this Grotto. Current realm: ${prev.realm}`,
-          'danger'
-        );
+        addLog(`Realm insufficient! Requires [${targetConfig.realmRequirement}] to upgrade to this Grotto.`, 'danger');
         return prev;
       }
 
@@ -233,7 +228,7 @@ export function useGrottoHandlers({
 
       // Find herb in inventory (multiple matching methods)
       // Strict filter: only herb types, exclude pills etc.
-      let seedItem = prev.inventory.find(
+      const seedItem = prev.inventory.find(
         (item) => {
           if (item.type !== ItemType.Herb) return false;
           // 1. Exact name match
@@ -597,7 +592,7 @@ export function useGrottoHandlers({
       }
 
       // Deduct materials
-      let updatedInventory = prev.inventory.map((item) => {
+      const updatedInventory = prev.inventory.map((item) => {
         const material = enhancementConfig.materials.find((m) => m.name === item.name);
         if (material) {
           return {
@@ -683,7 +678,7 @@ export function useGrottoHandlers({
       return player;
     }
 
-    let updatedPlayer = { ...player };
+    const updatedPlayer = { ...player };
     let totalExp = 0;
     let totalSpiritStones = 0;
     let totalAttributePoints = 0;

@@ -261,8 +261,8 @@ export const normalizeItemEffect = (
   itemName: string,
   aiEffect?: ItemEffect,
   aiPermanentEffect?: ItemPermanentEffect,
-  itemType?: ItemType,
-  rarity?: ItemRarity
+  _itemType?: ItemType,
+  _rarity?: ItemRarity
 ) => {
   // Prioritize getting item definition from constant pool (if exists, use directly, no adjustment)
   const itemFromConstants = getItemFromConstants(itemName);
@@ -782,7 +782,7 @@ export const calculateItemSellPrice = (item: Item): number => {
     仙品: 2000,
   };
   // Ensure basePrice has default value, prevent undefined
-  let basePrice = basePrices[rarity] || 10;
+  const basePrice = basePrices[rarity] || 10;
 
   // Calculate attribute value
   let attributeValue = 0;

@@ -102,7 +102,7 @@ const ShopModal: React.FC<Props> = ({
   // Sellable items (exclude equipped, and filter by type and rarity)
   const sellableItems = useMemo(() => {
     if (!Array.isArray(player.inventory)) return [];
-    let filtered = player.inventory.filter((item) => {
+    const filtered = player.inventory.filter((item) => {
       // Cannot sell equipped items
       const isEquipped = Object.values(player.equippedItems).includes(item.id);
       if (isEquipped) return false;

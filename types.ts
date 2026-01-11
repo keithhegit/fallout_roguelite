@@ -506,6 +506,47 @@ export interface LogEntry {
 
 export type AdventureType = 'normal' | 'lucky' | 'secret_realm' | 'sect_challenge' | 'dao_combining_challenge';
 
+export interface AdventureItemData {
+  name: string;
+  type: string; // "Herb" | "Material" | "Magic Treasure" | "Weapon" | "Armor" | "Accessory" | "Ring" | "Advanced Item"
+  description: string;
+  rarity?: string;
+  isEquippable?: boolean;
+  equipmentSlot?: string; // "Head" | "Shoulder" | "Chest" | "Gloves" | "Pants" | "Shoes" | "Ring1-4" | "Accessory1-2" | "Magic Treasure1-2" | "Weapon"
+  level?: number;
+  advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule'; // Advanced item type (only used when type is "Advanced Item")
+  advancedItemId?: string; // Advanced item ID (for refining)
+  recipeName?: string; // For recipe items
+  reviveChances?: number; // For legendary/mythic items
+  effect?: {
+    attack?: number;
+    defense?: number;
+    hp?: number;
+    exp?: number;
+    spirit?: number;
+    physique?: number;
+    speed?: number;
+    lifespan?: number;
+  };
+  permanentEffect?: {
+    // Permanently increased attributes
+    attack?: number;
+    defense?: number;
+    spirit?: number;
+    physique?: number;
+    speed?: number;
+    maxHp?: number;
+    maxLifespan?: number;
+    spiritualRoots?: {
+      metal?: number;
+      wood?: number;
+      water?: number;
+      fire?: number;
+      earth?: number;
+    };
+  };
+}
+
 export interface AdventureResult {
   story: string;
   hpChange: number;
@@ -550,70 +591,8 @@ export interface AdventureResult {
   longevityRuleObtained?: string; // Obtained rule power ID
   heavenEarthSoulEncounter?: string; // Encountered Heaven Earth Soul BOSS ID
   adventureType?: AdventureType; // Adventure type (used to determine if combat needs to be triggered, etc.)
-  itemObtained?: {
-    name: string;
-    type: string; // "Herb" | "Material" | "Magic Treasure" | "Weapon" | "Armor" | "Accessory" | "Ring" | "Advanced Item"
-    description: string;
-    rarity?: string;
-    isEquippable?: boolean;
-    equipmentSlot?: string; // "Head" | "Shoulder" | "Chest" | "Gloves" | "Pants" | "Shoes" | "Ring1-4" | "Accessory1-2" | "Magic Treasure1-2" | "Weapon"
-    advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule'; // Advanced item type (only used when type is "Advanced Item")
-    advancedItemId?: string; // Advanced item ID (for refining)
-    effect?: {
-      attack?: number;
-      defense?: number;
-      hp?: number;
-      exp?: number;
-      spirit?: number;
-      physique?: number;
-      speed?: number;
-      lifespan?: number;
-    };
-    permanentEffect?: {
-      // Permanently increased attributes
-      attack?: number;
-      defense?: number;
-      spirit?: number;
-      physique?: number;
-      speed?: number;
-      maxHp?: number;
-      maxLifespan?: number;
-      spiritualRoots?: {
-        metal?: number;
-        wood?: number;
-        water?: number;
-        fire?: number;
-        earth?: number;
-      };
-    };
-  };
-
-  itemsObtained?: Array<{
-    // Multiple items (for looting etc.)
-    name: string;
-    type: string;
-    description: string;
-    rarity?: string;
-    isEquippable?: boolean;
-    equipmentSlot?: string;
-    effect?: {
-      attack?: number;
-      defense?: number;
-      hp?: number;
-      exp?: number;
-      spirit?: number;
-      physique?: number;
-      speed?: number;
-    };
-    permanentEffect?: {
-      attack?: number;
-      defense?: number;
-      spirit?: number;
-      physique?: number;
-      speed?: number;
-      maxHp?: number;
-    };
-  }>;
+  itemObtained?: AdventureItemData;
+  itemsObtained?: Array<AdventureItemData>;
 
   petObtained?: string; // Obtained pet template ID (e.g., "pet-spirit-fox")
 

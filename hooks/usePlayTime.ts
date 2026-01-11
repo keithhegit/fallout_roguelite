@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { PlayerStats } from '../types';
+import { PlayerStats, LogEntry } from '../types';
 
 interface UsePlayTimeProps {
   gameStarted: boolean;
   player: PlayerStats | null;
   setPlayer: React.Dispatch<React.SetStateAction<PlayerStats | null>>;
-  saveGame: (player: PlayerStats, logs: any[]) => void;
-  logs: any[];
+  saveGame: (player: PlayerStats, logs: LogEntry[]) => void;
+  logs: LogEntry[];
 }
 
 export function usePlayTime({

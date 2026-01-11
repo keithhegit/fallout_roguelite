@@ -229,11 +229,11 @@ const CharacterModal: React.FC<Props> = ({
   addLog = (msg: string) => logger.log(msg),
 }) => {
   // Use getPlayerTotalStats to get total stats including heart method bonuses
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+   
   const totalStats = useMemo(() => getPlayerTotalStats(player), [player]);
 
   // Inheritance handlers
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+   
   const inheritanceHandlers = useInheritanceHandlers({
     player,
     setPlayer,
@@ -406,7 +406,7 @@ const CharacterModal: React.FC<Props> = ({
     };
 
     // Heart Method bonuses
-    let artStats = {
+    const artStats = {
       attack: 0,
       defense: 0,
       hp: 0,
@@ -427,7 +427,7 @@ const CharacterModal: React.FC<Props> = ({
     });
 
     // Legacy bonuses (Physical) - Removed
-    let inheritanceStats = {
+    const inheritanceStats = {
       attack: 0,
       defense: 0,
       hp: 0,
@@ -437,7 +437,7 @@ const CharacterModal: React.FC<Props> = ({
     };
 
     // Equipment bonuses
-    let equipmentStats = {
+    const equipmentStats = {
       attack: 0,
       defense: 0,
       hp: 0,
@@ -461,7 +461,7 @@ const CharacterModal: React.FC<Props> = ({
 
     // Current active heart method bonus
     const activeArt = getActiveMentalArt(player);
-    let activeArtStats = {
+    const activeArtStats = {
       attack: 0,
       defense: 0,
       hp: 0,

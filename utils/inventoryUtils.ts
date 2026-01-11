@@ -14,6 +14,7 @@ import { getItemFromConstants } from './itemConstantsUtils';
  */
 export function addItemToInventory(
   inventory: Item[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   itemData: any, // 接受原始数据，内部进行规范化
   quantity: number = 1
 ): Item[] {

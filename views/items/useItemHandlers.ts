@@ -31,14 +31,14 @@ const applyItemEffect = (
   const { addLog, setItemActionLog, isBatch = false } = options;
 
   // Clone base data
-  let newStats = { ...prev };
-  let newInv = prev.inventory
+  const newStats = { ...prev };
+  const newInv = prev.inventory
     .map((i) => {
       if (i.id === item.id) return { ...i, quantity: i.quantity - 1 };
       return i;
     })
     .filter((i) => i.quantity > 0);
-  let newPets = [...prev.pets];
+  const newPets = [...prev.pets];
   const effectLogs: string[] = [];
 
   // 1. Handle Inheritance Stone (Special Item) - Inheritance path feature removed, only increases inheritance level
@@ -205,7 +205,9 @@ const applyItemEffect = (
       name: string;
       type: ItemType;
       rarity: ItemRarity;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       effect?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       permanentEffect?: any;
       description?: string;
     }> = allPills.filter(p => p.rarity === targetRarity);
@@ -223,7 +225,9 @@ const applyItemEffect = (
         type: ItemType.Pill, // Force set to Pill type, as material pack should generate pills
         rarity: h.rarity,
         effect: h.effect,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         permanentEffect: (h as any).permanentEffect,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         description: (h as any).description,
       }));
     }
@@ -462,6 +466,16 @@ export function useItemHandlers({
       return;
     }
 
+    // Check realm requirement
+    if (item.minRealm) {
+      const currentRealmIndex = REALM_ORDER.indexOf(player.realm);
+      const requiredRealmIndex = REALM_ORDER.indexOf(item.minRealm);
+      if (currentRealmIndex < requiredRealmIndex) {
+        addLog(`Realm insufficient! Requires [${item.minRealm}] to use this item.`, 'danger');
+        return;
+      }
+    }
+
     // Other items used normally
     setPlayer((prev) => applyItemEffect(prev, item, { addLog, setItemActionLog }));
   };
@@ -589,7 +603,7 @@ export function useItemHandlers({
       let newFoundationTreasure = prev.foundationTreasure;
       let newHeavenEarthEssence = prev.heavenEarthEssence;
       let newHeavenEarthMarrow = prev.heavenEarthMarrow;
-      let newLongevityRules = [...(prev.longevityRules || [])];
+      const newLongevityRules = [...(prev.longevityRules || [])];
       let marrowRefiningProgress = prev.marrowRefiningProgress;
       let marrowRefiningSpeed = prev.marrowRefiningSpeed;
 

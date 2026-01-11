@@ -15,46 +15,33 @@ import {
 } from '../constants/index';
 import { ITEM_TEMPLATES } from '../constants/itemTemplates';
 
-// 缓存所有物品
-let cachedAllItems: Array<{
+// Define a type for item data extracted from constants
+export interface ItemConstantData {
   name: string;
   type: ItemType | string;
   description: string;
   rarity: ItemRarity;
-  effect?: any;
-  permanentEffect?: any;
+  effect?: Item['effect'];
+  permanentEffect?: Item['permanentEffect'];
   isEquippable?: boolean;
   equipmentSlot?: EquipmentSlot | string;
-}> | null = null;
+  advancedItemType?: Item['advancedItemType'];
+  advancedItemId?: Item['advancedItemId'];
+}
+
+// 缓存所有物品
+let cachedAllItems: ItemConstantData[] | null = null;
 
 /**
  * 从所有常量池中获取所有物品
  */
-function getAllItemsFromConstants(): Array<{
-  name: string;
-  type: ItemType | string;
-  description: string;
-  rarity: ItemRarity;
-  effect?: any;
-  permanentEffect?: any;
-  isEquippable?: boolean;
-  equipmentSlot?: EquipmentSlot | string;
-}> {
+function getAllItemsFromConstants(): ItemConstantData[] {
   // 使用缓存
   if (cachedAllItems) {
     return cachedAllItems;
   }
 
-  const items: Array<{
-    name: string;
-    type: ItemType | string;
-    description: string;
-    rarity: ItemRarity;
-    effect?: any;
-    permanentEffect?: any;
-    isEquippable?: boolean;
-    equipmentSlot?: EquipmentSlot | string;
-  }> = [];
+  const items: ItemConstantData[] = [];
   const itemNames = new Set<string>();
 
   // 从 INITIAL_ITEMS 中提取物品
@@ -65,7 +52,7 @@ function getAllItemsFromConstants(): Array<{
       name: item.name,
       type: item.type,
       description: item.description,
-      rarity: (item.rarity || '普通') as ItemRarity,
+      rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
@@ -81,7 +68,7 @@ function getAllItemsFromConstants(): Array<{
       name: item.name,
       type: item.type,
       description: item.description,
-      rarity: (item.rarity || '普通') as ItemRarity,
+      rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
@@ -132,7 +119,7 @@ function getAllItemsFromConstants(): Array<{
         name: item.name,
         type: item.type,
         description: item.description,
-        rarity: (item.rarity || '普通') as ItemRarity,
+        rarity: (item.rarity || 'Common') as ItemRarity,
         effect: item.effect,
         permanentEffect: item.permanentEffect,
         isEquippable: item.isEquippable,
@@ -158,6 +145,8 @@ function getAllItemsFromConstants(): Array<{
           rarity: pillDef.rarity as ItemRarity,
           effect: pillDef.effect,
           permanentEffect: pillDef.permanentEffect,
+          isEquippable: item.isEquippable,
+          equipmentSlot: item.equipmentSlot,
         });
         return;
       }
@@ -167,7 +156,7 @@ function getAllItemsFromConstants(): Array<{
       name: item.name,
       type: item.type,
       description: item.description,
-      rarity: (item.rarity || '普通') as ItemRarity,
+      rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
@@ -183,7 +172,7 @@ function getAllItemsFromConstants(): Array<{
       name: item.name,
       type: item.type,
       description: item.description,
-      rarity: (item.rarity || '普通') as ItemRarity,
+      rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
@@ -200,18 +189,7 @@ function getAllItemsFromConstants(): Array<{
  * @param itemName 物品名称
  * @returns 物品数据，如果未找到则返回 null
  */
-export function getItemFromConstants(itemName: string): {
-  name: string;
-  type: ItemType;
-  description: string;
-  rarity: ItemRarity;
-  effect?: any;
-  permanentEffect?: any;
-  isEquippable?: boolean;
-  equipmentSlot?: EquipmentSlot | string;
-  advancedItemType?: 'foundationTreasure' | 'heavenEarthEssence' | 'heavenEarthMarrow' | 'longevityRule';
-  advancedItemId?: string;
-} | null {
+export function getItemFromConstants(itemName: string): ItemConstantData | null {
   const allItems = getAllItemsFromConstants();
   const item = allItems.find(i => i.name === itemName);
 
@@ -224,7 +202,7 @@ export function getItemFromConstants(itemName: string): {
     ? (item.type as ItemType)
     : ItemType.Material;
 
-  const result: any = {
+  const result: ItemConstantData = {
     name: item.name,
     type: itemType,
     description: item.description,
@@ -236,8 +214,11 @@ export function getItemFromConstants(itemName: string): {
   };
 
   // 如果物品是进阶物品，添加进阶物品信息
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (itemType === ItemType.AdvancedItem && (item as any).advancedItemType) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result.advancedItemType = (item as any).advancedItemType;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result.advancedItemId = (item as any).advancedItemId;
   }
 
@@ -249,16 +230,7 @@ export function getItemFromConstants(itemName: string): {
  * @param rarity 稀有度
  * @returns 符合条件的物品列表
  */
-export function getItemsByRarity(rarity: ItemRarity): Array<{
-  name: string;
-  type: ItemType;
-  description: string;
-  rarity: ItemRarity;
-  effect?: any;
-  permanentEffect?: any;
-  isEquippable?: boolean;
-  equipmentSlot?: EquipmentSlot | string;
-}> {
+export function getItemsByRarity(rarity: ItemRarity): ItemConstantData[] {
   const allItems = getAllItemsFromConstants();
   return allItems
     .filter(item => item.rarity === rarity)
@@ -285,16 +257,7 @@ export function getItemsByRarity(rarity: ItemRarity): Array<{
  * @param itemType 物品类型
  * @returns 符合条件的物品列表
  */
-export function getItemsByType(itemType: ItemType): Array<{
-  name: string;
-  type: ItemType;
-  description: string;
-  rarity: ItemRarity;
-  effect?: any;
-  permanentEffect?: any;
-  isEquippable?: boolean;
-  equipmentSlot?: EquipmentSlot | string;
-}> {
+export function getItemsByType(itemType: ItemType): ItemConstantData[] {
   const allItems = getAllItemsFromConstants();
   return allItems.filter(item => item.type === itemType).map(item => ({
     name: item.name,
@@ -312,16 +275,6 @@ export function getItemsByType(itemType: ItemType): Array<{
  * 从常量池中获取所有法宝（Artifact类型）
  * @returns 所有法宝列表
  */
-export function getAllArtifacts(): Array<{
-  name: string;
-  type: ItemType;
-  description: string;
-  rarity: ItemRarity;
-  effect?: any;
-  permanentEffect?: any;
-  isEquippable?: boolean;
-  equipmentSlot?: EquipmentSlot | string;
-}> {
+export function getAllArtifacts(): ItemConstantData[] {
   return getItemsByType(ItemType.Artifact);
 }
-

@@ -1,15 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import {
-  BookOpen,
-  Backpack,
-  Star,
-  Trophy,
-  Sparkles,
-  Gift,
-  Settings,
-  Menu,
   Bug,
-  Calendar,
   Home,
   Users,
 } from 'lucide-react';

@@ -7,23 +7,26 @@
  * 深度比较两个对象是否相等
  * 比 JSON.stringify 更快，且不依赖属性顺序
  */
-export function deepEqual(obj1: any, obj2: any): boolean {
+export function deepEqual(obj1: unknown, obj2: unknown): boolean {
   if (obj1 === obj2) return true;
 
   if (obj1 == null || obj2 == null) return obj1 === obj2;
 
   if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return false;
 
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
+  const o1 = obj1 as Record<string, unknown>;
+  const o2 = obj2 as Record<string, unknown>;
+
+  const keys1 = Object.keys(o1);
+  const keys2 = Object.keys(o2);
 
   if (keys1.length !== keys2.length) return false;
 
   for (const key of keys1) {
-    if (!Object.prototype.hasOwnProperty.call(obj2, key)) return false;
+    if (!Object.prototype.hasOwnProperty.call(o2, key)) return false;
 
-    const val1 = obj1[key];
-    const val2 = obj2[key];
+    const val1 = o1[key];
+    const val2 = o2[key];
 
     if (typeof val1 === 'object' && typeof val2 === 'object' && val1 !== null && val2 !== null) {
       if (!deepEqual(val1, val2)) return false;
@@ -40,10 +43,10 @@ export function deepEqual(obj1: any, obj2: any): boolean {
  * 专门用于物品效果比较，性能优化版本
  */
 export function compareItemEffects(
-  effect1: any,
-  effect2: any,
-  permanentEffect1?: any,
-  permanentEffect2?: any
+  effect1: unknown,
+  effect2: unknown,
+  permanentEffect1?: unknown,
+  permanentEffect2?: unknown
 ): boolean {
   // 快速路径：如果都是 undefined 或 null
   if (!effect1 && !effect2 && !permanentEffect1 && !permanentEffect2) return true;

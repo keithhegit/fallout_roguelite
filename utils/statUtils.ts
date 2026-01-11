@@ -1,4 +1,4 @@
-import { PlayerStats, CultivationArt, ArtGrade } from '../types';
+import { PlayerStats, CultivationArt } from '../types';
 import { CULTIVATION_ARTS, TALENTS, TITLES, calculateSpiritualRootArtBonus } from '../constants/index';
 import { getGoldenCoreBonusMultiplier } from './cultivationUtils';
 import { getItemStats } from './itemUtils';

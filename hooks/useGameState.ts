@@ -207,7 +207,7 @@ export function useGameState() {
       };
     }
     // 当 player, logs, gameStarted 或 settings.autoSave 变化时触发
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [player, logs, gameStarted, settings.autoSave, saveGame]);
 
   return {

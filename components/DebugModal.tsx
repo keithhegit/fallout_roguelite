@@ -551,18 +551,18 @@ const DebugModal: React.FC<Props> = ({
     const newTalent = talent;
 
     // Calculate stat changes
-    let attackChange =
+    const attackChange =
       (newTalent.effects.attack || 0) - (oldTalent?.effects.attack || 0);
-    let defenseChange =
+    const defenseChange =
       (newTalent.effects.defense || 0) - (oldTalent?.effects.defense || 0);
-    let hpChange = (newTalent.effects.hp || 0) - (oldTalent?.effects.hp || 0);
-    let spiritChange =
+    const hpChange = (newTalent.effects.hp || 0) - (oldTalent?.effects.hp || 0);
+    const spiritChange =
       (newTalent.effects.spirit || 0) - (oldTalent?.effects.spirit || 0);
-    let physiqueChange =
+    const physiqueChange =
       (newTalent.effects.physique || 0) - (oldTalent?.effects.physique || 0);
-    let speedChange =
+    const speedChange =
       (newTalent.effects.speed || 0) - (oldTalent?.effects.speed || 0);
-    let luckChange =
+    const luckChange =
       (newTalent.effects.luck || 0) - (oldTalent?.effects.luck || 0);
 
     const updatedPlayer = {
@@ -633,11 +633,11 @@ const DebugModal: React.FC<Props> = ({
     const newTitle = title;
 
     // Calculate stat changes
-    let attackChange =
+    const attackChange =
       (newTitle.effects.attack || 0) - (oldTitle?.effects.attack || 0);
-    let defenseChange =
+    const defenseChange =
       (newTitle.effects.defense || 0) - (oldTitle?.effects.defense || 0);
-    let hpChange = (newTitle.effects.hp || 0) - (oldTitle?.effects.hp || 0);
+    const hpChange = (newTitle.effects.hp || 0) - (oldTitle?.effects.hp || 0);
 
     const updatedPlayer = {
       ...localPlayer,

@@ -41,7 +41,7 @@ export function useAchievementHandlers({
       let hasNewAchievement = false;
       let newExp = prev.exp;
       let newStones = prev.spiritStones;
-      let newInv = [...prev.inventory];
+      const newInv = [...prev.inventory];
       let lastRewardedTitleId = '';
       const newlyUnlockedTitles: string[] = [];
 

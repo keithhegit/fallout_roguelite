@@ -193,7 +193,7 @@ export function useSectHandlers({
 
       // Check if resources are sufficient
       let updatedInventory = [...prev.inventory];
-      let stoneCost = sect.exitCost.spiritStones || 0;
+      const stoneCost = sect.exitCost.spiritStones || 0;
       const missingItems: string[] = [];
 
       if (prev.spiritStones < stoneCost) {
@@ -263,7 +263,7 @@ export function useSectHandlers({
 
       // 2. Cost check and deduction
       let updatedInventory = [...prev.inventory];
-      let stoneCost = task.cost?.spiritStones || 0;
+      const stoneCost = task.cost?.spiritStones || 0;
 
       if (prev.spiritStones < stoneCost) {
         logMessage(`Insufficient Spirit Stones! Need ${stoneCost}.`, 'danger');

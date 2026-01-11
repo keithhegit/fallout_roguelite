@@ -102,6 +102,7 @@ interface InventoryItemProps {
   heavenEarthMarrow?: string;
   longevityRules?: string[];
   maxLongevityRules?: number;
+  isCompact?: boolean;
   onHover: (item: Item | null) => void;
   onUseItem: (item: Item) => void;
   onEquipItem: (item: Item) => void;
@@ -152,70 +153,89 @@ const InventoryItem = memo<InventoryItemProps>(
     // Helper to get type icon
     const getTypeIcon = () => {
       switch (item.type) {
-        case ItemType.Weapon: return <Sword size={18} />;
-        case ItemType.Armor: return <Shield size={18} />;
-        case ItemType.Pill: return <FlaskConical size={18} />;
-        // case ItemType.Consumable: return <Zap size={18} />;
-        case ItemType.Recipe: return <ScrollText size={18} />;
-        case ItemType.Material: return <Boxes size={18} />;
-        case ItemType.AdvancedItem: return <Dna size={18} />;
-        default: return <CircleHelp size={18} />;
+        case ItemType.Weapon: return <Sword size={16} />;
+        case ItemType.Armor: return <Shield size={16} />;
+        case ItemType.Pill: return <FlaskConical size={16} />;
+        // case ItemType.Consumable: return <Zap size={16} />;
+        case ItemType.Recipe: return <ScrollText size={16} />;
+        case ItemType.Material: return <Boxes size={16} />;
+        case ItemType.AdvancedItem: return <Dna size={16} />;
+        default: return <CircleHelp size={16} />;
       }
     };
 
+    const getRarityColor = (r: string) => {
+      // Return tailwind text color class
+      if (r === 'common') return 'text-stone-400';
+      if (r === 'uncommon') return 'text-emerald-400';
+      if (r === 'rare') return 'text-blue-400';
+      if (r === 'epic') return 'text-purple-400';
+      if (r === 'legendary') return 'text-amber-400';
+      if (r === 'mythic') return 'text-red-500';
+      return 'text-stone-400';
+    };
+
+    const rarityColorClass = getRarityColor(rarity);
+    const rarityBorderClass = getRarityBorder(rarity);
+
     return (
       <div
-        className={`p-3 rounded-none border flex flex-col justify-between relative transition-all duration-300 group overflow-hidden font-mono ${
+        className={`relative flex flex-col justify-between group overflow-hidden transition-all duration-200 ${
           isEquipped 
-            ? 'bg-stone-950 border-yellow-600/50 shadow-[0_0_15px_rgba(202,138,4,0.1)]' 
-            : `bg-stone-950/90 hover:bg-stone-900 ${getRarityBorder(rarity)}`
+            ? 'bg-stone-900/80 border-2 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.2)]' 
+            : `bg-black/60 hover:bg-stone-900/60 border border-stone-800 hover:border-stone-600`
         }`}
         onMouseEnter={() => onHover(item)}
         onMouseLeave={() => onHover(null)}
       >
         {/* CRT Visual Layers */}
-        <div className="absolute inset-0 bg-scanlines opacity-[0.02] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-scanlines opacity-[0.03] pointer-events-none"></div>
+        {isEquipped && <div className="absolute inset-0 bg-amber-500/5 pointer-events-none animate-pulse"></div>}
         
-        {isEquipped && (
-          <div className="absolute top-2 right-2 text-yellow-500 bg-yellow-950/20 px-2 py-0.5 rounded-none text-[9px] border border-yellow-900/40 flex items-center gap-1 z-10 animate-pulse uppercase tracking-widest">
-            <ShieldCheck size={10} /> ACTIVE_LINK
+        {/* Header Section */}
+        <div className="p-2.5 flex gap-3 relative z-10">
+           {/* Icon Box */}
+          <div className={`w-10 h-10 shrink-0 border flex items-center justify-center bg-stone-950 shadow-inner ${rarityBorderClass} ${rarityColorClass}`}>
+            {getTypeIcon()}
           </div>
-        )}
-
-        <div className="relative z-10">
-          <div className="flex gap-3 mb-3">
-            {/* Item Icon Container */}
-            <div className={`w-12 h-12 rounded-none border flex items-center justify-center shrink-0 ${getRarityBorder(rarity)} bg-stone-950 ${getRarityTextColor(rarity)} shadow-inner`}>
-              {getTypeIcon()}
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start mb-1">
-                <h4 className={`${getRarityNameClasses(rarity)} truncate text-sm font-bold uppercase tracking-wider`}>
+          
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+             <div className="flex justify-between items-baseline gap-2">
+                <h4 className={`text-xs font-bold uppercase tracking-wider truncate ${rarityColorClass} ${isEquipped ? 'text-amber-400' : ''}`}>
                   {item.name}
-                  {showLevel && (
-                    <span className="text-stone-600 text-[10px] font-normal ml-1">
-                      +{item.level}
-                    </span>
-                  )}
                 </h4>
-                <span className="text-[10px] bg-stone-950 text-stone-500 px-1.5 py-0.5 rounded-none border border-stone-900 ml-2">
-                  x{item.quantity}
-                </span>
-              </div>
-              
-              <div className="flex gap-2 items-center">
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-none uppercase font-bold tracking-widest border ${getRarityBadge(rarity)}`}>
+                {showLevel && (
+                  <span className="text-[9px] text-stone-500 font-mono">
+                    LVL.{item.level}
+                  </span>
+                )}
+             </div>
+             <div className="flex items-center gap-2 mt-0.5">
+                <span className={`text-[9px] uppercase tracking-widest font-mono ${rarityColorClass} opacity-80`}>
                   {rarityLabel}
                 </span>
-                <span className="text-[10px] text-stone-600 uppercase tracking-widest font-mono">{typeLabel}</span>
-              </div>
-            </div>
+                <span className="text-[8px] text-stone-600 uppercase tracking-widest font-mono border-l border-stone-800 pl-2">
+                  {typeLabel}
+                </span>
+                {item.quantity > 1 && (
+                  <span className="ml-auto text-[9px] bg-stone-800 text-stone-300 px-1 rounded-sm font-mono">
+                    x{item.quantity}
+                  </span>
+                )}
+             </div>
           </div>
+        </div>
 
-          <p className="text-[11px] text-stone-500 leading-relaxed mb-3 line-clamp-2 italic opacity-80 group-hover:opacity-100 transition-opacity font-mono">
-            {item.description}
-          </p>
+        {/* Content Section */}
+        <div className={`${isCompact ? 'px-1.5 pb-1.5' : 'px-2.5 pb-2'} flex-1 relative z-10`}>
+           {/* Description / Stats */}
+           {!isCompact && (
+           <div className="mb-2 min-h-[2.5em]">
+              <p className="text-[10px] text-stone-500 italic line-clamp-2 leading-tight">
+                {item.description}
+              </p>
+           </div>
+           )}
 
           {/* Advanced Item Effects Display */}
           {item.type === ItemType.AdvancedItem && item.advancedItemType && item.advancedItemId && (() => {
@@ -242,17 +262,17 @@ const InventoryItem = memo<InventoryItemProps>(
               if (effects.speedBonus) effectEntries.push(`AGI+${effects.speedBonus}`);
 
               return (
-                <div className="text-xs mb-3 space-y-1">
+                <div className="text-[10px] mb-2 p-1.5 bg-stone-950/50 border border-stone-800/50">
                   {effectEntries.length > 0 && (
-                    <div className="text-stone-400 grid grid-cols-2 gap-1">
+                    <div className="text-stone-400 grid grid-cols-2 gap-x-2 gap-y-0.5">
                       {effectEntries.map((entry, idx) => (
                         <span key={idx}>{entry}</span>
                       ))}
                     </div>
                   )}
                   {effects.specialEffect && (
-                    <div className="text-emerald-400 italic mt-1">
-                      ✨ {effects.specialEffect}
+                    <div className="text-emerald-500/80 italic mt-1 border-t border-stone-800/50 pt-0.5">
+                      {effects.specialEffect}
                     </div>
                   )}
                 </div>
@@ -263,54 +283,42 @@ const InventoryItem = memo<InventoryItemProps>(
 
           {/* Supply utility notes */}
           {item.type === ItemType.Material && (
-            <div className="text-xs text-blue-400 mb-2 p-2 bg-blue-900/20 rounded border border-blue-800/50">
-              <div className="font-bold mb-1">💡 Utility:</div>
-              <div className="space-y-0.5 text-blue-300">
+            <div className="text-[9px] text-blue-400/80 mb-2 p-1.5 bg-blue-950/10 border border-blue-900/30">
+              <div className="space-y-0.5">
                 {item.name.includes('crate') || item.name.includes('Package') ? (
-                  <div>• Contains medical or survival components.</div>
+                  <div>• Medical/Survival components</div>
                 ) : item.name.includes('Key') ? (
-                  <div>• Used to unlock old vaults or secure crates.</div>
-                ) : null}
-                {item.name.includes('Alloy') || item.name.includes('Steel') || item.name.includes('Circuit') ? (
-                  <div>• Essential for gear and mod upgrades.</div>
-                ) : null}
-                {item.name.includes('Chem') || item.name.includes('Resource') || item.name.includes('Sample') ? (
-                  <div>• Used for chem synthesis (see schematics).</div>
-                ) : null}
-                {!item.name.includes('crate') && !item.name.includes('Key') && (
-                  <div>• Can be used to train captured creatures.</div>
-                )}
-                {!item.effect && !item.name.includes('crate') && !item.name.includes('Key') && (
-                  <div className="text-stone-400">• This material has no confirmed direct utility.</div>
+                  <div>• Vault access protocol</div>
+                ) : item.name.includes('Alloy') || item.name.includes('Steel') || item.name.includes('Circuit') ? (
+                  <div>• Crafting component</div>
+                ) : item.name.includes('Chem') || item.name.includes('Resource') || item.name.includes('Sample') ? (
+                  <div>• Chemical synthesis base</div>
+                ) : (
+                  <div>• General wasteland scrap</div>
                 )}
               </div>
             </div>
           )}
 
           {isNatal && (
-            <div className="text-xs text-amber-400 mb-2 flex items-center gap-1">
-              <Sparkles size={12} />
-              <span className="font-bold">Signature Gear (Stats +50%)</span>
+            <div className="text-[9px] text-amber-500 mb-2 flex items-center gap-1 border border-amber-900/30 bg-amber-950/10 px-1.5 py-0.5">
+              <Sparkles size={10} />
+              <span className="font-bold uppercase">Signature Gear (+50%)</span>
             </div>
           )}
 
-
-          {reviveChances !== undefined && reviveChances > 0 && (
-            <div className="text-xs text-yellow-400 mb-2 flex items-center gap-1 font-bold">
-              💫 Survival Charges: {reviveChances}
-            </div>
-          )}
-          {reviveChances !== undefined && reviveChances <= 0 && (
-            <div className="text-[11px] text-stone-500 mb-2 flex items-center gap-1">
-              💫 Survival Charges: Depleted
-            </div>
+          {reviveChances !== undefined && (
+             <div className={`text-[9px] mb-2 flex items-center gap-1 px-1.5 py-0.5 border ${reviveChances > 0 ? 'text-yellow-500 border-yellow-900/30 bg-yellow-950/10' : 'text-stone-500 border-stone-800 bg-stone-900/20'}`}>
+                <Zap size={10} />
+                <span className="uppercase">Charges: {reviveChances > 0 ? reviveChances : 'DEPLETED'}</span>
+             </div>
           )}
 
           {(item.effect || item.permanentEffect) && (
-            <div className="text-xs mb-2 space-y-1">
+            <div className="text-[10px] mb-2 p-1.5 bg-stone-950/50 border border-stone-800/50 space-y-1">
               {/* Temporary Effects */}
               {item.effect && (
-                <div className="text-stone-400 grid grid-cols-2 gap-1">
+                <div className="text-stone-400 grid grid-cols-2 gap-x-2 gap-y-0.5">
                   {stats.attack > 0 && <span>FP +{stats.attack}</span>}
                   {stats.defense > 0 && <span>DR +{stats.defense}</span>}
                   {stats.hp > 0 && <span>HP +{stats.hp}</span>}
@@ -323,50 +331,39 @@ const InventoryItem = memo<InventoryItemProps>(
               )}
               {/* Permanent Effects */}
               {item.permanentEffect && (
-                <div className="text-emerald-400 grid grid-cols-2 gap-1">
+                <div className="text-emerald-500/90 grid grid-cols-2 gap-x-2 gap-y-0.5 border-t border-stone-800/50 pt-1 mt-1">
                   {item.permanentEffect.attack && item.permanentEffect.attack > 0 && (
-                    <span>✨ FP Perm +{item.permanentEffect.attack}</span>
+                    <span>FP Perm +{item.permanentEffect.attack}</span>
                   )}
                   {item.permanentEffect.defense && item.permanentEffect.defense > 0 && (
-                    <span>✨ DR Perm +{item.permanentEffect.defense}</span>
+                    <span>DR Perm +{item.permanentEffect.defense}</span>
                   )}
                   {item.permanentEffect.maxHp && item.permanentEffect.maxHp > 0 && (
-                    <span>✨ HP MAX Perm +{item.permanentEffect.maxHp}</span>
+                    <span>HP MAX Perm +{item.permanentEffect.maxHp}</span>
                   )}
                   {item.permanentEffect.spirit && item.permanentEffect.spirit > 0 && (
-                    <span>✨ PER Perm +{item.permanentEffect.spirit}</span>
+                    <span>PER Perm +{item.permanentEffect.spirit}</span>
                   )}
                   {item.permanentEffect.physique && item.permanentEffect.physique > 0 && (
-                    <span>✨ END Perm +{item.permanentEffect.physique}</span>
+                    <span>END Perm +{item.permanentEffect.physique}</span>
                   )}
                   {item.permanentEffect.speed && item.permanentEffect.speed > 0 && (
-                    <span>✨ AGI Perm +{item.permanentEffect.speed}</span>
+                    <span>AGI Perm +{item.permanentEffect.speed}</span>
                   )}
                   {item.permanentEffect.maxLifespan && item.permanentEffect.maxLifespan > 0 && (
-                    <span>✨ LIFE MAX Perm +{item.permanentEffect.maxLifespan}</span>
+                    <span>LIFE MAX Perm +{item.permanentEffect.maxLifespan}</span>
                   )}
                   {/* Aptitude Effects */}
                   {item.permanentEffect.spiritualRoots && (() => {
                     const roots = item.permanentEffect.spiritualRoots;
                     const rootEntries: string[] = [];
 
-                    if (roots.metal && roots.metal > 0) {
-                      rootEntries.push(`${SPIRITUAL_ROOT_NAMES.metal} Aptitude +${roots.metal}`);
-                    }
-                    if (roots.wood && roots.wood > 0) {
-                      rootEntries.push(`${SPIRITUAL_ROOT_NAMES.wood} Aptitude +${roots.wood}`);
-                    }
-                    if (roots.water && roots.water > 0) {
-                      rootEntries.push(`${SPIRITUAL_ROOT_NAMES.water} Aptitude +${roots.water}`);
-                    }
-                    if (roots.fire && roots.fire > 0) {
-                      rootEntries.push(`${SPIRITUAL_ROOT_NAMES.fire} Aptitude +${roots.fire}`);
-                    }
-                    if (roots.earth && roots.earth > 0) {
-                      rootEntries.push(`${SPIRITUAL_ROOT_NAMES.earth} Aptitude +${roots.earth}`);
-                    }
+                    if (roots.metal && roots.metal > 0) rootEntries.push(`${SPIRITUAL_ROOT_NAMES.metal} +${roots.metal}`);
+                    if (roots.wood && roots.wood > 0) rootEntries.push(`${SPIRITUAL_ROOT_NAMES.wood} +${roots.wood}`);
+                    if (roots.water && roots.water > 0) rootEntries.push(`${SPIRITUAL_ROOT_NAMES.water} +${roots.water}`);
+                    if (roots.fire && roots.fire > 0) rootEntries.push(`${SPIRITUAL_ROOT_NAMES.fire} +${roots.fire}`);
+                    if (roots.earth && roots.earth > 0) rootEntries.push(`${SPIRITUAL_ROOT_NAMES.earth} +${roots.earth}`);
 
-                    // If all aptitudes are the same, merge display
                     if (rootEntries.length > 0) {
                       const allSame = rootEntries.every(entry => {
                         const match = entry.match(/\+(\d+)$/);
@@ -375,10 +372,10 @@ const InventoryItem = memo<InventoryItemProps>(
 
                       if (allSame && rootEntries.length === 5) {
                         const value = rootEntries[0].match(/\+(\d+)$/)?.[1] || '0';
-                        return <span className="col-span-2">✨ All SPECIAL Perm +{value}</span>;
+                        return <span className="col-span-2">All S.P.E.C.I.A.L. Perm +{value}</span>;
                       } else {
                         return rootEntries.map((entry, idx) => (
-                          <span key={idx}>✨ {entry} Perm</span>
+                          <span key={idx}>{entry} Perm</span>
                         ));
                       }
                     }
@@ -390,30 +387,32 @@ const InventoryItem = memo<InventoryItemProps>(
           )}
         </div>
 
-        <div className="mt-2 flex gap-1.5 flex-wrap">
+        {/* Action Bar */}
+        <div className="mt-auto border-t border-stone-800 bg-stone-950/50 p-1 flex gap-1">
           {item.isEquippable && item.equipmentSlot ? (
             <>
               {isEquipped ? (
                 <button
-                  onClick={() => onUnequipItem(item)}
-                  className="flex-1 bg-stone-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
+                  onClick={(e) => { e.stopPropagation(); onUnequipItem(item); }}
+                  className="flex-1 bg-stone-800 hover:bg-stone-700 text-stone-300 text-[9px] py-1.5 transition-all border border-stone-700 uppercase tracking-widest font-bold"
                 >
-                  DE-EQUIP
+                  UNEQUIP
                 </button>
               ) : (
                 <button
-                  onClick={() => onEquipItem(item)}
-                  className="flex-1 bg-stone-950 hover:bg-blue-950/20 text-blue-400 text-[10px] py-2 rounded-none transition-all border border-blue-900/50 hover:border-blue-400 uppercase tracking-widest min-h-[36px]"
+                  onClick={(e) => { e.stopPropagation(); onEquipItem(item); }}
+                  className="flex-1 bg-blue-900/30 hover:bg-blue-800/50 text-blue-400 text-[9px] py-1.5 transition-all border border-blue-800 hover:border-blue-500 uppercase tracking-widest font-bold"
                 >
-                  INITIALIZE
+                  EQUIP
                 </button>
               )}
+              
               {item.type === ItemType.Artifact && onRefineNatalArtifact && (() => {
                 const isDisabled = !isNatal && !canRefine;
-
                 return (
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       if (isNatal && onUnrefineNatalArtifact) {
                         onUnrefineNatalArtifact();
                       } else if (!isNatal && canRefine) {
@@ -421,43 +420,38 @@ const InventoryItem = memo<InventoryItemProps>(
                       }
                     }}
                     disabled={isDisabled}
-                    className={`px-3 text-[10px] py-2 rounded-none transition-all border uppercase tracking-widest min-h-[36px] ${isNatal
-                      ? 'bg-bunker-900 hover:bg-amber-500/10 text-amber-400 border-amber-500/50'
+                    className={`px-2 py-1.5 border transition-all ${isNatal
+                      ? 'bg-amber-900/30 border-amber-600 text-amber-500'
                       : isDisabled
-                        ? 'bg-stone-950 text-stone-700 border-stone-900 cursor-not-allowed opacity-50'
-                        : 'bg-stone-950 hover:bg-purple-950/20 text-purple-400 border-purple-900/50'
+                        ? 'bg-stone-900/50 border-stone-800 text-stone-600 cursor-not-allowed'
+                        : 'bg-purple-900/30 border-purple-800 text-purple-400 hover:bg-purple-800/50'
                       }`}
-                    title={
-                      isNatal
-                        ? 'Dissolve Neural Sync'
-                        : isDisabled
-                          ? 'Neural Sync requires Mutant rank.'
-                          : 'Establish Neural Sync'
-                    }
+                    title={isNatal ? 'Dissolve Neural Sync' : 'Establish Neural Sync'}
                   >
-                    <Sparkles size={14} />
+                    <Sparkles size={12} />
                   </button>
                 );
               })()}
+              
               <button
-                onClick={() => onUpgradeItem(item)}
-                className="px-3 bg-stone-950 hover:bg-stone-900 text-stone-400 text-[10px] py-2 rounded-none transition-all border border-stone-800 uppercase tracking-widest min-h-[36px]"
+                onClick={(e) => { e.stopPropagation(); onUpgradeItem(item); }}
+                className="px-2 bg-stone-900 hover:bg-stone-800 text-stone-400 border border-stone-800 hover:border-stone-600 transition-all"
                 title="CALIBRATE"
               >
-                <Hammer size={14} />
+                <Hammer size={12} />
               </button>
+              
               <button
-                onClick={() => onDiscardItem(item)}
-                className="px-3 bg-stone-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none transition-all border border-red-900/50 hover:border-red-500 uppercase tracking-widest min-h-[36px]"
+                onClick={(e) => { e.stopPropagation(); onDiscardItem(item); }}
+                className="px-2 bg-stone-900 hover:bg-red-900/30 text-stone-500 hover:text-red-500 border border-stone-800 hover:border-red-800 transition-all"
                 title="PURGE"
               >
-                <Trash2 size={14} />
+                <Trash2 size={12} />
               </button>
             </>
           ) : (
             <>
               {(() => {
-                // Determine if the item is usable
                 const isMaterialPack = (item.name.includes('Material Pack')) && item.type === ItemType.Material;
                 const isTreasureVaultKey = (item.name === 'Faction Vault Key') && item.type === ItemType.Material;
                 const hasEffect = item.effect || item.permanentEffect;
@@ -466,115 +460,68 @@ const InventoryItem = memo<InventoryItemProps>(
 
                 return isUsable ? (
                   <button
-                    onClick={() => onUseItem(item)}
-                    className="flex-1 bg-ink-950 hover:bg-emerald-950/20 text-emerald-400 text-[10px] py-2 rounded-none border border-emerald-900/50 hover:border-emerald-400 uppercase tracking-widest transition-all min-h-[36px]"
+                    onClick={(e) => { e.stopPropagation(); onUseItem(item); }}
+                    className="flex-1 bg-emerald-900/30 hover:bg-emerald-800/50 text-emerald-400 text-[9px] py-1.5 border border-emerald-800 hover:border-emerald-500 uppercase tracking-widest font-bold transition-all"
                   >
-                    {item.type === ItemType.Recipe ? 'ANALYZE' : 'EXECUTE'}
+                    {item.type === ItemType.Recipe ? 'ANALYZE' : 'USE'}
                   </button>
                 ) : null;
               })()}
+              
               {item.type === ItemType.AdvancedItem && item.advancedItemType && onRefineAdvancedItem && (() => {
                 const currentRealmIndex = REALM_ORDER.indexOf(playerRealm as RealmType);
                 let canRefineItem = false;
                 let warningMessage = '';
-                let requiredRealmName = '';
-
+                
                 if (item.advancedItemType === 'foundationTreasure') {
-                  requiredRealmName = 'Scavenger';
                   canRefineItem = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.QiRefining);
-                  warningMessage = `Neural Link for Essential Gear requires ${requiredRealmName} rank\nCurrent rank: ${playerRealm}`;
+                  warningMessage = `Req: Scavenger`;
                 } else if (item.advancedItemType === 'heavenEarthEssence') {
-                  requiredRealmName = 'Mutant';
                   canRefineItem = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.GoldenCore);
-                  warningMessage = `Neural Link for Core Essence requires ${requiredRealmName} rank\nCurrent rank: ${playerRealm}`;
+                  warningMessage = `Req: Mutant`;
                 } else if (item.advancedItemType === 'heavenEarthMarrow') {
-                  requiredRealmName = 'Evolved';
                   canRefineItem = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.NascentSoul);
-                  warningMessage = `Neural Link for Apex Marrow requires ${requiredRealmName} rank\nCurrent rank: ${playerRealm}`;
+                  warningMessage = `Req: Evolved`;
                 } else if (item.advancedItemType === 'longevityRule') {
-                  requiredRealmName = 'Apex';
                   canRefineItem = currentRealmIndex >= REALM_ORDER.indexOf(RealmType.DaoCombining);
-                  warningMessage = `Neural Link for Wasteland Laws requires ${requiredRealmName} rank\nCurrent rank: ${playerRealm}`;
+                  warningMessage = `Req: Apex`;
                 }
 
-                // Check if already owned
+                // Check ownership logic (simplified for display)
                 let alreadyOwned = false;
-                let alreadyOwnedMessage = '';
-                if (item.advancedItemType === 'foundationTreasure' && foundationTreasure) {
-                  alreadyOwned = true;
-                  alreadyOwnedMessage = 'Essential Gear already linked.';
-                } else if (item.advancedItemType === 'heavenEarthEssence' && heavenEarthEssence) {
-                  alreadyOwned = true;
-                  alreadyOwnedMessage = 'Core Essence already linked.';
-                } else if (item.advancedItemType === 'heavenEarthMarrow' && heavenEarthMarrow) {
-                  alreadyOwned = true;
-                  alreadyOwnedMessage = 'Apex Marrow already linked.';
-                } else if (item.advancedItemType === 'longevityRule' && item.advancedItemId) {
-                  if ((longevityRules || []).includes(item.advancedItemId)) {
-                    alreadyOwned = true;
-                    alreadyOwnedMessage = 'Law already mastered.';
-                  } else {
-                    // Check if max limit reached
-                    const maxRules = maxLongevityRules || 3;
-                    if ((longevityRules || []).length >= maxRules) {
-                      alreadyOwned = true;
-                      alreadyOwnedMessage = `You already have ${maxRules} Wasteland Laws (Limit reached).`;
-                    }
-                  }
-                }
-
-                // Generate complete tooltip message
-                const tooltipMessage = alreadyOwned
-                  ? alreadyOwnedMessage
-                  : !canRefineItem
-                    ? warningMessage
-                    : 'INSTALL NEURAL MOD';
+                 if (item.advancedItemType === 'foundationTreasure' && foundationTreasure) alreadyOwned = true;
+                 else if (item.advancedItemType === 'heavenEarthEssence' && heavenEarthEssence) alreadyOwned = true;
+                 else if (item.advancedItemType === 'heavenEarthMarrow' && heavenEarthMarrow) alreadyOwned = true;
+                 else if (item.advancedItemType === 'longevityRule' && item.advancedItemId && (longevityRules || []).includes(item.advancedItemId)) alreadyOwned = true;
 
                 return (
                   <button
-                    onClick={() => {
-                      if (!canRefineItem) {
-                        if (setItemActionLog) {
-                          setItemActionLog({ text: warningMessage.replace(/\n/g, ' '), type: 'danger' });
-                        }
-                        return;
-                      }
-                      if (alreadyOwned) {
-                        if (setItemActionLog) {
-                          setItemActionLog({ text: alreadyOwnedMessage, type: 'danger' });
-                        }
-                        return;
-                      }
-                      // confirm
-                      const confirmMessage = item.advancedItemType === 'foundationTreasure'
-                        ? `Initialize neural link with [${item.name}]?\n\n⚠️ WARNING: Essential Gear links are permanent and cannot be modified!`
-                        : `Initialize neural link with [${item.name}]?`;
-                      showConfirm(
-                        confirmMessage,
+                    onClick={(e) => {
+                       e.stopPropagation();
+                       if (!canRefineItem || alreadyOwned) return;
+                       showConfirm(
+                        `Initialize neural link with [${item.name}]?`,
                         'CONFIRM LINK',
-                        () => {
-                          onRefineAdvancedItem(item);
-                        }
+                        () => onRefineAdvancedItem(item)
                       );
                     }}
                     disabled={!canRefineItem || alreadyOwned}
-                    className={`flex-1 bg-ink-950 text-[10px] py-2 rounded-none transition-all border uppercase tracking-widest min-h-[36px] ${!canRefineItem || alreadyOwned
-                      ? 'text-stone-700 border-stone-900/50 cursor-not-allowed'
-                      : 'hover:bg-purple-950/20 text-purple-400 border-purple-900/50 hover:border-purple-400'
+                    className={`flex-1 text-[9px] py-1.5 border uppercase tracking-widest font-bold ${!canRefineItem || alreadyOwned
+                      ? 'bg-stone-900/50 text-stone-600 border-stone-800 cursor-not-allowed'
+                      : 'bg-purple-900/30 hover:bg-purple-800/50 text-purple-400 border-purple-800 hover:border-purple-500'
                       }`}
-                    title={tooltipMessage}
                   >
-                    <Sparkles size={14} className="inline mr-1" />
-                    INSTALL
+                    {alreadyOwned ? 'INSTALLED' : !canRefineItem ? 'LOCKED' : 'INSTALL'}
                   </button>
                 );
               })()}
+              
               <button
-                onClick={() => onDiscardItem(item)}
-                className="px-3 bg-stone-950 hover:bg-red-950/20 text-red-500 text-[10px] py-2 rounded-none border border-red-900/50 hover:border-red-500 transition-all uppercase tracking-widest min-h-[36px]"
+                onClick={(e) => { e.stopPropagation(); onDiscardItem(item); }}
+                className="px-2 bg-stone-900 hover:bg-red-900/30 text-stone-500 hover:text-red-500 border border-stone-800 hover:border-red-800 transition-all"
                 title="PURGE"
               >
-                <Trash2 size={14} />
+                <Trash2 size={12} />
               </button>
             </>
           )}
@@ -598,7 +545,8 @@ const InventoryItem = memo<InventoryItemProps>(
       prevProps.heavenEarthEssence === nextProps.heavenEarthEssence &&
       prevProps.heavenEarthMarrow === nextProps.heavenEarthMarrow &&
       prevProps.longevityRules === nextProps.longevityRules &&
-      prevProps.maxLongevityRules === nextProps.maxLongevityRules
+      prevProps.maxLongevityRules === nextProps.maxLongevityRules &&
+      prevProps.isCompact === nextProps.isCompact
     );
   }
 );
@@ -647,6 +595,7 @@ const InventoryModal: React.FC<Props> = ({
   const [rarityFilter, setRarityFilter] = useState<ItemRarity | 'all'>('all');
   const [statFilter, setStatFilter] = useState<'all' | 'attack' | 'defense' | 'hp' | 'spirit' | 'physique' | 'speed'>('all');
   const [statFilterMin, setStatFilterMin] = useState<number>(0);
+  const [isCompact, setIsCompact] = useState(false);
 
   // Use useTransition to optimize category switching and avoid blocking UI
   const [isPending, startTransition] = useTransition();
@@ -1212,6 +1161,7 @@ const InventoryModal: React.FC<Props> = ({
                   <InventoryItem
                     key={item.id}
                     item={item}
+                    isCompact={isCompact}
                     isNatal={item.id === natalArtifactId}
                     canRefine={canRefineGlobal}
                     isEquipped={itemEquippedMap.get(item.id) || false}
