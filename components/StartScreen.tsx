@@ -434,6 +434,7 @@ const StartScreen: React.FC<Props> = ({ onStart }) => {
       </div>
     </div>
   </div>
+</div>
   );
 };
 
