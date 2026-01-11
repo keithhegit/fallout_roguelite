@@ -139,14 +139,10 @@ export interface Item {
 }
 
 
-export const SectRank = {
-  Outer: 'Candidate',
-  Inner: 'Member',
-  Core: 'Elite',
-  Elder: 'Lieutenant',
-  Leader: 'Leader',
-} as const;
-export type SectRank = typeof SectRank[keyof typeof SectRank];
+import { SectRank as SectRankValue } from './constants/ranks';
+
+export const SectRank = SectRankValue;
+export type SectRank = typeof SectRankValue[keyof typeof SectRankValue];
 
 export interface SecretRealm {
   id: string;
