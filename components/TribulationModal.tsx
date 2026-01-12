@@ -290,8 +290,10 @@ const TribulationModal: React.FC<TribulationModalProps> = ({
       setPuzzle({ type: firstChallenge.type, data: firstChallenge.data });
       setUserInput([]);
       // If Rune Sequence, init from data
-      if (firstChallenge.type === 'Rune Sequence' && firstChallenge.data?.sequence) {
-        setCurrentSequence([...firstChallenge.data.sequence]);
+      if (firstChallenge.type === 'Rune Sequence') {
+        const sequence = (firstChallenge.data as { sequence?: number[] } | null | undefined)
+          ?.sequence;
+        setCurrentSequence(Array.isArray(sequence) ? sequence.map(String) : []);
       } else {
         setCurrentSequence([]);
       }

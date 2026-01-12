@@ -135,6 +135,12 @@ function GameView({
     modals.setIsMobileSidebarOpen(false);
   }, [modals]);
 
+  const handleOpenMenuTab = useCallback(() => {
+    setMobileTab('radio');
+    modals.setIsMobileStatsOpen(false);
+    modals.setIsMobileSidebarOpen(true);
+  }, [modals]);
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-stone-950 text-stone-200 overflow-hidden relative crt-screen">
       {/* CRT Visual Layers */}
@@ -236,10 +242,7 @@ function GameView({
             {mobileTab === 'radio' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500"></div>}
           </button>
           <button
-            onClick={() => {
-              handlers.onOpenMenu();
-              handleSelectRadioTab();
-            }}
+            onClick={handleOpenMenuTab}
             className="min-h-[56px] py-1 flex flex-col items-center justify-center touch-manipulation transition-colors text-stone-500 active:bg-stone-900 relative z-20"
           >
             <Menu size={20} className="mb-1" />

@@ -116,28 +116,31 @@ interface InventoryItemProps {
 }
 
 const InventoryItem = memo<InventoryItemProps>(
-  ({
-    item,
-    isNatal,
-    canRefine,
-    isEquipped,
-    playerRealm,
-    foundationTreasure,
-    heavenEarthEssence,
-    heavenEarthMarrow,
-    longevityRules,
-    maxLongevityRules,
-    onHover,
-    onUseItem,
-    onEquipItem,
-    onUnequipItem,
-    onUpgradeItem,
-    onDiscardItem,
-    onRefineNatalArtifact,
-    onUnrefineNatalArtifact,
-    onRefineAdvancedItem,
-    setItemActionLog,
-  }) => {
+  (props) => {
+    const {
+      item,
+      isNatal,
+      canRefine,
+      isEquipped,
+      playerRealm,
+      foundationTreasure,
+      heavenEarthEssence,
+      heavenEarthMarrow,
+      longevityRules,
+      maxLongevityRules,
+      onHover,
+      onUseItem,
+      onEquipItem,
+      onUnequipItem,
+      onUpgradeItem,
+      onDiscardItem,
+      onRefineNatalArtifact,
+      onUnrefineNatalArtifact,
+      onRefineAdvancedItem,
+      setItemActionLog,
+    } = props;
+    const isCompact = !!props.isCompact;
+
     // Use unified utility functions for item stats
     const stats = getItemStats(item, isNatal);
     const rarity = normalizeRarityValue(item.rarity);
@@ -554,6 +557,7 @@ const InventoryItem = memo<InventoryItemProps>(
 InventoryItem.displayName = 'InventoryItem';
 
 const InventoryModal: React.FC<Props> = ({
+  isOpen,
   onClose,
   inventory,
   equippedItems,
@@ -827,6 +831,8 @@ const InventoryModal: React.FC<Props> = ({
       hp: hoveredStats.hp - currentEquippedStats.hp,
     };
   }, [hoveredItem, equippedItems, inventory, getItemStatsForComparison]);
+
+  if (!isOpen) return null;
 
   return (
     <div

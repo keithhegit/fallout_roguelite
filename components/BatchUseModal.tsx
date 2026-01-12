@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { X, Zap, Filter } from 'lucide-react';
 import { Item, ItemType, ItemRarity, EquipmentSlot } from '../types';
 import { ASSETS } from '../constants/assets';
-import { getRarityTextColor, getRarityBorder } from '../utils/rarityUtils';
+import { getRarityTextColor, getRarityBorder, normalizeRarityValue } from '../utils/rarityUtils';
 import { normalizeTypeLabel } from '../utils/itemUtils';
 import { showConfirm } from '../utils/toastUtils';
 
@@ -295,7 +295,8 @@ const BatchUseModal: React.FC<Props> = ({
             ) : (
               filteredItems.map((item) => {
                 const isSelected = selectedItems.has(item.id);
-                const rarity = item.rarity || '普通';
+                const rarity = normalizeRarityValue(item.rarity);
+                const rarityLabel = item.rarity || rarity;
                 const quantity = itemQuantities.get(item.id) || 1;
 
                 return (
@@ -327,7 +328,7 @@ const BatchUseModal: React.FC<Props> = ({
                           <span
                             className={`text-[9px] px-1.5 py-0.5 rounded-none border font-bold uppercase tracking-widest ${getRarityBorder(rarity).replace('border-2', 'border')}`}
                           >
-                            {rarity}
+                            {rarityLabel}
                           </span>
                           <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
                             {normalizeTypeLabel(item.type, item)}

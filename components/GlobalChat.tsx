@@ -23,6 +23,9 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null;
+
   // Handle message display logic: History first, then real-time
   useEffect(() => {
     if (messages.length === 0) return;
@@ -33,18 +36,25 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
 
     // Process messages in order: History -> Welcome -> Real-time
     for (const msg of messages) {
-      if (msg.type === 'history' && !hasProcessedHistory) {
-        // Handle history messages, add to display list
-        if (msg.messages && Array.isArray(msg.messages)) {
-          processedMessages.push(...msg.messages);
+      if (!isRecord(msg)) continue;
+      const type = msg.type;
+
+      if (type === 'history' && !hasProcessedHistory) {
+        const historyMessages = msg.messages;
+        if (Array.isArray(historyMessages)) {
+          processedMessages.push(...historyMessages);
         }
         hasProcessedHistory = true;
-      } else if (msg.type === 'welcome' && !hasProcessedWelcome) {
-        // Handle welcome messages, show after history
+        continue;
+      }
+
+      if (type === 'welcome' && !hasProcessedWelcome) {
         processedMessages.push(msg);
         hasProcessedWelcome = true;
-      } else if (msg.type === 'chat' || msg.type === 'welcome') {
-        // Handle real-time chat and subsequent welcomes
+        continue;
+      }
+
+      if (type === 'chat' || type === 'welcome') {
         processedMessages.push(msg);
       }
     }
@@ -57,12 +67,20 @@ export const GlobalChat: React.FC<Props> = ({ playerName }) => {
     if (messages.length === 0 || isOpen) return;
 
     const lastMessage = messages[messages.length - 1];
-    const lastMessageTimestamp = lastMessage.timestamp || Date.now();
+    const lastMessageTimestamp =
+      isRecord(lastMessage) && typeof lastMessage.timestamp === 'number'
+        ? lastMessage.timestamp
+        : Date.now();
+    const lastMessageUser =
+      isRecord(lastMessage) && typeof lastMessage.user === 'string'
+        ? lastMessage.user
+        : '';
 
     // If closed, and new message exists (timestamp > last viewed) and not from self, show dot
     if (
       lastMessageTimestamp > lastViewedTimestamp &&
-      lastMessage.user !== playerName
+      lastMessageUser !== '' &&
+      lastMessageUser !== playerName
     ) {
       setHasNew(true);
     }

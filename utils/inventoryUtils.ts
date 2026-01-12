@@ -2,6 +2,7 @@ import { Item, ItemType, ItemRarity, EquipmentSlot } from '../types';
 import { uid } from './gameUtils';
 import { inferItemTypeAndSlot, normalizeItemEffect } from './itemUtils';
 import { getItemFromConstants } from './itemConstantsUtils';
+import { normalizeRarityValue } from './rarityUtils';
 
 /**
  * 将物品添加到物品栏
@@ -23,7 +24,7 @@ export function addItemToInventory(
   const itemName = (itemData.name || '未知物品').trim();
   const rawType = (itemData.type as ItemType) || ItemType.Material;
   const rawIsEquippable = !!itemData.isEquippable;
-  const rawRarity = (itemData.rarity as ItemRarity) || '普通';
+  const rawRarity = normalizeRarityValue(itemData.rarity as ItemRarity | string);
 
   // 1. 优先从常量池获取物品信息（如果常量池中有，直接使用，避免类型推断）
   const itemFromConstants = getItemFromConstants(itemName);
@@ -115,6 +116,5 @@ export function addItemToInventory(
 
   return newInv;
 }
-
 
 

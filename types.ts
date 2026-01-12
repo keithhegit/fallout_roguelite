@@ -102,6 +102,7 @@ export interface Item {
   level?: number; // Upgrade level, defaults to 0
   isEquippable?: boolean;
   equipmentSlot?: EquipmentSlot; // Equipment Slot
+  minRealm?: RealmType;
   isNatal?: boolean; // Is Natal Artifact
   recipeData?: Recipe; // Recipe data (only used when type is Recipe)
   reviveChances?: number; // Revive chances (1-3), only available for Legendary/Mythic gear
@@ -1116,6 +1117,7 @@ export type TribulationLevel = 'Elite Storm' | 'Master Storm' | 'Grandmaster Sto
 
 // Tribulation Stage
 export type TribulationStage =
+  | 'Pending'
   | 'Stabilizing'
   | 'First Wave'
   | 'Second Wave'

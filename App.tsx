@@ -1685,14 +1685,14 @@ function App() {
             setReputationEvent(event);
             setIsReputationEventOpen(true);
           }}
-          onChallengeDaoCombining={() => {
-            // Challenge Heaven Earth Soul: use executeAdventure to execute special challenge
-            if (adventureHandlers) {
-              adventureHandlers.executeAdventure('dao_combining_challenge', undefined, 'Extreme Danger');
-            }
-          }}
-        />
-      )}
+            onChallengeDaoCombining={() => {
+              // Challenge Heaven Earth Soul: use executeAdventure to execute special challenge
+              if (adventureHandlers) {
+              adventureHandlers.executeAdventure('dao_combining_challenge', undefined, 'Extreme');
+              }
+            }}
+          />
+        )}
 
       {/* Alert Modal */}
       {alertState && (

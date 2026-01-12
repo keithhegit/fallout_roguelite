@@ -1,4 +1,4 @@
-import { PlayerStats, ItemType, RealmType, AdventureResult } from '../types';
+import { PlayerStats, Item, ItemType, RealmType, AdventureResult } from '../types';
 import { REALM_ORDER, FOUNDATION_TREASURES, HEAVEN_EARTH_ESSENCES, HEAVEN_EARTH_MARROWS, LONGEVITY_RULES } from '../constants/index';
 import { uid } from './gameUtils';
 import { RandomSectTask } from '../services/randomService';
@@ -69,7 +69,7 @@ export const sectTaskUtils = {
   /**
    * Try to get advanced item reward
    */
-  tryGetAdvancedItem: (player: PlayerStats, task: RandomSectTask): { item: Partial<Item> | null; message: string } => {
+  tryGetAdvancedItem: (player: PlayerStats, task: RandomSectTask): { item: Item | null; message: string } => {
     if (task.difficulty !== 'Extreme' || task.quality !== 'Mythic') {
       return { item: null, message: '' };
     }
@@ -170,4 +170,3 @@ export const sectTaskUtils = {
     return { item: null, message: '' };
   }
 };
-

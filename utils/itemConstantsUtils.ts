@@ -18,16 +18,30 @@ import { ITEM_TEMPLATES } from '../constants/itemTemplates';
 // Define a type for item data extracted from constants
 export interface ItemConstantData {
   name: string;
-  type: ItemType | string;
+  type: ItemType;
   description: string;
   rarity: ItemRarity;
   effect?: Item['effect'];
   permanentEffect?: Item['permanentEffect'];
   isEquippable?: boolean;
-  equipmentSlot?: EquipmentSlot | string;
+  equipmentSlot?: EquipmentSlot;
   advancedItemType?: Item['advancedItemType'];
   advancedItemId?: Item['advancedItemId'];
 }
+
+const normalizeItemType = (rawType: unknown): ItemType => {
+  return Object.values(ItemType).includes(rawType as ItemType)
+    ? (rawType as ItemType)
+    : ItemType.Material;
+};
+
+const normalizeEquipmentSlot = (
+  rawSlot: unknown
+): EquipmentSlot | undefined => {
+  return Object.values(EquipmentSlot).includes(rawSlot as EquipmentSlot)
+    ? (rawSlot as EquipmentSlot)
+    : undefined;
+};
 
 // 缓存所有物品
 let cachedAllItems: ItemConstantData[] | null = null;
@@ -50,13 +64,13 @@ function getAllItemsFromConstants(): ItemConstantData[] {
     itemNames.add(item.name);
     items.push({
       name: item.name,
-      type: item.type,
+      type: normalizeItemType(item.type),
       description: item.description,
       rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
-      equipmentSlot: item.equipmentSlot,
+      equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
     });
   });
 
@@ -66,13 +80,13 @@ function getAllItemsFromConstants(): ItemConstantData[] {
     itemNames.add(item.name);
     items.push({
       name: item.name,
-      type: item.type,
+      type: normalizeItemType(item.type),
       description: item.description,
       rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
-      equipmentSlot: item.equipmentSlot,
+      equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
     });
   });
 
@@ -82,7 +96,7 @@ function getAllItemsFromConstants(): ItemConstantData[] {
       itemNames.add(recipe.result.name);
       items.push({
         name: recipe.result.name,
-        type: recipe.result.type,
+        type: normalizeItemType(recipe.result.type),
         description: recipe.result.description,
         rarity: recipe.result.rarity as ItemRarity,
         effect: recipe.result.effect,
@@ -105,7 +119,7 @@ function getAllItemsFromConstants(): ItemConstantData[] {
         if (pillDef) {
           items.push({
             name: pillDef.name,
-            type: pillDef.type,
+            type: normalizeItemType(pillDef.type),
             description: pillDef.description,
             rarity: pillDef.rarity as ItemRarity,
             effect: pillDef.effect,
@@ -117,13 +131,13 @@ function getAllItemsFromConstants(): ItemConstantData[] {
       // 非丹药或常量中没有定义的物品，使用原始定义
       items.push({
         name: item.name,
-        type: item.type,
+        type: normalizeItemType(item.type),
         description: item.description,
         rarity: (item.rarity || 'Common') as ItemRarity,
         effect: item.effect,
         permanentEffect: item.permanentEffect,
         isEquippable: item.isEquippable,
-        equipmentSlot: item.equipmentSlot,
+        equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
       });
     }
   });
@@ -140,13 +154,13 @@ function getAllItemsFromConstants(): ItemConstantData[] {
       if (pillDef) {
         items.push({
           name: pillDef.name,
-          type: pillDef.type,
+          type: normalizeItemType(pillDef.type),
           description: pillDef.description,
           rarity: pillDef.rarity as ItemRarity,
           effect: pillDef.effect,
           permanentEffect: pillDef.permanentEffect,
           isEquippable: item.isEquippable,
-          equipmentSlot: item.equipmentSlot,
+          equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
         });
         return;
       }
@@ -154,13 +168,13 @@ function getAllItemsFromConstants(): ItemConstantData[] {
 
     items.push({
       name: item.name,
-      type: item.type,
+      type: normalizeItemType(item.type),
       description: item.description,
       rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
-      equipmentSlot: item.equipmentSlot,
+      equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
     });
   });
 
@@ -170,13 +184,13 @@ function getAllItemsFromConstants(): ItemConstantData[] {
     itemNames.add(item.name);
     items.push({
       name: item.name,
-      type: item.type,
+      type: normalizeItemType(item.type),
       description: item.description,
       rarity: (item.rarity || 'Common') as ItemRarity,
       effect: item.effect,
       permanentEffect: item.permanentEffect,
       isEquippable: item.isEquippable,
-      equipmentSlot: item.equipmentSlot,
+      equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
     });
   });
 
@@ -197,25 +211,20 @@ export function getItemFromConstants(itemName: string): ItemConstantData | null 
     return null;
   }
 
-  // 验证物品类型是否为有效的 ItemType
-  const itemType = Object.values(ItemType).includes(item.type as ItemType)
-    ? (item.type as ItemType)
-    : ItemType.Material;
-
   const result: ItemConstantData = {
     name: item.name,
-    type: itemType,
+    type: normalizeItemType(item.type),
     description: item.description,
     rarity: item.rarity,
     effect: item.effect,
     permanentEffect: item.permanentEffect,
     isEquippable: item.isEquippable,
-    equipmentSlot: item.equipmentSlot,
+    equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
   };
 
   // 如果物品是进阶物品，添加进阶物品信息
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (itemType === ItemType.AdvancedItem && (item as any).advancedItemType) {
+  if (result.type === ItemType.AdvancedItem && (item as any).advancedItemType) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result.advancedItemType = (item as any).advancedItemType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -235,19 +244,15 @@ export function getItemsByRarity(rarity: ItemRarity): ItemConstantData[] {
   return allItems
     .filter(item => item.rarity === rarity)
     .map(item => {
-      const itemType = Object.values(ItemType).includes(item.type as ItemType)
-        ? (item.type as ItemType)
-        : ItemType.Material;
-
       return {
         name: item.name,
-        type: itemType,
+        type: normalizeItemType(item.type),
         description: item.description,
         rarity: item.rarity,
         effect: item.effect,
         permanentEffect: item.permanentEffect,
         isEquippable: item.isEquippable,
-        equipmentSlot: item.equipmentSlot,
+        equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
       };
     });
 }
@@ -261,13 +266,13 @@ export function getItemsByType(itemType: ItemType): ItemConstantData[] {
   const allItems = getAllItemsFromConstants();
   return allItems.filter(item => item.type === itemType).map(item => ({
     name: item.name,
-    type: item.type as ItemType,
+    type: normalizeItemType(item.type),
     description: item.description,
     rarity: item.rarity,
     effect: item.effect,
     permanentEffect: item.permanentEffect,
     isEquippable: item.isEquippable,
-    equipmentSlot: item.equipmentSlot,
+    equipmentSlot: normalizeEquipmentSlot(item.equipmentSlot),
   }));
 }
 

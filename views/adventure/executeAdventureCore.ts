@@ -102,7 +102,7 @@ const applyResultToPlayer = (
   let newLuck = prev.luck;
   let newLotteryTickets = prev.lotteryTickets;
   let newInheritanceLevel = prev.inheritanceLevel;
-  const newPets = [...prev.pets];
+  let newPets = [...prev.pets];
   let newReputation = prev.reputation || 0;
   let newSpirit = prev.spirit;
   let newPhysique = prev.physique;
@@ -151,6 +151,7 @@ const applyResultToPlayer = (
     let equipmentSlot: EquipmentSlot | undefined = undefined;
     let finalEffect: any = undefined;
     let finalPermanentEffect: any = undefined;
+    let recipeData: any = undefined;
 
     try {
       itemName = itemData.name.trim();
@@ -311,7 +312,6 @@ const applyResultToPlayer = (
       currentBatchNames.add(itemName);
 
       // Recipe handling
-      let recipeData = undefined;
       if (itemType === ItemType.Recipe) {
         const recipeName = itemData.recipeName || itemName.replace(/Recipe$/, '');
         recipeData = DISCOVERABLE_RECIPES.find(r => r.name === recipeName);

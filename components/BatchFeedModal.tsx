@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { X, Filter, Heart } from 'lucide-react';
 import { Item, ItemType, ItemRarity, PlayerStats } from '../types';
 import { ASSETS } from '../constants/assets';
-import { getRarityTextColor, getRarityBorder } from '../utils/rarityUtils';
+import { getRarityTextColor, getRarityBorder, normalizeRarityValue } from '../utils/rarityUtils';
 import { normalizeTypeLabel } from '../utils/itemUtils';
 import { showInfo } from '../utils/toastUtils';
 
@@ -16,7 +16,7 @@ interface Props {
 }
 
 type ItemCategory = 'all' | 'pill' | 'consumable' | 'equipment';
-type RarityFilter = 'all' | ItemRarity;
+type RarityFilter = 'all' | ItemRarity | '普通' | '稀有' | '传说' | '仙品';
 
 const BatchFeedModal: React.FC<Props> = ({
   isOpen,
@@ -72,7 +72,9 @@ const BatchFeedModal: React.FC<Props> = ({
 
       // Filter by rarity
       if (selectedRarity !== 'all') {
-        if (item.rarity !== selectedRarity) return false;
+        const normalizedItemRarity = normalizeRarityValue(item.rarity);
+        const normalizedSelectedRarity = normalizeRarityValue(selectedRarity);
+        if (normalizedItemRarity !== normalizedSelectedRarity) return false;
       }
 
       return true;
@@ -298,7 +300,7 @@ const BatchFeedModal: React.FC<Props> = ({
                 <span>SIGNAL_STRENGTH:</span>
               </div>
               <div className="flex gap-1 flex-wrap">
-                {(['all', '普通', '稀有', '传说', '仙品'] as RarityFilter[]).map(
+                {(['all', '普通', '稀有', '传说', '仙品'] as const).map(
                   (rarity) => (
                     <button
                       key={rarity}
@@ -404,7 +406,15 @@ const BatchFeedModal: React.FC<Props> = ({
             ) : (
               filteredItems.map((item) => {
                 const isSelected = selectedItems.has(item.id);
-                const rarity = item.rarity || '普通';
+                const rarity = normalizeRarityValue(item.rarity);
+                const rarityLabel =
+                  rarity === 'Common'
+                    ? 'COMMON'
+                    : rarity === 'Rare'
+                      ? 'RARE'
+                      : rarity === 'Legendary'
+                        ? 'LEGENDARY'
+                        : 'DIVINE';
 
                 return (
                   <div
@@ -446,7 +456,7 @@ const BatchFeedModal: React.FC<Props> = ({
                           <span
                             className={`text-[9px] px-1.5 py-0.5 rounded-none border uppercase font-bold tracking-widest ${getRarityBorder(rarity)}`}
                           >
-                            {rarity === '普通' ? 'COMMON' : rarity === '稀有' ? 'RARE' : rarity === '传说' ? 'LEGENDARY' : 'DIVINE'}
+                            {rarityLabel}
                           </span>
                           <span className="text-[10px] text-stone-600 uppercase tracking-widest font-mono">
                             {normalizeTypeLabel(item.type, item)}

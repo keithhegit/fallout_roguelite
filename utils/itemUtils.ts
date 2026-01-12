@@ -1,6 +1,7 @@
 import { Item, ItemType, ItemRarity, EquipmentSlot, RealmType } from '../types';
 import { RARITY_MULTIPLIERS, REALM_ORDER, REALM_DATA } from '../constants/index';
 import { getItemFromConstants } from './itemConstantsUtils';
+import { normalizeRarityValue } from './rarityUtils';
 
 // Shared equipment stats configuration (unified management to avoid duplication)
 // Adjust attribute fluctuation range, narrow the gap, make equipment attributes more stable
@@ -16,11 +17,6 @@ export const EQUIPMENT_MIN_STATS: Record<ItemRarity, { attack: number; defense: 
   Rare: { attack: 200, defense: 200, hp: 200, spirit: 200, physique: 200, speed: 200 },
   Legendary: { attack: 400, defense: 400, hp: 400, spirit: 400, physique: 400, speed: 400 },
   Mythic: { attack: 1000, defense: 1000, hp: 1000, spirit: 1000, physique: 1000, speed: 1000 },
-  // Compatibility with Chinese keys
-  普通: { attack: 50, defense: 50, hp: 50, spirit: 50, physique: 50, speed: 50 },
-  稀有: { attack: 200, defense: 200, hp: 200, spirit: 200, physique: 200, speed: 200 },
-  传说: { attack: 400, defense: 400, hp: 400, spirit: 400, physique: 400, speed: 400 },
-  仙品: { attack: 1000, defense: 1000, hp: 1000, spirit: 1000, physique: 1000, speed: 1000 },
 };
 
 // Define item effect type (keep consistent with Item interface)
@@ -767,7 +763,7 @@ export const generateAttributePreview = (effect: Item['effect']): string => {
 
 // Calculate item sell price
 export const calculateItemSellPrice = (item: Item): number => {
-  const rarity = item.rarity || 'Common';
+  const rarity = normalizeRarityValue(item.rarity);
   const level = item.level || 0;
 
   // Base price (based on rarity)
@@ -776,10 +772,6 @@ export const calculateItemSellPrice = (item: Item): number => {
     Rare: 50,
     Legendary: 300,
     Mythic: 2000,
-    普通: 10,
-    稀有: 50,
-    传说: 300,
-    仙品: 2000,
   };
   // Ensure basePrice has default value, prevent undefined
   const basePrice = basePrices[rarity] || 10;

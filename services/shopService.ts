@@ -1,5 +1,13 @@
 import { ShopItem, ShopType, ItemType, ItemRarity, EquipmentSlot, RealmType } from '../types';
+import {
+  REALM_ORDER,
+  FOUNDATION_TREASURES,
+  HEAVEN_EARTH_ESSENCES,
+  HEAVEN_EARTH_MARROWS,
+  LONGEVITY_RULES,
+} from '../constants/index';
 import { getItemFromConstants } from '../utils/itemConstantsUtils';
+import { uid } from '../utils/gameUtils';
 import { generateItems } from '../utils/itemGenerator';
 
 /**

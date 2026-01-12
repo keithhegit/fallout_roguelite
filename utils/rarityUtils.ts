@@ -136,6 +136,10 @@ const rarityAliasMap: Record<string, ItemRarity> = {
   legendary: 'Legendary',
   mythic: 'Mythic',
   immortal: 'Mythic',
+  '普通': 'Common',
+  '稀有': 'Rare',
+  '传说': 'Legendary',
+  '仙品': 'Mythic',
 };
 
 /**

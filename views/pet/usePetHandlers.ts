@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayerStats, ItemRarity } from '../../types';
+import { PlayerStats, ItemRarity, ItemType } from '../../types';
 import {
   PET_TEMPLATES,
   REALM_ORDER,

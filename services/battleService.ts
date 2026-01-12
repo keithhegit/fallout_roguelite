@@ -557,11 +557,16 @@ const generateLoot = (
         }
       }
 
+      const selectedDescription =
+        typeof (selected as any).description === 'string'
+          ? (selected as any).description
+          : `${selected.name}, looted from the enemy.`;
+
       const item: AdventureResult['itemObtained'] & { reviveChances?: number } =
       {
         name: selected.name,
         type: itemType,
-        description: selected.description || `${selected.name}, looted from the enemy.`,
+        description: selectedDescription,
         rarity: selected.rarity,
         isEquippable: selected.equipmentSlot !== undefined,
         equipmentSlot: selected.equipmentSlot as string | undefined,
@@ -1575,13 +1580,10 @@ export const calculateBattleRewards = (
   ): number => {
     if (!riskLevel) return 1.0;
     const multipliers: Record<string, number> = {
-      Low: 1.0,
-      Medium: 1.3,
-      High: 1.6,
-      'Extreme': 2.2,
       'Low': 1.0,
       'Medium': 1.3,
       'High': 1.6,
+      'Extreme': 2.2,
       'Extreme Danger': 2.2,
     };
     return multipliers[riskLevel] || 1.0;
@@ -1692,7 +1694,7 @@ export const initializeTurnBasedBattle = async (
   const enemyData = await createEnemy(player, adventureType, riskLevel, realmMinRealm, sectMasterId, huntSectId, huntLevel, bossId);
 
   // Create player battle unit
-  const playerUnit = createBattleUnitFromPlayer(player);
+  const playerUnit = createPlayerUnit(player);
 
   // Create enemy battle unit
   const enemyUnit: BattleUnit = {
